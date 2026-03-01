@@ -33,8 +33,8 @@ export const LightSource: React.FC<VocabComponentProps> = ({
     for (let i = 0; i < rays; i++) {
       const baseAngle = (i / rays) * Math.PI * 2;
       const angle = baseAngle + Math.sin(time * 0.5 + i) * 0.15;
-      const rayLength = 350 + Math.sin(time + i * 1.5) * 80 + audio.mid * 100;
-      const rayWidth = 0.08 + audio.rms * 0.06;
+      const rayLength = 350 + Math.sin(time + i * 1.5) * 80 + audio.mid * 200;
+      const rayWidth = 0.08 + audio.rms * 0.1;
 
       ctx.beginPath();
       ctx.moveTo(cx, cy);
@@ -50,7 +50,7 @@ export const LightSource: React.FC<VocabComponentProps> = ({
         cx + Math.cos(angle) * rayLength,
         cy + Math.sin(angle) * rayLength
       );
-      const alpha = 0.06 + audio.rms * 0.08 + Math.sin(time * 2 + i * 0.7) * 0.03;
+      const alpha = 0.08 + audio.rms * 0.15 + Math.sin(time * 2 + i * 0.7) * 0.04;
       gradient.addColorStop(0, `rgba(255, 255, 200, ${alpha * 2})`);
       gradient.addColorStop(0.5, `rgba(255, 215, 0, ${alpha})`);
       gradient.addColorStop(1, "rgba(255, 215, 0, 0)");
@@ -81,8 +81,8 @@ export const LightSource: React.FC<VocabComponentProps> = ({
       const dist = 50 + ((time * 40 + i * 37) % 400);
       const x = cx + Math.cos(angle) * dist;
       const y = cy + Math.sin(angle) * dist;
-      const size = 1.5 + Math.sin(time * 3 + i) * 1 + audio.high * 2;
-      const pAlpha = Math.max(0, 0.5 - dist / 500) * (0.5 + audio.rms * 0.5);
+      const size = 2 + Math.sin(time * 3 + i) * 1.5 + audio.high * 4;
+      const pAlpha = Math.max(0, 0.5 - dist / 500) * (0.3 + audio.rms * 0.8);
 
       if (pAlpha > 0.01) {
         ctx.beginPath();
@@ -93,7 +93,7 @@ export const LightSource: React.FC<VocabComponentProps> = ({
     }
 
     // 중심 광원
-    const coreSize = 40 + audio.bass * 30 + Math.sin(time * 2) * 10;
+    const coreSize = 45 + audio.bass * 60 + Math.sin(time * 2) * 15;
 
     // 외부 글로우
     const outerGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreSize * 4);

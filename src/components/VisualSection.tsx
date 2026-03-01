@@ -24,6 +24,8 @@ import { TextReveal } from "./vocab/TextReveal";
 import { DataBar } from "./vocab/DataBar";
 import { GridMorph } from "./vocab/GridMorph";
 import { WaveformVisualizer } from "./vocab/WaveformVisualizer";
+import { PixelGrid } from "./vocab/PixelGrid";
+import { PixelWaveform } from "./vocab/PixelWaveform";
 
 // 비주얼 어휘 → 컴포넌트 매핑
 const VOCAB_MAP: Record<string, React.FC<VocabComponentProps>> = {
@@ -59,6 +61,14 @@ const VOCAB_MAP: Record<string, React.FC<VocabComponentProps>> = {
   waveform: WaveformVisualizer,
   waveform_spectrum: WaveformVisualizer,
   waveform_circular: WaveformVisualizer,
+  // 8bit / 레트로 비주얼
+  pixel_grid: PixelGrid,
+  pixel_grid_outline: PixelGrid,
+  pixel_grid_life: PixelGrid,
+  pixel_grid_rain: PixelGrid,
+  pixel_waveform: PixelWaveform,
+  pixel_waveform_steps: PixelWaveform,
+  pixel_waveform_cascade: PixelWaveform,
 };
 
 interface VisualSectionProps {

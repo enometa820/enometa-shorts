@@ -131,7 +131,7 @@ export const TextReveal: React.FC<VocabComponentProps> = ({
             });
             // 웨이브: 각 글자가 위아래로 물결
             const waveY =
-              Math.sin((frame * 0.08) + i * 0.5) * (12 + audio.bass * 15);
+              Math.sin((frame * 0.08) + i * 0.5) * (15 + audio.bass * 30);
             const waveRotate =
               Math.sin((frame * 0.06) + i * 0.7) * 3;
 
@@ -146,7 +146,7 @@ export const TextReveal: React.FC<VocabComponentProps> = ({
                   opacity,
                   transform: `translateY(${waveY}px) rotate(${waveRotate}deg)`,
                   display: "inline-block",
-                  textShadow: `0 0 ${6 + audio.rms * 25}px ${glowColor}`,
+                  textShadow: `0 0 ${8 + audio.rms * 40}px ${glowColor}`,
                 }}
               >
                 {char === " " ? "\u00A0" : char}

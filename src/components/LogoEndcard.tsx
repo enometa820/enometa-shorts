@@ -1,10 +1,11 @@
 import React, { useRef, useEffect } from "react";
 import { useCurrentFrame, useVideoConfig, interpolate } from "remotion";
+import { Palette } from "../utils/palettes";
 
 /**
  * ENOMETA 로고 엔드카드
  * 파티클이 흩어졌다가 "ENOMETA" 텍스트로 수렴하는 애니메이션.
- * 원본: EnometaLogoV2.jsx → Remotion 프레임 기반으로 변환.
+ * palette prop으로 에피소드마다 다른 색상/분위기 적용.
  */
 
 const PARTICLE_COUNT = 3000;
@@ -28,13 +29,15 @@ function hexToRGBA(hex: string, alpha: number): string {
 }
 
 interface LogoEndcardProps {
-  startFrame: number; // 엔드카드 시작 프레임
-  durationFrames: number; // 엔드카드 길이 (프레임)
+  startFrame: number;
+  durationFrames: number;
+  palette?: Palette;
 }
 
 export const LogoEndcard: React.FC<LogoEndcardProps> = ({
   startFrame,
   durationFrames,
+  palette,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -47,12 +50,12 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
   const localFrame = frame - startFrame;
   const t = localFrame / fps;
 
-  // 팔레트 — phantom (원본과 동일)
-  const palette = {
+  // 팔레트 — prop이 없으면 phantom 기본값
+  const p = palette || {
+    name: "Phantom",
     bg: "#06060A",
     accent: "#8B5CF6",
     glow: "#7C3AED",
-    sub: "#4C1D95",
     particles: ["#FFFFFF", "#C8C8D0", "#8888AA", "#555577", "#AAAACC"],
   };
 
@@ -68,7 +71,6 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
     ctx.font = `200 110px "Pretendard Variable", "Segoe UI", sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    // letterSpacing은 fillText 전에 설정
     (ctx as any).letterSpacing = "35px";
     ctx.fillText("ENOMETA", W / 2 + 18, H / 2 - 60);
 
@@ -96,12 +98,12 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
     if (pixels.length === 0) return;
 
     // 캔버스 클리어
-    ctx.fillStyle = palette.bg;
+    ctx.fillStyle = p.bg;
     ctx.fillRect(0, 0, W, H);
 
     // 타이밍
-    const scatterEnd = 0.8; // 0.8초까지 흩어짐
-    const convergeDuration = 3.2; // 3.2초에 걸쳐 수렴
+    const scatterEnd = 0.15;
+    const convergeDuration = 2.5;
 
     let convergeProgress = 0;
     if (t > scatterEnd) {
@@ -134,7 +136,7 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
       // 개별 진행도 (딜레이 적용)
       const pp = Math.max(
         0,
-        Math.min(1, (convergeProgress - delay) / (1 - delay))
+        Math.min(1, (convergeProgress - delay) / (1 - delay)),
       );
 
       // 노이즈 (수렴 중 유기적 움직임)
@@ -163,10 +165,9 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
         ? (1 + r3 * 1.5) * (settled ? 1.0 : 0.8 + (1 - pp) * 0.8)
         : (0.5 + r3 * 1.5) * (0.8 + (1 - pp) * 0.8);
       const color = isAccent
-        ? palette.accent
-        : palette.particles[
-            Math.floor(r3 * palette.particles.length) %
-              palette.particles.length
+        ? p.accent
+        : p.particles[
+            Math.floor(r3 * p.particles.length) % p.particles.length
           ];
 
       // 파티클 본체
@@ -180,7 +181,7 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
         const glowPulse = 0.5 + Math.sin(t * 3 + i) * 0.3;
         ctx.beginPath();
         ctx.arc(x, y, size * 6, 0, Math.PI * 2);
-        ctx.fillStyle = hexToRGBA(palette.glow, 0.035 * glowPulse);
+        ctx.fillStyle = hexToRGBA(p.glow, 0.035 * glowPulse);
         ctx.fill();
 
         accentPositions.push({ x, y });
@@ -190,7 +191,7 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
     // 액센트 파티클 연결선 (수렴 후)
     if (convergeProgress > 0.85) {
       const lineAlpha = 0.05 * ((convergeProgress - 0.85) / 0.15);
-      ctx.strokeStyle = hexToRGBA(palette.accent, lineAlpha);
+      ctx.strokeStyle = hexToRGBA(p.accent, lineAlpha);
       ctx.lineWidth = 0.5;
       for (let i = 0; i < accentPositions.length; i++) {
         for (let j = i + 1; j < accentPositions.length; j++) {
@@ -223,14 +224,14 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
   if (localFrame < 0 || localFrame >= durationFrames) return null;
 
   // 전체 페이드인/아웃
-  const fadeIn = interpolate(localFrame, [0, fps * 0.5], [0, 1], {
+  const fadeIn = interpolate(localFrame, [0, fps * 0.15], [0, 1], {
     extrapolateRight: "clamp",
   });
   const fadeOut = interpolate(
     localFrame,
     [durationFrames - fps * 0.8, durationFrames],
     [1, 0],
-    { extrapolateLeft: "clamp" }
+    { extrapolateLeft: "clamp" },
   );
   const opacity = fadeIn * fadeOut;
 
@@ -239,7 +240,7 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
     localFrame,
     [fps * 4.2, fps * 5.0],
     [0, 0.35],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
 
   return (
@@ -254,7 +255,7 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
         zIndex: 100,
       }}
     >
-      {/* 배경 (캔버스 아래) */}
+      {/* 배경 */}
       <div
         style={{
           position: "absolute",
@@ -262,7 +263,7 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
           left: 0,
           width: W,
           height: H,
-          backgroundColor: "#06060A",
+          backgroundColor: p.bg,
         }}
       />
 
@@ -292,7 +293,7 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
           fontFamily: "Pretendard Variable, sans-serif",
           fontSize: 18,
           letterSpacing: "0.4em",
-          color: palette.accent,
+          color: p.accent,
           fontWeight: 300,
         }}
       >

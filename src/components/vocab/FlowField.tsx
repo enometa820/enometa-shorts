@@ -65,16 +65,16 @@ export const FlowField: React.FC<VocabComponentProps> = ({
 
     const time = frame / fps;
     const turbulence = isTurbulent ? 2.5 : 1.0;
-    const currentSpeed = speed * (1 + audio.mid * 2) * turbulence;
+    const currentSpeed = speed * (1 + audio.mid * 4) * turbulence;
     const currentScale = noise_scale * turbulence;
 
     // flow field 라인 그리기
     const step = 20;
-    const lineLen = 15 + audio.bass * 20;
+    const lineLen = 15 + audio.bass * 40;
 
     ctx.strokeStyle = line_color;
     ctx.lineWidth = 0.8;
-    ctx.globalAlpha = line_opacity * (0.5 + audio.rms * 0.5);
+    ctx.globalAlpha = line_opacity * (0.3 + audio.rms * 0.8);
 
     for (let x = 0; x < width; x += step) {
       for (let y = 0; y < height; y += step) {

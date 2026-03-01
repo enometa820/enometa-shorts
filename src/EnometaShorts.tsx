@@ -43,7 +43,7 @@ export const EnometaShorts: React.FC<EnometaShortsProps> = ({
 
   // 엔드카드: 마지막 씬 종료 후 시작
   const lastScene = script.scenes[script.scenes.length - 1];
-  const endcardStartSec = lastScene ? lastScene.end_sec + 0.5 : 30; // 0.5초 여유
+  const endcardStartSec = lastScene ? lastScene.end_sec : 30; // 씬 끝나자마자 엔드카드
   const endcardStartFrame = Math.round(endcardStartSec * 30);
   const endcardDurationFrames = Math.round(endcardDurationSec * 30);
 
@@ -97,10 +97,11 @@ export const EnometaShorts: React.FC<EnometaShortsProps> = ({
           narrationSegments={narrationSegments}
         />
 
-        {/* 엔드카드: 로고 애니메이션 */}
+        {/* 엔드카드: 로고 애니메이션 (에피소드 팔레트 적용) */}
         <LogoEndcard
           startFrame={endcardStartFrame}
           durationFrames={endcardDurationFrames}
+          palette={palette}
         />
       </div>
     </AbsoluteFill>

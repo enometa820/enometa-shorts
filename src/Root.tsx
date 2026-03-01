@@ -15,6 +15,13 @@ import {
   ep002AudioSrc,
   ep002NarrationSegments,
 } from "./ep002Script";
+import {
+  ep003VisualScript,
+  ep003Title,
+  ep003AudioAnalysis,
+  ep003AudioSrc,
+  ep003NarrationSegments,
+} from "./ep003Script";
 
 export const Root: React.FC = () => {
   return (
@@ -48,10 +55,11 @@ export const Root: React.FC = () => {
         }}
       />
       {/* EP002: 당신의 오답이 뇌를 가장 크게 깨운다 */}
+      {/* 134.232s + 0.5s 여유 + 6s 엔드카드 = 140.732s × 30fps = 4222 */}
       <Composition
         id="EP002"
         component={EnometaShorts}
-        durationInFrames={4027}
+        durationInFrames={4222}
         fps={30}
         width={1080}
         height={1920}
@@ -62,6 +70,24 @@ export const Root: React.FC = () => {
           audioSrc: ep002AudioSrc,
           narrationSegments: ep002NarrationSegments,
           highlightWords: ["오답", "설계"],
+        }}
+      />
+      {/* EP003: 우리의 기억은 매번 다시 만들어진다 */}
+      {/* 96.186s + 6s 엔드카드 = 102.186s × 30fps = 3066 */}
+      <Composition
+        id="EP003"
+        component={EnometaShorts}
+        durationInFrames={3066}
+        fps={30}
+        width={1080}
+        height={1920}
+        defaultProps={{
+          visualScript: ep003VisualScript,
+          title: ep003Title,
+          audioAnalysis: ep003AudioAnalysis,
+          audioSrc: ep003AudioSrc,
+          narrationSegments: ep003NarrationSegments,
+          highlightWords: ["기억", "해석"],
         }}
       />
     </>

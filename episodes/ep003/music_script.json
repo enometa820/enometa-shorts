@@ -1,0 +1,930 @@
+{
+  "metadata": {
+    "title": "우리의 기억은 매번 다시 만들어진다",
+    "duration": 101.186,
+    "sample_rate": 44100,
+    "key": "E_minor",
+    "base_bpm": 120,
+    "genre": "chiptune",
+    "synthesis_overrides": {
+      "bit_depth": 4
+    }
+  },
+  "palette": {
+    "bass_freq": 82.4,
+    "pad_root": 329.6,
+    "pad_fifth": 493.9,
+    "arp_root": 220,
+    "arp_pattern": [
+      1,
+      1.25,
+      1.5,
+      2,
+      1.5,
+      1.25
+    ]
+  },
+  "sections": [
+    {
+      "id": "scene_01",
+      "text": "우리가 가장 선명하게 기억하는 순간을 떠올려 보자. 그 기억은 사실이 아닐 수 있다.",
+      "start_sec": 0.0,
+      "end_sec": 7.422,
+      "emotion": "neutral_curious",
+      "energy": 0.4,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.26
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.5,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.175
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.35,
+          "volume": 0.325
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.15
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.16000000000000003
+        },
+        "noise_burst": {
+          "active": true,
+          "density": 0.15
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.075
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.045
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": true,
+          "volume": 0.30000000000000004,
+          "duty": 0.25
+        },
+        "chiptune_drum": {
+          "active": true
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.42,
+        "filter_cutoff": 1400,
+        "stereo_width": 0.5
+      },
+      "transition_in": {
+        "type": "fade_in",
+        "duration_sec": 1.0
+      }
+    },
+    {
+      "id": "scene_02",
+      "text": "뇌는 기억을 저장하지 않는다. 매번 다시 만든다.",
+      "start_sec": 7.572,
+      "end_sec": 13.002,
+      "emotion": "tension_reveal",
+      "energy": 0.7,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.38
+        },
+        "clicks": {
+          "active": true,
+          "density": 1.0,
+          "pan_spread": 0.7
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.25
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.18,
+          "volume": 0.9099999999999999
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.55
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.27999999999999997
+        },
+        "noise_burst": {
+          "active": true,
+          "density": 0.4
+        },
+        "metallic_hit": {
+          "active": true,
+          "volume": 0.25,
+          "density": 0.25
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.15
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.09
+        },
+        "bytebeat": {
+          "active": true,
+          "volume": 0.15,
+          "formula": "glitch"
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": true
+        },
+        "chiptune_drum": {
+          "active": true
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.51,
+        "filter_cutoff": 2300,
+        "stereo_width": 0.6499999999999999
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_03",
+      "text": "신경과학에서 이것을 기억 재공고화라 부른다. 기억을 떠올리는 순간, 뇌는 그것을 해체한다. 그리고 현재의 감정으로 다시 조립한다.",
+      "start_sec": 13.152,
+      "end_sec": 25.332,
+      "emotion": "neutral_analytical",
+      "energy": 0.45,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.27999999999999997
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.6,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.2
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.25,
+          "volume": 0.45499999999999996
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.25
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.18000000000000002
+        },
+        "metallic_hit": {
+          "active": true,
+          "volume": 0.2,
+          "density": 0.2
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.105
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.06
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": true
+        },
+        "chiptune_drum": {
+          "active": true,
+          "volume": 0.27999999999999997
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.435,
+        "filter_cutoff": 1550,
+        "stereo_width": 0.525
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_04",
+      "text": "행복할 때 떠올린 과거는 따뜻하다. 불안할 때 떠올린 같은 과거는 차갑다. 기억은 같다.",
+      "start_sec": 25.482,
+      "end_sec": 34.614,
+      "emotion": "somber_reflective",
+      "energy": 0.5,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.32000000000000006
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.15,
+          "pan_spread": 0.3
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.25
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.3,
+          "volume": 0.5850000000000001
+        },
+        "glitch": {
+          "active": false
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.18000000000000002
+        },
+        "kick": {
+          "active": false
+        },
+        "hi_hat": {
+          "active": false
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": true
+        },
+        "chiptune_drum": {
+          "active": true
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.44999999999999996,
+        "filter_cutoff": 1700,
+        "stereo_width": 0.55
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_05",
+      "text": "달라진 건 기억하는 우리 자신이다.",
+      "start_sec": 34.764,
+      "end_sec": 37.98,
+      "emotion": "awakening_spark",
+      "energy": 0.8,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.38
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.4,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.35
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.25,
+          "volume": 0.5850000000000001
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.15
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.24
+        },
+        "metallic_hit": {
+          "active": true,
+          "volume": 0.25,
+          "density": 0.2
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.135
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.075
+        },
+        "synth_lead": {
+          "active": false,
+          "volume": 0.4,
+          "note_duration": 0.6
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": true,
+          "volume": 0.375,
+          "duty": 0.125
+        },
+        "chiptune_drum": {
+          "active": true,
+          "volume": 0.27999999999999997
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.54,
+        "filter_cutoff": 2600,
+        "stereo_width": 0.7
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_06",
+      "text": "2000년, 신경과학자 카림 나데르의 실험. 공포 기억을 떠올린 쥐의 뇌에서 단백질 합성을 차단했다. 기억이 사라졌다.",
+      "start_sec": 38.13,
+      "end_sec": 49.374,
+      "emotion": "tension_reveal",
+      "energy": 0.7,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.38
+        },
+        "clicks": {
+          "active": true,
+          "density": 1.0,
+          "pan_spread": 0.7
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.25
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.18,
+          "volume": 0.9099999999999999
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.55
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.27999999999999997
+        },
+        "noise_burst": {
+          "active": true,
+          "density": 0.4
+        },
+        "metallic_hit": {
+          "active": true,
+          "volume": 0.25,
+          "density": 0.25
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.15
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.09
+        },
+        "bytebeat": {
+          "active": true,
+          "volume": 0.15,
+          "formula": "glitch"
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": true
+        },
+        "chiptune_drum": {
+          "active": true
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.51,
+        "filter_cutoff": 2300,
+        "stereo_width": 0.6499999999999999
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_07",
+      "text": "기억은 떠올리는 순간 불안정해진다. 저장하지 않은 문서처럼. 닫는 순간, 현재 버전으로 덮어쓰기된다.",
+      "start_sec": 49.524,
+      "end_sec": 59.928,
+      "emotion": "tension_transformative",
+      "energy": 0.8,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.4
+        },
+        "clicks": {
+          "active": true,
+          "density": 1.1,
+          "pan_spread": 0.8
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.3
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.12,
+          "volume": 1.105
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.7
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.32000000000000006
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.195
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.105
+        },
+        "acid_bass": {
+          "active": false,
+          "volume": 0.6,
+          "sweep_dir": "up"
+        },
+        "stutter_gate": {
+          "active": true,
+          "divisions": 8,
+          "blend": 0.3
+        },
+        "bytebeat": {
+          "active": true,
+          "volume": 0.2,
+          "formula": "chaos"
+        },
+        "feedback": {
+          "active": true,
+          "volume": 0.2,
+          "iterations": 4
+        },
+        "chiptune_lead": {
+          "active": true
+        },
+        "chiptune_drum": {
+          "active": true
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.54,
+        "filter_cutoff": 2600,
+        "stereo_width": 0.7
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      }
+    },
+    {
+      "id": "scene_08",
+      "text": "이건 결함이 아니다. 뇌가 우리를 보호하는 방식이다.",
+      "start_sec": 60.078,
+      "end_sec": 65.604,
+      "emotion": "tension_redefine",
+      "energy": 0.78,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.4
+        },
+        "clicks": {
+          "active": true,
+          "density": 1.0,
+          "pan_spread": 0.75
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.25
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.14,
+          "volume": 0.9750000000000001
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.6
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.30000000000000004
+        },
+        "noise_burst": {
+          "active": true,
+          "density": 0.35
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.18
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.096
+        },
+        "synth_lead": {
+          "active": false,
+          "volume": 0.35,
+          "note_duration": 1.0
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": true,
+          "volume": 0.15,
+          "iterations": 3
+        },
+        "chiptune_lead": {
+          "active": true
+        },
+        "chiptune_drum": {
+          "active": true,
+          "volume": 0.27999999999999997
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.534,
+        "filter_cutoff": 2540,
+        "stereo_width": 0.69
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      }
+    },
+    {
+      "id": "scene_09",
+      "text": "고통을 원본 그대로 재생한다면 우리는 과거를 견딜 수 없다. 그래서 뇌는 매번 기억을 편집한다.",
+      "start_sec": 65.754,
+      "end_sec": 74.28,
+      "emotion": "somber_warning",
+      "energy": 0.6,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.36000000000000004
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.4,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.225
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.2,
+          "volume": 0.7150000000000001
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.25
+        },
+        "noise_sweep": {
+          "active": false,
+          "direction": "down",
+          "speed": 0.3
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.24
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.12
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.06
+        },
+        "bytebeat": {
+          "active": true,
+          "volume": 0.15,
+          "formula": "drone"
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": true
+        },
+        "chiptune_drum": {
+          "active": true
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.48,
+        "filter_cutoff": 2000,
+        "stereo_width": 0.6
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_10",
+      "text": "기억이 다시 쓰여질 수 있다면, 과거에 갇힌 우리도 다시 쓸 수 있다.",
+      "start_sec": 74.43,
+      "end_sec": 81.18,
+      "emotion": "hopeful",
+      "energy": 0.7,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.34
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.2,
+          "pan_spread": 0.3
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.3
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.3,
+          "volume": 0.52
+        },
+        "glitch": {
+          "active": false
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.18000000000000002
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.12
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.06
+        },
+        "synth_lead": {
+          "active": false,
+          "volume": 0.4,
+          "note_duration": 0.9
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": true,
+          "volume": 0.30000000000000004,
+          "duty": 0.5
+        },
+        "chiptune_drum": {
+          "active": true
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.51,
+        "filter_cutoff": 2300,
+        "stereo_width": 0.6499999999999999
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_11",
+      "text": "상처는 덜 아프게 기억되고, 트라우마는 교훈으로 재편된다.",
+      "start_sec": 81.33,
+      "end_sec": 87.336,
+      "emotion": "awakening",
+      "energy": 0.85,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.4
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.3,
+          "pan_spread": 0.4
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.35
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.3,
+          "volume": 0.45499999999999996
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.12
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.24
+        },
+        "metallic_hit": {
+          "active": true,
+          "volume": 0.2,
+          "density": 0.15
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.15
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.075
+        },
+        "synth_lead": {
+          "active": false,
+          "volume": 0.45,
+          "note_duration": 0.7
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": true,
+          "volume": 0.30000000000000004,
+          "duty": 0.5
+        },
+        "chiptune_drum": {
+          "active": true,
+          "volume": 0.27999999999999997
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.5549999999999999,
+        "filter_cutoff": 2750,
+        "stereo_width": 0.725
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_12",
+      "text": "기억은 과거의 기록이 아니다. 현재의 해석이다. 그리고 해석은 언제든 바뀔 수 있다.",
+      "start_sec": 87.486,
+      "end_sec": 96.186,
+      "emotion": "transcendent_open",
+      "energy": 0.6,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.27999999999999997
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.08,
+          "pan_spread": 0.3
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.25
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.4,
+          "volume": 0.26
+        },
+        "glitch": {
+          "active": false
+        },
+        "kick": {
+          "active": false
+        },
+        "hi_hat": {
+          "active": false
+        },
+        "synth_lead": {
+          "active": false,
+          "volume": 0.3,
+          "note_duration": 1.5
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": true
+        },
+        "chiptune_drum": {
+          "active": true
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.48,
+        "filter_cutoff": 2000,
+        "stereo_width": 0.6
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "outro",
+      "text": "",
+      "start_sec": 96.186,
+      "end_sec": 101.186,
+      "emotion": "fade",
+      "energy": 0.1,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.25
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.15
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.7,
+        "filter_cutoff": 500,
+        "stereo_width": 0.3
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 3.0
+      }
+    }
+  ]
+}

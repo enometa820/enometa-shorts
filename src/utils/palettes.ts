@@ -35,6 +35,27 @@ export const PALETTES: Record<string, Palette> = {
     accent: "#FF6B00",
     glow: "#FF4500",
   },
+  synapse: {
+    name: "Synapse",
+    bg: "#060618",
+    particles: ["#FFFFFF", "#4169E1", "#FF3333", "#00FF88", "#FFD700"],
+    accent: "#4169E1",
+    glow: "#3355CC",
+  },
+  gameboy: {
+    name: "Game Boy",
+    bg: "#0f380f",
+    particles: ["#9bbc0f", "#8bac0f", "#306230", "#0f380f", "#9bbc0f"],
+    accent: "#9bbc0f",
+    glow: "#8bac0f",
+  },
+  c64: {
+    name: "Commodore 64",
+    bg: "#40318D",
+    particles: ["#7869C4", "#A59ADE", "#FFFFFF", "#6C5EB5", "#FFFACD"],
+    accent: "#A59ADE",
+    glow: "#7869C4",
+  },
 };
 
 export const getPalette = (name: string): Palette => {

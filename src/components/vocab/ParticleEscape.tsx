@@ -42,8 +42,8 @@ export const ParticleEscape: React.FC<VocabComponentProps> = ({
       const py = cy + Math.sin(orbitAngle) * escapeRadius;
 
       // 오디오 리액티브
-      const audioBoost = audio.onset ? 2.0 : 1.0;
-      const glowSize = 10 + audio.rms * 30;
+      const audioBoost = audio.onset ? 3.0 : 1.0;
+      const glowSize = 15 + audio.rms * 50;
       const particleSize = 4 * audioBoost;
 
       // 이탈 파티클 — 밝은 점

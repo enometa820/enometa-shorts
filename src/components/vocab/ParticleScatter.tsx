@@ -47,8 +47,8 @@ export const ParticleScatter: React.FC<VocabComponentProps> = ({
     ctx.clearRect(0, 0, width, height);
 
     const t = sceneProgress * 120 * expansion_speed;
-    const sizeBoost = 1 + audio.bass * 2;
-    const alpha = 0.4 + audio.rms * 0.5;
+    const sizeBoost = 1 + audio.bass * 4;
+    const alpha = 0.3 + audio.rms * 0.8;
 
     for (const p of particles) {
       const px = p.x + p.vx * t;
@@ -65,8 +65,8 @@ export const ParticleScatter: React.FC<VocabComponentProps> = ({
 
       if (glow) {
         ctx.beginPath();
-        ctx.arc(px, py, p.size * sizeBoost * 3, 0, Math.PI * 2);
-        ctx.globalAlpha = alpha * 0.15;
+        ctx.arc(px, py, p.size * sizeBoost * 5, 0, Math.PI * 2);
+        ctx.globalAlpha = alpha * 0.25;
         ctx.fill();
       }
     }

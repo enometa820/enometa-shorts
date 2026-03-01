@@ -20,13 +20,13 @@ export const PostProcess: React.FC<PostProcessProps> = ({
   height,
 }) => {
   // onset 플래시 강도
-  const flashOpacity = audio.onset ? 0.15 + audio.rms * 0.2 : 0;
+  const flashOpacity = audio.onset ? 0.25 + audio.rms * 0.35 : 0;
 
   // rms 기반 글로우 강도
-  const glowOpacity = 0.03 + audio.rms * 0.08;
+  const glowOpacity = 0.05 + audio.rms * 0.15;
 
   // bass 기반 비네트 강도 변화
-  const vignetteIntensity = 0.55 + audio.bass * 0.15;
+  const vignetteIntensity = 0.5 + audio.bass * 0.25;
 
   return (
     <>
@@ -105,8 +105,8 @@ export const PostProcess: React.FC<PostProcessProps> = ({
           height,
           background: `linear-gradient(180deg,
             transparent 0%,
-            rgba(255, 0, 0, ${0.03 + audio.high * 0.05}) 30%,
-            rgba(255, 0, 0, ${0.02 + audio.high * 0.03}) 70%,
+            rgba(255, 0, 0, ${0.04 + audio.high * 0.1}) 30%,
+            rgba(255, 0, 0, ${0.03 + audio.high * 0.06}) 70%,
             transparent 100%
           )`,
           pointerEvents: "none",
@@ -121,8 +121,8 @@ export const PostProcess: React.FC<PostProcessProps> = ({
           height,
           background: `linear-gradient(180deg,
             transparent 0%,
-            rgba(0, 100, 255, ${0.03 + audio.high * 0.05}) 30%,
-            rgba(0, 100, 255, ${0.02 + audio.high * 0.03}) 70%,
+            rgba(0, 100, 255, ${0.04 + audio.high * 0.1}) 30%,
+            rgba(0, 100, 255, ${0.03 + audio.high * 0.06}) 70%,
             transparent 100%
           )`,
           pointerEvents: "none",

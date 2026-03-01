@@ -49,9 +49,9 @@ export const ParticleOrbit: React.FC<VocabComponentProps> = ({
     ctx.clearRect(0, 0, width, height);
 
     const time = frame / fps;
-    const radiusMod = audio.bass * 50;
-    const shake = audio.onset ? 15 : 0;
-    const alpha = 0.4 + audio.rms * 0.4;
+    const radiusMod = audio.bass * 100;
+    const shake = audio.onset ? 30 : 0;
+    const alpha = 0.3 + audio.rms * 0.7;
 
     for (const p of particles) {
       const currentAngle = p.angle + time * p.speed;

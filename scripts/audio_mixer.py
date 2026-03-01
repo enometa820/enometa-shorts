@@ -2,7 +2,7 @@
 ENOMETA 오디오 믹서
 - 나레이션 + BGM → mixed.wav
 - ffmpeg 기반
-- 나레이션 100% + BGM 35%
+- 나레이션 100% + BGM 50%
 """
 
 import sys
@@ -15,7 +15,7 @@ def mix_audio(
     bgm_path: str,
     output_path: str,
     narration_volume: float = 1.0,
-    bgm_volume: float = 0.35,
+    bgm_volume: float = 0.50,
 ):
     """나레이션과 BGM을 믹싱"""
 

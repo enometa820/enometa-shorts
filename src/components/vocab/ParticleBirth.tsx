@@ -51,8 +51,8 @@ export const ParticleBirth: React.FC<VocabComponentProps> = ({
     const spawnProgress = Math.min(sceneProgress * (1 / (spawn_duration_sec / 6)), 1);
 
     // 오디오 리액티브
-    const sizeBoost = 1 + audio.bass * 2;
-    const brightnessBoost = 0.3 + audio.rms * 0.7;
+    const sizeBoost = 1 + audio.bass * 4;
+    const brightnessBoost = 0.2 + audio.rms * 0.9;
 
     for (const p of particles) {
       // 아직 태어나지 않은 파티클은 건너뜀
@@ -74,11 +74,11 @@ export const ParticleBirth: React.FC<VocabComponentProps> = ({
       ctx.fill();
 
       // 비트에 글로우 추가
-      if (audio.onset && Math.random() < 0.1) {
+      if (audio.onset && Math.random() < 0.3) {
         ctx.beginPath();
-        ctx.arc(px % width, py % height, p.size * sizeBoost * 4, 0, Math.PI * 2);
+        ctx.arc(px % width, py % height, p.size * sizeBoost * 6, 0, Math.PI * 2);
         ctx.fillStyle = initial_color;
-        ctx.globalAlpha = alpha * 0.3;
+        ctx.globalAlpha = alpha * 0.4;
         ctx.fill();
       }
     }

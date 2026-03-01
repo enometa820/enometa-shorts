@@ -1,0 +1,974 @@
+{
+  "title": "우리의 기억은 매번 다시 만들어진다",
+  "highlightWords": [
+    "기억하",
+    "기억",
+    "현재"
+  ],
+  "global": {
+    "color_palette": [
+      "#8B5CF6",
+      "#C084FC",
+      "#06B6D4",
+      "#F43F5E"
+    ],
+    "background_color": "#06060A",
+    "particle_total": 2000,
+    "font": "Pretendard Variable",
+    "palette": "phantom"
+  },
+  "scenes": [
+    {
+      "id": "scene_01",
+      "sentence": "우리가 가장 선명하게 기억하는 순간을 떠올려 보자.",
+      "start_sec": 0.0,
+      "end_sec": 4.032,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 500,
+              "color": "#8B5CF6",
+              "rings": 5,
+              "speed": 0.6291319526899488
+            }
+          },
+          {
+            "vocab": "brightness_pulse",
+            "params": {
+              "intensity": 0.376317621263552,
+              "color": "#7C3AED"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "기억하",
+              "mode": "wave",
+              "fontSize": 48,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.5 + 0.5",
+          "particle_size": "bass * 1.5 + 1",
+          "glow_intensity": "rms * 0.4"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0037,
+            "speed": 0.05,
+            "line_opacity": 0.078,
+            "line_color": "#8888AA"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      }
+    },
+    {
+      "id": "scene_02",
+      "sentence": "그 기억은 사실이 아닐 수 있다.",
+      "start_sec": 4.182,
+      "end_sec": 7.422,
+      "emotion": "tension_reveal",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "neural_network",
+            "params": {
+              "count": 60,
+              "color": "#8B5CF6"
+            }
+          },
+          {
+            "vocab": "waveform_spectrum",
+            "params": {
+              "mode": "spectrum",
+              "color": "#8B5CF6",
+              "lineWidth": 1.5,
+              "sensitivity": 1.8740866797674216
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "bass * 2.5",
+          "speed_mult": "onset ? 3 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0065,
+            "speed": 0.24,
+            "line_opacity": 0.041,
+            "line_color": "#555577"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_03",
+      "sentence": "뇌는 기억을 저장하지 않는다. 매번 다시 만든다.",
+      "start_sec": 7.572,
+      "end_sec": 13.002,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 300,
+              "color": "#8B5CF6",
+              "rings": 3,
+              "speed": 0.6841694824126916
+            }
+          },
+          {
+            "vocab": "brightness_pulse",
+            "params": {
+              "intensity": 0.5410751154673035,
+              "color": "#7C3AED"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "기억",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.5 + 0.5",
+          "particle_size": "bass * 1.5 + 1",
+          "glow_intensity": "rms * 0.4"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0026,
+            "speed": 0.05,
+            "line_opacity": 0.077,
+            "line_color": "#AAAACC"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_04",
+      "sentence": "신경과학에서 이것을 기억 재공고화라 부른다.",
+      "start_sec": 13.152,
+      "end_sec": 17.28,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "data_bar",
+            "params": {
+              "bars": 8,
+              "color": "#8B5CF6",
+              "mode": "vertical"
+            }
+          },
+          {
+            "vocab": "counter_up",
+            "params": {
+              "target": 100,
+              "suffix": "%",
+              "color": "#8B5CF6",
+              "fontSize": 48
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 2 + 1",
+          "glow_intensity": "bass * 1.5",
+          "displacement": "rms * 1.5"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0023,
+            "speed": 0.05,
+            "line_opacity": 0.076,
+            "line_color": "#555577"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_05",
+      "sentence": "기억을 떠올리는 순간, 뇌는 그것을 해체한다.",
+      "start_sec": 17.43,
+      "end_sec": 21.582,
+      "emotion": "somber_reflective",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {}
+          },
+          {
+            "vocab": "loop_ring",
+            "params": {
+              "rings": 8,
+              "color": "#8B5CF6",
+              "pulse_speed": 0.7795346006428795
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.5 + 0.5",
+          "particle_size": "bass * 1.5 + 1",
+          "glow_intensity": "rms * 0.4"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0041,
+            "speed": 0.05,
+            "line_opacity": 0.073,
+            "line_color": "#555577"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_06",
+      "sentence": "그리고 현재의 감정으로 다시 조립한다.",
+      "start_sec": 21.732,
+      "end_sec": 25.332,
+      "emotion": "tension_reveal",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_scatter",
+            "params": {
+              "count": 300,
+              "color": "#F43F5E",
+              "glow": true,
+              "expansion_speed": 1.7132210479598866
+            }
+          },
+          {
+            "vocab": "color_shift",
+            "params": {
+              "from_color": "#8B5CF6",
+              "to_color": "#F43F5E",
+              "rhythm": "pulse"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "현재",
+              "mode": "glitch",
+              "fontSize": 72,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "bass * 2.5",
+          "speed_mult": "onset ? 3 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0072,
+            "speed": 0.279,
+            "line_opacity": 0.073,
+            "line_color": "#AAAACC"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_07",
+      "sentence": "행복할 때 떠올린 과거는 따뜻하다.",
+      "start_sec": 25.482,
+      "end_sec": 28.866,
+      "emotion": "somber_reflective",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_converge",
+            "params": {
+              "count": 800,
+              "color": "#06B6D4",
+              "target": "center",
+              "speed": 1.0979604954225732
+            }
+          },
+          {
+            "vocab": "brightness_pulse",
+            "params": {
+              "intensity": 0.7016939780838651,
+              "color": "#7C3AED"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "과거",
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.5 + 0.5",
+          "particle_size": "bass * 1.5 + 1",
+          "glow_intensity": "rms * 0.4"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0029,
+            "speed": 0.05,
+            "line_opacity": 0.083,
+            "line_color": "#8888AA"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_08",
+      "sentence": "불안할 때 떠올린 같은 과거는 차갑다.",
+      "start_sec": 29.016,
+      "end_sec": 32.568,
+      "emotion": "somber_reflective",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {}
+          },
+          {
+            "vocab": "light_source",
+            "params": {
+              "rays": 12,
+              "color": "#8B5CF6",
+              "intensity": 0.5547848253187063,
+              "position": "top"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "과거",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.5 + 0.5",
+          "particle_size": "bass * 1.5 + 1",
+          "glow_intensity": "rms * 0.4"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.002,
+            "speed": 0.05,
+            "line_opacity": 0.061,
+            "line_color": "#AAAACC"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      }
+    },
+    {
+      "id": "scene_09",
+      "sentence": "기억은 같다. 달라진 건 기억하는 우리 자신이다.",
+      "start_sec": 32.718,
+      "end_sec": 37.98,
+      "emotion": "somber_reflective",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_converge",
+            "params": {
+              "count": 800,
+              "color": "#06B6D4",
+              "target": "center",
+              "speed": 0.8310469862387161
+            }
+          },
+          {
+            "vocab": "loop_ring",
+            "params": {
+              "rings": 6,
+              "color": "#8B5CF6",
+              "pulse_speed": 0.9170015014679768
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.5 + 0.5",
+          "particle_size": "bass * 1.5 + 1",
+          "glow_intensity": "rms * 0.4"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0036,
+            "speed": 0.05,
+            "line_opacity": 0.1,
+            "line_color": "#555577"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      }
+    },
+    {
+      "id": "scene_10",
+      "sentence": "2000년, 신경과학자 카림 나데르의 실험.",
+      "start_sec": 38.13,
+      "end_sec": 42.234,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "data_bar",
+            "params": {
+              "bars": 12,
+              "color": "#8B5CF6",
+              "mode": "vertical"
+            }
+          },
+          {
+            "vocab": "waveform_spectrum",
+            "params": {
+              "mode": "spectrum",
+              "color": "#8B5CF6",
+              "lineWidth": 3,
+              "sensitivity": 1.284075387670547
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "나데르",
+              "mode": "typewriter",
+              "fontSize": 56,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 2 + 1",
+          "glow_intensity": "bass * 1.5",
+          "displacement": "rms * 1.5"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0038,
+            "speed": 0.05,
+            "line_opacity": 0.065,
+            "line_color": "#8888AA"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_11",
+      "sentence": "공포 기억을 떠올린 쥐의 뇌에서 단백질 합성을 차단했다.",
+      "start_sec": 42.384,
+      "end_sec": 47.04,
+      "emotion": "somber_reflective",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "color_shift",
+            "params": {
+              "from_color": "#8B5CF6",
+              "to_color": "#F43F5E",
+              "rhythm": "slow"
+            }
+          },
+          {
+            "vocab": "light_source",
+            "params": {
+              "rays": 16,
+              "color": "#8B5CF6",
+              "intensity": 0.7830267890941766,
+              "position": "center"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.5 + 0.5",
+          "particle_size": "bass * 1.5 + 1",
+          "glow_intensity": "rms * 0.4"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0023,
+            "speed": 0.05,
+            "line_opacity": 0.082,
+            "line_color": "#555577"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_12",
+      "sentence": "기억이 사라졌다. 기억은 떠올리는 순간 불안정해진다.",
+      "start_sec": 47.19,
+      "end_sec": 52.932,
+      "emotion": "somber_reflective",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {}
+          },
+          {
+            "vocab": "brightness_pulse",
+            "params": {
+              "intensity": 0.7771493414579258,
+              "color": "#7C3AED"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "기억",
+              "mode": "wave",
+              "fontSize": 72,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.5 + 0.5",
+          "particle_size": "bass * 1.5 + 1",
+          "glow_intensity": "rms * 0.4"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0027,
+            "speed": 0.05,
+            "line_opacity": 0.094,
+            "line_color": "#555577"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_13",
+      "sentence": "저장하지 않은 문서처럼. 닫는 순간, 현재 버전으로 덮어쓰기된다.",
+      "start_sec": 53.082,
+      "end_sec": 59.928,
+      "emotion": "awakening_spark",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_chain_awaken",
+            "params": {
+              "count": 600,
+              "color": "#8B5CF6",
+              "chain_speed": 1.0272584748494116,
+              "glow_color": "#7C3AED"
+            }
+          },
+          {
+            "vocab": "color_bloom",
+            "params": {
+              "from_color": "#8B5CF6",
+              "to_color": "#F43F5E",
+              "rhythm": "slow"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 2 + 1",
+          "glow_intensity": "bass * 1.5",
+          "displacement": "rms * 1.5"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0034,
+            "speed": 0.05,
+            "line_opacity": 0.069,
+            "line_color": "#555577"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_14",
+      "sentence": "이건 결함이 아니다. 뇌가 우리를 보호하는 방식이다.",
+      "start_sec": 60.078,
+      "end_sec": 65.604,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "grid_morph",
+            "params": {
+              "cols": 15,
+              "rows": 20,
+              "mode": "wave",
+              "color": "#8888AA",
+              "accentColor": "#8B5CF6",
+              "morphIntensity": 1.0888845359027763,
+              "showConnections": false
+            }
+          },
+          {
+            "vocab": "counter_up",
+            "params": {
+              "target": 100,
+              "suffix": "",
+              "color": "#8B5CF6",
+              "fontSize": 64
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "결함",
+              "mode": "typewriter",
+              "fontSize": 48,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 2 + 1",
+          "glow_intensity": "bass * 1.5",
+          "displacement": "rms * 1.5"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0046,
+            "speed": 0.05,
+            "line_opacity": 0.091,
+            "line_color": "#555577"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_15",
+      "sentence": "고통을 원본 그대로 재생한다면 우리는 과거를 견딜 수 없다.",
+      "start_sec": 65.754,
+      "end_sec": 70.794,
+      "emotion": "somber_reflective",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {}
+          },
+          {
+            "vocab": "brightness_pulse",
+            "params": {
+              "intensity": 0.39712853192290376,
+              "color": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.5 + 0.5",
+          "particle_size": "bass * 1.5 + 1",
+          "glow_intensity": "rms * 0.4"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0038,
+            "speed": 0.05,
+            "line_opacity": 0.083,
+            "line_color": "#8888AA"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      }
+    },
+    {
+      "id": "scene_16",
+      "sentence": "그래서 뇌는 매번 기억을 편집한다.",
+      "start_sec": 70.944,
+      "end_sec": 74.28,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "data_bar",
+            "params": {
+              "bars": 16,
+              "color": "#8B5CF6",
+              "mode": "vertical"
+            }
+          },
+          {
+            "vocab": "counter_up",
+            "params": {
+              "target": 95,
+              "suffix": "%",
+              "color": "#8B5CF6",
+              "fontSize": 80
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "기억",
+              "mode": "typewriter",
+              "fontSize": 72,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 2 + 1",
+          "glow_intensity": "bass * 1.5",
+          "displacement": "rms * 1.5"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0049,
+            "speed": 0.05,
+            "line_opacity": 0.088,
+            "line_color": "#8888AA"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_17",
+      "sentence": "기억이 다시 쓰여질 수 있다면, 과거에 갇힌 우리도 다시 쓸 수 있다.",
+      "start_sec": 74.43,
+      "end_sec": 81.18,
+      "emotion": "somber_reflective",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_converge",
+            "params": {
+              "count": 600,
+              "color": "#06B6D4",
+              "target": "center",
+              "speed": 0.7640784027381552
+            }
+          },
+          {
+            "vocab": "brightness_pulse",
+            "params": {
+              "intensity": 0.44029797323548064,
+              "color": "#7C3AED"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "기억",
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.5 + 0.5",
+          "particle_size": "bass * 1.5 + 1",
+          "glow_intensity": "rms * 0.4"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0039,
+            "speed": 0.05,
+            "line_opacity": 0.054,
+            "line_color": "#555577"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_18",
+      "sentence": "상처는 덜 아프게 기억되고, 트라우마는 교훈으로 재편된다.",
+      "start_sec": 81.33,
+      "end_sec": 87.336,
+      "emotion": "somber_reflective",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "color_shift",
+            "params": {
+              "from_color": "#8B5CF6",
+              "to_color": "#F43F5E",
+              "rhythm": "pulse"
+            }
+          },
+          {
+            "vocab": "loop_ring",
+            "params": {
+              "rings": 8,
+              "color": "#8B5CF6",
+              "pulse_speed": 1.4937827248352618
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.5 + 0.5",
+          "particle_size": "bass * 1.5 + 1",
+          "glow_intensity": "rms * 0.4"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0039,
+            "speed": 0.05,
+            "line_opacity": 0.04,
+            "line_color": "#8888AA"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_19",
+      "sentence": "기억은 과거의 기록이 아니다. 현재의 해석이다.",
+      "start_sec": 87.486,
+      "end_sec": 92.676,
+      "emotion": "transcendent_open",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 300,
+              "color": "#8B5CF6",
+              "rings": 3,
+              "speed": 0.6986027012207157
+            }
+          },
+          {
+            "vocab": "waveform_circular",
+            "params": {
+              "mode": "circular",
+              "color": "#8B5CF6",
+              "lineWidth": 1.5,
+              "sensitivity": 1.5298348856040342
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "기억",
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 2 + 1",
+          "glow_intensity": "bass * 1.5",
+          "displacement": "rms * 1.5"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0041,
+            "speed": 0.05,
+            "line_opacity": 0.083,
+            "line_color": "#8888AA"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_20",
+      "sentence": "그리고 해석은 언제든 바뀔 수 있다.",
+      "start_sec": 92.826,
+      "end_sec": 96.186,
+      "emotion": "somber_reflective",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "color_shift",
+            "params": {
+              "from_color": "#8B5CF6",
+              "to_color": "#F43F5E",
+              "rhythm": "slow"
+            }
+          },
+          {
+            "vocab": "loop_ring",
+            "params": {
+              "rings": 4,
+              "color": "#8B5CF6",
+              "pulse_speed": 1.487917621018581
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.5 + 0.5",
+          "particle_size": "bass * 1.5 + 1",
+          "glow_intensity": "rms * 0.4"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0033,
+            "speed": 0.05,
+            "line_opacity": 0.092,
+            "line_color": "#555577"
+          }
+        }
+      }
+    }
+  ]
+}

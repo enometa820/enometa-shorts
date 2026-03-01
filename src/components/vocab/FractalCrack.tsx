@@ -89,10 +89,10 @@ export const FractalCrack: React.FC<VocabComponentProps> = ({
       const y2 = branch.y1 + Math.sin(branch.angle) * branch.length * localProgress;
 
       // 균열 두께 (깊이가 깊을수록 얇게)
-      const lineWidth = Math.max(0.5, 3 - branch.depth * 0.5) + audio.bass * 1.5;
+      const lineWidth = Math.max(0.5, 3 - branch.depth * 0.5) + audio.bass * 3;
 
       // 빛 방출 효과 (균열 안에서 빛이 새어나옴)
-      const glowAlpha = 0.15 + audio.rms * 0.25;
+      const glowAlpha = 0.2 + audio.rms * 0.4;
       ctx.beginPath();
       ctx.moveTo(branch.x1, branch.y1);
       ctx.lineTo(x2, y2);
@@ -104,14 +104,14 @@ export const FractalCrack: React.FC<VocabComponentProps> = ({
       ctx.beginPath();
       ctx.moveTo(branch.x1, branch.y1);
       ctx.lineTo(x2, y2);
-      const crackAlpha = 0.4 + localProgress * 0.4 + audio.rms * 0.2;
+      const crackAlpha = 0.4 + localProgress * 0.4 + audio.rms * 0.4;
       ctx.strokeStyle = `rgba(255, 68, 68, ${crackAlpha})`;
       ctx.lineWidth = lineWidth;
       ctx.stroke();
 
       // 균열 끝에서 빛 파티클
       if (localProgress > 0.8 && branch.depth >= maxDepth - 1) {
-        const sparkSize = 4 + audio.onset * 8;
+        const sparkSize = 6 + audio.onset * 14;
         const sparkGlow = ctx.createRadialGradient(x2, y2, 0, x2, y2, sparkSize * 3);
         sparkGlow.addColorStop(0, `rgba(255, 255, 200, ${0.4 + audio.rms * 0.4})`);
         sparkGlow.addColorStop(1, "rgba(255, 100, 50, 0)");
@@ -125,7 +125,7 @@ export const FractalCrack: React.FC<VocabComponentProps> = ({
     // 중심 폭발 글로우
     const cx = width / 2;
     const cy = height / 2;
-    const coreSize = 20 + growProgress * 30 + audio.bass * 25;
+    const coreSize = 25 + growProgress * 40 + audio.bass * 45;
     const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreSize);
     coreGlow.addColorStop(0, `rgba(255, 255, 255, ${0.3 + audio.rms * 0.4})`);
     coreGlow.addColorStop(0.3, `rgba(255, 100, 50, ${0.2 + audio.rms * 0.3})`);

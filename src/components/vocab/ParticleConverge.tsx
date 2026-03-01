@@ -52,8 +52,8 @@ export const ParticleConverge: React.FC<VocabComponentProps> = ({
 
     ctx.clearRect(0, 0, width, height);
 
-    const sizeBoost = 1 + audio.bass * 1.5;
-    const alpha = 0.5 + audio.rms * 0.4;
+    const sizeBoost = 1 + audio.bass * 3.5;
+    const alpha = 0.3 + audio.rms * 0.8;
 
     for (const p of particles) {
       const t = Math.max(0, Math.min(1, (sceneProgress - p.delay) / (1 - p.delay)));

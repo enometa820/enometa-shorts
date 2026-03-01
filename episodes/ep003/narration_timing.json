@@ -1,0 +1,203 @@
+{
+  "voice": "ko-KR-SunHiNeural",
+  "rate": "+5%",
+  "total_duration_sec": 96.186,
+  "segments": [
+    {
+      "index": 0,
+      "text": "우리가 가장 선명하게 기억하는 순간을 떠올려 보자.",
+      "start_sec": 0.0,
+      "end_sec": 4.032,
+      "duration_sec": 4.032
+    },
+    {
+      "index": 1,
+      "text": "그 기억은 사실이 아닐 수 있다.",
+      "start_sec": 4.182,
+      "end_sec": 7.422,
+      "duration_sec": 3.24
+    },
+    {
+      "index": 2,
+      "text": "뇌는 기억을 저장하지 않는다.",
+      "start_sec": 7.572,
+      "end_sec": 10.548,
+      "duration_sec": 2.976
+    },
+    {
+      "index": 3,
+      "text": "매번 다시 만든다.",
+      "start_sec": 10.698,
+      "end_sec": 13.002,
+      "duration_sec": 2.304
+    },
+    {
+      "index": 4,
+      "text": "신경과학에서 이것을 기억 재공고화라 부른다.",
+      "start_sec": 13.152,
+      "end_sec": 17.28,
+      "duration_sec": 4.128
+    },
+    {
+      "index": 5,
+      "text": "기억을 떠올리는 순간, 뇌는 그것을 해체한다.",
+      "start_sec": 17.43,
+      "end_sec": 21.582,
+      "duration_sec": 4.152
+    },
+    {
+      "index": 6,
+      "text": "그리고 현재의 감정으로 다시 조립한다.",
+      "start_sec": 21.732,
+      "end_sec": 25.332,
+      "duration_sec": 3.6
+    },
+    {
+      "index": 7,
+      "text": "행복할 때 떠올린 과거는 따뜻하다.",
+      "start_sec": 25.482,
+      "end_sec": 28.866,
+      "duration_sec": 3.384
+    },
+    {
+      "index": 8,
+      "text": "불안할 때 떠올린 같은 과거는 차갑다.",
+      "start_sec": 29.016,
+      "end_sec": 32.568,
+      "duration_sec": 3.552
+    },
+    {
+      "index": 9,
+      "text": "기억은 같다.",
+      "start_sec": 32.718,
+      "end_sec": 34.614,
+      "duration_sec": 1.896
+    },
+    {
+      "index": 10,
+      "text": "달라진 건 기억하는 우리 자신이다.",
+      "start_sec": 34.764,
+      "end_sec": 37.98,
+      "duration_sec": 3.216
+    },
+    {
+      "index": 11,
+      "text": "2000년, 신경과학자 카림 나데르의 실험.",
+      "start_sec": 38.13,
+      "end_sec": 42.234,
+      "duration_sec": 4.104
+    },
+    {
+      "index": 12,
+      "text": "공포 기억을 떠올린 쥐의 뇌에서 단백질 합성을 차단했다.",
+      "start_sec": 42.384,
+      "end_sec": 47.04,
+      "duration_sec": 4.656
+    },
+    {
+      "index": 13,
+      "text": "기억이 사라졌다.",
+      "start_sec": 47.19,
+      "end_sec": 49.374,
+      "duration_sec": 2.184
+    },
+    {
+      "index": 14,
+      "text": "기억은 떠올리는 순간 불안정해진다.",
+      "start_sec": 49.524,
+      "end_sec": 52.932,
+      "duration_sec": 3.408
+    },
+    {
+      "index": 15,
+      "text": "저장하지 않은 문서처럼.",
+      "start_sec": 53.082,
+      "end_sec": 55.65,
+      "duration_sec": 2.568
+    },
+    {
+      "index": 16,
+      "text": "닫는 순간, 현재 버전으로 덮어쓰기된다.",
+      "start_sec": 55.8,
+      "end_sec": 59.928,
+      "duration_sec": 4.128
+    },
+    {
+      "index": 17,
+      "text": "이건 결함이 아니다.",
+      "start_sec": 60.078,
+      "end_sec": 62.43,
+      "duration_sec": 2.352
+    },
+    {
+      "index": 18,
+      "text": "뇌가 우리를 보호하는 방식이다.",
+      "start_sec": 62.58,
+      "end_sec": 65.604,
+      "duration_sec": 3.024
+    },
+    {
+      "index": 19,
+      "text": "고통을 원본 그대로 재생한다면 우리는 과거를 견딜 수 없다.",
+      "start_sec": 65.754,
+      "end_sec": 70.794,
+      "duration_sec": 5.04
+    },
+    {
+      "index": 20,
+      "text": "그래서 뇌는 매번 기억을 편집한다.",
+      "start_sec": 70.944,
+      "end_sec": 74.28,
+      "duration_sec": 3.336
+    },
+    {
+      "index": 21,
+      "text": "기억이 다시 쓰여질 수 있다면,",
+      "start_sec": 74.43,
+      "end_sec": 77.358,
+      "duration_sec": 2.928
+    },
+    {
+      "index": 22,
+      "text": "과거에 갇힌 우리도 다시 쓸 수 있다.",
+      "start_sec": 77.508,
+      "end_sec": 81.18,
+      "duration_sec": 3.672
+    },
+    {
+      "index": 23,
+      "text": "상처는 덜 아프게 기억되고,",
+      "start_sec": 81.33,
+      "end_sec": 84.282,
+      "duration_sec": 2.952
+    },
+    {
+      "index": 24,
+      "text": "트라우마는 교훈으로 재편된다.",
+      "start_sec": 84.432,
+      "end_sec": 87.336,
+      "duration_sec": 2.904
+    },
+    {
+      "index": 25,
+      "text": "기억은 과거의 기록이 아니다.",
+      "start_sec": 87.486,
+      "end_sec": 90.366,
+      "duration_sec": 2.88
+    },
+    {
+      "index": 26,
+      "text": "현재의 해석이다.",
+      "start_sec": 90.516,
+      "end_sec": 92.676,
+      "duration_sec": 2.16
+    },
+    {
+      "index": 27,
+      "text": "그리고 해석은 언제든 바뀔 수 있다.",
+      "start_sec": 92.826,
+      "end_sec": 96.186,
+      "duration_sec": 3.36
+    }
+  ]
+}

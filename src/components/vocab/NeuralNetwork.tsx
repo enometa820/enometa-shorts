@@ -71,7 +71,7 @@ export const NeuralNetwork: React.FC<VocabComponentProps> = ({
     ctx.clearRect(0, 0, width, height);
 
     const time = sceneProgress * 10;
-    const signalSpeed = 2 + audio.mid * 5;
+    const signalSpeed = 3 + audio.mid * 10;
 
     // 엣지 (연결선)
     for (const node of nodes) {
@@ -82,7 +82,7 @@ export const NeuralNetwork: React.FC<VocabComponentProps> = ({
         ctx.beginPath();
         ctx.moveTo(node.x, node.y);
         ctx.lineTo(target.x, target.y);
-        ctx.strokeStyle = `rgba(139, 92, 246, ${0.08 + audio.rms * 0.1})`;
+        ctx.strokeStyle = `rgba(139, 92, 246, ${0.1 + audio.rms * 0.2})`;
         ctx.lineWidth = 0.8;
         ctx.stroke();
 
@@ -91,8 +91,8 @@ export const NeuralNetwork: React.FC<VocabComponentProps> = ({
         const sy = node.y + (target.y - node.y) * signalPos;
 
         ctx.beginPath();
-        ctx.arc(sx, sy, 2 + audio.bass * 3, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 215, 0, ${0.3 + audio.rms * 0.5})`;
+        ctx.arc(sx, sy, 3 + audio.bass * 6, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 215, 0, ${0.4 + audio.rms * 0.6})`;
         ctx.fill();
       }
     }
@@ -100,14 +100,14 @@ export const NeuralNetwork: React.FC<VocabComponentProps> = ({
     // 노드
     for (const node of nodes) {
       const pulse = Math.sin(time * 3 + node.pulsePhase) * 0.5 + 0.5;
-      const r = node.radius * (1 + audio.bass * 0.5 + pulse * 0.3);
+      const r = node.radius * (1 + audio.bass * 1.2 + pulse * 0.5);
 
       // 글로우
       const gradient = ctx.createRadialGradient(
         node.x, node.y, 0,
         node.x, node.y, r * 3
       );
-      gradient.addColorStop(0, `rgba(139, 92, 246, ${0.4 + audio.rms * 0.4})`);
+      gradient.addColorStop(0, `rgba(139, 92, 246, ${0.5 + audio.rms * 0.5})`);
       gradient.addColorStop(1, "rgba(139, 92, 246, 0)");
       ctx.beginPath();
       ctx.arc(node.x, node.y, r * 3, 0, Math.PI * 2);
