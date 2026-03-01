@@ -20,6 +20,10 @@ import { LoopRing } from "./vocab/LoopRing";
 import { FractalCrack } from "./vocab/FractalCrack";
 import { LightSource } from "./vocab/LightSource";
 import { PostProcess } from "./vocab/PostProcess";
+import { TextReveal } from "./vocab/TextReveal";
+import { DataBar } from "./vocab/DataBar";
+import { GridMorph } from "./vocab/GridMorph";
+import { WaveformVisualizer } from "./vocab/WaveformVisualizer";
 
 // 비주얼 어휘 → 컴포넌트 매핑
 const VOCAB_MAP: Record<string, React.FC<VocabComponentProps>> = {
@@ -43,6 +47,18 @@ const VOCAB_MAP: Record<string, React.FC<VocabComponentProps>> = {
   loop_ring: LoopRing,
   fractal_crack: FractalCrack,
   light_source: LightSource,
+  // 타이포그래피 + 데이터 시각화 + Max Cooper 스타일
+  text_reveal: TextReveal,
+  text_wave: TextReveal,
+  text_glitch: TextReveal,
+  text_scatter: TextReveal,
+  data_bar: DataBar,
+  data_ring: DataBar,
+  grid_morph: GridMorph,
+  grid_mesh: GridMorph,
+  waveform: WaveformVisualizer,
+  waveform_spectrum: WaveformVisualizer,
+  waveform_circular: WaveformVisualizer,
 };
 
 interface VisualSectionProps {

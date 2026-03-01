@@ -8,6 +8,7 @@ import {
 import { TitleSection } from "./components/TitleSection";
 import { VisualSection } from "./components/VisualSection";
 import { SubtitleSection } from "./components/SubtitleSection";
+import { LogoEndcard } from "./components/LogoEndcard";
 import { getPalette } from "./utils/palettes";
 import { VisualScript, NarrationSegment } from "./types";
 
@@ -21,6 +22,7 @@ interface EnometaShortsProps {
   audioAnalysis?: AudioAnalysis;
   narrationSegments?: NarrationSegment[];
   highlightWords?: string[];
+  endcardDurationSec?: number; // 엔드카드 길이 (초), 기본 6초
 }
 
 export const EnometaShorts: React.FC<EnometaShortsProps> = ({
@@ -30,6 +32,7 @@ export const EnometaShorts: React.FC<EnometaShortsProps> = ({
   audioAnalysis,
   narrationSegments,
   highlightWords,
+  endcardDurationSec = 6,
 }) => {
   const script = visualScript || testVisualScript;
   const palette = getPalette(script.global.palette || "phantom");
@@ -37,6 +40,12 @@ export const EnometaShorts: React.FC<EnometaShortsProps> = ({
   const realAudio = useAudioData(audioAnalysis);
   const audio = audioAnalysis ? realAudio : simulatedAudio;
   const displayTitle = title || (script as any).title || "ENOMETA";
+
+  // 엔드카드: 마지막 씬 종료 후 시작
+  const lastScene = script.scenes[script.scenes.length - 1];
+  const endcardStartSec = lastScene ? lastScene.end_sec + 0.5 : 30; // 0.5초 여유
+  const endcardStartFrame = Math.round(endcardStartSec * 30);
+  const endcardDurationFrames = Math.round(endcardDurationSec * 30);
 
   return (
     <AbsoluteFill style={{ backgroundColor: palette.bg }}>
@@ -86,6 +95,12 @@ export const EnometaShorts: React.FC<EnometaShortsProps> = ({
           audio={audio}
           accentColor={palette.accent}
           narrationSegments={narrationSegments}
+        />
+
+        {/* 엔드카드: 로고 애니메이션 */}
+        <LogoEndcard
+          startFrame={endcardStartFrame}
+          durationFrames={endcardDurationFrames}
         />
       </div>
     </AbsoluteFill>

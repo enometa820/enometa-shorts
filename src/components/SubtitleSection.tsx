@@ -11,45 +11,37 @@ interface SubtitleSectionProps {
 }
 
 /**
- * 한국어 자연 줄바꿈: 조사/어미 뒤에서 끊고 단어 중간 잘림 방지
- * 한 줄 최대 charLimit 글자, 2줄까지만
+ * 한국어 자연 줄바꿈: 공백(띄어쓰기) 기준으로만 끊어서 단어 잘림 방지
+ * 텍스트 중간 지점에 가장 가까운 공백에서 2줄로 분할
  */
 function smartLineBreak(text: string, charLimit: number = 18): string {
   if (text.length <= charLimit) return text;
 
-  // 조사/어미/쉼표/마침표 뒤가 자연스러운 줄바꿈 지점
-  const breakAfter = /([은는이가을를에서도의로와과만까지부터라고처럼보다마다씩째]|[,.])\s*/g;
-  const mid = Math.floor(text.length / 2);
+  const words = text.split(" ");
+  if (words.length <= 1) return text;
 
-  // 중간 근처에서 가장 가까운 자연 줄바꿈 지점 찾기
-  let bestPos = -1;
+  // 텍스트 중간에 가장 가까운 공백 위치에서 2줄 분할
+  const mid = text.length / 2;
+  let bestSplitIdx = 0;
   let bestDist = Infinity;
+  let pos = 0;
 
-  let match;
-  while ((match = breakAfter.exec(text)) !== null) {
-    const pos = match.index + match[0].length;
-    // 줄바꿈 후 양쪽 모두 3글자 이상이어야
-    if (pos >= 3 && pos <= text.length - 3) {
-      const dist = Math.abs(pos - mid);
-      if (dist < bestDist) {
-        bestDist = dist;
-        bestPos = pos;
-      }
+  for (let i = 0; i < words.length - 1; i++) {
+    pos += words[i].length;
+    const splitPos = pos + 1;
+    const dist = Math.abs(splitPos - mid);
+    if (dist < bestDist && splitPos >= 2 && splitPos <= text.length - 2) {
+      bestDist = dist;
+      bestSplitIdx = i + 1;
     }
+    pos += 1;
   }
 
-  // 자연 줄바꿈 지점을 못 찾으면 공백 기준으로
-  if (bestPos === -1) {
-    const spaceIdx = text.indexOf(" ", Math.max(3, mid - 5));
-    if (spaceIdx > 0 && spaceIdx < text.length - 3) {
-      bestPos = spaceIdx + 1;
-    }
-  }
+  if (bestSplitIdx === 0) return text;
 
-  // 그래도 못 찾으면 원문 그대로 (word-break: keep-all이 처리)
-  if (bestPos === -1) return text;
-
-  return text.slice(0, bestPos).trimEnd() + "\n" + text.slice(bestPos).trimStart();
+  const line1 = words.slice(0, bestSplitIdx).join(" ");
+  const line2 = words.slice(bestSplitIdx).join(" ");
+  return line1 + "\n" + line2;
 }
 
 export const SubtitleSection: React.FC<SubtitleSectionProps> = ({

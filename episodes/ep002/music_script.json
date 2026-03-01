@@ -1,0 +1,574 @@
+{
+  "metadata": {
+    "title": "당신의 오답이 뇌를 가장 크게 깨운다",
+    "duration": 134.232,
+    "sample_rate": 44100,
+    "key": "A_minor",
+    "base_bpm": 72
+  },
+  "palette": {
+    "bass_freq": 110.0,
+    "pad_root": 440.0,
+    "pad_fifth": 659.3,
+    "arp_root": 261.6,
+    "arp_pattern": [1, 1.5, 1.333, 2, 1.667, 1.25]
+  },
+  "sections": [
+    {
+      "id": "scene_01",
+      "text": "틀렸을 때, 뇌에서 발생하는 전기 신호. 맞았을 때의 세 배.",
+      "start_sec": 0.0,
+      "end_sec": 7.134,
+      "emotion": "neutral_curious",
+      "energy": 0.35,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.4
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.3,
+          "pan_spread": 0.4
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.2
+        },
+        "arpeggio": {
+          "active": false
+        },
+        "glitch": {
+          "active": false
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.2
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.4,
+        "filter_cutoff": 1200,
+        "stereo_width": 0.45
+      },
+      "transition_in": {
+        "type": "fade_in",
+        "duration_sec": 1.5
+      }
+    },
+    {
+      "id": "scene_02",
+      "text": "신경과학은 이것을 오류 관련 부적전위라 부른다. 정답 앞에서 뇌파는 잔잔하다. 오답 앞에서 뇌파는 폭발한다.",
+      "start_sec": 7.284,
+      "end_sec": 19.056,
+      "emotion": "neutral_curious",
+      "energy": 0.45,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.5
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.45,
+          "pan_spread": 0.5
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.3
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.35,
+          "volume": 0.15
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.08
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.25
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.42,
+        "filter_cutoff": 1500,
+        "stereo_width": 0.5
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.5
+      }
+    },
+    {
+      "id": "scene_03",
+      "text": "뇌가 가장 격렬하게 재배선되는 순간. 성공했을 때가 아니다. 실패한 직후다.",
+      "start_sec": 19.206,
+      "end_sec": 28.434,
+      "emotion": "tension",
+      "energy": 0.7,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.75
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.8,
+          "pan_spread": 0.7
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.3
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.18,
+          "volume": 0.5
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.4
+        },
+        "noise_sweep": {
+          "active": true,
+          "direction": "up",
+          "speed": 0.25
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.5
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.5,
+        "filter_cutoff": 2200,
+        "stereo_width": 0.65
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.5
+      }
+    },
+    {
+      "id": "scene_04",
+      "text": "당신이 틀린 바로 그 순간, 뇌 안에서는 새로운 연결이 태어나고 있었다.",
+      "start_sec": 28.584,
+      "end_sec": 36.078,
+      "emotion": "awakening",
+      "energy": 0.8,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.75
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.2,
+          "pan_spread": 0.4
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.7,
+          "harmony": "root_fifth"
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.25,
+          "volume": 0.3
+        },
+        "glitch": {
+          "active": false
+        },
+        "shimmer_high": {
+          "active": true,
+          "volume": 0.45
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.4
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.55,
+        "filter_cutoff": 2800,
+        "stereo_width": 0.7
+      },
+      "transition_in": {
+        "type": "silence_break",
+        "silence_sec": 0.15,
+        "then": "fade_in",
+        "duration_sec": 1.0
+      }
+    },
+    {
+      "id": "scene_05",
+      "text": "뇌는 정답을 만나면 기존 회로를 재확인한다. 이미 아는 길. 이미 닳은 경로. 효율적이지만, 아무것도 변하지 않는다.",
+      "start_sec": 36.228,
+      "end_sec": 48.408,
+      "emotion": "somber_repetitive",
+      "energy": 0.45,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.55
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.25,
+          "pan_spread": 0.35
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.4
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.22,
+          "volume": 0.4
+        },
+        "glitch": {
+          "active": false
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.45,
+        "filter_cutoff": 1600,
+        "stereo_width": 0.5
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_06",
+      "text": "하지만 틀린 순간, 뇌는 완전히 다르게 작동한다. 기존 경로를 해체한다. 새로운 가지를 뻗는다. 한 번도 존재하지 않았던 회로를 설계한다.",
+      "start_sec": 48.558,
+      "end_sec": 63.36,
+      "emotion": "tension",
+      "energy": 0.8,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.85
+        },
+        "clicks": {
+          "active": true,
+          "density": 1.0,
+          "pan_spread": 0.85
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.35
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.12,
+          "volume": 0.65
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.6
+        },
+        "noise_sweep": {
+          "active": true,
+          "direction": "up",
+          "speed": 0.2
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.6
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.55,
+        "filter_cutoff": 2600,
+        "stereo_width": 0.7
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.5
+      }
+    },
+    {
+      "id": "scene_07",
+      "text": "우리는 이 과정을 고통이라 불렀다. 뇌는 이것을 성장이라 불렀다.",
+      "start_sec": 63.51,
+      "end_sec": 70.716,
+      "emotion": "awakening",
+      "energy": 0.85,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.8
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.15,
+          "pan_spread": 0.4
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.75,
+          "harmony": "root_fifth"
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.28,
+          "volume": 0.25
+        },
+        "glitch": {
+          "active": false
+        },
+        "shimmer_high": {
+          "active": true,
+          "volume": 0.5
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.45
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.55,
+        "filter_cutoff": 2800,
+        "stereo_width": 0.72
+      },
+      "transition_in": {
+        "type": "silence_break",
+        "silence_sec": 0.1,
+        "then": "fade_in",
+        "duration_sec": 0.8
+      }
+    },
+    {
+      "id": "scene_08",
+      "text": "정답을 아는 뇌는 반복한다. 이미 만들어진 길을 걸으니까. 틀린 뇌는 창조한다. 없는 길을 만들어야 하니까. 이건 실패가 아니다. 설계다. 뇌가 더 정교한 자신을 향해 선택한 경로다.",
+      "start_sec": 70.866,
+      "end_sec": 92.766,
+      "emotion": "awakening_climax",
+      "energy": 1.0,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.95
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.35,
+          "pan_spread": 0.6
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.9,
+          "harmony": "root_fifth"
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.2,
+          "volume": 0.4,
+          "fade": "out"
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.15,
+          "fade": "out"
+        },
+        "shimmer_high": {
+          "active": true,
+          "volume": 0.65
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.55
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.6,
+        "filter_cutoff": 3200,
+        "stereo_width": 0.8
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.5
+      }
+    },
+    {
+      "id": "scene_09",
+      "text": "세상은 오답에 빨간 줄을 긋는다. 뇌는 오답에 새로운 회로를 긋는다.",
+      "start_sec": 92.916,
+      "end_sec": 100.434,
+      "emotion": "awakening",
+      "energy": 0.85,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.8
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.2,
+          "pan_spread": 0.45
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.75,
+          "harmony": "root_fifth"
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.3,
+          "volume": 0.2
+        },
+        "glitch": {
+          "active": false
+        },
+        "shimmer_high": {
+          "active": true,
+          "volume": 0.5
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.4
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.55,
+        "filter_cutoff": 2700,
+        "stereo_width": 0.72
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      }
+    },
+    {
+      "id": "scene_10",
+      "text": "당신이 틀렸다고 느낀 모든 순간. 뇌는 한 번도 멈추지 않았다. 더 많은 시냅스를 연결하고, 더 넓은 구조를 확장하고 있었다.",
+      "start_sec": 100.584,
+      "end_sec": 114.594,
+      "emotion": "hopeful",
+      "energy": 0.7,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.65
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.1,
+          "pan_spread": 0.3
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.75,
+          "harmony": "root_fifth"
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.3,
+          "volume": 0.2
+        },
+        "glitch": {
+          "active": false
+        },
+        "shimmer_high": {
+          "active": true,
+          "volume": 0.45
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.5,
+        "filter_cutoff": 2300,
+        "stereo_width": 0.65
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_11",
+      "text": "틀린 적 없는 사람은 출발한 적 없는 사람이다. 오답이 없는 인생은 문제를 풀지 않은 인생이다. 당신의 실패 기록. 지우고 싶었던 오답들. 그것이 뇌가 가장 치열하게 살아있었다는 증거다.",
+      "start_sec": 114.744,
+      "end_sec": 129.232,
+      "emotion": "transcendent_open",
+      "energy": 0.6,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.5
+        },
+        "clicks": {
+          "active": false
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.65,
+          "harmony": "root_fifth"
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.4,
+          "volume": 0.1
+        },
+        "glitch": {
+          "active": false
+        },
+        "shimmer_high": {
+          "active": true,
+          "volume": 0.4,
+          "fade": "out"
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.5,
+        "filter_cutoff": 2000,
+        "stereo_width": 0.6
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "outro",
+      "text": "",
+      "start_sec": 129.232,
+      "end_sec": 134.232,
+      "emotion": "fade",
+      "energy": 0.1,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.15,
+          "fade": "out"
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.1,
+          "fade": "out"
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.7,
+        "filter_cutoff": 500,
+        "stereo_width": 0.3
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 3.0
+      }
+    }
+  ]
+}
