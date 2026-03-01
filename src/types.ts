@@ -1,0 +1,78 @@
+import { AudioFrame } from "./hooks/useAudioData";
+
+// 비주얼 어휘 파라미터 — 각 어휘별로 다른 params를 가질 수 있음
+export type VocabParams = Record<string, any>;
+
+// 오디오 리액티브 설정
+export type AudioReactiveConfig = Record<string, any>;
+
+// 씬 내 비주얼 어휘 항목
+export interface VocabEntry {
+  vocab: string;
+  params: VocabParams;
+}
+
+// 배경 설정
+export interface BackgroundConfig {
+  vocab: string;
+  params: VocabParams;
+  transition_to?: string;
+}
+
+// 씬 레이어
+export interface SceneLayers {
+  semantic: VocabEntry[];
+  audio_reactive: AudioReactiveConfig;
+  background?: BackgroundConfig;
+}
+
+// 씬 정의
+export interface Scene {
+  id: string;
+  sentence: string;
+  start_sec: number;
+  end_sec: number;
+  emotion: string;
+  layers: SceneLayers;
+}
+
+// 전환 설정
+export interface TransitionConfig {
+  type: string;
+  duration_sec?: number;
+  note?: string;
+}
+
+// 나레이션 세그먼트 (문장 단위 자막 타이밍)
+export interface NarrationSegment {
+  index: number;
+  text: string;
+  start_sec: number;
+  end_sec: number;
+  duration_sec: number;
+}
+
+// 비주얼 스크립트 전체 구조
+export interface VisualScript {
+  global: {
+    color_palette: string[];
+    background_color: string;
+    particle_total: number;
+    font: string;
+    palette?: string;
+  };
+  scenes: Scene[];
+  transitions?: Record<string, TransitionConfig>;
+}
+
+// 비주얼 어휘 컴포넌트의 공통 props
+export interface VocabComponentProps {
+  audio: AudioFrame;
+  audioReactive: AudioReactiveConfig;
+  sceneProgress: number;
+  frame: number;
+  fps: number;
+  width: number;
+  height: number;
+  [key: string]: any;
+}

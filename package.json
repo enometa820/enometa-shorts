@@ -1,0 +1,26 @@
+{
+  "name": "enometa-shorts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx remotion studio",
+    "build": "npx remotion render src/index.tsx EnometaShorts output/enometa_shorts.mp4",
+    "preview": "npx remotion preview src/index.tsx"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@remotion/bundler": "4.0.431",
+    "@remotion/cli": "4.0.431",
+    "@remotion/renderer": "4.0.431",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "remotion": "4.0.431",
+    "typescript": "5.9.3"
+  }
+}

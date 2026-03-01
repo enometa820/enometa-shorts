@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Audio/Video binaries (large files)
+*.wav
+*.mp3
+*.mp4
+*.avi
+*.mov
+
+# Temp
+_tts_temp/
+*.log
+
+# IDE
+.vscode/
+.idea/

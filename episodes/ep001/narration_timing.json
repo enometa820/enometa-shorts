@@ -1,0 +1,182 @@
+{
+  "voice": "ko-KR-SunHiNeural",
+  "rate": "-5%",
+  "total_duration_sec": 91.128,
+  "segments": [
+    {
+      "index": 0,
+      "text": "하루에 뇌가 처리하는 생각의 수.",
+      "start_sec": 0.0,
+      "end_sec": 3.336,
+      "duration_sec": 3.336
+    },
+    {
+      "index": 1,
+      "text": "6만 개.",
+      "start_sec": 3.486,
+      "end_sec": 5.406,
+      "duration_sec": 1.92
+    },
+    {
+      "index": 2,
+      "text": "그중 같은 생각의 비율.",
+      "start_sec": 5.556,
+      "end_sec": 8.34,
+      "duration_sec": 2.784
+    },
+    {
+      "index": 3,
+      "text": "95퍼센트.",
+      "start_sec": 8.49,
+      "end_sec": 10.938,
+      "duration_sec": 2.448
+    },
+    {
+      "index": 4,
+      "text": "우리는 매일 새로운 하루를 산다고 믿는다.",
+      "start_sec": 11.088,
+      "end_sec": 15.576,
+      "duration_sec": 4.488
+    },
+    {
+      "index": 5,
+      "text": "하지만 뇌는 어제의 루프를 정확히 복사하고 있다.",
+      "start_sec": 15.726,
+      "end_sec": 20.622,
+      "duration_sec": 4.896
+    },
+    {
+      "index": 6,
+      "text": "같은 불안. 같은 후회. 같은 내일에 대한 막연한 기대.",
+      "start_sec": 20.772,
+      "end_sec": 27.996,
+      "duration_sec": 7.224
+    },
+    {
+      "index": 7,
+      "text": "달라진 건 날짜뿐이다.",
+      "start_sec": 28.146,
+      "end_sec": 30.954,
+      "duration_sec": 2.808
+    },
+    {
+      "index": 8,
+      "text": "이건 습관이 아니다.",
+      "start_sec": 31.104,
+      "end_sec": 33.552,
+      "duration_sec": 2.448
+    },
+    {
+      "index": 9,
+      "text": "자동화다.",
+      "start_sec": 33.702,
+      "end_sec": 35.862,
+      "duration_sec": 2.16
+    },
+    {
+      "index": 10,
+      "text": "의식하지 않으면 뇌는 가장 익숙한 경로를 선택한다.",
+      "start_sec": 36.012,
+      "end_sec": 41.004,
+      "duration_sec": 4.992
+    },
+    {
+      "index": 11,
+      "text": "에너지를 아끼려는 생존 전략이",
+      "start_sec": 41.154,
+      "end_sec": 44.562,
+      "duration_sec": 3.408
+    },
+    {
+      "index": 12,
+      "text": "어느새 존재를 잠식한 것이다.",
+      "start_sec": 44.712,
+      "end_sec": 47.976,
+      "duration_sec": 3.264
+    },
+    {
+      "index": 13,
+      "text": "그래서 변하고 싶다는 말만으로는 아무것도 바뀌지 않는다.",
+      "start_sec": 48.126,
+      "end_sec": 53.334,
+      "duration_sec": 5.208
+    },
+    {
+      "index": 14,
+      "text": "의지는 루프를 인식하지 못한다.",
+      "start_sec": 53.484,
+      "end_sec": 56.916,
+      "duration_sec": 3.432
+    },
+    {
+      "index": 15,
+      "text": "바뀌는 건 단 하나.",
+      "start_sec": 57.066,
+      "end_sec": 59.634,
+      "duration_sec": 2.568
+    },
+    {
+      "index": 16,
+      "text": "알아차림.",
+      "start_sec": 59.784,
+      "end_sec": 61.704,
+      "duration_sec": 1.92
+    },
+    {
+      "index": 17,
+      "text": "6만 개 중 단 하나의 생각이",
+      "start_sec": 61.854,
+      "end_sec": 65.094,
+      "duration_sec": 3.24
+    },
+    {
+      "index": 18,
+      "text": "이건 어제도 했던 생각이다 라고 자각하는 순간.",
+      "start_sec": 65.244,
+      "end_sec": 69.684,
+      "duration_sec": 4.44
+    },
+    {
+      "index": 19,
+      "text": "루프에 균열이 생긴다.",
+      "start_sec": 69.834,
+      "end_sec": 72.69,
+      "duration_sec": 2.856
+    },
+    {
+      "index": 20,
+      "text": "거기서부터다.",
+      "start_sec": 72.84,
+      "end_sec": 75.264,
+      "duration_sec": 2.424
+    },
+    {
+      "index": 21,
+      "text": "5퍼센트의 틈이 벌어지고",
+      "start_sec": 75.414,
+      "end_sec": 78.51,
+      "duration_sec": 3.096
+    },
+    {
+      "index": 22,
+      "text": "그 틈으로 네가 직접 선택한 생각이 들어온다.",
+      "start_sec": 78.66,
+      "end_sec": 83.052,
+      "duration_sec": 4.392
+    },
+    {
+      "index": 23,
+      "text": "새로운 하루는 새로운 날짜가 만드는 게 아니다.",
+      "start_sec": 83.202,
+      "end_sec": 87.642,
+      "duration_sec": 4.44
+    },
+    {
+      "index": 24,
+      "text": "어제와 다른 생각 하나가 만든다.",
+      "start_sec": 87.792,
+      "end_sec": 91.128,
+      "duration_sec": 3.336
+    }
+  ]
+}

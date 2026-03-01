@@ -1,0 +1,566 @@
+{
+  "metadata": {
+    "title": "당신의 뇌는 어제를 복사하고 있다",
+    "duration": 96.128,
+    "sample_rate": 44100,
+    "key": "E_minor",
+    "base_bpm": 80
+  },
+  "palette": {
+    "bass_freq": 82.4,
+    "pad_root": 329.6,
+    "pad_fifth": 493.9,
+    "arp_root": 220,
+    "arp_pattern": [
+      1,
+      1.25,
+      1.5,
+      2,
+      1.5,
+      1.25
+    ]
+  },
+  "sections": [
+    {
+      "id": "scene_01",
+      "text": "하루에 뇌가 처리하는 생각의 수. 6만 개.",
+      "start_sec": 0.0,
+      "end_sec": 5.406,
+      "emotion": "neutral_curious",
+      "energy": 0.4,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.45
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.4,
+          "pan_spread": 0.5
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.25
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.35,
+          "volume": 0.15
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.1
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.25
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.42,
+        "filter_cutoff": 1400,
+        "stereo_width": 0.5
+      },
+      "transition_in": {
+        "type": "fade_in",
+        "duration_sec": 1.0
+      }
+    },
+    {
+      "id": "scene_02",
+      "text": "그중 같은 생각의 비율. 95퍼센트.",
+      "start_sec": 5.556,
+      "end_sec": 10.938,
+      "emotion": "somber",
+      "energy": 0.45,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.65
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.15,
+          "pan_spread": 0.3
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.35
+        },
+        "arpeggio": {
+          "active": false
+        },
+        "glitch": {
+          "active": false
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.435,
+        "filter_cutoff": 1550,
+        "stereo_width": 0.525
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_03",
+      "text": "우리는 매일 새로운 하루를 산다고 믿는다. 하지만 뇌는 어제의 루프를 정확히 복사하고 있다.",
+      "start_sec": 11.088,
+      "end_sec": 20.622,
+      "emotion": "somber_reflective",
+      "energy": 0.5,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.6
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.1,
+          "pan_spread": 0.3
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.4
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.3,
+          "volume": 0.3
+        },
+        "glitch": {
+          "active": false
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.44999999999999996,
+        "filter_cutoff": 1700,
+        "stereo_width": 0.55
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      }
+    },
+    {
+      "id": "scene_04",
+      "text": "같은 불안. 같은 후회. 같은 내일에 대한 막연한 기대. 달라진 건 날짜뿐이다.",
+      "start_sec": 20.772,
+      "end_sec": 30.954,
+      "emotion": "somber_repetitive",
+      "energy": 0.55,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.65
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.3,
+          "pan_spread": 0.4
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.4
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.22,
+          "volume": 0.45
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.08
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.35
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.46499999999999997,
+        "filter_cutoff": 1850,
+        "stereo_width": 0.575
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      }
+    },
+    {
+      "id": "scene_05",
+      "text": "이건 습관이 아니다. 자동화다.",
+      "start_sec": 31.104,
+      "end_sec": 35.862,
+      "emotion": "tension",
+      "energy": 0.75,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.8
+        },
+        "clicks": {
+          "active": true,
+          "density": 1.0,
+          "pan_spread": 0.8
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.3
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.15,
+          "volume": 0.6
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.6
+        },
+        "noise_sweep": {
+          "active": true,
+          "direction": "up",
+          "speed": 0.3
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.6
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.5249999999999999,
+        "filter_cutoff": 2450,
+        "stereo_width": 0.675
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_06",
+      "text": "의식하지 않으면 뇌는 가장 익숙한 경로를 선택한다. 에너지를 아끼려는 생존 전략이 어느새 존재를 잠식한 것이다.",
+      "start_sec": 36.012,
+      "end_sec": 47.976,
+      "emotion": "somber_analytical",
+      "energy": 0.6,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.7
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.35,
+          "pan_spread": 0.5
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.45
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.2,
+          "volume": 0.5
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.2
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.4
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.48,
+        "filter_cutoff": 2000,
+        "stereo_width": 0.6
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_07",
+      "text": "그래서 변하고 싶다는 말만으로는 아무것도 바뀌지 않는다. 의지는 루프를 인식하지 못한다.",
+      "start_sec": 48.126,
+      "end_sec": 56.916,
+      "emotion": "tension_frustrated",
+      "energy": 0.85,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.85
+        },
+        "clicks": {
+          "active": true,
+          "density": 1.2,
+          "pan_spread": 0.9
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.35
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.1,
+          "volume": 0.7
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.7
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.7
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.5549999999999999,
+        "filter_cutoff": 2750,
+        "stereo_width": 0.725
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_08",
+      "text": "바뀌는 건 단 하나. 알아차림.",
+      "start_sec": 57.066,
+      "end_sec": 61.704,
+      "emotion": "awakening_climax",
+      "energy": 1.0,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.95
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.3,
+          "pan_spread": 0.6
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.9,
+          "harmony": "root_fifth"
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.18,
+          "volume": 0.4,
+          "fade": "out"
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.15,
+          "fade": "out"
+        },
+        "shimmer_high": {
+          "active": true,
+          "volume": 0.6
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.5
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.6,
+        "filter_cutoff": 3200,
+        "stereo_width": 0.8
+      },
+      "transition_in": {
+        "type": "silence_break",
+        "silence_sec": 0.3,
+        "then": "fade_in",
+        "duration_sec": 1.5
+      }
+    },
+    {
+      "id": "scene_09",
+      "text": "6만 개 중 단 하나의 생각이 이건 어제도 했던 생각이다 라고 자각하는 순간. 루프에 균열이 생긴다.",
+      "start_sec": 61.854,
+      "end_sec": 72.69,
+      "emotion": "awakening",
+      "energy": 0.85,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.8
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.15,
+          "pan_spread": 0.4
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.75,
+          "harmony": "root_fifth"
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.3,
+          "volume": 0.2
+        },
+        "glitch": {
+          "active": false
+        },
+        "shimmer_high": {
+          "active": true,
+          "volume": 0.5
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.4
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.5549999999999999,
+        "filter_cutoff": 2750,
+        "stereo_width": 0.725
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      }
+    },
+    {
+      "id": "scene_10",
+      "text": "거기서부터다. 5퍼센트의 틈이 벌어지고 그 틈으로 네가 직접 선택한 생각이 들어온다.",
+      "start_sec": 72.84,
+      "end_sec": 83.052,
+      "emotion": "hopeful",
+      "energy": 0.7,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.65
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.1,
+          "pan_spread": 0.3
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.75,
+          "harmony": "root_fifth"
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.3,
+          "volume": 0.2
+        },
+        "glitch": {
+          "active": false
+        },
+        "shimmer_high": {
+          "active": true,
+          "volume": 0.45
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.51,
+        "filter_cutoff": 2300,
+        "stereo_width": 0.6499999999999999
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_11",
+      "text": "새로운 하루는 새로운 날짜가 만드는 게 아니다. 어제와 다른 생각 하나가 만든다.",
+      "start_sec": 83.202,
+      "end_sec": 91.128,
+      "emotion": "transcendent_open",
+      "energy": 0.6,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.5
+        },
+        "clicks": {
+          "active": false
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.65,
+          "harmony": "root_fifth"
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.4,
+          "volume": 0.1
+        },
+        "glitch": {
+          "active": false
+        },
+        "shimmer_high": {
+          "active": true,
+          "volume": 0.4,
+          "fade": "out"
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.48,
+        "filter_cutoff": 2000,
+        "stereo_width": 0.6
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "outro",
+      "text": "",
+      "start_sec": 91.128,
+      "end_sec": 96.128,
+      "emotion": "fade",
+      "energy": 0.1,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.15,
+          "fade": "out"
+        },
+        "pad": {
+          "active": true,
+          "volume": 0.1,
+          "fade": "out"
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.7,
+        "filter_cutoff": 500,
+        "stereo_width": 0.3
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 3.0
+      }
+    }
+  ]
+}
