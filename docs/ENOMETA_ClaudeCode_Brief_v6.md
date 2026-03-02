@@ -1,22 +1,19 @@
 # ENOMETA Shorts Pipeline v6 — Claude Code 실행 기획안
 
+> **역할**: Brief=실전 매뉴얼 (CLI 명령, 검증 체크리스트). 설계도는 SNAPSHOT 참조.
 > 이 문서를 Claude Code에 전달하면 에피소드 제작을 시작할 수 있다.
 > 상세 시스템 문서: ENOMETA_SYSTEM_SNAPSHOT_v6.md 참조
 > 음악 엔진 상세: ENOMETA_Music_Engine_Spec_v6.md 참조
-> **last_updated**: 2026-03-02 — v8 + 글쓰기 스킬 v11 + script_data v2 (사전 대폭 확장 + custom_dictionary + 미등록 단어 감지)
+> **last_updated**: 2026-03-03 — 문서 리팩토링 (중복 제거, SNAPSHOT과 역할 분리)
 
 ---
 
 ## 프로젝트 개요
 
-ENOMETA 유튜브 쇼츠 자동 생성 파이프라인.
-대본 + 제목만 입력하면 Claude Code가 나머지 전부를 처리한다.
+> 상세: SYSTEM_SNAPSHOT Sec.1 참조
 
-**포맷**: 9:16 세로 (1080x1920)
-**구조**: 상단 제목(190px) / 중앙 1:1 비주얼(1080px) / 하단 자막(비주얼 내 하단)
-**핵심**: 3중 리액티브 비주얼 (시간 x 오디오 x 의미)
-**비용**: 0원 — 전부 오픈소스 로컬 실행
-**GPU**: NVIDIA RTX 3060 Laptop 6GB VRAM
+대본 + 제목만 입력하면 Claude Code가 나머지 전부를 처리한다.
+**핵심**: 3중 리액티브 비주얼 (시간 x 오디오 x 의미), ikeda 단일 장르, Hybrid 전용 VRAM
 
 ---
 
@@ -67,75 +64,12 @@ ENOMETA 유튜브 쇼츠 자동 생성 파이프라인.
 
 ---
 
-## 비주얼 어휘 컴포넌트 (22개)
+## 비주얼/음악/팔레트 상세
 
-### 파티클 (7개)
-```
-ParticleBirth, ParticleScatter, ParticleConverge,
-ParticleOrbit, ParticleEscape, ParticleChainAwaken, ParticleSplitRatio
-```
-
-### 배경/효과 (4개)
-```
-FlowField (calm/turbulent), CounterUp, ColorShift, BrightnessPulse
-```
-
-### 대본 의미 (4개)
-```
-NeuralNetwork, LoopRing, FractalCrack, LightSource
-```
-
-### 타이포/데이터/기타 (5개)
-```
-TextReveal (4모드), DataBar (bar/ring), GridMorph (3모드),
-WaveformVisualizer (4모드), PostProcess (오버레이)
-```
-
-### v5 8bit / 레트로 (2개, 7 vocab 키)
-```
-PixelGrid (fill/outline/life/rain 4모드)
-PixelWaveform (bars/steps/cascade 3모드)
-→ bytebeat/chiptune 장르에서 자동 주입 (70%/60% 확률)
-```
-
----
-
-## 음악 엔진 v8 요약
-
-### 악기 26종
-- **연속**: deep_bass_drone, fm_bass, arpeggio, sub_pulse, kick_drum, hi_hat
-- **텍스처**: modular_click, glitch_texture(6종), noise_sweep, noise_burst, metallic_hit, synth_lead, acid_bass, reverse_swell, silence_break
-- **v5 신규**: bytebeat(12공식), feedback(피드백루프), chiptune_lead(스퀘어), chiptune_drum(LFSR)
-- **v6 신규**: sine_interference(맥놀이), data_click(정밀클릭), ultrahigh_texture(초고주파)
-- **이펙트**: bit_crush, stutter_gate, tape_stop, soft_clip, wavefold
-
-### 합성법 9종 (v5 6개 + v6 3개)
-```
-v5: bytebeat, chiptune_square, chiptune_noise_drum, feedback_loop, wavefold, euclidean_rhythm
-v6: sine_interference(사인파간섭), data_click(데이터클릭), ultrahigh_texture(초고주파)
-```
-
-### 장르 (v8: ikeda 단일)
-```
-ikeda(60) — 사인파 간섭 + 데이터 클릭 + 초고주파 + 텍스처 모듈(유클리드/피드백/bytebeat/킥/멜로딕)
-```
-- v8 확장: SINE_MELODY_SEQUENCES 5종, TEXTURE_MODULES 에피소드별 자동 선택
-- ⚠ ikeda는 리듬/멜로디 최소 구조 필수 (EP005 교훈)
-
----
-
-## 컬러 팔레트 시스템 (v8: ikeda 기본)
-
-| 이름 | 용도 | 배경 | 액센트 |
-|------|------|------|--------|
-| **Ikeda** | **v8 기본** — 데이터아트 (모노크롬+감정색) | #000000 | #FFFFFF (씬별 전환) |
-| Phantom | legacy — 성찰/명상/존재론적 | #06060A | #8B5CF6 |
-| Neon Noir | legacy — 긴장/경고/데이터 충격 | #050508 | #FF2D55 |
-| Cold Steel | legacy — 분석/논리/차가운 통찰 | #08080C | #00F0FF |
-| Ember | legacy — 따뜻함/위로/인간적 | #0A0806 | #FF6B00 |
-| Synapse | legacy — 각성/연결/신경망 | #060618 | #4169E1 |
-| Game Boy | legacy — 8bit/chiptune/bytebeat | #0f380f | #9bbc0f |
-| Commodore 64 | legacy — 레트로/칩튠 대안 | #40318D | #A59ADE |
+> 22개 vocab 컴포넌트 목록: SYSTEM_SNAPSHOT Sec.4 참조
+> 음악 엔진 악기 26종 + 합성법 9종: Music_Engine_Spec 참조
+> 컬러 팔레트 8종: SYSTEM_SNAPSHOT Sec.7 참조
+> visual_script_generator가 자동 선택하므로 CLI 실행 시 수동 지정 불필요
 
 ---
 

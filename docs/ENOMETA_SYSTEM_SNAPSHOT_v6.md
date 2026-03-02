@@ -1,7 +1,8 @@
 # ENOMETA System Snapshot v6
-> 최종 업데이트: 2026-03-02
+> **역할**: SNAPSHOT=설계도 (아키텍처, 히스토리). 실전 매뉴얼은 ClaudeCode_Brief 참조.
+> 최종 업데이트: 2026-03-03
 > 상태: v8 ikeda 단일 장르 + Hybrid 전용화 + ikeda 확장
-> **last_updated**: 2026-03-02 — v8 + 글쓰기 스킬 v11 + script_data v2 (사전 대폭 확장 + custom_dictionary + 미등록 단어 감지)
+> **last_updated**: 2026-03-03 — 문서 리팩토링 (Brief와 역할 분리, 환경 테이블 Brief로 이관)
 
 ---
 
@@ -424,15 +425,7 @@ EP020+ [██████████] 디지털 아트 완성체 (Remotion 제
 
 ## 10. 환경
 
-| 항목 | 버전 |
-|------|------|
-| Node.js | v24.14.0 |
-| Remotion | 4.0.431 |
-| React | 19.2.4 |
-| Python | 3.11.9 |
-| FFmpeg | 8.0.1 |
-| OS | Windows 11 Pro |
-| GPU | RTX 3060 Laptop 6GB |
+> 기술 스택 상세 테이블: ClaudeCode_Brief "기술 스택" 섹션 참조
 
 ---
 
