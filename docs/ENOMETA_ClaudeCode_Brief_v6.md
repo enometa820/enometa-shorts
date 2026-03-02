@@ -4,7 +4,7 @@
 > 이 문서를 Claude Code에 전달하면 에피소드 제작을 시작할 수 있다.
 > 상세 시스템 문서: ENOMETA_SYSTEM_SNAPSHOT_v6.md 참조
 > 음악 엔진 상세: ENOMETA_Music_Engine_Spec_v6.md 참조
-> **last_updated**: 2026-03-03 — 문서 리팩토링 (중복 제거, SNAPSHOT과 역할 분리)
+> **last_updated**: 2026-03-03 — ikeda 팔레트 + PixelGrid 통합 반영
 
 ---
 
@@ -69,7 +69,8 @@
 > 22개 vocab 컴포넌트 목록: SYSTEM_SNAPSHOT Sec.4 참조
 > 음악 엔진 악기 26종 + 합성법 9종: Music_Engine_Spec 참조
 > 컬러 팔레트 8종: SYSTEM_SNAPSHOT Sec.7 참조
-> visual_script_generator가 자동 선택하므로 CLI 실행 시 수동 지정 불필요
+> visual_script_generator가 자동 선택. v8: ikeda 팔레트 기본 + PixelGrid/PixelWaveform 25% 확률 주입
+> `--palette` 옵션으로 다른 팔레트 선택 가능 (8bit vocab 색상도 자동 연동)
 
 ---
 

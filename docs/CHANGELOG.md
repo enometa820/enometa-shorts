@@ -5,6 +5,30 @@
 
 ---
 
+## 2026-03-03 — PixelGrid/PixelWaveform ikeda 통합 + 레거시 클린업
+
+### 코드 변경
+- **`visual_script_generator.py`**: PALETTES에 ikeda 팔레트 추가 (기존: phantom 폴백 → 해결)
+- **`visual_script_generator.py`**: ikeda inject_vocabs 활성화 (`pixel_grid_rain`, `pixel_grid_life`, `pixel_waveform_cascade`, 25% 확률)
+
+### 문서 레거시 클린업
+- **SNAPSHOT Sec.4**: PixelGrid/PixelWaveform "v8 ikeda 팔레트 연동" 표시, VOCAB_MAP 활성 vocab 명시
+- **SNAPSHOT Sec.4**: 비주얼 전략 "techno→dense, algorave→collision" 장르 매핑 제거
+- **SNAPSHOT Sec.3-1**: v5 bytebeat 설명 → v8 ikeda 기준으로 갱신
+- **SNAPSHOT Sec.7**: 팔레트 테이블 ikeda 최상단 + "8종 선택 가능" 구조로 변경
+- **SNAPSHOT Sec.8**: 파일 구조 코멘트 v8 기준 업데이트
+- **Visual_Diff Spec**: BytebeatLayer/FeedbackLayer "(v8 ikeda 미사용)" 표시
+
+### 반영 문서
+| 문서 | 반영 내용 |
+|------|----------|
+| SYSTEM_SNAPSHOT | ikeda 팔레트 통합, 레거시 클린업 (Sec.3-1, 4, 7, 8) |
+| ClaudeCode_Brief | ikeda 팔레트 + PixelGrid 통합 반영 |
+| Visual_Diff_Spec | BytebeatLayer/FeedbackLayer v8 미사용 표시 |
+| CHANGELOG | 이 항목 |
+
+---
+
 ## 2026-03-03 — 문서 시스템 리팩토링 (토큰 최적화)
 
 ### 변경 내용

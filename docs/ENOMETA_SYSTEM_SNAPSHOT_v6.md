@@ -2,7 +2,7 @@
 > **역할**: SNAPSHOT=설계도 (아키텍처, 히스토리). 실전 매뉴얼은 ClaudeCode_Brief 참조.
 > 최종 업데이트: 2026-03-03
 > 상태: v8 ikeda 단일 장르 + Hybrid 전용화 + ikeda 확장
-> **last_updated**: 2026-03-03 — 문서 리팩토링 (Brief와 역할 분리, 환경 테이블 Brief로 이관)
+> **last_updated**: 2026-03-03 — ikeda 팔레트 추가 + PixelGrid/PixelWaveform ikeda 통합 + 레거시 클린업
 
 ---
 
@@ -64,9 +64,8 @@
 
 ### 3-1. 대본 → visual_script.json
 - `scripts/visual_script_generator.py`가 대본 + 나레이션 타이밍 + 장르 → JSON 자동 생성
-- v5: `--genre` 옵션으로 8bit 비주얼 자동 주입 (bytebeat/chiptune → gameboy 팔레트 + PixelGrid/PixelWaveform)
-- v8: 모든 에피소드 항상 `render_mode: "hybrid"` 자동 설정 + `frames_dir`/`total_frames` 자동 계산
-- 장르: 항상 ikeda (v8 단일 장르)
+- v8: 항상 ikeda 단일 장르 + `render_mode: "hybrid"` + `frames_dir`/`total_frames` 자동 계산
+- v8: 8bit vocab (PixelGrid/PixelWaveform) 25% 확률 주입, 팔레트 색상 자동 연동
 
 ### 3-2. TTS 생성
 - **필수 스크립트**: `scripts/generate_voice_edge.py` (Edge-TTS 전용)
@@ -157,15 +156,16 @@
 | **데이터 시각화** | DataBar | 바/링 차트 |
 | **Max Cooper** | GridMorph | 격자 왜곡 (3모드) |
 | **오디오 파형** | WaveformVisualizer | 파형 시각화 (4모드) |
-| **v5 8bit** | PixelGrid | 8bit 격자 (fill/outline/life/rain 4모드) |
-| | PixelWaveform | 8bit 파형 (bars/steps/cascade 3모드) |
+| **8bit** | PixelGrid | 8bit 격자 (fill/outline/life/rain 4모드) — v8: ikeda 팔레트 연동, 25% 확률 주입 |
+| | PixelWaveform | 8bit 파형 (bars/steps/cascade 3모드) — v8: ikeda 팔레트 연동 |
 | **오버레이** | PostProcess | 비네트, 스캔라인, onset 플래시 |
 
 ### VOCAB_MAP (37 vocab 키)
 ```
-기존 30개 + v5 7개:
+기존 30개 + 8bit 7개:
 pixel_grid, pixel_grid_outline, pixel_grid_life, pixel_grid_rain,
 pixel_waveform, pixel_waveform_steps, pixel_waveform_cascade
+(v8: ikeda inject_vocabs로 rain/life/cascade 활성, 나머지는 코드 존재만)
 ```
 
 ### Variant 시스템 (v5.1)
@@ -201,7 +201,7 @@ pixel_waveform, pixel_waveform_steps, pixel_waveform_cascade
 | minimal | 단일 포커스/집중 | 1 | 0.4x |
 | glitch | 글리치+노이즈/긴장 | 3 | 1.0x |
 
-- `--strategy` CLI 옵션 또는 장르 자동 매핑 (techno→dense, algorave→collision 등)
+- `--strategy` CLI 옵션 (v8: ikeda 전략 기본, 수동 변경 가능)
 - `visual_script.json`에 `"meta"` 필드로 전략 정보 기록
 
 ### Vocab 이력 추적 (v5.1)
@@ -297,18 +297,20 @@ GENRE_LAYER_PRESETS: Music 3 + TTS 4 = 7레이어.
 
 ---
 
-## 7. 컬러 팔레트 (7종)
+## 7. 컬러 팔레트 (v8: ikeda 기본, 8종 선택 가능)
+
+v8 기본: **ikeda 팔레트**. `--palette` CLI 옵션으로 다른 팔레트 선택 가능 (PixelGrid 등 모든 vocab에 자동 적용).
 
 | 이름 | 배경 | 액센트 | 용도 |
 |------|------|--------|------|
-| phantom | #06060A | #8B5CF6 | 성찰/명상 (기본) |
-| neon_noir | #050508 | #FF2D55 | 긴장/경고/algorave |
-| cold_steel | #08080C | #00F0FF | 분석/논리/harsh_noise |
+| **ikeda** | **#000000** | **#FFFFFF** | **v8 기본 — 모노크롬 데이터아트** |
+| phantom | #06060A | #8B5CF6 | 성찰/명상 |
+| neon_noir | #050508 | #FF2D55 | 긴장/경고 |
+| cold_steel | #08080C | #00F0FF | 분석/논리 |
 | ember | #0A0806 | #FF6B00 | 따뜻함/위로 |
 | synapse | #060618 | #4169E1 | 각성/연결 |
-| gameboy | #0f380f | #9bbc0f | v5 8bit (bytebeat/chiptune) |
-| c64 | #40318D | #A59ADE | v5 레트로 대안 |
-| **ikeda** | **#000000** | **#FFFFFF (씬별 전환)** | **v6 데이터아트 (모노크롬+감정색)** |
+| gameboy | #0f380f | #9bbc0f | 8bit 레트로 |
+| c64 | #40318D | #A59ADE | 레트로 대안 |
 
 ---
 
@@ -324,11 +326,11 @@ enometa-shorts/
 │   │   ├── TitleSection.tsx            # 제목 표시 (endcardStartFrame fade-out 연동)
 │   │   └── vocab/                      # 22개 비주얼 컴포넌트
 │   │       ├── (기존 20개)
-│   │       ├── PixelGrid.tsx           # v5: 8bit 격자 (4모드)
-│   │       └── PixelWaveform.tsx       # v5: 8bit 파형 (3모드)
+│   │       ├── PixelGrid.tsx           # 8bit 격자 (4모드) — v8 ikeda 팔레트 연동
+│   │       └── PixelWaveform.tsx       # 8bit 파형 (3모드) — v8 ikeda 팔레트 연동
 │   ├── types.ts                        # VisualScriptMeta (render_mode 등)
 │   └── utils/
-│       └── palettes.ts                 # 7종 팔레트 (gameboy/c64 추가)
+│       └── palettes.ts                 # 8종 팔레트 (v8: ikeda 기본)
 ├── scripts/
 │   ├── enometa_music_engine.py         # v8 (ikeda 단일, 텍스처 모듈 확장)
 │   ├── script_data_extractor.py        # v6: 대본 데이터 추출기

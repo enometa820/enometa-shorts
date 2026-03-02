@@ -71,6 +71,13 @@ PALETTES = {
         "colors": ["#A59ADE", "#7869C4", "#FFFFFF", "#FFFACD"],
         "particles": ["#7869C4", "#A59ADE", "#FFFFFF", "#6C5EB5", "#FFFACD"],
     },
+    "ikeda": {
+        "bg": "#000000",
+        "accent": "#FFFFFF",
+        "glow": "#CCCCCC",
+        "colors": ["#FFFFFF", "#AAAAAA", "#555555", "#222222"],
+        "particles": ["#FFFFFF", "#CCCCCC", "#888888", "#444444", "#222222"],
+    },
 }
 
 # ============================================================
@@ -218,8 +225,8 @@ GENRE_VISUAL_OVERRIDES = {
     # techno: 기본 비주얼 유지, 오버라이드 없음
     "ikeda": {
         "palette": "ikeda",
-        "inject_vocabs": [],  # Python 레이어가 전담, vocab 주입 최소화
-        "inject_chance": 0.0,
+        "inject_vocabs": ["pixel_grid_rain", "pixel_grid_life", "pixel_waveform_cascade"],
+        "inject_chance": 0.25,  # 씬의 25% 확률로 8bit 격자/파형 등장
         "force_bg_pixel": False,
     },
 }

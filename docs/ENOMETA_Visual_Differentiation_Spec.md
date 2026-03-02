@@ -3,7 +3,7 @@
 > 버전: 2.0
 > 최종 업데이트: 2026-03-02 — v8 ikeda 단일 장르 + Hybrid 전용화
 > 상태: **Phase 1~4 구현 완료** / v8 ikeda 단일 장르 + ikeda 확장
-> **last_updated**: 2026-03-02 — v8 + 글쓰기 v11 + script_data v2 (EMOTION 68개 감정어 → 비주얼 감정 태그 매핑 고도화)
+> **last_updated**: 2026-03-03 — BytebeatLayer/FeedbackLayer v8 미사용 표시
 
 ---
 
@@ -87,8 +87,8 @@ visual_script.json → VocabEntry.variant → VisualSection.tsx → Component(va
 | **Music** | SineWaveLayer | 오실로스코프 사인파 (sine_interference_values → 파형) |
 | **Music** | WaveformLayer | 오디오 파형 직접 렌더링 |
 | **Music** | ParticleLayer | 파티클 시뮬레이션 (오디오 에너지 → 물리) |
-| **Music** | BytebeatLayer | bytebeat 공식 → 픽셀 |
-| **Music** | FeedbackLayer | 자기참조 피드백 루프 |
+| **Music** | BytebeatLayer | bytebeat 공식 → 픽셀 (v8 ikeda 미사용) |
+| **Music** | FeedbackLayer | 자기참조 피드백 루프 (v8 ikeda 미사용) |
 | **TTS** | BarcodeLayer | UTF-8 바이트 → 바코드 스트라이프 |
 | **TTS** | DataStreamLayer | 데이터 스트림 수평 스크롤 |
 | **TTS** | TextDataLayer | 터미널 스타일 텍스트 카드 |
