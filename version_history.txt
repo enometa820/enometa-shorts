@@ -1,0 +1,53 @@
+* d1e7f4f v4~v8 + Writing v11: 시스템 전면 업그레이드
+* 199f79e EP003 완료 + Music Engine v5 + 8bit 비주얼 시스템
+* 6a6469c EP002: 당신의 오답이 뇌를 가장 크게 깨운다
+* 2ed287a EP001 완성 스냅샷: 전체 파이프라인 + 제목 스타일 강화
+ .gitignore                                 |   10 +
+ scripts/audio_mixer.py                     |  140 ++-
+ scripts/enometa_music_engine.py            | 1692 ++++++++++++++++++++++++----
+ scripts/feedback_defaults.json             |   67 ++
+ scripts/generate_voice.py                  |  166 ---
+ scripts/generate_voice_edge.py             |  142 +++
+ scripts/script_data_extractor.py           |  512 +++++++++
+ scripts/subtitle_grouper.py                |   85 ++
+ scripts/visual_layers/__init__.py          |   28 +
+ scripts/visual_layers/barcode_layer.py     |  160 +++
+ scripts/visual_layers/bytebeat_layer.py    |   79 ++
+ scripts/visual_layers/composite.py         |   62 +
+ scripts/visual_layers/data_matrix_layer.py |   58 +
+ scripts/visual_layers/data_stream_layer.py |  227 ++++
+ scripts/visual_layers/feedback_layer.py    |   43 +
+ scripts/visual_layers/particle_layer.py    |   65 ++
+ scripts/visual_layers/sine_wave_layer.py   |   98 ++
+ scripts/visual_layers/text_data_layer.py   |  252 +++++
+ scripts/visual_layers/tts_effects.py       |  277 +++++
+ scripts/visual_layers/waveform_layer.py    |   62 +
+ scripts/visual_renderer.py                 |  354 ++++++
+ scripts/visual_script_generator.py         |  267 ++++-
+ scripts/visual_strategies.py               |  126 +++
+ skills/enometa-writing.md                  |  553 ++++++---
+ src/EnometaShorts.tsx                      |    2 +
+ src/Root.tsx                               |   50 +
+ src/components/LogoEndcard.tsx             |  102 +-
+ src/components/PythonFrameBackground.tsx   |   40 +
+ src/components/SubtitleSection.tsx         |    6 +-
+ src/components/TitleSection.tsx            |   16 +-
+ src/components/VisualSection.tsx           |   72 +-
+ src/components/vocab/DataBar.tsx           |    2 +-
+ src/components/vocab/FlowField.tsx         |   43 +-
+ src/components/vocab/FractalCrack.tsx      |  104 +-
+ src/components/vocab/GridMorph.tsx         |  206 ++--
+ src/components/vocab/NeuralNetwork.tsx     |  122 +-
+ src/components/vocab/ParticleBirth.tsx     |   99 +-
+ src/components/vocab/ParticleConverge.tsx  |   59 +-
+ src/components/vocab/ParticleEscape.tsx    |   78 +-
+ src/components/vocab/ParticleOrbit.tsx     |   42 +-
+ src/components/vocab/ParticleScatter.tsx   |   58 +-
+ src/ep004Script.ts                         |   14 +
+ src/ep005Script.ts                         |   14 +
+ src/types.ts                               |   14 +
+ vocab_history.json                         |   28 +
+ 45 files changed, 5684 insertions(+), 1012 deletions(-)
+---
+이전 버전 복원 명령: git checkout 199f79e
+현재 버전으로 복귀: git checkout main

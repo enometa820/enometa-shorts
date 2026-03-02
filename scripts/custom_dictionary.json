@@ -1,0 +1,9 @@
+{
+  "_comment": "ENOMETA 사용자 커스텀 사전. 미등록 단어 감지 시 여기에 추가됨. script_data_extractor.py가 자동 로드.",
+  "_version": "1.0",
+  "verb_energy": {},
+  "emotion_intensity": {},
+  "science_terms": [],
+  "chemicals": [],
+  "body_parts": []
+}

@@ -14,6 +14,7 @@ import json
 import re
 from functools import reduce
 from operator import xor
+from pathlib import Path
 
 
 # ============================================================
@@ -133,49 +134,89 @@ PARTICLES = {"가", "이", "를", "을", "는", "은", "의", "에", "에서", "
              "와", "과", "도", "만", "부터", "까지", "처럼", "보다"}
 
 CHEMICALS = {"코르티솔", "아드레날린", "도파민", "노르에피네프린", "세로토닌",
-             "엔도르핀", "옥시토신", "GABA", "글루타메이트"}
+             "엔도르핀", "옥시토신", "GABA", "글루타메이트",
+             # v11.1 확장
+             "멜라토닌", "테스토스테론", "에스트로겐", "인슐린", "글리코겐",
+             "아세틸콜린", "히스타민", "프로락틴", "바소프레신", "ATP"}
+
 BODY_PARTS = {"편도체", "전두엽", "해마", "시상하부", "뇌", "심장", "심박수",
-              "호흡", "손바닥", "몸"}
+              "호흡", "손바닥", "몸",
+              # v11.1 확장
+              "측두엽", "두정엽", "후두엽", "소뇌", "뇌간", "대뇌피질", "시냅스",
+              "뉴런", "축삭", "수상돌기", "신경세포", "척수", "미주신경",
+              "동공", "피부", "혈관", "근육", "폐", "위장", "간"}
+
 SCIENCE_TERMS = {"화학식", "회로", "신호", "패턴", "수치", "실험", "데이터",
                  "반응", "분비", "급등", "상승", "하강",
-                 # 컴퓨팅/시스템 (v11 확장)
-                 "알고리즘", "네트워크", "시냅스", "최적화", "시뮬레이션", "변수", "함수",
-                 "코드", "연산", "프로세스", "루프", "재귀",
-                 # 철학/인문학 (v11 확장)
+                 # 컴퓨팅/시스템
+                 "알고리즘", "네트워크", "최적화", "시뮬레이션", "변수", "함수",
+                 "코드", "연산", "프로세스", "루프", "재귀", "캐시", "버퍼",
+                 "대역폭", "지연시간", "처리량", "병렬", "직렬", "모듈", "인터페이스",
+                 "컴파일", "런타임", "스택", "큐", "트리", "그래프", "해시",
+                 # 데이터/수학
+                 "확률", "통계", "평균", "분산", "표준편차", "상관", "회귀",
+                 "분포", "정규분포", "빈도", "비율", "퍼센트", "편차", "중앙값",
+                 # 뇌과학/생물
+                 "가소성", "전위", "활성화", "억제", "흥분성", "수용체", "전달물질",
+                 "리듬", "진동", "주파수", "진폭", "파장", "스펙트럼",
+                 # 철학/인문학
                  "존재", "본질", "의식", "인식", "자아", "자유의지",
-                 "구조", "메커니즘", "역학", "확률", "통계"}
+                 "구조", "메커니즘", "역학", "현상", "실체", "범주", "명제",
+                 "귀납", "연역", "인과", "상관", "필연", "우연", "결정론"}
 
 # ============================================================
 # Semantic Intensity 룩업 테이블
 # ============================================================
 VERB_ENERGY = {
-    # 최고 에너지 (0.85~0.9)
-    "폭발": 0.9, "급등": 0.9, "폭주": 0.9, "분비": 0.85, "터지": 0.85,
-    "치솟": 0.85,
-    # 고에너지 (0.7~0.8)
+    # 최고 에너지 (0.85~0.9) — 파괴/폭발/극단
+    "폭발": 0.9, "급등": 0.9, "폭주": 0.9, "붕괴": 0.9, "전멸": 0.9,
+    "분비": 0.85, "터지": 0.85, "치솟": 0.85, "추락": 0.85, "압도": 0.85,
+    "소멸": 0.85, "잠식": 0.85, "침식": 0.85,
+    # 고에너지 (0.7~0.8) — 변혁/관통/초월
     "초월": 0.8, "관통": 0.8, "휩쓸": 0.8, "뒤흔들": 0.8, "쏟아지": 0.8, "돌진": 0.8,
-    "해체": 0.75, "전복": 0.75, "찢": 0.75, "질주": 0.75, "가속": 0.75, "각성": 0.75,
+    "전복": 0.8, "침투": 0.8, "뚫": 0.8, "격돌": 0.8,
+    "해체": 0.75, "찢": 0.75, "질주": 0.75, "가속": 0.75, "각성": 0.75,
+    "점령": 0.75, "지배": 0.75, "압축": 0.75, "증폭": 0.75, "삼키": 0.75,
     "깨우": 0.7, "오르": 0.7, "상승": 0.7, "올라가": 0.7, "재정의": 0.7, "발산": 0.7,
-    # 중고 에너지 (0.5~0.65)
-    "밀려오": 0.65, "수렴": 0.65, "작동": 0.6, "최적화": 0.6, "성장": 0.6,
-    "연산": 0.55, "탐구": 0.55, "순환": 0.5, "성찰": 0.5, "사유": 0.5, "움직이": 0.5,
-    # 중에너지 (0.3~0.45)
-    "응시": 0.45, "흐르": 0.45, "퍼지": 0.4, "스며들": 0.3, "감싸": 0.3,
-    # 저에너지 (0.1~0.2)
-    "같": 0.2, "보이": 0.2, "하": 0.15, "되": 0.15, "있": 0.1,
+    "돌파": 0.7, "해방": 0.7, "분열": 0.7, "충돌": 0.7, "제거": 0.7, "소진": 0.7,
+    # 중고 에너지 (0.5~0.65) — 변화/이동/작용
+    "밀려오": 0.65, "수렴": 0.65, "흡수": 0.65, "확산": 0.65, "변환": 0.65,
+    "작동": 0.6, "최적화": 0.6, "성장": 0.6, "진화": 0.6, "활성화": 0.6,
+    "소모": 0.6, "축적": 0.6, "전환": 0.6, "이탈": 0.6,
+    "연산": 0.55, "탐구": 0.55, "복제": 0.55, "변형": 0.55, "증가": 0.55,
+    "순환": 0.5, "성찰": 0.5, "사유": 0.5, "움직이": 0.5, "반복": 0.5,
+    "처리": 0.5, "저장": 0.5, "전달": 0.5, "생성": 0.5, "삭제": 0.5,
+    # 중에너지 (0.3~0.45) — 정적 변화/관찰
+    "응시": 0.45, "흐르": 0.45, "멈추": 0.45, "기다리": 0.45, "지나가": 0.45,
+    "퍼지": 0.4, "감소": 0.4, "줄어들": 0.4, "식": 0.4, "가라앉": 0.4,
+    "스며들": 0.3, "감싸": 0.3, "머무르": 0.3, "쉬": 0.3, "놓": 0.3,
+    # 저에너지 (0.1~0.2) — 상태/존재
+    "같": 0.2, "보이": 0.2, "느끼": 0.2, "알": 0.2, "모르": 0.2,
+    "하": 0.15, "되": 0.15, "나": 0.15, "가": 0.15,
+    "있": 0.1, "없": 0.1, "아니": 0.1,
 }
 
 EMOTION_INTENSITY = {
-    # 최고 강도 (0.85~0.9)
-    "공포": 0.9, "경악": 0.9, "두려움": 0.85, "혼돈": 0.85, "비탄": 0.85,
-    # 고강도 (0.7~0.8)
-    "전율": 0.8, "경외": 0.8, "숭고": 0.8, "각성": 0.75, "해방": 0.75, "경이": 0.75,
-    "흥분": 0.7, "자각": 0.7,
-    # 중강도 (0.4~0.65)
-    "쾌감": 0.65, "긴장": 0.65, "불안": 0.6, "초조": 0.6, "허무": 0.6,
-    "집중": 0.5, "몰입": 0.5, "연민": 0.5, "기대": 0.45, "호기심": 0.4, "체념": 0.4,
-    # 저강도 (0.1~0.2)
-    "안정": 0.2, "평온": 0.1, "고요": 0.1,
+    # 최고 강도 (0.85~0.9) — 극단적 감정/위기/충격
+    "공포": 0.9, "경악": 0.9, "절망": 0.9, "광기": 0.9,
+    "두려움": 0.85, "혼돈": 0.85, "비탄": 0.85, "분노": 0.85, "격분": 0.85,
+    "공황": 0.85, "파멸": 0.85, "소멸감": 0.85,
+    # 고강도 (0.7~0.8) — 강렬한 감정/각성/전환
+    "전율": 0.8, "경외": 0.8, "숭고": 0.8, "열광": 0.8, "환희": 0.8, "황홀": 0.8,
+    "각성": 0.75, "해방": 0.75, "경이": 0.75, "비장": 0.75, "결연": 0.75, "격앙": 0.75,
+    "흥분": 0.7, "자각": 0.7, "열망": 0.7, "갈망": 0.7, "초월감": 0.7, "통찰": 0.7,
+    # 중고 강도 (0.55~0.65) — 뚜렷한 감정/긴장
+    "쾌감": 0.65, "긴장": 0.65, "죄책감": 0.65, "수치심": 0.65, "질투": 0.65,
+    "불안": 0.6, "초조": 0.6, "허무": 0.6, "고독": 0.6, "상실": 0.6, "그리움": 0.6,
+    "아이러니": 0.55, "모순": 0.55, "혼란": 0.55, "의심": 0.55,
+    # 중강도 (0.4~0.5) — 인지적/성찰적 감정
+    "집중": 0.5, "몰입": 0.5, "연민": 0.5, "동경": 0.5, "경탄": 0.5,
+    "기대": 0.45, "호기심": 0.45, "체념": 0.45, "무력감": 0.45,
+    "회의": 0.4, "의문": 0.4, "향수": 0.4, "담담함": 0.4,
+    # 저강도 (0.1~0.3) — 잔잔한/배경적 감정
+    "위안": 0.3, "안도": 0.3, "수용": 0.3, "관조": 0.25,
+    "안정": 0.2, "무관심": 0.2, "나른함": 0.15,
+    "평온": 0.1, "고요": 0.1, "정적": 0.1,
 }
 
 # 키워드 타입별 기본 intensity
@@ -187,6 +228,181 @@ KEYWORD_TYPE_INTENSITY = {
     "science": 0.5,
     "number": 0.6,
 }
+
+
+# ============================================================
+# Custom Dictionary 로딩 (사용자 추가 단어)
+# ============================================================
+CUSTOM_DICT_PATH = Path(__file__).parent / "custom_dictionary.json"
+
+
+def load_custom_dictionary():
+    """custom_dictionary.json 로드 → 기존 사전에 머지"""
+    if not CUSTOM_DICT_PATH.exists():
+        return
+    try:
+        with open(CUSTOM_DICT_PATH, 'r', encoding='utf-8') as f:
+            custom = json.load(f)
+    except (json.JSONDecodeError, IOError):
+        return
+
+    # VERB_ENERGY 머지
+    for word, score in custom.get("verb_energy", {}).items():
+        if word not in VERB_ENERGY:
+            VERB_ENERGY[word] = score
+
+    # EMOTION_INTENSITY 머지
+    for word, score in custom.get("emotion_intensity", {}).items():
+        if word not in EMOTION_INTENSITY:
+            EMOTION_INTENSITY[word] = score
+
+    # Set 사전들 머지
+    for term in custom.get("science_terms", []):
+        SCIENCE_TERMS.add(term)
+    for term in custom.get("chemicals", []):
+        CHEMICALS.add(term)
+    for term in custom.get("body_parts", []):
+        BODY_PARTS.add(term)
+
+
+def save_to_custom_dictionary(updates):
+    """미등록 단어를 custom_dictionary.json에 저장
+    updates: {"verb_energy": {word: score}, "emotion_intensity": {word: score},
+              "science_terms": [word], "chemicals": [word], "body_parts": [word]}
+    """
+    # 기존 파일 로드
+    if CUSTOM_DICT_PATH.exists():
+        try:
+            with open(CUSTOM_DICT_PATH, 'r', encoding='utf-8') as f:
+                custom = json.load(f)
+        except (json.JSONDecodeError, IOError):
+            custom = {}
+    else:
+        custom = {}
+
+    # 머지
+    custom.setdefault("_comment", "ENOMETA 사용자 커스텀 사전")
+    custom.setdefault("_version", "1.0")
+    for k in ("verb_energy", "emotion_intensity"):
+        custom.setdefault(k, {})
+        custom[k].update(updates.get(k, {}))
+    for k in ("science_terms", "chemicals", "body_parts"):
+        custom.setdefault(k, [])
+        existing = set(custom[k])
+        for item in updates.get(k, []):
+            if item not in existing:
+                custom[k].append(item)
+
+    with open(CUSTOM_DICT_PATH, 'w', encoding='utf-8') as f:
+        json.dump(custom, f, ensure_ascii=False, indent=2)
+
+
+# ============================================================
+# 미등록 단어 감지 (Unregistered Word Detection)
+# ============================================================
+# 미등록 단어 감지 제외 목록 (일반적인 비-키워드 단어)
+_COMMON_SKIP = {
+    "것", "수", "때", "중", "안", "속", "위", "뒤", "앞", "번", "개", "명",
+    "년", "월", "일", "시", "분", "초", "곳", "등", "더", "덜", "가장",
+    "매우", "아주", "정말", "진짜", "모두", "다시", "그", "이", "저",
+    "어떤", "무엇", "왜", "어디", "누구", "언제", "아닌", "같은", "다른",
+    "새로운", "오래된", "큰", "작은", "많은", "적은", "높은", "낮은",
+    "좋은", "나쁜", "첫", "마지막", "하나", "둘", "셋",
+}
+
+
+def detect_unregistered_words(segments):
+    """대본 세그먼트에서 미등록 단어 감지.
+    Returns: {
+        "unregistered_verbs": [{"word": str, "context": str, "suggested_score": float}],
+        "unregistered_nouns": [{"word": str, "context": str, "frequency": int}],
+    }
+    """
+    unregistered_verbs = {}  # word → {"contexts": [], "count": int}
+    unregistered_nouns = {}  # word → {"contexts": [], "count": int}
+
+    # 모든 등록된 단어 집합 (빠른 조회)
+    all_registered = (
+        set(VERB_ENERGY.keys())
+        | set(EMOTION_INTENSITY.keys())
+        | SCIENCE_TERMS | CHEMICALS | BODY_PARTS
+        | PARTICLES | _COMMON_SKIP
+    )
+
+    for seg in segments:
+        text = seg.get("text", "")
+        tokens = tokenize_korean(text)
+
+        for t in tokens:
+            word = t["text"]
+            wtype = t["type"]
+
+            # 등록 여부 확인: 조사/구두점/숫자/이미 분류된 특수 타입은 스킵
+            if wtype in ("particle", "punct", "number", "chemical", "body", "science"):
+                continue
+
+            # 이미 등록된 단어면 스킵
+            if word in all_registered:
+                continue
+
+            # 동사 어간이 VERB_ENERGY에 부분 매칭되는지 체크
+            if wtype == "verb":
+                matched = False
+                for stem in VERB_ENERGY:
+                    if stem in word:
+                        matched = True
+                        break
+                if matched:
+                    continue
+                # 미등록 동사 발견
+                if word not in unregistered_verbs:
+                    unregistered_verbs[word] = {"contexts": [], "count": 0}
+                unregistered_verbs[word]["count"] += 1
+                if len(unregistered_verbs[word]["contexts"]) < 3:
+                    unregistered_verbs[word]["contexts"].append(text[:50])
+            else:
+                # 감정어/명사 중 미등록
+                # 2글자 이상만 (1글자는 대부분 조사/접미사)
+                if len(word) < 2:
+                    continue
+                if word not in unregistered_nouns:
+                    unregistered_nouns[word] = {"contexts": [], "count": 0}
+                unregistered_nouns[word]["count"] += 1
+                if len(unregistered_nouns[word]["contexts"]) < 3:
+                    unregistered_nouns[word]["contexts"].append(text[:50])
+
+    # 결과 정리 (빈도 높은 순)
+    result_verbs = []
+    for word, info in sorted(unregistered_verbs.items(), key=lambda x: -x[1]["count"]):
+        # 동사 점수 추정: 글자 수 + 어감 기반 (기본 0.5)
+        suggested = 0.5
+        result_verbs.append({
+            "word": word,
+            "frequency": info["count"],
+            "contexts": info["contexts"],
+            "suggested_score": suggested,
+            "category": "verb_energy",
+        })
+
+    result_nouns = []
+    for word, info in sorted(unregistered_nouns.items(), key=lambda x: -x[1]["count"]):
+        # 감정어 후보인지 판별 (주관적 감정/상태를 나타내는 단어)
+        result_nouns.append({
+            "word": word,
+            "frequency": info["count"],
+            "contexts": info["contexts"],
+            "category": "unknown",  # 사용자가 분류
+        })
+
+    return {
+        "unregistered_verbs": result_verbs,
+        "unregistered_nouns": result_nouns,
+        "total_unregistered": len(result_verbs) + len(result_nouns),
+    }
+
+
+# 모듈 로드 시 커스텀 사전 자동 머지
+load_custom_dictionary()
 
 
 def tokenize_korean(text):
@@ -468,24 +684,147 @@ def extract_script_data(narration_timing_path):
     }
 
 
+def print_unregistered_report(unregistered):
+    """미등록 단어 리포트 출력"""
+    if unregistered["total_unregistered"] == 0:
+        print("\n  [DICT] All words registered - no unregistered words found.")
+        return
+
+    print(f"\n  ========== UNREGISTERED WORDS: {unregistered['total_unregistered']} ==========")
+
+    if unregistered["unregistered_verbs"]:
+        print(f"\n  [VERB] Unregistered verbs ({len(unregistered['unregistered_verbs'])}):")
+        for v in unregistered["unregistered_verbs"]:
+            ctx = v["contexts"][0] if v["contexts"] else ""
+            print(f"    - \"{v['word']}\" (x{v['frequency']}) suggested={v['suggested_score']}")
+            if ctx:
+                try:
+                    print(f"      context: \"{ctx}\"")
+                except UnicodeEncodeError:
+                    pass
+
+    if unregistered["unregistered_nouns"]:
+        print(f"\n  [NOUN/EMOTION] Unregistered nouns ({len(unregistered['unregistered_nouns'])}):")
+        for n in unregistered["unregistered_nouns"][:20]:  # 상위 20개만
+            ctx = n["contexts"][0] if n["contexts"] else ""
+            print(f"    - \"{n['word']}\" (x{n['frequency']})")
+            if ctx:
+                try:
+                    print(f"      context: \"{ctx}\"")
+                except UnicodeEncodeError:
+                    pass
+        if len(unregistered["unregistered_nouns"]) > 20:
+            print(f"    ... and {len(unregistered['unregistered_nouns']) - 20} more")
+
+    print(f"\n  [TIP] Use --update-dict to interactively add words to custom_dictionary.json")
+    print(f"  [TIP] Or manually edit: scripts/custom_dictionary.json")
+
+
+def interactive_dict_update(unregistered):
+    """미등록 단어를 대화형으로 custom_dictionary에 추가"""
+    updates = {
+        "verb_energy": {},
+        "emotion_intensity": {},
+        "science_terms": [],
+        "chemicals": [],
+        "body_parts": [],
+    }
+    added_count = 0
+
+    # 동사 처리
+    for v in unregistered["unregistered_verbs"]:
+        print(f"\n  Verb: \"{v['word']}\" (used {v['frequency']}x)")
+        if v["contexts"]:
+            try:
+                print(f"  Context: \"{v['contexts'][0]}\"")
+            except UnicodeEncodeError:
+                pass
+        answer = input(f"  Add to VERB_ENERGY? [y/N/score(0.1~0.9)]: ").strip().lower()
+        if answer == 'y':
+            updates["verb_energy"][v["word"]] = v["suggested_score"]
+            added_count += 1
+            print(f"    -> Added with score {v['suggested_score']}")
+        elif answer and answer != 'n':
+            try:
+                score = float(answer)
+                score = max(0.1, min(0.9, score))
+                updates["verb_energy"][v["word"]] = score
+                added_count += 1
+                print(f"    -> Added with score {score}")
+            except ValueError:
+                print(f"    -> Skipped")
+
+    # 명사/감정어 처리 (상위 15개만)
+    for n in unregistered["unregistered_nouns"][:15]:
+        print(f"\n  Word: \"{n['word']}\" (used {n['frequency']}x)")
+        if n["contexts"]:
+            try:
+                print(f"  Context: \"{n['contexts'][0]}\"")
+            except UnicodeEncodeError:
+                pass
+        answer = input(f"  Category? [e=emotion/s=science/c=chemical/b=body/N=skip/score]: ").strip().lower()
+        if answer == 'e' or answer.startswith('e'):
+            score_str = input(f"  Emotion score (0.1~0.9, default 0.5): ").strip()
+            score = 0.5
+            if score_str:
+                try:
+                    score = max(0.1, min(0.9, float(score_str)))
+                except ValueError:
+                    pass
+            updates["emotion_intensity"][n["word"]] = score
+            added_count += 1
+            print(f"    -> Added to EMOTION with score {score}")
+        elif answer == 's':
+            updates["science_terms"].append(n["word"])
+            added_count += 1
+            print(f"    -> Added to SCIENCE_TERMS")
+        elif answer == 'c':
+            updates["chemicals"].append(n["word"])
+            added_count += 1
+            print(f"    -> Added to CHEMICALS")
+        elif answer == 'b':
+            updates["body_parts"].append(n["word"])
+            added_count += 1
+            print(f"    -> Added to BODY_PARTS")
+
+    if added_count > 0:
+        save_to_custom_dictionary(updates)
+        print(f"\n  [SAVED] {added_count} words added to {CUSTOM_DICT_PATH}")
+        # 런타임에도 즉시 반영
+        load_custom_dictionary()
+    else:
+        print(f"\n  No words added.")
+
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: py scripts/script_data_extractor.py <narration_timing.json> [output.json]")
+        print("  Options:")
+        print("    --update-dict   Interactive mode to add unregistered words to custom dictionary")
+        print("    --report-only   Show unregistered word report without extraction")
         sys.exit(1)
 
-    input_path = sys.argv[1]
-    if len(sys.argv) > 2:
-        output_path = sys.argv[2]
+    # 옵션 파싱
+    args = [a for a in sys.argv[1:] if not a.startswith('--')]
+    update_dict = '--update-dict' in sys.argv
+    report_only = '--report-only' in sys.argv
+
+    input_path = args[0]
+    if len(args) > 1:
+        output_path = args[1]
     else:
         output_path = os.path.join(os.path.dirname(input_path), "script_data.json")
 
     print(f"=== ENOMETA Script Data Extractor ===")
     print(f"  Input: {input_path}")
+    print(f"  Dictionaries: VERB={len(VERB_ENERGY)} EMOTION={len(EMOTION_INTENSITY)} "
+          f"SCIENCE={len(SCIENCE_TERMS)} CHEM={len(CHEMICALS)} BODY={len(BODY_PARTS)}")
 
     result = extract_script_data(input_path)
 
-    with open(output_path, 'w', encoding='utf-8') as f:
-        json.dump(result, f, ensure_ascii=False, indent=2)
+    if not report_only:
+        with open(output_path, 'w', encoding='utf-8') as f:
+            json.dump(result, f, ensure_ascii=False, indent=2)
 
     # 요약 출력
     g = result["global"]
@@ -493,7 +832,8 @@ def main():
     print(f"  Numbers found: {g['all_numbers']}")
     print(f"  Chemicals found: {g['all_chemicals']}")
     print(f"  Freq map: {g['freq_map']}")
-    print(f"  Output: {output_path}")
+    if not report_only:
+        print(f"  Output: {output_path}")
 
     # 세그먼트별 데이터 밀도 + semantic intensity
     for seg in result["segments"]:
@@ -506,6 +846,24 @@ def main():
             print(f"  [{seg['index']:02d}] {si_bar} si={si:.2f} d={density:.2f} kw={kw_count} | {text_preview}")
         except UnicodeEncodeError:
             print(f"  [{seg['index']:02d}] si={si:.2f} d={density:.2f} kw={kw_count}")
+
+    # 미등록 단어 감지
+    unregistered = detect_unregistered_words(
+        [{"text": seg["text"]} for seg in result["segments"]]
+    )
+    # 미등록 단어를 결과에 포함
+    result["unregistered_words"] = unregistered
+
+    if not report_only:
+        with open(output_path, 'w', encoding='utf-8') as f:
+            json.dump(result, f, ensure_ascii=False, indent=2)
+
+    # 리포트 출력
+    print_unregistered_report(unregistered)
+
+    # 대화형 사전 업데이트
+    if update_dict and unregistered["total_unregistered"] > 0:
+        interactive_dict_update(unregistered)
 
 
 if __name__ == "__main__":
