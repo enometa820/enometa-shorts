@@ -15,10 +15,20 @@ Thumbs.db
 *.mp4
 *.avi
 *.mov
+*.npz
+
+# Visual frames (large PNG sequences)
+**/frames/
+public/ep*/frames/
+
+# Python cache
+__pycache__/
+*.pyc
 
 # Temp
 _tts_temp/
 *.log
+nul
 
 # IDE
 .vscode/

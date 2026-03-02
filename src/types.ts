@@ -10,12 +10,14 @@ export type AudioReactiveConfig = Record<string, any>;
 export interface VocabEntry {
   vocab: string;
   params: VocabParams;
+  variant?: string;
 }
 
 // 배경 설정
 export interface BackgroundConfig {
   vocab: string;
   params: VocabParams;
+  variant?: string;
   transition_to?: string;
 }
 
@@ -52,6 +54,17 @@ export interface NarrationSegment {
   duration_sec: number;
 }
 
+// 비주얼 스크립트 메타 정보 (생성기가 출력)
+export interface VisualScriptMeta {
+  render_mode?: "hybrid";
+  frames_dir?: string;
+  total_frames?: number;
+  strategy?: string;
+  genre?: string;
+  palette?: string;
+  seed?: number;
+}
+
 // 비주얼 스크립트 전체 구조
 export interface VisualScript {
   global: {
@@ -61,6 +74,7 @@ export interface VisualScript {
     font: string;
     palette?: string;
   };
+  meta?: VisualScriptMeta;
   scenes: Scene[];
   transitions?: Record<string, TransitionConfig>;
 }

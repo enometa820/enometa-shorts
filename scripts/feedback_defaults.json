@@ -1,0 +1,67 @@
+{
+  "version": 3,
+  "last_updated": "2026-03-02",
+  "last_updated_from": "volume_balance_4_6",
+
+  "music_defaults": {
+    "volume_caps": {
+      "bytebeat": {"max_volume": 0.3, "note": "noise overload risk, minimize usage"},
+      "feedback": {"max_volume": 0.3, "note": "noise overload risk, minimize usage"},
+      "stutter_gate": {"max_volume": 0.3, "note": "minimize usage"}
+    },
+    "energy_rules": [
+      {"condition": "genre in [algorave, harsh_noise]", "max_energy": 0.72, "source": "ep004_experience"},
+      {"condition": "genre == ikeda", "rule": "최소한의 리듬/멜로디 구조 필수, 순수 노이즈 금지", "source": "ep005_feedback"}
+    ],
+    "instrument_notes": {
+      "bytebeat": "최소화 — noise 과다 위험",
+      "feedback": "최소화 — noise 과다 위험",
+      "stutter_gate": "최소화",
+      "ikeda_genre": "sine_interference + ultrahigh만으로는 음악이 아님. 리듬(kick/click 패턴), 멜로디(sine 시퀀스) 필수"
+    }
+  },
+
+  "visual_defaults": {
+    "layer_rules": [
+      {"rule": "hybrid 모드에서도 Remotion vocab 컴포넌트를 Python 배경 위에 반드시 오버레이", "source": "ep005_feedback"},
+      {"rule": "파티클, 모션그래픽, 텍스트 애니메이션 등 다양한 패턴 혼합 필수", "source": "ep005_feedback"},
+      {"rule": "단조로운 반복 금지 - 씬마다 다른 비주얼 전략 적용", "source": "ep005_feedback"}
+    ],
+    "background_rules": {
+      "flow_field_calm": {"min_line_opacity": 0.06, "note": "0.05 이하 거의 안 보임"}
+    },
+    "strategy_adjustments": {
+      "hybrid_mode": "Python 배경 + Remotion vocab 오버레이 동시 사용. Python만 단독 사용 금지",
+      "remotion_utilization": "Remotion의 강점(파티클, 모션그래픽, 텍스트 애니메이션, 데이터 시각화) 적극 활용"
+    },
+    "reactivity_rules": [
+      {
+        "rule": "script_data에 semantic_intensity(0-1) 추출 필수 — 단어/문장의 의미 강도가 움직임 세기 결정",
+        "detail": "동사 에너지(폭발>오르다>스며들다), 감정 강도(공포>불안>평온), 문장 길이(짧으면 급박), 문장부호(!강조, ...여운)",
+        "source": "ep005_feedback_v2"
+      },
+      {
+        "rule": "오디오 민감도 다이나믹 레인지 확장 — 현재 rms 기반 밝기가 너무 빠르게 포화됨",
+        "detail": "semantic_intensity가 기본 레벨(0.1~0.8), rms는 그 위에 ±20% 미세 변조만. 조용한 구간은 정말 어둡고 강한 구간만 밝게",
+        "source": "ep005_feedback_v2"
+      },
+      {
+        "rule": "byte_variance 노이즈 임계값 상향 — 현재 2000은 대부분 단어가 초과하여 전부 노이즈 추가됨",
+        "source": "ep005_feedback_v2"
+      }
+    ]
+  },
+
+  "narration_defaults": {
+    "voice": "ko-KR-SunHiNeural",
+    "rate": "+5%",
+    "tool": "generate_voice_edge.py (Edge-TTS only)",
+    "notes": ["generate_voice.py(Chatterbox) 절대 사용 금지"]
+  },
+
+  "mixing_defaults": {
+    "bgm_volume": 1.0,
+    "narration_volume": 0.67,
+    "ratio_note": "TTS:BGM = 4:6 (음악이 더 큰 비율)"
+  }
+}

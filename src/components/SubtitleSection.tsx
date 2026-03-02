@@ -89,7 +89,7 @@ export const SubtitleSection: React.FC<SubtitleSectionProps> = ({
   const emotion = activeScene?.emotion || "";
   const isEmphasis =
     emotion.includes("climax") || emotion.includes("awakening");
-  const fontSize = isEmphasis ? 48 : 42;
+  const fontSize = isEmphasis ? 62 : 54;
 
   // 한국어 스마트 줄바꿈 적용
   const formattedText = smartLineBreak(displayText, 18);
@@ -111,7 +111,7 @@ export const SubtitleSection: React.FC<SubtitleSectionProps> = ({
       <div
         style={{
           fontFamily: "Pretendard Variable, sans-serif",
-          fontWeight: isEmphasis ? 600 : 400,
+          fontWeight: isEmphasis ? 700 : 500,
           fontSize,
           color: "#FFFFFF",
           textAlign: "center",
@@ -123,7 +123,7 @@ export const SubtitleSection: React.FC<SubtitleSectionProps> = ({
             "0 0 40px rgba(0,0,0,0.4)",
           ].join(", "),
           backgroundColor: "rgba(0, 0, 0, 0.35)",
-          padding: "12px 28px",
+          padding: "16px 36px",
           borderRadius: 12,
           maxWidth: 900,
           wordBreak: "keep-all",

@@ -3,8 +3,8 @@ import { useCurrentFrame, useVideoConfig, interpolate } from "remotion";
 import { Palette } from "../utils/palettes";
 
 /**
- * ENOMETA 로고 엔드카드
- * 파티클이 흩어졌다가 "ENOMETA" 텍스트로 수렴하는 애니메이션.
+ * ENOMETA 로고 엔드카드 v2
+ * 파티클이 흩어졌다가 "ENOMETA" 텍스트로 수렴 + 다이나믹 웨이브/펄스/깜빡임.
  * palette prop으로 에피소드마다 다른 색상/분위기 적용.
  */
 
@@ -101,9 +101,9 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
     ctx.fillStyle = p.bg;
     ctx.fillRect(0, 0, W, H);
 
-    // 타이밍
-    const scatterEnd = 0.15;
-    const convergeDuration = 2.5;
+    // ===== 타이밍 (v2: 빠른 시작) =====
+    const scatterEnd = 0.03;
+    const convergeDuration = 2.0;
 
     let convergeProgress = 0;
     if (t > scatterEnd) {
@@ -121,12 +121,12 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
       const r3 = seededRandom(i + 20000);
       const r4 = seededRandom(i + 30000);
       const r5 = seededRandom(i + 40000);
-      const isAccent = r5 < 0.08;
+      const isAccent = r5 < 0.12;
       const delay = r4 * 0.5;
 
-      // 초기 위치 (원형으로 흩어진 상태)
+      // 초기 위치 (v2: 화면 안에서 시작, 더 가까운 원형)
       const angle = r1 * Math.PI * 2;
-      const radius = Math.max(W, H) * 0.35 + r2 * 400;
+      const radius = Math.max(W, H) * 0.2 + r2 * 200;
       const initX = W / 2 + Math.cos(angle) * radius;
       const initY = H / 2 + Math.sin(angle) * radius;
 
@@ -143,32 +143,66 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
       const noiseX = Math.sin(t * 1.5 + i * 3.7) * (1 - pp) * 20;
       const noiseY = Math.cos(t * 1.2 + i * 2.3) * (1 - pp) * 20;
 
-      // 안착 후 호흡 (미세한 떨림)
-      const breatheX = pp > 0.85 ? Math.sin(t * 0.8 + i * 5) * 0.6 : 0;
-      const breatheY = pp > 0.85 ? Math.cos(t * 0.6 + i * 4) * 0.6 : 0;
+      // 안착 후 호흡 (v2: 진폭 증가)
+      const breatheX = pp > 0.85 ? Math.sin(t * 1.2 + i * 5) * 2.5 : 0;
+      const breatheY = pp > 0.85 ? Math.cos(t * 0.9 + i * 4) * 2.0 : 0;
+
+      // 안착 후 웨이브 (v2: 텍스트가 물결처럼 살아있는 느낌)
+      let waveX = 0;
+      let waveY = 0;
+      if (pp > 0.9) {
+        const wavePhase =
+          t * 2.0 + target.x * 0.005 + target.y * 0.003;
+        waveX = Math.sin(wavePhase) * 3.0;
+        waveY = Math.cos(wavePhase * 0.7) * 2.0;
+      }
 
       // 흩어짐 단계 떠돌기
       const wanderX = t < scatterEnd ? Math.sin(t * 2 + i) * 4 : 0;
       const wanderY = t < scatterEnd ? Math.cos(t * 1.5 + i * 2) * 4 : 0;
 
-      // 최종 위치 = lerp(초기, 목표, 진행도) + 노이즈
+      // 최종 위치
       const x =
-        initX + (target.x - initX) * pp + noiseX + breatheX + wanderX;
+        initX +
+        (target.x - initX) * pp +
+        noiseX +
+        breatheX +
+        waveX +
+        wanderX;
       const y =
-        initY + (target.y - initY) * pp + noiseY + breatheY + wanderY;
+        initY +
+        (target.y - initY) * pp +
+        noiseY +
+        breatheY +
+        waveY +
+        wanderY;
 
-      // 크기 & 투명도
+      // 크기 & 투명도 (v2: 더 밝게 시작)
       const baseAlpha = 0.2 + r3 * 0.8;
-      const alpha = baseAlpha * (0.15 + pp * 0.85);
+      const alpha = baseAlpha * (0.35 + pp * 0.65);
       const settled = pp > 0.7 && Math.abs(x - target.x) < 15;
-      const size = isAccent
+
+      // v2: 정착 파티클 크기 펄스 (±30%)
+      const sizePulse = settled
+        ? 1.0 + Math.sin(t * 3.0 + i * 0.5) * 0.3
+        : 1.0;
+      let size = isAccent
         ? (1 + r3 * 1.5) * (settled ? 1.0 : 0.8 + (1 - pp) * 0.8)
         : (0.5 + r3 * 1.5) * (0.8 + (1 - pp) * 0.8);
-      const color = isAccent
-        ? p.accent
-        : p.particles[
+      size *= sizePulse;
+
+      // v2: 정착 파티클 색상 깜빡임 (일반→accent 전환)
+      let color: string;
+      if (isAccent) {
+        color = p.accent;
+      } else if (pp > 0.85 && Math.sin(t * 4 + i * 7) > 0.85) {
+        color = p.accent;
+      } else {
+        color =
+          p.particles[
             Math.floor(r3 * p.particles.length) % p.particles.length
           ];
+      }
 
       // 파티클 본체
       ctx.beginPath();
@@ -176,29 +210,29 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
       ctx.fillStyle = hexToRGBA(color, alpha);
       ctx.fill();
 
-      // 액센트 글로우
+      // 액센트 글로우 (v2: 강화)
       if (isAccent && settled) {
         const glowPulse = 0.5 + Math.sin(t * 3 + i) * 0.3;
         ctx.beginPath();
-        ctx.arc(x, y, size * 6, 0, Math.PI * 2);
-        ctx.fillStyle = hexToRGBA(p.glow, 0.035 * glowPulse);
+        ctx.arc(x, y, size * 8, 0, Math.PI * 2);
+        ctx.fillStyle = hexToRGBA(p.glow, 0.06 * glowPulse);
         ctx.fill();
 
         accentPositions.push({ x, y });
       }
     }
 
-    // 액센트 파티클 연결선 (수렴 후)
-    if (convergeProgress > 0.85) {
-      const lineAlpha = 0.05 * ((convergeProgress - 0.85) / 0.15);
+    // 액센트 파티클 연결선 (v2: 더 일찍, 더 강하게)
+    if (convergeProgress > 0.8) {
+      const lineAlpha = 0.08 * ((convergeProgress - 0.8) / 0.2);
       ctx.strokeStyle = hexToRGBA(p.accent, lineAlpha);
-      ctx.lineWidth = 0.5;
+      ctx.lineWidth = 0.7;
       for (let i = 0; i < accentPositions.length; i++) {
         for (let j = i + 1; j < accentPositions.length; j++) {
           const dx = accentPositions[i].x - accentPositions[j].x;
           const dy = accentPositions[i].y - accentPositions[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 70) {
+          if (dist < 90) {
             ctx.beginPath();
             ctx.moveTo(accentPositions[i].x, accentPositions[i].y);
             ctx.lineTo(accentPositions[j].x, accentPositions[j].y);
@@ -223,8 +257,8 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
   // 엔드카드 영역 밖이면 렌더링하지 않음
   if (localFrame < 0 || localFrame >= durationFrames) return null;
 
-  // 전체 페이드인/아웃
-  const fadeIn = interpolate(localFrame, [0, fps * 0.15], [0, 1], {
+  // 전체 페이드인/아웃 (v2: 빠른 fade-in)
+  const fadeIn = interpolate(localFrame, [0, fps * 0.1], [0, 1], {
     extrapolateRight: "clamp",
   });
   const fadeOut = interpolate(
@@ -235,11 +269,11 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
   );
   const opacity = fadeIn * fadeOut;
 
-  // 태그라인 등장 (수렴 완료 후)
+  // 태그라인 등장 (v2: 더 일찍, 더 오래)
   const taglineOpacity = interpolate(
     localFrame,
-    [fps * 4.2, fps * 5.0],
-    [0, 0.35],
+    [fps * 2.8, fps * 3.5],
+    [0, 0.5],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
 

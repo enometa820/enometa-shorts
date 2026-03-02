@@ -1,7 +1,8 @@
 import React from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { AudioFrame } from "../hooks/useAudioData";
-import { Scene, VocabComponentProps } from "../types";
+import { Scene, VocabComponentProps, VisualScriptMeta } from "../types";
+import { PythonFrameBackground } from "./PythonFrameBackground";
 
 // 비주얼 어휘 컴포넌트 임포트
 import { ParticleBirth } from "./vocab/ParticleBirth";
@@ -75,12 +76,14 @@ interface VisualSectionProps {
   scenes: Scene[];
   audio: AudioFrame;
   bgColor: string;
+  meta?: VisualScriptMeta;
 }
 
 export const VisualSection: React.FC<VisualSectionProps> = ({
   scenes,
   audio,
   bgColor,
+  meta,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -88,27 +91,36 @@ export const VisualSection: React.FC<VisualSectionProps> = ({
 
   const SIZE = 1080;
 
-  // 현재 시간에 해당하는 씬 찾기
-  const activeScene = scenes.find(
-    (s) => currentTime >= s.start_sec && currentTime < s.end_sec,
-  );
-
-  if (!activeScene) {
+  // ── 방어 코드: frames_dir / total_frames 미설정 시 에러 표시 ──
+  if (!meta?.frames_dir || !meta?.total_frames) {
     return (
       <div
         style={{
           width: SIZE,
           height: SIZE,
-          background: bgColor,
+          background: "#000",
+          color: "#f00",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 24,
+          fontFamily: "monospace",
         }}
-      />
+      >
+        <span>⚠ frames_dir / total_frames 미설정 — hybrid 렌더링 불가</span>
+      </div>
     );
   }
 
-  // 씬 내 진행도 (0~1)
-  const sceneProgress =
-    (currentTime - activeScene.start_sec) /
-    (activeScene.end_sec - activeScene.start_sec);
+  // ── Hybrid 모드: Python 프레임 배경 + Vocab 오버레이 + PostProcess ──
+  const activeScene = scenes.find(
+    (s) => currentTime >= s.start_sec && currentTime < s.end_sec,
+  );
+
+  const sceneProgress = activeScene
+    ? (currentTime - activeScene.start_sec) /
+      (activeScene.end_sec - activeScene.start_sec)
+    : 0;
 
   return (
     <div
@@ -120,29 +132,16 @@ export const VisualSection: React.FC<VisualSectionProps> = ({
         background: bgColor,
       }}
     >
-      {/* 배경 레이어 */}
-      {activeScene.layers.background && (() => {
-        const bgVocab = activeScene.layers.background.vocab;
-        const BgComponent = VOCAB_MAP[bgVocab];
-        if (!BgComponent) return null;
+      {/* Python 렌더 배경 (데이터 비주얼) */}
+      <PythonFrameBackground
+        framesDir={meta.frames_dir}
+        width={SIZE}
+        height={SIZE}
+        totalFrames={meta.total_frames}
+      />
 
-        return (
-          <BgComponent
-            {...activeScene.layers.background.params}
-            vocab={bgVocab}
-            audio={audio}
-            audioReactive={activeScene.layers.audio_reactive}
-            sceneProgress={sceneProgress}
-            frame={frame}
-            fps={fps}
-            width={SIZE}
-            height={SIZE}
-          />
-        );
-      })()}
-
-      {/* 의미 레이어 — 비주얼 어휘 컴포넌트 렌더링 */}
-      {activeScene.layers.semantic.map((vocabEntry, i) => {
+      {/* Vocab 시맨틱 오버레이 (모션그래픽) */}
+      {activeScene?.layers.semantic.map((vocabEntry, i) => {
         const Component = VOCAB_MAP[vocabEntry.vocab];
         if (!Component) return null;
 
@@ -151,6 +150,7 @@ export const VisualSection: React.FC<VisualSectionProps> = ({
             key={`${activeScene.id}-${vocabEntry.vocab}-${i}`}
             {...vocabEntry.params}
             vocab={vocabEntry.vocab}
+            variant={vocabEntry.variant}
             audio={audio}
             audioReactive={activeScene.layers.audio_reactive}
             sceneProgress={sceneProgress}
@@ -162,7 +162,7 @@ export const VisualSection: React.FC<VisualSectionProps> = ({
         );
       })}
 
-      {/* 포스트프로세싱 오버레이 — 모든 씬 위에 비네트/스캔라인/플래시 */}
+      {/* 포스트프로세싱 오버레이 */}
       <PostProcess audio={audio} width={SIZE} height={SIZE} />
     </div>
   );

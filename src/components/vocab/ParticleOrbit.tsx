@@ -2,11 +2,12 @@ import React, { useRef, useEffect, useMemo } from "react";
 import { VocabComponentProps } from "../../types";
 
 interface OrbitParticle {
-  angle: number;      // 시작 각도
-  radius: number;     // 궤도 반지름
-  speed: number;      // 각속도
+  angle: number;
+  radius: number;
+  speed: number;
   size: number;
-  orbitOffset: number; // 궤도 중심 오프셋
+  orbitOffset: number;
+  radiusY?: number;
 }
 
 export const ParticleOrbit: React.FC<VocabComponentProps> = ({
@@ -14,6 +15,7 @@ export const ParticleOrbit: React.FC<VocabComponentProps> = ({
   color = "#555577",
   orbit_radius = 300,
   orbit_speed = 0.5,
+  variant = "default",
   audio,
   audioReactive,
   sceneProgress,
@@ -29,16 +31,20 @@ export const ParticleOrbit: React.FC<VocabComponentProps> = ({
   const particles = useMemo(() => {
     const arr: OrbitParticle[] = [];
     for (let i = 0; i < count; i++) {
+      const rY = variant === "ellipse_drift"
+        ? orbit_radius * (0.3 + Math.random() * 0.5)
+        : undefined;
       arr.push({
         angle: Math.random() * Math.PI * 2,
         radius: orbit_radius * (0.5 + Math.random() * 0.8),
         speed: orbit_speed * (0.6 + Math.random() * 0.8),
         size: 1 + Math.random() * 1.5,
         orbitOffset: (Math.random() - 0.5) * 30,
+        radiusY: rY,
       });
     }
     return arr;
-  }, [count, orbit_radius, orbit_speed]);
+  }, [count, orbit_radius, orbit_speed, variant]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -55,10 +61,30 @@ export const ParticleOrbit: React.FC<VocabComponentProps> = ({
 
     for (const p of particles) {
       const currentAngle = p.angle + time * p.speed;
-      const currentRadius = p.radius + radiusMod + p.orbitOffset;
+      let px: number, py: number;
 
-      const px = cx + Math.cos(currentAngle) * currentRadius + (Math.random() - 0.5) * shake;
-      const py = cy + Math.sin(currentAngle) * currentRadius + (Math.random() - 0.5) * shake;
+      if (variant === "ellipse_drift") {
+        const rX = p.radius + radiusMod + p.orbitOffset;
+        const rY = (p.radiusY || p.radius * 0.6) + radiusMod * 0.5;
+        const drift = time * 0.15;
+        const ex = Math.cos(currentAngle) * rX;
+        const ey = Math.sin(currentAngle) * rY;
+        px = cx + ex * Math.cos(drift) - ey * Math.sin(drift);
+        py = cy + ex * Math.sin(drift) + ey * Math.cos(drift);
+      } else if (variant === "figure_eight") {
+        const r = p.radius + radiusMod + p.orbitOffset;
+        const a = currentAngle;
+        const denom = 1 + Math.sin(a) * Math.sin(a);
+        px = cx + (r * Math.cos(a)) / denom;
+        py = cy + (r * Math.sin(a) * Math.cos(a)) / denom;
+      } else {
+        const currentRadius = p.radius + radiusMod + p.orbitOffset;
+        px = cx + Math.cos(currentAngle) * currentRadius;
+        py = cy + Math.sin(currentAngle) * currentRadius;
+      }
+
+      px += (Math.random() - 0.5) * shake;
+      py += (Math.random() - 0.5) * shake;
 
       ctx.beginPath();
       ctx.arc(px, py, p.size, 0, Math.PI * 2);

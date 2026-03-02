@@ -12,6 +12,12 @@ import random
 import re
 from typing import List, Dict, Any, Tuple, Optional
 
+# 같은 scripts/ 디렉토리에서 임포트
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from visual_strategies import (
+    get_strategy, get_default_strategy, boost_reactivity,
+)
+
 # ============================================================
 # 팔레트 정의 (src/utils/palettes.ts와 동기화)
 # ============================================================
@@ -94,6 +100,88 @@ VOCAB_CATEGORIES = {
 }
 
 # ============================================================
+# Variant 레지스트리 — 각 vocab별 사용 가능한 variant 목록
+# ============================================================
+VARIANT_REGISTRY = {
+    "particle_birth": ["default", "triangles_rise", "lines_scatter", "dots_grid"],
+    "particle_scatter": ["default", "directional_wind", "spiral_out"],
+    "particle_converge": ["default", "multi_point", "collapse_line"],
+    "particle_orbit": ["default", "ellipse_drift", "figure_eight"],
+    "particle_escape": ["default", "chain_break", "explosion"],
+    "fractal_crack": ["default", "edge_shatter", "web_crack"],
+    "neural_network": ["default", "tree_branch", "constellation"],
+    "flow_field_calm": ["default", "vortex", "opposing"],
+    "flow_field_turbulent": ["default", "vortex", "opposing"],
+    "grid_morph": ["default", "wave_propagation", "pixel_dissolve"],
+    "grid_mesh": ["default", "wave_propagation", "pixel_dissolve"],
+}
+
+
+def select_variant(vocab: str, rng: random.Random, recent_used: set = None) -> Optional[str]:
+    """vocab에 대한 variant를 선택. variant가 없는 vocab은 None 반환."""
+    variants = VARIANT_REGISTRY.get(vocab)
+    if not variants:
+        return None
+
+    # 최근 사용된 조합 회피
+    if recent_used:
+        preferred = [v for v in variants if f"{vocab}:{v}" not in recent_used]
+        if preferred:
+            return rng.choice(preferred)
+
+    return rng.choice(variants)
+
+
+# ============================================================
+# Vocab 이력 추적 (에피소드 간 중복 회피)
+# ============================================================
+HISTORY_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "vocab_history.json")
+
+
+def load_vocab_history() -> Dict[str, Any]:
+    """vocab_history.json 로드 (없으면 빈 구조 반환)"""
+    try:
+        with open(HISTORY_PATH, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {"episodes": {}}
+
+
+def save_vocab_history(history: Dict[str, Any]) -> None:
+    """vocab_history.json 저장"""
+    with open(HISTORY_PATH, 'w', encoding='utf-8') as f:
+        json.dump(history, f, ensure_ascii=False, indent=2)
+
+
+def get_recent_used(history: Dict[str, Any], lookback: int = 2) -> set:
+    """최근 lookback개 에피소드에서 사용된 vocab:variant 조합 반환"""
+    episodes = history.get("episodes", {})
+    # 에피소드 키를 정렬해서 최근 N개 선택
+    sorted_eps = sorted(episodes.keys(), reverse=True)[:lookback]
+    recent = set()
+    for ep_key in sorted_eps:
+        for combo in episodes[ep_key].get("used_combos", []):
+            recent.add(combo)
+    return recent
+
+
+def record_episode_history(history: Dict[str, Any], episode_id: str, scenes: List[Dict]) -> None:
+    """에피소드의 vocab:variant 사용 이력 기록"""
+    combos = set()
+    for scene in scenes:
+        for entry in scene.get("layers", {}).get("semantic", []):
+            vocab = entry.get("vocab", "")
+            variant = entry.get("variant", "default")
+            combos.add(f"{vocab}:{variant}")
+        bg = scene.get("layers", {}).get("background", {})
+        if bg.get("variant"):
+            combos.add(f"{bg['vocab']}:{bg['variant']}")
+    history.setdefault("episodes", {})[episode_id] = {
+        "used_combos": sorted(combos),
+    }
+
+
+# ============================================================
 # 장르 → 비주얼 오버라이드 (8bit 장르에서 픽셀 비주얼 주입)
 # ============================================================
 GENRE_VISUAL_OVERRIDES = {
@@ -128,6 +216,12 @@ GENRE_VISUAL_OVERRIDES = {
         "force_bg_pixel": False,
     },
     # techno: 기본 비주얼 유지, 오버라이드 없음
+    "ikeda": {
+        "palette": "ikeda",
+        "inject_vocabs": [],  # Python 레이어가 전담, vocab 주입 최소화
+        "inject_chance": 0.0,
+        "force_bg_pixel": False,
+    },
 }
 
 # ============================================================
@@ -541,6 +635,10 @@ def generate_background(emotion: str, palette: dict, rng: random.Random, scene_i
             "line_color": rng.choice(palette["particles"][-3:]),
         },
     }
+    # 배경에도 variant 적용 (확률적)
+    bg_variant = select_variant(vocab, rng)
+    if bg_variant and bg_variant != "default" and rng.random() > 0.5:
+        bg["variant"] = bg_variant
 
     # 일부 씬에서 배경 전환
     if bg_mode == "calm" and rng.random() > 0.7:
@@ -562,22 +660,40 @@ def build_scene(
     used_vocabs: set,
     highlight_words: list,
     genre: str = "",
+    strategy: dict = None,
+    recent_combos: set = None,
 ) -> dict:
-    """단일 씬의 비주얼 스크립트 생성 (v5: 장르 기반 8bit 비주얼 주입)"""
+    """단일 씬의 비주얼 스크립트 생성 (v5: 장르+전략+variant)"""
     pool = EMOTION_VOCAB_POOL.get(emotion, EMOTION_VOCAB_POOL["neutral_curious"])
     genre_override = GENRE_VISUAL_OVERRIDES.get(genre, {})
+    if strategy is None:
+        strategy = get_strategy("dense")
 
-    # 주요 비주얼 1개 선택 (이전 씬과 다른 것 선호)
-    primary_candidates = [v for v in pool["primary"] if v not in used_vocabs]
+    # 전략 기반 vocab 필터링
+    avoid = set(strategy.get("avoid_vocabs", []))
+    prefer = strategy.get("prefer_vocabs", [])
+
+    # 주요 비주얼 1개 선택 (이전 씬과 다른 것 선호 + 전략 반영)
+    primary_candidates = [v for v in pool["primary"] if v not in used_vocabs and v not in avoid]
+    if not primary_candidates:
+        primary_candidates = [v for v in pool["primary"] if v not in avoid]
     if not primary_candidates:
         primary_candidates = pool["primary"]
-    primary_vocab = rng.choice(primary_candidates)
+    # prefer 가중치: prefer에 있는 후보를 앞에 배치
+    preferred = [v for v in primary_candidates if v in prefer]
+    if preferred and rng.random() > 0.3:
+        primary_vocab = rng.choice(preferred)
+    else:
+        primary_vocab = rng.choice(primary_candidates)
 
-    # 보조 비주얼 1개 선택
-    secondary_candidates = [v for v in pool["secondary"] if v != primary_vocab and v not in used_vocabs]
+    # 보조 비주얼 선택 (minimal 전략이면 생략)
+    max_layers = strategy.get("max_semantic_layers", 3)
+    secondary_candidates = [v for v in pool["secondary"] if v != primary_vocab and v not in used_vocabs and v not in avoid]
+    if not secondary_candidates:
+        secondary_candidates = [v for v in pool["secondary"] if v not in avoid]
     if not secondary_candidates:
         secondary_candidates = pool["secondary"]
-    secondary_vocab = rng.choice(secondary_candidates)
+    secondary_vocab = rng.choice(secondary_candidates) if max_layers >= 2 else None
 
     # 장르 오버라이드: 8bit 비주얼 주입
     inject_vocabs = genre_override.get("inject_vocabs", [])
@@ -589,23 +705,35 @@ def build_scene(
         # 보조 비주얼도 8bit로 교체 (절반 확률)
         secondary_vocab = rng.choice(inject_vocabs)
 
-    # 사용 기록
-    used_vocabs.clear()  # 최근 2개만 추적
+    # 사용 기록 (최근 2개만 추적)
+    used_vocabs.clear()
     used_vocabs.add(primary_vocab)
-    used_vocabs.add(secondary_vocab)
+    if secondary_vocab:
+        used_vocabs.add(secondary_vocab)
 
-    # 파라미터 생성
+    # 파라미터 생성 (variant 포함)
     semantic: List[Dict] = []
     primary_params = generate_vocab_params(primary_vocab, palette, rng)
-    semantic.append({"vocab": primary_vocab, "params": primary_params})
+    primary_entry: Dict[str, Any] = {"vocab": primary_vocab, "params": primary_params}
+    primary_variant = select_variant(primary_vocab, rng, recent_combos)
+    if primary_variant and primary_variant != "default":
+        primary_entry["variant"] = primary_variant
+    semantic.append(primary_entry)
 
-    secondary_params = generate_vocab_params(secondary_vocab, palette, rng)
-    semantic.append({"vocab": secondary_vocab, "params": secondary_params})
+    if secondary_vocab:
+        secondary_params = generate_vocab_params(secondary_vocab, palette, rng)
+        secondary_entry: Dict[str, Any] = {"vocab": secondary_vocab, "params": secondary_params}
+        secondary_variant = select_variant(secondary_vocab, rng, recent_combos)
+        if secondary_variant and secondary_variant != "default":
+            secondary_entry["variant"] = secondary_variant
+        semantic.append(secondary_entry)
 
-    # 텍스트 비주얼 추가 (확률적, 핵심 키워드가 있는 경우)
+    # 텍스트 비주얼 추가 (전략의 text_chance 반영)
+    text_chance = strategy.get("text_chance", 0.5)
+    force_text_mode = strategy.get("force_text_mode")
     keyword = extract_highlight_word(sentence)
-    if keyword and rng.random() > 0.4:
-        text_mode = pool.get("text_mode", "wave")
+    if keyword and rng.random() < text_chance:
+        text_mode = force_text_mode or pool.get("text_mode", "wave")
         text_params = generate_vocab_params("text_reveal", palette, rng)
         text_params["text"] = keyword
         text_params["mode"] = text_mode
@@ -613,8 +741,11 @@ def build_scene(
         if keyword not in highlight_words:
             highlight_words.append(keyword)
 
-    # 오디오 리액티비티
+    # 오디오 리액티비티 (전략의 reactivity_boost 적용)
     reactivity_level = pool.get("reactivity", "medium")
+    reactivity_boost = strategy.get("reactivity_boost", 0)
+    if reactivity_boost != 0:
+        reactivity_level = boost_reactivity(reactivity_level, reactivity_boost)
     audio_reactive = dict(REACTIVITY_PRESETS[reactivity_level])
 
     # 배경: 8bit 장르면 pixel_grid 배경 사용 가능
@@ -648,11 +779,13 @@ def generate_visual_script(
     narration_timing_path: str,
     script_path: Optional[str] = None,
     palette_name: str = "phantom",
-    title: str = "ENOMETA",
+    title: str = "",
     seed: Optional[int] = None,
     genre: str = "",
+    strategy_name: str = "",
+    episode_id: str = "",
 ) -> dict:
-    """전체 비주얼 스크립트 생성 (v5: 장르 기반 비주얼 선택)"""
+    """전체 비주얼 스크립트 생성 (v5: 장르+전략+이력 기반 비주얼 선택)"""
 
     # 나레이션 타이밍 로드
     with open(narration_timing_path, 'r', encoding='utf-8') as f:
@@ -697,6 +830,23 @@ def generate_visual_script(
 
     print(f"  Segments: {len(segments)} → Scenes: {len(merged_scenes)}")
 
+    # 전략 해석 (명시적 지정 > 장르 기반 > 기본 dense)
+    if not strategy_name and genre:
+        strategy_name = get_default_strategy(genre)
+    if not strategy_name:
+        strategy_name = "dense"
+    strategy = get_strategy(strategy_name)
+    try:
+        print(f"  Strategy: {strategy_name} - {strategy.get('description', '')}")
+    except UnicodeEncodeError:
+        print(f"  Strategy: {strategy_name}")
+
+    # 이력 로드 (최근 2개 에피소드 vocab:variant 조합 회피)
+    vocab_history = load_vocab_history()
+    recent_combos = get_recent_used(vocab_history, lookback=2)
+    if recent_combos:
+        print(f"  History: {len(recent_combos)} combos from recent episodes avoided")
+
     # 장르 기반 팔레트 오버라이드
     genre_override = GENRE_VISUAL_OVERRIDES.get(genre, {})
     if genre_override.get("palette") and palette_name == "phantom":
@@ -736,6 +886,8 @@ def generate_visual_script(
             emotion, palette, rng,
             used_vocabs, highlight_words,
             genre=genre,
+            strategy=strategy,
+            recent_combos=recent_combos,
         )
         scenes.append(scene)
         prev_emotion = emotion
@@ -744,12 +896,32 @@ def generate_visual_script(
     if not highlight_words:
         # 폴백: 제목에서 추출
         title_words = re.findall(r'[가-힣]{2,4}', title)
-        highlight_words = title_words[:2] if title_words else ["ENOMETA"]
+        highlight_words = title_words[:2] if title_words else []
     highlight_words = highlight_words[:3]  # 최대 3개
+
+    # 이력 기록 (episode_id가 있으면)
+    if episode_id:
+        record_episode_history(vocab_history, episode_id, scenes)
+        save_vocab_history(vocab_history)
+        print(f"  History saved for {episode_id}")
+
+    # v8: frames_dir + total_frames 자동 계산 (hybrid 전용)
+    last_end = merged_scenes[-1]["end"] if merged_scenes else 0
+    auto_total_frames = int((last_end + 6.0) * 30)  # 30fps, endcard 6초 포함
 
     return {
         "title": title,
         "highlightWords": highlight_words,
+        "meta": {
+            "strategy": strategy_name,
+            "strategy_description": strategy.get("description", ""),
+            "genre": "ikeda",
+            "palette": palette_name,
+            "seed": seed,
+            "render_mode": "hybrid",
+            **({"frames_dir": f"{episode_id}/frames"} if episode_id else {}),
+            "total_frames": auto_total_frames,
+        },
         "global": {
             "color_palette": palette["colors"],
             "background_color": palette["bg"],
@@ -767,13 +939,15 @@ def main():
         print("  python visual_script_generator.py <narration_timing.json> [output.json] [options]")
         print()
         print("Options:")
-        print("  --palette <name>    팔레트 (phantom/neon_noir/cold_steel/ember/synapse/gameboy/c64)")
-        print("  --genre <name>      장르 (techno/bytebeat/algorave/harsh_noise/chiptune)")
-        print("  --title <title>     에피소드 제목")
-        print("  --seed <number>     랜덤 시드 (같은 시드 = 같은 결과)")
+        print("  --palette <name>     팔레트 (phantom/neon_noir/cold_steel/ember/synapse/gameboy/c64)")
+        print("  --genre <name>       (v8: 무시됨, 항상 ikeda)")
+        print("  --strategy <name>    비주얼 전략 (dense/breathing/collision/layered/minimal/glitch)")
+        print("  --episode <id>       에피소드 ID (이력 추적용, 예: ep005)")
+        print("  --title <title>      에피소드 제목")
+        print("  --seed <number>      랜덤 시드 (같은 시드 = 같은 결과)")
         print()
         print("Example:")
-        print("  python visual_script_generator.py episodes/ep003/narration_timing.json episodes/ep003/visual_script.json --palette phantom --title '우리의 기억은 매번 다시 만들어진다'")
+        print("  python visual_script_generator.py episodes/ep003/narration_timing.json episodes/ep003/visual_script.json --palette phantom --genre techno --strategy collision --title '우리의 기억은 매번 다시 만들어진다'")
         sys.exit(1)
 
     narration_timing = sys.argv[1]
@@ -781,9 +955,11 @@ def main():
 
     # 옵션 파싱
     palette_name = "phantom"
-    title = "ENOMETA"
+    title = ""
     seed = None
     genre = ""
+    strategy_name = ""
+    episode_id = ""
 
     i = 2
     while i < len(sys.argv):
@@ -792,6 +968,12 @@ def main():
             i += 2
         elif sys.argv[i] == "--genre" and i + 1 < len(sys.argv):
             genre = sys.argv[i + 1]
+            i += 2
+        elif sys.argv[i] == "--strategy" and i + 1 < len(sys.argv):
+            strategy_name = sys.argv[i + 1]
+            i += 2
+        elif sys.argv[i] == "--episode" and i + 1 < len(sys.argv):
+            episode_id = sys.argv[i + 1]
             i += 2
         elif sys.argv[i] == "--title" and i + 1 < len(sys.argv):
             title = sys.argv[i + 1]
@@ -808,12 +990,31 @@ def main():
         # narration_timing.json과 같은 디렉토리에 visual_script.json
         output = os.path.join(os.path.dirname(narration_timing), "visual_script.json")
 
-    print(f"=== ENOMETA Visual Script Generator ===")
+    # v8: 장르 항상 ikeda (단일 장르 시스템)
+    if genre and genre != "ikeda":
+        print(f"⚠ WARNING: --genre {genre} 무시됨. v8부터 ikeda 단일 장르 시스템입니다.")
+    genre = "ikeda"
+
+    print(f"=== ENOMETA Visual Script Generator v8 ===")
     print(f"Narration timing: {narration_timing}")
     print(f"Palette: {palette_name}")
-    if genre:
-        print(f"Genre: {genre}")
+    print(f"Genre: ikeda (v8 단일 장르)")
+    if strategy_name:
+        print(f"Strategy: {strategy_name}")
+    if not title:
+        print(f"⚠ WARNING: --title 미지정! 에피소드 제목을 --title 옵션으로 반드시 전달하세요.")
+        print(f"  예: --title '공포와 각성의 화학식은 같다'")
+        title = "제목 미지정"
     print(f"Title: {title}")
+
+    # episode_id 자동 추출 (경로에서)
+    if not episode_id:
+        # episodes/ep005/narration_timing.json → ep005
+        parts = narration_timing.replace("\\", "/").split("/")
+        for p in parts:
+            if p.startswith("ep") and p[2:].isdigit():
+                episode_id = p
+                break
 
     result = generate_visual_script(
         narration_timing,
@@ -821,6 +1022,8 @@ def main():
         title=title,
         seed=seed,
         genre=genre,
+        strategy_name=strategy_name,
+        episode_id=episode_id,
     )
 
     with open(output, 'w', encoding='utf-8') as f:

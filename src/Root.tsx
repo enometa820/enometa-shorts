@@ -22,6 +22,20 @@ import {
   ep003AudioSrc,
   ep003NarrationSegments,
 } from "./ep003Script";
+import {
+  ep004VisualScript,
+  ep004Title,
+  ep004AudioAnalysis,
+  ep004AudioSrc,
+  ep004NarrationSegments,
+} from "./ep004Script";
+import {
+  ep005VisualScript,
+  ep005Title,
+  ep005AudioAnalysis,
+  ep005AudioSrc,
+  ep005NarrationSegments,
+} from "./ep005Script";
 
 export const Root: React.FC = () => {
   return (
@@ -88,6 +102,42 @@ export const Root: React.FC = () => {
           audioSrc: ep003AudioSrc,
           narrationSegments: ep003NarrationSegments,
           highlightWords: ["기억", "해석"],
+        }}
+      />
+      {/* EP004: 우리의 선택은 몇 번이나 우리의 것이었을까 */}
+      {/* 93.37s + 6s 엔드카드 = 99.37s × 30fps = 2982 */}
+      <Composition
+        id="EP004"
+        component={EnometaShorts}
+        durationInFrames={2982}
+        fps={30}
+        width={1080}
+        height={1920}
+        defaultProps={{
+          visualScript: ep004VisualScript,
+          title: ep004Title,
+          audioAnalysis: ep004AudioAnalysis,
+          audioSrc: ep004AudioSrc,
+          narrationSegments: ep004NarrationSegments,
+          highlightWords: ["선택"],
+        }}
+      />
+      {/* EP005: 공포와 각성의 화학식은 같다 */}
+      {/* 123.602s + 6s 엔드카드 = 129.602s × 30fps = 3888 */}
+      <Composition
+        id="EP005"
+        component={EnometaShorts}
+        durationInFrames={3888}
+        fps={30}
+        width={1080}
+        height={1920}
+        defaultProps={{
+          visualScript: ep005VisualScript,
+          title: ep005Title,
+          audioAnalysis: ep005AudioAnalysis,
+          audioSrc: ep005AudioSrc,
+          narrationSegments: ep005NarrationSegments,
+          highlightWords: ["화학식"],
         }}
       />
     </>

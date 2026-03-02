@@ -7,7 +7,8 @@ interface Particle {
   vx: number;
   vy: number;
   size: number;
-  birthProgress: number; // 0~1, 이 파티클이 태어나는 시점
+  birthProgress: number;
+  angle?: number;
 }
 
 export const ParticleBirth: React.FC<VocabComponentProps> = ({
@@ -16,6 +17,7 @@ export const ParticleBirth: React.FC<VocabComponentProps> = ({
   initial_color = "#8B5CF6",
   initial_opacity = 0.6,
   size_range = [1, 3],
+  variant = "default",
   audio,
   sceneProgress,
   width = 1080,
@@ -23,21 +25,53 @@ export const ParticleBirth: React.FC<VocabComponentProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // 파티클 시드 데이터 (한 번만 생성)
   const particles = useMemo(() => {
     const arr: Particle[] = [];
     for (let i = 0; i < count; i++) {
-      arr.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        size: size_range[0] + Math.random() * (size_range[1] - size_range[0]),
-        birthProgress: i / count,
-      });
+      const bp = i / count;
+      const sz = size_range[0] + Math.random() * (size_range[1] - size_range[0]);
+
+      if (variant === "triangles_rise") {
+        arr.push({
+          x: Math.random() * width,
+          y: height * 0.7 + Math.random() * height * 0.3,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: -(0.5 + Math.random() * 1.5),
+          size: sz, birthProgress: bp,
+        });
+      } else if (variant === "lines_scatter") {
+        arr.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: (Math.random() - 0.5) * 0.8,
+          size: sz, birthProgress: bp,
+          angle: Math.random() * Math.PI,
+        });
+      } else if (variant === "dots_grid") {
+        const gridCols = Math.ceil(Math.sqrt(count * (width / height)));
+        const gridRows = Math.ceil(count / gridCols);
+        const col = i % gridCols;
+        const row = Math.floor(i / gridCols);
+        arr.push({
+          x: (col / gridCols) * width + (Math.random() - 0.5) * 5,
+          y: (row / gridRows) * height + (Math.random() - 0.5) * 5,
+          vx: (Math.random() - 0.5) * 0.2,
+          vy: (Math.random() - 0.5) * 0.2,
+          size: sz * 0.5, birthProgress: bp,
+        });
+      } else {
+        arr.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          size: sz, birthProgress: bp,
+        });
+      }
     }
     return arr;
-  }, [count, width, height, size_range[0], size_range[1]]);
+  }, [count, width, height, size_range[0], size_range[1], variant]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -47,36 +81,49 @@ export const ParticleBirth: React.FC<VocabComponentProps> = ({
 
     ctx.clearRect(0, 0, width, height);
 
-    // spawn_duration 내에서 얼마나 진행되었는지
     const spawnProgress = Math.min(sceneProgress * (1 / (spawn_duration_sec / 6)), 1);
-
-    // 오디오 리액티브
     const sizeBoost = 1 + audio.bass * 4;
     const brightnessBoost = 0.2 + audio.rms * 0.9;
 
     for (const p of particles) {
-      // 아직 태어나지 않은 파티클은 건너뜀
       if (p.birthProgress > spawnProgress) continue;
 
-      // 태어난 후 얼마나 지났는지
       const lifeProgress = (spawnProgress - p.birthProgress) / (1 - p.birthProgress + 0.01);
       const alpha = Math.min(lifeProgress * 3, 1) * initial_opacity * brightnessBoost;
 
-      // 위치 업데이트 (미세한 드리프트)
-      const px = p.x + p.vx * sceneProgress * 60;
-      const py = p.y + p.vy * sceneProgress * 60;
+      const px = ((p.x + p.vx * sceneProgress * 60) % width + width) % width;
+      const py = ((p.y + p.vy * sceneProgress * 60) % height + height) % height;
 
-      // 파티클 그리기
-      ctx.beginPath();
-      ctx.arc(px % width, py % height, p.size * sizeBoost, 0, Math.PI * 2);
-      ctx.fillStyle = initial_color;
       ctx.globalAlpha = alpha;
-      ctx.fill();
 
-      // 비트에 글로우 추가
+      if (variant === "triangles_rise") {
+        const s = p.size * sizeBoost * 3;
+        ctx.beginPath();
+        ctx.moveTo(px, py - s);
+        ctx.lineTo(px - s * 0.7, py + s * 0.5);
+        ctx.lineTo(px + s * 0.7, py + s * 0.5);
+        ctx.closePath();
+        ctx.fillStyle = initial_color;
+        ctx.fill();
+      } else if (variant === "lines_scatter") {
+        const len = p.size * sizeBoost * 6;
+        const a = p.angle || 0;
+        ctx.beginPath();
+        ctx.moveTo(px - Math.cos(a) * len, py - Math.sin(a) * len);
+        ctx.lineTo(px + Math.cos(a) * len, py + Math.sin(a) * len);
+        ctx.strokeStyle = initial_color;
+        ctx.lineWidth = 0.8 + audio.bass * 1.5;
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.arc(px, py, p.size * sizeBoost, 0, Math.PI * 2);
+        ctx.fillStyle = initial_color;
+        ctx.fill();
+      }
+
       if (audio.onset && Math.random() < 0.3) {
         ctx.beginPath();
-        ctx.arc(px % width, py % height, p.size * sizeBoost * 6, 0, Math.PI * 2);
+        ctx.arc(px, py, p.size * sizeBoost * 6, 0, Math.PI * 2);
         ctx.fillStyle = initial_color;
         ctx.globalAlpha = alpha * 0.4;
         ctx.fill();

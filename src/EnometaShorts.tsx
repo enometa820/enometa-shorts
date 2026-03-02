@@ -78,6 +78,7 @@ export const EnometaShorts: React.FC<EnometaShortsProps> = ({
           accentColor={palette.accent}
           glowColor={palette.glow}
           highlightWords={highlightWords}
+          endcardStartFrame={endcardStartFrame}
         />
 
         {/* 중앙: 비주얼 (1080 × 1080px, y=370 시작) */}
@@ -86,6 +87,7 @@ export const EnometaShorts: React.FC<EnometaShortsProps> = ({
             scenes={script.scenes}
             audio={audio}
             bgColor={palette.bg}
+            meta={script.meta}
           />
         </div>
 

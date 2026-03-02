@@ -1,0 +1,28 @@
+{
+  "episodes": {
+    "ep005": {
+      "used_combos": [
+        "brightness_pulse:default",
+        "color_drain:default",
+        "color_shift:default",
+        "flow_field_calm:default",
+        "flow_field_calm:opposing",
+        "flow_field_calm:vortex",
+        "flow_field_turbulent:vortex",
+        "grid_mesh:wave_propagation",
+        "grid_morph:default",
+        "grid_morph:wave_propagation",
+        "loop_ring:default",
+        "particle_chain_awaken:default",
+        "particle_converge:multi_point",
+        "particle_escape:chain_break",
+        "particle_orbit:default",
+        "particle_split_ratio:default",
+        "text_reveal:default",
+        "waveform:default",
+        "waveform_circular:default",
+        "waveform_spectrum:default"
+      ]
+    }
+  }
+}

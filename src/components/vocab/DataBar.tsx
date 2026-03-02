@@ -28,7 +28,7 @@ export const DataBar: React.FC<VocabComponentProps> = ({
   ...params
 }) => {
   const bars: Array<{ label: string; value: number; color?: string }> =
-    params.bars || [
+    Array.isArray(params.bars) ? params.bars : [
       { label: "A", value: 95 },
       { label: "B", value: 60 },
       { label: "C", value: 35 },

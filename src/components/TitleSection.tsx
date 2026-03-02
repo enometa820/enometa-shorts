@@ -8,6 +8,7 @@ interface TitleSectionProps {
   accentColor: string;
   glowColor: string;
   highlightWords?: string[];
+  endcardStartFrame?: number;
 }
 
 export const TitleSection: React.FC<TitleSectionProps> = ({
@@ -16,14 +17,27 @@ export const TitleSection: React.FC<TitleSectionProps> = ({
   accentColor,
   glowColor,
   highlightWords = [],
+  endcardStartFrame,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
   // 인트로 페이드인 (0~1초)
-  const opacity = interpolate(frame, [0, fps], [0, 1], {
+  const fadeIn = interpolate(frame, [0, fps], [0, 1], {
     extrapolateRight: "clamp",
   });
+
+  // 엔드카드 시작 1초 전부터 fade-out
+  let fadeOut = 1;
+  if (endcardStartFrame) {
+    fadeOut = interpolate(
+      frame,
+      [endcardStartFrame - fps, endcardStartFrame],
+      [1, 0],
+      { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+    );
+  }
+  const opacity = fadeIn * fadeOut;
 
   // 오디오 리액티브 글로우
   const glowIntensity = 8 + audio.rms * 20;
