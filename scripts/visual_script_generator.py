@@ -669,8 +669,9 @@ def build_scene(
     genre: str = "",
     strategy: dict = None,
     recent_combos: set = None,
+    si: float = 0.5,
 ) -> dict:
-    """단일 씬의 비주얼 스크립트 생성 (v5: 장르+전략+variant)"""
+    """단일 씬의 비주얼 스크립트 생성 (v5: 장르+전략+variant+SI)"""
     pool = EMOTION_VOCAB_POOL.get(emotion, EMOTION_VOCAB_POOL["neutral_curious"])
     genre_override = GENRE_VISUAL_OVERRIDES.get(genre, {})
     if strategy is None:
@@ -693,8 +694,11 @@ def build_scene(
     else:
         primary_vocab = rng.choice(primary_candidates)
 
-    # 보조 비주얼 선택 (minimal 전략이면 생략)
+    # 보조 비주얼 선택 (minimal 전략이면 생략, SI 기반 레이어 수 조절)
     max_layers = strategy.get("max_semantic_layers", 3)
+    # SI 낮으면 레이어 수 줄이기: si=0.25→max 1, si=0.5→max 2, si=0.75+→max 3
+    si_max_layers = max(1, min(3, int(si * 3.5)))
+    max_layers = min(max_layers, si_max_layers)
     secondary_candidates = [v for v in pool["secondary"] if v != primary_vocab and v not in used_vocabs and v not in avoid]
     if not secondary_candidates:
         secondary_candidates = [v for v in pool["secondary"] if v not in avoid]
@@ -748,11 +752,18 @@ def build_scene(
         if keyword not in highlight_words:
             highlight_words.append(keyword)
 
-    # 오디오 리액티비티 (전략의 reactivity_boost 적용)
+    # 오디오 리액티비티 (전략의 reactivity_boost 적용 + SI 기반 오버라이드)
     reactivity_level = pool.get("reactivity", "medium")
     reactivity_boost = strategy.get("reactivity_boost", 0)
     if reactivity_boost != 0:
         reactivity_level = boost_reactivity(reactivity_level, reactivity_boost)
+    # SI 기반 reactivity 보정: si 높으면 반응성 상향, si 낮으면 하향
+    if si >= 0.88:
+        reactivity_level = "max"
+    elif si >= 0.72:
+        reactivity_level = boost_reactivity(reactivity_level, 1)
+    elif si <= 0.25:
+        reactivity_level = "low"
     audio_reactive = dict(REACTIVITY_PRESETS[reactivity_level])
 
     # 배경: 8bit 장르면 pixel_grid 배경 사용 가능
@@ -800,32 +811,46 @@ def generate_visual_script(
 
     segments = timing_data["segments"]
 
-    # 문장 합치기 (짧은 문장은 합침)
+    # 문장 합치기 (짧은 문장은 합침) + SI 평균 계산
     merged_scenes: List[Dict] = []
     buffer_text = ""
     buffer_start = 0.0
     buffer_end = 0.0
+    buffer_si_sum = 0.0
+    buffer_count = 0
     MIN_SCENE_DURATION = 3.0  # 최소 씬 길이 (초)
+
+    def _seg_si(seg):
+        """세그먼트에서 semantic_intensity 추출 (다양한 포맷 지원)"""
+        analysis = seg.get("analysis", {})
+        return analysis.get("semantic_intensity", seg.get("semantic_intensity", 0.5))
 
     for seg in segments:
         if not buffer_text:
             buffer_text = seg["text"]
             buffer_start = seg["start_sec"]
             buffer_end = seg["end_sec"]
+            buffer_si_sum = _seg_si(seg)
+            buffer_count = 1
         else:
             # 현재 버퍼 길이가 최소 씬 길이 미만이면 합침
             if buffer_end - buffer_start < MIN_SCENE_DURATION:
                 buffer_text += " " + seg["text"]
                 buffer_end = seg["end_sec"]
+                buffer_si_sum += _seg_si(seg)
+                buffer_count += 1
             else:
                 merged_scenes.append({
                     "text": buffer_text,
                     "start": buffer_start,
                     "end": buffer_end,
+                    "si": buffer_si_sum / buffer_count,
                 })
                 buffer_text = seg["text"]
                 buffer_start = seg["start_sec"]
                 buffer_end = seg["end_sec"]
+                buffer_si_sum = _seg_si(seg)
+                buffer_count = 1
 
     # 마지막 버퍼
     if buffer_text:
@@ -833,6 +858,7 @@ def generate_visual_script(
             "text": buffer_text,
             "start": buffer_start,
             "end": buffer_end,
+            "si": buffer_si_sum / buffer_count if buffer_count else 0.5,
         })
 
     print(f"  Segments: {len(segments)} → Scenes: {len(merged_scenes)}")
@@ -895,6 +921,7 @@ def generate_visual_script(
             genre=genre,
             strategy=strategy,
             recent_combos=recent_combos,
+            si=scene_data.get("si", 0.5),
         )
         scenes.append(scene)
         prev_emotion = emotion

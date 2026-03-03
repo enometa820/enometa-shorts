@@ -105,10 +105,10 @@ GENRE_LAYER_PRESETS = {
             {"layer": "ParticleLayer",   "intensity": 0.3},
         ],
         "tts_layers": [
-            {"layer": "TextDataLayer",   "intensity": 0.7},
-            {"layer": "BarcodeLayer",    "intensity": 0.6},
-            {"layer": "DataStreamLayer", "intensity": 0.5},
-            {"layer": "DataMatrixLayer", "intensity": 0.4},
+            {"layer": "TextDataLayer",   "intensity": 0.95},
+            {"layer": "BarcodeLayer",    "intensity": 0.85},
+            {"layer": "DataStreamLayer", "intensity": 0.75},
+            {"layer": "DataMatrixLayer", "intensity": 0.65},
         ],
         "blend_ratio": 0.45,
     },
@@ -124,6 +124,21 @@ LAYER_CLASSES = {
     "SineWaveLayer": SineWaveLayer,
     "DataStreamLayer": DataStreamLayer,
     "TextDataLayer": TextDataLayer,
+}
+
+# SI 기반 레이어 강도 스케일 함수
+# base_intensity × scale(si) = effective_intensity
+# SineWave: 배경 역할 → si 낮을 때 강하고 si 높을 때 약해짐
+# Waveform/Particle: 음악 반응 → si에 비례
+# TTS 레이어: 텍스트 표시 → si에 완만하게 비례
+SI_INTENSITY_SCALE = {
+    "SineWaveLayer":   lambda si: max(0.35, 1.0 - si * 0.45),  # 배경→서브, si=0→1.0, si=1→0.55
+    "WaveformLayer":   lambda si: 0.25 + si * 0.75,             # si=0→0.25, si=1→1.0
+    "ParticleLayer":   lambda si: max(0.05, si ** 1.5),         # si=0→0.05, si=1→1.0 (민감)
+    "TextDataLayer":   lambda si: 0.70 + si * 0.30,             # si=0→0.70, si=1→1.0
+    "BarcodeLayer":    lambda si: 0.60 + si * 0.40,             # si=0→0.60, si=1→1.0
+    "DataStreamLayer": lambda si: 0.50 + si * 0.50,             # si=0→0.50, si=1→1.0
+    "DataMatrixLayer": lambda si: max(0.40, si ** 0.8),         # si=0→0.40, si=1→1.0
 }
 
 
@@ -179,8 +194,11 @@ class VisualRenderer:
             result = []
             for cfg in cfgs:
                 cls = LAYER_CLASSES[cfg["layer"]]
-                result.append(cls(self.width, self.height, self.palette,
-                                  intensity=cfg["intensity"]))
+                layer = cls(self.width, self.height, self.palette,
+                            intensity=cfg["intensity"])
+                # SI 동적 스케일링을 위한 기준값 저장
+                layer._base_intensity = cfg["intensity"]
+                result.append(layer)
             return result
 
         return {
@@ -283,6 +301,14 @@ class VisualRenderer:
 
         # Dual-Source: 음악 레이어와 TTS 레이어 독립 렌더
         zeros = np.zeros((self.height, self.width, 3), dtype=np.uint8)
+
+        # SI 기반 레이어 강도 동적 조절
+        si = ctx["semantic_intensity"]
+        for layer in self.layers["music"] + self.layers["tts"]:
+            layer_name = type(layer).__name__
+            scale_fn = SI_INTENSITY_SCALE.get(layer_name)
+            if scale_fn and hasattr(layer, "_base_intensity"):
+                layer.intensity = layer._base_intensity * scale_fn(si)
 
         music_images = [layer.render(ctx) for layer in self.layers["music"]]
         tts_images = [layer.render(ctx) for layer in self.layers["tts"]]

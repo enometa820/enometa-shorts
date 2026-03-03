@@ -1,5 +1,6 @@
 import React from "react";
 import { useCurrentFrame, useVideoConfig, interpolate } from "remotion";
+import { fitText } from "@remotion/layout-utils";
 import { AudioFrame } from "../hooks/useAudioData";
 
 interface TitleSectionProps {
@@ -42,16 +43,28 @@ export const TitleSection: React.FC<TitleSectionProps> = ({
   // 오디오 리액티브 글로우
   const glowIntensity = 8 + audio.rms * 20;
 
+  // 마침표 뒤 공백에서 문장 단위 줄바꿈 (2줄 처리)
+  const titleFormatted = title.replace(/\.\s+/g, ".\n");
+
+  // fitText: 제목 길이에 따라 fontSize 자동 조절 (최대 72px)
+  const { fontSize } = fitText({
+    text: titleFormatted,
+    withinWidth: 920,
+    fontFamily: "Pretendard Variable, sans-serif",
+    fontWeight: "900",
+  });
+  const titleFontSize = Math.min(fontSize, 72);
+
   // 핵심 키워드를 붉은색으로 렌더링
   const renderTitle = () => {
-    if (highlightWords.length === 0) return title;
+    if (highlightWords.length === 0) return titleFormatted;
 
     // 키워드 매칭을 위한 정규식
     const pattern = highlightWords
       .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
       .join("|");
     const regex = new RegExp(`(${pattern})`, "g");
-    const parts = title.split(regex);
+    const parts = titleFormatted.split(regex);
 
     return parts.map((part, i) => {
       const isHighlight = highlightWords.includes(part);
@@ -96,7 +109,7 @@ export const TitleSection: React.FC<TitleSectionProps> = ({
         style={{
           fontFamily: "Pretendard Variable, sans-serif",
           fontWeight: 900,
-          fontSize: 72,
+          fontSize: titleFontSize,
           letterSpacing: "0.08em",
           color: "#FFD700",
           textAlign: "center",
@@ -110,7 +123,8 @@ export const TitleSection: React.FC<TitleSectionProps> = ({
           padding: "0 80px",
           lineHeight: 1.25,
           wordBreak: "keep-all" as const,
-          overflowWrap: "break-word" as const,
+          overflowWrap: "normal" as const,
+          whiteSpace: "pre-line" as const,
         }}
       >
         {renderTitle()}

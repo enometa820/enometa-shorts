@@ -2,8 +2,8 @@
 
 > Pure Python 전자음악 엔진 — Raw Synthesis, GPU 불필요
 > numpy + scipy만으로 동작.
-> **last_updated**: 2026-03-02 — v8 + script_data_extractor VERB/EMOTION/SCIENCE 확장 (글쓰기 v11 연동)
-> v8: ikeda 단일 장르 (techno/bytebeat/algorave/harsh_noise/chiptune 제거) + 텍스처 모듈 흡수
+> **last_updated**: 2026-03-03 — v10: SI 변조 완화, density_scale 하한 60%, tanh 3.0, RMS -6dB, song arc 에너지 전체 상향
+> v9→v10: SI 변조 95~105%로 안정화, density_scale max(0.6,si), 마스터링 강화(tanh 3.0, -6dB), song arc 에너지 상향, 킥/하이햇/saw 볼륨 증가
 
 ---
 
@@ -127,40 +127,98 @@ envelope             ADSR 엔벨로프
 
 ---
 
-## 장르 프리셋 (v8: ikeda 단일)
+## 장르 프리셋 (v9: ikeda 단일)
 
 | 장르 | BPM | 핵심 사운드 | synthesis_overrides |
 |------|-----|------------|---------------------|
-| **ikeda** | 60 | 사인파 간섭 + 데이터 클릭 + 초고주파 + 텍스처 모듈 | ikeda_mode: True, rhythm_mode: euclidean |
+| **ikeda** | **135** (±20%) | 쏘우파+스퀘어 brutal + 사인 간섭 + 데이터 클릭 + gap burst | ikeda_mode: True, rhythm_mode: euclidean |
 
-### v8 ikeda 확장 (다른 장르 요소 흡수)
-- **유클리드 리듬** (from algorave): data_click에 E(3,8)/E(5,16) 비대칭 패턴 적용
-- **피드백 텍스처** (from harsh_noise): 고긴장 구간(tension_peak, awakening_climax)에서 제한적 피드백(gain=0.6, iterations=4)
-- **Bytebeat 미세 텍스처** (from bytebeat): 극저볼륨(0.08) 디지털 배경 텍스처
-- **킥/리듬 백본** (from techno): 극저볼륨 서브킥(0.2) + 하이햇(0.1), si > 0.5에서 활성화
-- **SINE_MELODY_SEQUENCES**: 감정별 5종 멜로디 시퀀스 (ascending/descending/tension/release/neutral), 4마디마다 주파수쌍 전환 + 0.1s 크로스페이드
-- **TEXTURE_MODULES 시스템**: 5개 텍스처 모듈 중 에피소드별 3~4개 자동 선택 (music_history.json lookback=2)
+> BPM은 SI 기반 가변: `section_bpm = 135 × (0.80 + si_avg × 0.40)` → 108~162 BPM 범위
 
-### v5에서 교체된 장르 (v8에서 제거)
-techno/bytebeat/algorave/harsh_noise/chiptune의 유용한 합성 요소가 ikeda에 흡수되어 "텍스처 모듈"로 통합됨.
+### v9 ikeda 10레이어 구조
 
-### 비주얼 레이어 연동 (v8: ikeda 전용)
-ikeda 프리셋: Music 3 + TTS 4 = 7레이어, blend_ratio=0.45. 상세: `ENOMETA_Hybrid_Visual_Architecture.md` 참조
+| 레이어 | 함수 | 역할 |
+|--------|------|------|
+| 1 | `_render_continuous_rhythm` | 킥/하이햇 리듬 백본 |
+| 2 | `_render_continuous_saw_sequence` | 쏘우파 게이트 시퀀서 ('뚜두두') |
+| 3 | `_render_continuous_arpeggio` | 고음역 아르페지오 |
+| 4 | `_render_continuous_bass` | 서브 베이스 드론 |
+| 5 | `_render_continuous_sub_pulse` | 서브 펄스 |
+| 6 | `_render_continuous_sine_interference` | 사인파 간섭 (맥놀이) |
+| 7 | `_render_continuous_pulse_train` | 펄스 트레인 |
+| 8 | `_render_continuous_ultrahigh` | 8-20kHz 초고주파 텍스처 |
+| 9 | `_render_continuous_gate_stutter` | **SI/data_density/numbers 연동** — 게이트+유클리드+스터터+다파형 |
+| 10 | `_render_gap_stutter_burst` | **무음 구간 brutal burst** — 나레이션 gap에 쏘우+스퀘어 삽입 |
+
+### SI 기반 레이어 밀도 제어 (v10)
+```
+density_scale = max(0.60, si)      ← v10: 최소 60% 보장 (v9: si^1.5 최소 0.05%)
+적용 레이어: saw_sequence, arpeggio, pulse_train, ultrahigh, sine_interference, gate_stutter
+si=0.25 → density_scale=0.60 (v9: 0.09 → v10: 60% — 조용한 구간도 충분히 들림)
+si=0.50 → density_scale=0.60 (최소 하한)
+si=1.00 → density_scale=1.00 (최대)
+```
+
+### SI 변조 시스템 (v10)
+```
+v9: self._si_modulation = 0.7 + self._si_env * 0.6   (70%~130%)
+v10: self._si_modulation = 0.95 + self._si_env * 0.1  (95%~105%)
+변동폭 축소 → 조용한 구간에서도 음악이 과도하게 감쇠되지 않음
+```
+
+### 레이어 9: gate_stutter 다파형 매핑
+| SI 구간 | 파형 | drive |
+|---------|------|-------|
+| si < 0.30 | sine (clean) | — |
+| 0.30 ≤ si < 0.55 | sawtooth | — |
+| 0.55 ≤ si < 0.75 | sawtooth_distorted | 2.5~5.5 |
+| si ≥ 0.75 | saw + square (brutal) | 4.5~8.5 |
+
+### 레이어 10: gap_stutter_burst 설계 (v9 신규)
+```
+조건: 나레이션 세그먼트 사이 gap_dur ≥ 30ms
+에너지: (prev_seg.si + next_seg.si) / 2 = burst_energy
+파형: sawtooth_distorted + chiptune_square(×0.5)
+drive: 5.0 + burst_energy × 5.0  → 5.0~10.0 (항상 brutal)
+gate: si=1.0 기준 32분음표 (최대 스터터)
+fade: 5ms in/out (클릭 방지)
+vol: 0.5 + burst_energy × 0.35  → 0.50~0.85
+```
+
+### v9→v10 주요 변경 (2026-03-03)
+- **SI 변조 안정화**: `0.7+si*0.6` → `0.95+si*0.1` — 변동폭 60% → 10%로 축소
+- **density_scale 하한 보장**: `si^1.5` → `max(0.6, si)` — 최소 60% 보장
+- **마스터링 강화**: tanh drive `1.2` → `3.0`, RMS target `-10dB` → `-6dB` (+4dB)
+- **Song arc 에너지 전체 상향**: intro 0.25~0.45→0.7~0.9, buildup 0.45~0.85→0.9~1.2, climax 0.85~1.2→1.2~1.5
+- **킥/하이햇 볼륨**: 킥 `si_g*1.2`→`si_g*2.5`, 하이햇 `si_g*1.0`→`si_g*1.8`
+- **saw_sequence 볼륨**: default `0.4`→`0.7`
+
+### v8→v9 주요 변경
+- **유클리드 리듬** (from algorave): numbers 리스트 → Bjorklund 알고리즘 → 비대칭 게이트 패턴
+- **다파형 스터터**: si 구간별 sine→saw→distorted→brutal 자동 전환
+- **SINE_MELODY_SEQUENCES**: 감정별 5종 멜로디 시퀀스, key_palette 기반 동적 생성
+- **에피소드 해시 시드**: `random.seed(42)` 제거 → `hashlib.md5(episode_id)`
+
+### 비주얼 레이어 연동 (v9: ikeda 전용)
+ikeda 프리셋: Music 3 + TTS 4 = 7레이어, blend_ratio=0.45, SI_INTENSITY_SCALE 실시간 스케일. 상세: `ENOMETA_Hybrid_Visual_Architecture.md` 참조
 
 ---
 
-## v8 마스터링 체인 (ikeda 전용)
+## v10 마스터링 체인 (ikeda 전용)
 
 ```python
 def _master(self) -> np.ndarray:
     stereo = np.column_stack([self.master_L, self.master_R])
 
-    # v8: ikeda 전용 마스터링 (wavefold/bit_depth 분기 제거)
+    # v10: ikeda 전용 마스터링 강화 (v8 대비 drive/RMS 상향)
     # 1. 피크 노멀라이즈
-    # 2. 소프트 새츄레이션 (tanh drive=1.2)
-    # 3. RMS 노멀라이즈 (target -10dB)
+    # 2. 소프트 새츄레이션 (tanh drive=3.0)  ← v9: 1.2
+    # 3. RMS 노멀라이즈 (target -6dB, RMS=0.5)  ← v9: -10dB, RMS=0.316
     # 4. 피크 리미팅 (0.95 ceiling)
     # 5. 페이드 + 16bit 변환
+
+# 후처리: audio_mixer.py에서 EBU R128 loudnorm 적용
+# loudnorm=I=-14:TP=-1.5:LRA=11 (클리핑 방지)
 ```
 
 ---

@@ -23,6 +23,42 @@
         "waveform_circular:default",
         "waveform_spectrum:default"
       ]
+    },
+    "ep006": {
+      "used_combos": [
+        "flow_field_calm:default",
+        "flow_field_calm:opposing",
+        "flow_field_calm:vortex",
+        "flow_field_turbulent:opposing",
+        "fractal_crack:default",
+        "particle_chain_awaken:default",
+        "particle_converge:collapse_line",
+        "particle_escape:default",
+        "particle_orbit:ellipse_drift",
+        "particle_scatter:spiral_out",
+        "pixel_grid_life:default",
+        "pixel_grid_rain:default",
+        "pixel_waveform_cascade:default",
+        "text_reveal:default"
+      ]
+    },
+    "ep007": {
+      "used_combos": [
+        "color_drain:default",
+        "flow_field_calm:opposing",
+        "flow_field_calm:vortex",
+        "flow_field_turbulent:opposing",
+        "flow_field_turbulent:vortex",
+        "particle_chain_awaken:default",
+        "particle_converge:default",
+        "particle_escape:explosion",
+        "particle_orbit:figure_eight",
+        "particle_scatter:default",
+        "pixel_grid_life:default",
+        "pixel_grid_rain:default",
+        "pixel_waveform_cascade:default",
+        "text_reveal:default"
+      ]
     }
   }
 }

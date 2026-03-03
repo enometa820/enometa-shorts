@@ -1,5 +1,5 @@
 import React from "react";
-import { Composition } from "remotion";
+import { Composition, CalculateMetadataFunction } from "remotion";
 import { EnometaShorts } from "./EnometaShorts";
 import {
   ep001VisualScript,
@@ -36,6 +36,31 @@ import {
   ep005AudioSrc,
   ep005NarrationSegments,
 } from "./ep005Script";
+import {
+  ep006VisualScript,
+  ep006Title,
+  ep006AudioAnalysis,
+  ep006AudioSrc,
+  ep006NarrationSegments,
+} from "./ep006Script";
+import {
+  ep007VisualScript,
+  ep007Title,
+  ep007AudioAnalysis,
+  ep007AudioSrc,
+  ep007NarrationSegments,
+} from "./ep007Script";
+
+// calculateMetadata: audioAnalysis.duration_sec 기반 durationInFrames 자동 계산
+// endcardDurationSec 기본 6초 포함
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const calcMeta: CalculateMetadataFunction<any> = async ({ props }) => {
+  const durationSec = props.audioAnalysis?.duration_sec ?? 120;
+  const endcardSec = props.endcardDurationSec ?? 6;
+  return {
+    durationInFrames: Math.ceil((durationSec + endcardSec) * 30),
+  };
+};
 
 export const Root: React.FC = () => {
   return (
@@ -59,6 +84,7 @@ export const Root: React.FC = () => {
         fps={30}
         width={1080}
         height={1920}
+        calculateMetadata={calcMeta}
         defaultProps={{
           visualScript: ep001VisualScript,
           title: ep001Title,
@@ -69,7 +95,6 @@ export const Root: React.FC = () => {
         }}
       />
       {/* EP002: 당신의 오답이 뇌를 가장 크게 깨운다 */}
-      {/* 134.232s + 0.5s 여유 + 6s 엔드카드 = 140.732s × 30fps = 4222 */}
       <Composition
         id="EP002"
         component={EnometaShorts}
@@ -77,6 +102,7 @@ export const Root: React.FC = () => {
         fps={30}
         width={1080}
         height={1920}
+        calculateMetadata={calcMeta}
         defaultProps={{
           visualScript: ep002VisualScript,
           title: ep002Title,
@@ -87,7 +113,6 @@ export const Root: React.FC = () => {
         }}
       />
       {/* EP003: 우리의 기억은 매번 다시 만들어진다 */}
-      {/* 96.186s + 6s 엔드카드 = 102.186s × 30fps = 3066 */}
       <Composition
         id="EP003"
         component={EnometaShorts}
@@ -95,6 +120,7 @@ export const Root: React.FC = () => {
         fps={30}
         width={1080}
         height={1920}
+        calculateMetadata={calcMeta}
         defaultProps={{
           visualScript: ep003VisualScript,
           title: ep003Title,
@@ -105,7 +131,6 @@ export const Root: React.FC = () => {
         }}
       />
       {/* EP004: 우리의 선택은 몇 번이나 우리의 것이었을까 */}
-      {/* 93.37s + 6s 엔드카드 = 99.37s × 30fps = 2982 */}
       <Composition
         id="EP004"
         component={EnometaShorts}
@@ -113,6 +138,7 @@ export const Root: React.FC = () => {
         fps={30}
         width={1080}
         height={1920}
+        calculateMetadata={calcMeta}
         defaultProps={{
           visualScript: ep004VisualScript,
           title: ep004Title,
@@ -123,7 +149,6 @@ export const Root: React.FC = () => {
         }}
       />
       {/* EP005: 공포와 각성의 화학식은 같다 */}
-      {/* 123.602s + 6s 엔드카드 = 129.602s × 30fps = 3888 */}
       <Composition
         id="EP005"
         component={EnometaShorts}
@@ -131,6 +156,7 @@ export const Root: React.FC = () => {
         fps={30}
         width={1080}
         height={1920}
+        calculateMetadata={calcMeta}
         defaultProps={{
           visualScript: ep005VisualScript,
           title: ep005Title,
@@ -138,6 +164,43 @@ export const Root: React.FC = () => {
           audioSrc: ep005AudioSrc,
           narrationSegments: ep005NarrationSegments,
           highlightWords: ["화학식"],
+        }}
+      />
+      {/* EP007: 알고리즘은 쌓지 않는다. 덜어낸다 */}
+      <Composition
+        id="EP007"
+        component={EnometaShorts}
+        durationInFrames={4170}
+        fps={30}
+        width={1080}
+        height={1920}
+        calculateMetadata={calcMeta}
+        defaultProps={{
+          visualScript: ep007VisualScript,
+          title: ep007Title,
+          audioAnalysis: ep007AudioAnalysis,
+          audioSrc: ep007AudioSrc,
+          narrationSegments: ep007NarrationSegments,
+          highlightWords: ["탐색", "덜어낸다"],
+        }}
+      />
+
+      {/* EP006: 틀리면서 닿는다. 그게 삶이다 */}
+      <Composition
+        id="EP006"
+        component={EnometaShorts}
+        durationInFrames={3520}
+        fps={30}
+        width={1080}
+        height={1920}
+        calculateMetadata={calcMeta}
+        defaultProps={{
+          visualScript: ep006VisualScript,
+          title: ep006Title,
+          audioAnalysis: ep006AudioAnalysis,
+          audioSrc: ep006AudioSrc,
+          narrationSegments: ep006NarrationSegments,
+          highlightWords: ["닿는다"],
         }}
       />
     </>

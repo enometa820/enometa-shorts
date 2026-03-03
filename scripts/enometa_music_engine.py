@@ -1,12 +1,21 @@
 """
-ENOMETA Generative Music Engine v8 — ikeda Single Genre System
+ENOMETA Generative Music Engine v9 — ikeda Matrix Style
 대본의 감정을 읽고 1곡의 연속적 음악을 생성하는 엔진.
 GPU 불필요. numpy + scipy만으로 동작.
 
+v9 변경사항 (Matrix 스타일 확장):
+- sawtooth() + sawtooth_distorted(): 쏘우파 원초적 전자음 파형 추가
+- saw_sequence(): 게이트된 쏘우파 시퀀서 — '뚜두두 뚜두 뚜 뚜 뚜~' 패턴
+- _render_continuous_saw_sequence(): ikeda 분기의 핵심 리듬 레이어
+- ikeda generate() 분기: rhythm + arpeggio + saw_sequence 모두 활성화 (8레이어)
+- BPM 60 → 120: Matrix 스타일 강렬한 리듬
+- kick/hihat volume 0.1~0.2 → 0.5~0.8: 드럼 리듬 실체 복원
+- random.seed(42) 제거: 에피소드 해시 기반 시드 (매번 다른 텍스처)
+- SINE_MELODY_SEQUENCES: 하드코딩 220Hz → key_palette pad_root 기반 동적 생성
+- EMOTION_MAP: tension/awakening 계열에 saw_sequence 활성화
+
 v8 변경사항:
-- 6장르 → ikeda 단일 장르 통합 (techno/bytebeat/algorave/harsh_noise/chiptune 흡수)
-- 확장 ikeda: 유클리드리듬 + 피드백텍스처 + 멜로딕시퀀스 + 서브킥/하이햇
-- SINE_MELODY_SEQUENCES: 감정별 4마디 주파수 쌍 전환 멜로디 시스템
+- 6장르 → ikeda 단일 장르 통합
 - TEXTURE_MODULES: 에피소드 간 텍스처 조합 다양화 시스템
 - 마스터링 통합: tanh(1.2) + RMS -10dB (ikeda 전용)
 - EMOTION_MAP: 고에너지 상태에 feedback 텍스처 활성화
@@ -19,6 +28,8 @@ v8 변경사항:
 import sys
 import os
 import json
+sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
 import numpy as np
 from scipy.io import wavfile
 from scipy.signal import lfilter, butter
@@ -26,8 +37,8 @@ import random
 import math
 
 SAMPLE_RATE = 44100
-random.seed(42)
-np.random.seed(42)
+# v9: 고정 시드 제거 — 에피소드마다 다른 랜덤 패턴 생성
+# (generate_music_script()에서 episode 해시 기반 시드 설정)
 
 
 # ============================================================
@@ -628,6 +639,168 @@ def soft_clip(signal, drive=2.0):
     return np.tanh(driven)
 
 
+def sawtooth(freq, duration, sr=SAMPLE_RATE):
+    """쏘우파(Sawtooth) — 모든 하모닉 포함, 전자음악 리드/베이스의 기본
+    phase ramp: 0→1 반복, [-1, 1] 범위
+    """
+    total_samples = int(sr * duration)
+    phase = (np.arange(total_samples) * freq / sr) % 1.0
+    return (2.0 * phase - 1.0) * 0.4
+
+
+def sawtooth_distorted(freq, duration, drive=3.0, sr=SAMPLE_RATE):
+    """디스토션 쏘우파 — tanh 드라이브로 하드한 전자음
+    drive 값이 클수록 더 거칠고 사각파에 가까워짐
+    """
+    wave = sawtooth(freq, duration, sr)
+    return np.tanh(wave * drive) * 0.4
+
+
+def saw_sequence(base_freq, duration, pattern_ratios, gate_div=8,
+                 note_len_ratio=0.7, bpm=120, distort=True, sr=SAMPLE_RATE):
+    """게이트된 쏘우파 시퀀서 — '뚜두두 뚜두 뚜 뚜 뚜~' 패턴 생성
+    pattern_ratios: 음정 비율 리스트 (e.g. [1, 1, 0.75, 1.5, 1, 1, 2, 0.5])
+    gate_div: 16분음표(16), 8분음표(8), 4분음표(4) 단위
+    note_len_ratio: 0.0~1.0 — 1.0이면 레가토, 0.5이면 스타카토
+    """
+    total_samples = int(sr * duration)
+    result = np.zeros(total_samples)
+    beat_sec = 60.0 / bpm
+    note_sec = beat_sec * 4 / gate_div          # 1음표 길이
+    note_samples = int(sr * note_sec)
+    sound_samples = max(int(note_samples * note_len_ratio), 1)
+
+    pos = 0
+    pat_idx = 0
+    while pos < total_samples:
+        ratio = pattern_ratios[pat_idx % len(pattern_ratios)]
+        freq = base_freq * ratio
+        actual_len = min(sound_samples, total_samples - pos)
+        if actual_len > 4 and ratio > 0:
+            if distort:
+                note = sawtooth_distorted(freq, actual_len / sr, drive=2.5, sr=sr)
+            else:
+                note = sawtooth(freq, actual_len / sr, sr)
+            # 빠른 어택 + 짧은 릴리즈 엔벨로프 (뚝뚝 끊기는 느낌)
+            atk = min(int(sr * 0.005), actual_len // 4)
+            rel = min(int(sr * 0.02), actual_len // 3)
+            env = np.ones(actual_len)
+            if atk > 0:
+                env[:atk] = np.linspace(0, 1, atk)
+            if rel > 0:
+                env[-rel:] = np.linspace(1, 0, rel)
+            trim = min(len(note), actual_len)
+            note = note[:trim] * env[:trim]
+            result[pos:pos + trim] += note
+        pos += note_samples
+        pat_idx += 1
+    return result
+
+
+def numbers_to_euclidean(numbers: list, steps: int = 16) -> list:
+    """대본 숫자 리스트 → 유클리드 리듬 패턴
+    numbers 중 적절한 값을 pulses로 사용.
+    e.g. [70, 3, 5] → E(3, 16) = [1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0]
+    반환: bool 리스트 (True=hit, False=rest)
+    """
+    # 숫자를 2~steps//2 범위로 클램프해서 pulses 추출
+    candidates = [int(abs(n)) % (steps // 2) for n in numbers if abs(n) > 0]
+    candidates = [c for c in candidates if 2 <= c <= steps // 2]
+    pulses = candidates[0] if candidates else max(2, steps // 4)
+    return euclidean_rhythm(steps, pulses)
+
+
+def gate_pattern_from_si(si: float, bpm: float, duration: float,
+                          sr: int = SAMPLE_RATE) -> np.ndarray:
+    """semantic_intensity → 게이트 엔벨로프 배열
+    si=0.0~0.25 → 4분음표  (느긋, 숨쉬는 느낌)
+    si=0.25~0.5 → 8분음표  (중간, 기본 비트)
+    si=0.5~0.75 → 16분음표 (촘촘, 긴장)
+    si=0.75~1.0 → 32분음표 (초고속, 뚜뚜뚜뚜)
+    duty cycle도 si에 따라 감소 → 높을수록 더 끊기는 느낌
+    """
+    beat_sec = 60.0 / bpm
+    if si < 0.25:
+        div = 4
+        duty = 0.75
+    elif si < 0.5:
+        div = 8
+        duty = 0.65
+    elif si < 0.75:
+        div = 16
+        duty = 0.5
+    else:
+        div = 32   # 32분음표 — 초고속 뚜뚜뚜뚜
+        duty = 0.4
+
+    note_sec = beat_sec * 4 / div
+    note_samples = max(int(sr * note_sec), 1)
+    on_samples = max(int(note_samples * duty), 1)
+    total_samples = int(sr * duration)
+    gate = np.zeros(total_samples)
+
+    for i in range(0, total_samples, note_samples):
+        end = min(i + on_samples, total_samples)
+        gate[i:end] = 1.0
+
+    # 부드러운 on/off (클릭 방지, 32분음표는 ramp 더 짧게)
+    ramp_ms = 1.0 if div >= 32 else 3.0
+    ramp = min(int(sr * ramp_ms / 1000), on_samples // 4)
+    if ramp > 0:
+        for i in range(0, total_samples, note_samples):
+            end = min(i + on_samples, total_samples)
+            r = min(ramp, end - i)
+            gate[i:i + r] = np.linspace(0, 1, r)
+            off_start = end - ramp
+            if off_start > i:
+                gate[off_start:end] = np.linspace(1, 0, end - off_start)
+    return gate
+
+
+def stutter_from_data(signal: np.ndarray, data_density: float,
+                       numbers: list, sr: int = SAMPLE_RATE) -> np.ndarray:
+    """data_density + numbers → 스터터 효과
+    data_density: 0~1 (높을수록 조각이 짧고 반복 많음)
+    numbers: 대본 숫자 → 조각 길이(ms) 및 반복 횟수에 영향
+    """
+    total = len(signal)
+    result = signal.copy()
+
+    # 스터터 파라미터 결정
+    base_chunk_ms = max(5.0, 100.0 * (1.0 - data_density))  # 5ms~100ms
+    # 숫자로 청크 길이 미세조정 (숫자가 클수록 조각 더 짧게)
+    if numbers:
+        scale = 1.0 / max(1, min(abs(numbers[0]) / 50.0, 5.0))
+        base_chunk_ms *= scale
+    base_chunk_ms = max(5.0, min(base_chunk_ms, 120.0))
+    chunk_samples = int(sr * base_chunk_ms / 1000)
+
+    repeats = int(2 + data_density * 10)  # 2~12회
+
+    # data_density 높은 구간에만 스터터 적용 (전체 신호에 랜덤 배치)
+    stutter_probability = data_density * 0.4  # 최대 40% 구간에 스터터
+    pos = 0
+    while pos < total - chunk_samples * repeats:
+        seg_len = random.randint(int(total * 0.05), int(total * 0.15))
+        if random.random() < stutter_probability:
+            # 스터터 적용: chunk를 반복 배치
+            chunk_start = pos
+            chunk = signal[chunk_start:chunk_start + chunk_samples].copy()
+            if len(chunk) < chunk_samples:
+                pos += seg_len
+                continue
+            # 윈도우 적용 (클릭 방지)
+            w = np.hanning(len(chunk))
+            chunk *= w
+            for r in range(repeats):
+                dst = chunk_start + r * chunk_samples
+                if dst + chunk_samples > total:
+                    break
+                result[dst:dst + chunk_samples] = chunk
+        pos += seg_len
+    return result
+
+
 # ============================================================
 # Ikeda 합성 함수 — 순수 사인파 간섭, 데이터 클릭, 초고주파 텍스처
 # ============================================================
@@ -881,8 +1054,8 @@ class EnometaMusicEngine:
             if start >= end:
                 continue
             si_avg = float(np.mean(self._si_env[start:end]))
-            # si=0 → 85% BPM, si=1 → 115% BPM
-            section_bpm = self.bpm * (0.85 + si_avg * 0.30)
+            # si=0 → 80% BPM, si=1 → 120% BPM (±20% 확장 — 미니멀↔강렬 대비 극대화)
+            section_bpm = self.bpm * (0.80 + si_avg * 0.40)
             tempo[start:end] = section_bpm
 
         # 0.5초 cumsum 스무딩 (계단→곡선)
@@ -1043,10 +1216,10 @@ class EnometaMusicEngine:
         )
 
         si_g = self._si_gate[:self.total_samples]  # v7-P8: si gate
-        self.master_L += kick_full * kick_vol_env * si_g * 1.2
-        self.master_R += kick_full * kick_vol_env * si_g * 1.2
-        self.master_L += hihat_full_L * hihat_vol_env * si_g * 1.0
-        self.master_R += hihat_full_R * hihat_vol_env * si_g * 1.0
+        self.master_L += kick_full * kick_vol_env * si_g * 2.5  # v10: 1.2 → 2.5 (킥 강화)
+        self.master_R += kick_full * kick_vol_env * si_g * 2.5
+        self.master_L += hihat_full_L * hihat_vol_env * si_g * 1.8  # v10: 1.0 → 1.8
+        self.master_R += hihat_full_R * hihat_vol_env * si_g * 1.8
 
     def _render_continuous_sub_pulse(self, sections):
         """전체 길이 서브 펄스"""
@@ -1243,6 +1416,292 @@ class EnometaMusicEngine:
         # 좌우 약간 다른 위치에 배치 (스테레오 width)
         self._add_stereo(pt, random.uniform(-0.3, 0.3), 0, 1.0)
 
+    def _render_continuous_saw_sequence(self, sections):
+        """v9: 전체 길이 쏘우파 게이트 시퀀서 — ikeda 리듬의 핵심 뼈대
+        '뚜두두 뚜두 뚜 뚜 뚜~' 패턴을 섹션별 감정에 따라 변화시킴.
+        고에너지 섹션 → 16분음표 빠른 패턴 / 저에너지 → 4분음표 느린 패턴
+        """
+        print("  [saw_seq] continuous sawtooth gate sequencer...", flush=True)
+        bpm = self.script.get("metadata", {}).get("base_bpm", 120)
+
+        # 섹션별 쏘우파 시퀀스 렌더링 (에너지별 패턴 다름)
+        SAW_PATTERNS = {
+            # energy 레벨별 게이트 패턴 (1=on, 0=rest로 해석하지 않고 음정 비율)
+            "high":   [1, 1, 0.75, 1.5, 1, 1, 2, 0.5],   # 16분음표, 역동적
+            "mid":    [1, 1.5, 1, 0.75, 1.333, 1],          # 8분음표, 중간
+            "low":    [1, 1.5, 2, 1.5],                      # 4분음표, 느긋
+            "tension":[1, 1, 1, 1.5, 0.75, 1, 1.25, 0.5],  # 반복+긴장
+        }
+        GATE_DIV = {
+            "high": 16, "mid": 8, "low": 4, "tension": 16
+        }
+
+        # 메인 쏘우 시퀀스 (L 채널, 베이스 음역)
+        saw_L = np.zeros(self.total_samples)
+        # 디튠된 쏘우 시퀀스 (R 채널, 약간 높은 음역)
+        saw_R = np.zeros(self.total_samples)
+
+        for sec in sections:
+            energy = sec.get("energy", 0.3)
+            emotion = sec.get("emotion", "neutral")
+            start = int(sec["start_sec"] * self.sr)
+            end = min(int(sec["end_sec"] * self.sr), self.total_samples)
+            dur = (end - start) / self.sr
+            if dur < 0.1:
+                continue
+
+            # 패턴 선택
+            if "tension" in emotion or "frustrated" in emotion:
+                pat_key = "tension"
+            elif energy >= 0.7:
+                pat_key = "high"
+            elif energy >= 0.45:
+                pat_key = "mid"
+            else:
+                pat_key = "low"
+
+            pattern = SAW_PATTERNS[pat_key]
+            gate_div = GATE_DIV[pat_key]
+            note_len = 0.85 if pat_key in ["low", "mid"] else 0.6  # 빠른 패턴은 더 스타카토
+
+            # 쏘우 시퀀스 생성 (메인: bass_freq, 디튠: bass_freq * 1.003)
+            chunk_L = saw_sequence(self.bass_freq, dur, pattern,
+                                   gate_div=gate_div, note_len_ratio=note_len,
+                                   bpm=bpm, distort=True, sr=self.sr)
+            chunk_R = saw_sequence(self.bass_freq * 1.003, dur, pattern,
+                                   gate_div=gate_div, note_len_ratio=note_len,
+                                   bpm=bpm, distort=True, sr=self.sr)
+            # 섹션 내 페이드
+            fade_s = min(int(0.05 * self.sr), len(chunk_L) // 4)
+            if fade_s > 0:
+                chunk_L[:fade_s] *= np.linspace(0, 1, fade_s)
+                chunk_R[:fade_s] *= np.linspace(0, 1, fade_s)
+                chunk_L[-fade_s:] *= np.linspace(1, 0, fade_s)
+                chunk_R[-fade_s:] *= np.linspace(1, 0, fade_s)
+
+            chunk_len = end - start
+            saw_L[start:end] += chunk_L[:chunk_len]
+            saw_R[start:end] += chunk_R[:chunk_len]
+
+        # 섹션별 볼륨 모핑
+        vol_env = smooth_envelope(
+            self.total_samples, sections, "saw_sequence", "volume",
+            default=0.7, morph_sec=0.8, sr=self.sr  # v10: 0.4 → 0.7 (베이스라인 강화)
+        )
+        saw_L *= vol_env * self._si_gate[:self.total_samples]
+        saw_R *= vol_env * self._si_gate[:self.total_samples]
+
+        saw_L = fade_in(fade_out(saw_L, 2.0), 0.5)
+        saw_R = fade_in(fade_out(saw_R, 2.0), 0.5)
+
+        self.master_L += saw_L
+        self.master_R += saw_R
+
+    def _render_continuous_gate_stutter(self, sections):
+        """v9: 게이트 + 유클리드 리듬 + 스터터 — 대본 데이터 직접 연동
+
+        대본 데이터 매핑:
+          semantic_intensity → 게이트 분할 속도 (4/8/16분음표)
+          data_density       → 스터터 밀도 + 조각 길이
+          numbers            → 유클리드 리듬 패턴 선택
+
+        결과: 같은 감정(tension)이라도 대본마다 리듬 패턴이 달라짐
+        """
+        print("  [gate_stutter] continuous gate+euclidean+stutter...", flush=True)
+        bpm = self.script.get("metadata", {}).get("base_bpm", 120)
+        sd_segments = self._script_data.get("segments", []) if self._script_data else []
+
+        gate_L = np.zeros(self.total_samples)
+        gate_R = np.zeros(self.total_samples)
+
+        for sec in sections:
+            start_s = int(sec["start_sec"] * self.sr)
+            end_s = min(int(sec["end_sec"] * self.sr), self.total_samples)
+            dur = (end_s - start_s) / self.sr
+            if dur < 0.1:
+                continue
+
+            seg_idx = sec.get("_segment_index")
+            # 대본 데이터에서 파라미터 추출
+            si = 0.5
+            data_density = 0.3
+            numbers = []
+            if sd_segments and seg_idx is not None and seg_idx < len(sd_segments):
+                seg = sd_segments[seg_idx]
+                analysis = seg.get("analysis", {})
+                si = analysis.get("semantic_intensity", 0.5)
+                data_density = analysis.get("data_density", 0.3)
+                numbers = [abs(n) for n in analysis.get("numbers", []) if abs(n) > 0]
+            else:
+                # script_data 없으면 감정/에너지에서 추정
+                si = sec.get("energy", 0.5)
+                data_density = si * 0.6
+
+            # ── 게이트 엔벨로프 (si 기반 속도) ──
+            gate_env = gate_pattern_from_si(si, bpm, dur, self.sr)
+
+            # ── 유클리드 리듬으로 게이트 마스킹 (numbers 기반) ──
+            if numbers:
+                euclid = numbers_to_euclidean(numbers, steps=16)
+                beat_sec = 60.0 / bpm
+                step_samples = int(self.sr * beat_sec * 4 / 16)
+                if step_samples > 0:
+                    euclid_env = np.zeros(end_s - start_s)
+                    for i, hit in enumerate(euclid * (len(gate_env) // (step_samples * len(euclid)) + 1)):
+                        s_pos = i * step_samples
+                        if s_pos >= len(euclid_env):
+                            break
+                        e_pos = min(s_pos + step_samples, len(euclid_env))
+                        euclid_env[s_pos:e_pos] = 1.0 if hit else 0.2
+                    gate_env = gate_env[:len(euclid_env)] * euclid_env
+
+            # ── 파형 혼합 소스 생성 (si + data_density 기반) ──
+            # si 낮음: sine(clean) → saw → distorted saw → si 높음: saw+square(brutal)
+            gate_len = len(gate_env)
+            freq_L = self.bass_freq * 2
+            freq_R = self.bass_freq * 2 * 1.004
+            dur_sec = gate_len / self.sr
+
+            if si < 0.3:
+                # 낮은 긴장감: 사인파 베이스 (clean, 부드러운 펄스)
+                src_L = sine(freq_L, dur_sec, self.sr) * 0.5
+                src_R = sine(freq_R, dur_sec, self.sr) * 0.5
+            elif si < 0.55:
+                # 중간: 쏘우파 (raw, 날카로움)
+                src_L = sawtooth(freq_L, dur_sec, self.sr)
+                src_R = sawtooth(freq_R, dur_sec, self.sr)
+            elif si < 0.75:
+                # 긴장: 쏘우파 + 중간 디스토션
+                drive = 2.5 + data_density * 3.0  # 2.5~5.5
+                src_L = sawtooth_distorted(freq_L, dur_sec, drive=drive, sr=self.sr)
+                src_R = sawtooth_distorted(freq_R, dur_sec, drive=drive, sr=self.sr)
+            else:
+                # 고강도: 쏘우파 + 스퀘어파 혼합 + 강한 디스토션
+                drive = 4.5 + data_density * 4.0  # 4.5~8.5 (brutal)
+                saw_L = sawtooth_distorted(freq_L, dur_sec, drive=drive, sr=self.sr)
+                saw_R = sawtooth_distorted(freq_R, dur_sec, drive=drive, sr=self.sr)
+                sq_duty = 0.25 + data_density * 0.25  # 0.25~0.5 (날카로울수록 좁은 듀티)
+                sq_L = chiptune_square(freq_L * 0.5, dur_sec, duty=sq_duty, sr=self.sr) * 0.4
+                sq_R = chiptune_square(freq_R * 0.5, dur_sec, duty=sq_duty, sr=self.sr) * 0.4
+                blend = (si - 0.75) / 0.25  # 0→1 as si goes 0.75→1.0
+                src_L = saw_L + sq_L * blend
+                src_R = saw_R + sq_R * blend
+
+            # 배열 길이 맞추기
+            min_len = min(len(src_L), gate_len)
+            gated_L = src_L[:min_len] * gate_env[:min_len]
+            gated_R = src_R[:min_len] * gate_env[:min_len]
+
+            # ── 스터터 (data_density 기반 조각 반복) ──
+            if data_density > 0.2:
+                gated_L = stutter_from_data(gated_L, data_density, numbers, self.sr)
+                gated_R = stutter_from_data(gated_R, data_density, numbers, self.sr)
+
+            chunk_len = end_s - start_s
+            gate_L[start_s:end_s] += gated_L[:chunk_len]
+            gate_R[start_s:end_s] += gated_R[:chunk_len]
+
+        # 섹션별 볼륨 + si 게이트
+        vol_env = smooth_envelope(
+            self.total_samples, sections, "gate_stutter", "volume",
+            default=0.35, morph_sec=0.5, sr=self.sr
+        )
+        gate_L *= vol_env * self._si_gate[:self.total_samples]
+        gate_R *= vol_env * self._si_gate[:self.total_samples]
+
+        gate_L = fade_in(fade_out(gate_L, 2.0), 0.3)
+        gate_R = fade_in(fade_out(gate_R, 2.0), 0.3)
+
+        self.master_L += gate_L
+        self.master_R += gate_R
+
+    def _render_gap_stutter_burst(self):
+        """무음 구간(나레이션 세그먼트 사이)에 쏘우 스터터 버스트 삽입 (v9)
+
+        나레이션이 없는 짧은 gap에서 오히려 자극적인 쏘우+스퀘어 버스트를 발사.
+        대비 효과: 나레이션 있을 때는 음악 흐름, gap에서는 날카로운 임팩트.
+
+        조건:
+          - gap_dur >= 30ms (너무 짧으면 스킵)
+          - 에너지: 이전+다음 세그먼트 SI 평균 → drive 결정
+          - 파형: 쏘우 + 스퀘어 혼합, drive=5.0~10.0 (항상 brutal)
+          - 게이트: si=1.0 기준 32분음표 (최대 스터터)
+        """
+        if not self._script_data:
+            return
+
+        segments = self._script_data.get("segments", [])
+        if len(segments) < 2:
+            return
+
+        bpm = self.script.get("metadata", {}).get("base_bpm", 120)
+        burst_L = np.zeros(self.total_samples)
+        burst_R = np.zeros(self.total_samples)
+        gap_count = 0
+
+        for i in range(len(segments) - 1):
+            gap_start_sec = segments[i].get("end_sec", 0)
+            gap_end_sec = segments[i + 1].get("start_sec", 0)
+            gap_dur = gap_end_sec - gap_start_sec
+
+            if gap_dur < 0.03:  # 30ms 미만 스킵
+                continue
+
+            gap_start = int(gap_start_sec * self.sr)
+            gap_end = min(int(gap_end_sec * self.sr), self.total_samples)
+            actual_gap = gap_end - gap_start
+            if actual_gap <= 0:
+                continue
+
+            # 에너지: 이전+다음 세그먼트 SI 평균
+            prev_si = segments[i].get("analysis", {}).get("semantic_intensity", 0.5)
+            next_si = segments[i + 1].get("analysis", {}).get("semantic_intensity", 0.5)
+            burst_energy = (prev_si + next_si) / 2
+
+            # 쏘우파 + 강한 디스토션 (gap에서는 항상 brutal)
+            drive = 5.0 + burst_energy * 5.0  # 5.0~10.0
+            freq_L = self.bass_freq * 2
+            freq_R = self.bass_freq * 2 * 1.006  # 약간 detuned (stereo width)
+
+            saw_L = sawtooth_distorted(freq_L, gap_dur, drive=drive, sr=self.sr)
+            saw_R = sawtooth_distorted(freq_R, gap_dur, drive=drive, sr=self.sr)
+
+            # 스퀘어파 혼합 (gap에서는 항상 추가)
+            sq_duty = 0.3 + burst_energy * 0.2  # 0.3~0.5
+            sq_L = chiptune_square(freq_L * 0.5, gap_dur, duty=sq_duty, sr=self.sr) * 0.5
+            sq_R = chiptune_square(freq_R * 0.5, gap_dur, duty=sq_duty, sr=self.sr) * 0.5
+
+            src_L = saw_L + sq_L
+            src_R = saw_R + sq_R
+
+            # 32분음표 게이트 (si=1.0 → 최대 스터터 속도)
+            gate_env = gate_pattern_from_si(1.0, bpm, gap_dur, self.sr)
+
+            min_len = min(len(src_L), len(gate_env), actual_gap)
+            gated_L = src_L[:min_len] * gate_env[:min_len]
+            gated_R = src_R[:min_len] * gate_env[:min_len]
+
+            # 5ms 빠른 fade in/out (클릭 방지)
+            fade_len = min(int(0.005 * self.sr), min_len // 4)
+            if fade_len > 1:
+                gated_L[:fade_len] *= np.linspace(0, 1, fade_len)
+                gated_R[:fade_len] *= np.linspace(0, 1, fade_len)
+                gated_L[-fade_len:] *= np.linspace(1, 0, fade_len)
+                gated_R[-fade_len:] *= np.linspace(1, 0, fade_len)
+
+            # 볼륨: 에너지 비례 (0.5~0.85)
+            vol = 0.5 + burst_energy * 0.35
+
+            burst_L[gap_start:gap_start + min_len] = gated_L * vol
+            burst_R[gap_start:gap_start + min_len] = gated_R * vol
+            gap_count += 1
+
+        if gap_count:
+            print(f"  [gap_burst] {gap_count} gaps filled with saw+stutter", flush=True)
+
+        self.master_L += burst_L
+        self.master_R += burst_R
+
     # ---- 텍스처 악기: 섹션 단위 (자연스럽게 등장/퇴장) ----
 
     def _render_section_textures(self, section):
@@ -1328,6 +1787,23 @@ class EnometaMusicEngine:
             speed = sweep_cfg.get("speed", 0.3)
             sweep = noise_sweep(dur, direction, speed, self.sr)
             self._add_stereo(sweep, 0.0, start, 0.6)
+
+        # Saw Sequence (v9: 쏘우파 게이트 시퀀서 — 섹션별 텍스처 레이어)
+        # _render_continuous_saw_sequence()가 전체 버퍼를 채우지만,
+        # EMOTION_MAP에서 활성화된 섹션에 추가 레이어(고음역 카운터멜로디)를 덧씌움
+        saw_cfg = instruments.get("saw_sequence", {})
+        if saw_cfg.get("active"):
+            vol = saw_cfg.get("volume", 0.5)
+            bpm_sec = self._section_bpm(section)
+            # 고음역 카운터멜로디 패턴 (메인보다 1옥타브 위)
+            hi_pattern = [2, 2, 3, 1.5, 2, 2.667, 2, 1.5]
+            energy = section.get("energy", 0.5)
+            gate_div = 16 if energy >= 0.7 else 8
+            hi_saw = saw_sequence(self.bass_freq * 2, dur, hi_pattern,
+                                  gate_div=gate_div, note_len_ratio=0.55,
+                                  bpm=bpm_sec, distort=True, sr=self.sr)
+            hi_saw = fade_in(fade_out(hi_saw, min(dur * 0.2, 0.3)), min(dur * 0.1, 0.1))
+            self._add_stereo(hi_saw, 0.3, start, vol * 0.6)
 
         # Synth Lead (새 악기)
         lead_cfg = instruments.get("synth_lead", {})
@@ -1630,9 +2106,10 @@ class EnometaMusicEngine:
 
         segments = self._script_data.get("segments", [])
         for seg in segments:
-            si = seg.get("semantic_intensity", 0.5)
-            start_sample = int(seg.get("start", 0) * self.sr)
-            end_sample = int(seg.get("end", 0) * self.sr)
+            analysis = seg.get("analysis", {})
+            si = analysis.get("semantic_intensity", seg.get("semantic_intensity", 0.5))
+            start_sample = int(seg.get("start_sec", seg.get("start", 0)) * self.sr)
+            end_sample = int(seg.get("end_sec", seg.get("end", 0)) * self.sr)
             start_sample = max(0, min(start_sample, self.total_samples))
             end_sample = max(0, min(end_sample, self.total_samples))
             si_env[start_sample:end_sample] = si
@@ -1665,7 +2142,7 @@ class EnometaMusicEngine:
 
         # semantic_intensity 엔벨로프 사전 빌드 (adaptive arc가 참조하므로 arc 전에 빌드)
         self._si_env = self._build_si_envelope()
-        self._si_modulation = 0.7 + self._si_env * 0.6  # si=0→0.7, si=0.5→1.0, si=1→1.3
+        self._si_modulation = 0.95 + self._si_env * 0.1  # v10: si=0→0.95, si=1→1.05 (거의 상수 — 전구간 공격적 유지)
         self._si_gate = self._build_si_gate()  # v7-P8: 연속 악기 si 게이트
         self._tempo_curve = self._compute_tempo_curve()  # v7-P6: 가변 BPM 곡선
         if self._script_data:
@@ -1680,17 +2157,49 @@ class EnometaMusicEngine:
         # v7-P3: script_data로 섹션별 악기 파라미터 풍부화 (전장르)
         self._script_data_enrichment(sections)
 
+        # v9: si 기반 레이어 밀도 동적 제어
+        # 상위 레이어는 si 낮은 섹션에서 볼륨 감소 → 미니멀 구간 실현
+        # scale = si^1.5 (비선형: 낮을수록 급격히 감소, si=0.25→0.09, si=0.5→0.35, si=1.0→1.0)
+        if self._script_data and is_ikeda:
+            sd_segs = self._script_data.get("segments", [])
+            density_layers = ["saw_sequence", "arpeggio", "pulse_train", "ultrahigh",
+                               "sine_interference", "gate_stutter"]
+            for sec in sections:
+                idx = sec.get("_segment_index")
+                if idx is not None and idx < len(sd_segs):
+                    si_val = sd_segs[idx].get("analysis", {}).get("semantic_intensity", 0.5)
+                else:
+                    si_val = sec.get("energy", 0.5)
+                density_scale = max(0.6, si_val)  # v10: 상위 레이어 항상 60% 이상 활성 (이전: si^1.5 최소 5%)
+                instr = sec.get("instruments", {})
+                for layer in density_layers:
+                    if layer in instr and instr[layer].get("active"):
+                        instr[layer]["volume"] = instr[layer].get("volume", 0.3) * density_scale
+            print(f"  [v9] Layer density: si-driven (upper layers scale si^1.5)", flush=True)
+
         # Song Arc 사전 계산 (adaptive arc는 위의 si_env를 사용)
         self._song_arc_env = self._compute_song_arc(arc_name)
         self._song_arc_name = arc_name
 
         if is_ikeda:
-            # Ikeda 모드: 사인파 간섭 + 초고주파 + 펄스 트레인 + 극미 베이스만
+            # v9 Ikeda 확장: 쏘우파 시퀀서 + 리듬 + 아르페지오 + 펄스 트레인 + 드론
+            # 레이어 1: 리듬 뼈대 (킥 + 하이햇)
+            self._render_continuous_rhythm(sections)
+            # 레이어 2: 쏘우파 게이트 시퀀서 (메인 멜로디/베이스 라인)
+            self._render_continuous_saw_sequence(sections)
+            # 레이어 3: 아르페지오 (고음역 움직임)
+            self._render_continuous_arpeggio(sections)
+            # 레이어 4: 서브 베이스 드론 (바닥 에너지)
             self._render_continuous_bass(sections)
             self._render_continuous_sub_pulse(sections)
+            # 레이어 5: ikeda 시그니처 텍스처 (사인파 간섭, 펄스, 초고주파)
             self._render_continuous_sine_interference(sections)
-            self._render_continuous_ultrahigh(sections)
             self._render_continuous_pulse_train(sections)
+            self._render_continuous_ultrahigh(sections)
+            # 레이어 9: 게이트 + 유클리드 + 스터터 (대본 데이터 연동)
+            self._render_continuous_gate_stutter(sections)
+            # 레이어 10: 무음 갭 쏘우 스터터 버스트 (나레이션 없는 구간 임팩트)
+            self._render_gap_stutter_burst()
         else:
             # Phase 1: 기반 악기 — 전체 길이 연속 렌더링
             self._render_continuous_bass(sections)
@@ -1729,11 +2238,11 @@ class EnometaMusicEngine:
         peak = np.max(np.abs(stereo))
         if peak > 0:
             stereo = stereo / peak
-        stereo = np.tanh(stereo * 1.2)  # 부드러운 새츄레이션
+        stereo = np.tanh(stereo * 3.0)  # v10: 강한 새츄레이션 — 원초적 디스토션 (이전: 1.2)
 
-        # RMS 타겟 -10dB (0.316 linear) — 음악이 나레이션과 동등한 존재감
+        # RMS 타겟 -6dB (0.5 linear) — v10: 더 큰 음악 볼륨 (이전: -10dB 0.316)
         rms = np.sqrt(np.mean(stereo ** 2))
-        target_rms = 0.316  # -10dB
+        target_rms = 0.5  # -6dB
         if rms > 0:
             gain = target_rms / rms
             stereo *= gain
@@ -2183,6 +2692,8 @@ EMOTION_MAP = {
         "kick": {"active": True, "volume": 0.65},
         "hi_hat": {"active": True, "volume": 0.35},
         "acid_bass": {"active": True, "volume": 0.5, "sweep_dir": "down"},
+        "saw_sequence": {"active": True, "volume": 0.7},  # v9
+        "gate_stutter": {"active": True, "volume": 0.4},  # v9
         "sub_pulse": {"active": True, "volume": 0.8},
         "noise_burst": {"active": True, "density": 0.5},
         "bytebeat": {"active": True, "volume": 0.2, "formula": "industrial"},
@@ -2270,11 +2781,13 @@ EMOTION_MAP = {
         "kick": {"active": True, "volume": 0.8},
         "hi_hat": {"active": True, "volume": 0.45},
         "acid_bass": {"active": True, "volume": 0.7, "sweep_dir": "down"},
+        "saw_sequence": {"active": True, "volume": 1.0},  # v9
+        "gate_stutter": {"active": True, "volume": 0.6},  # v9
         "sub_pulse": {"active": True, "volume": 1.0},
         "stutter_gate": {"active": True, "divisions": 16, "blend": 0.5},
         "noise_burst": {"active": True, "density": 0.6},
         "bytebeat": {"active": True, "volume": 0.3, "formula": "chaos"},
-        "feedback": {"active": True, "volume": 0.15},  # v8 C-2: ikeda 피드백 텍스처
+        "feedback": {"active": True, "volume": 0.15},
         "chiptune_lead": {"active": False},
         "chiptune_drum": {"active": False},
         "pulse_train": {"active": True, "volume": 0.5},
@@ -2308,10 +2821,12 @@ EMOTION_MAP = {
         "hi_hat": {"active": True, "volume": 0.4},
         "synth_lead": {"active": True, "volume": 0.5, "note_duration": 0.5},
         "acid_bass": {"active": True, "volume": 0.5, "sweep_dir": "up"},
+        "saw_sequence": {"active": True, "volume": 0.8},  # v9
+        "gate_stutter": {"active": True, "volume": 0.5},  # v9
         "sub_pulse": {"active": True, "volume": 0.7},
         "stutter_gate": {"active": True, "divisions": 8, "blend": 0.25},
         "bytebeat": {"active": True, "volume": 0.15, "formula": "cascade"},
-        "feedback": {"active": True, "volume": 0.12},  # v8 C-2: ikeda 피드백 텍스처
+        "feedback": {"active": True, "volume": 0.12},
         "chiptune_lead": {"active": True, "volume": 0.3, "duty": 0.25},
         "chiptune_drum": {"active": True, "volume": 0.25},
         "pulse_train": {"active": True, "volume": 0.45},
@@ -2406,13 +2921,25 @@ EMOTION_MAP = {
 # _render_continuous_sine_interference()에서 사용
 # ============================================================
 
-SINE_MELODY_SEQUENCES = {
-    "ascending": [(220, 223), (261, 265), (329, 333), (392, 397)],
-    "descending": [(392, 397), (329, 333), (261, 265), (220, 223)],
-    "tension": [(220, 227), (220, 233), (220, 240), (220, 247)],
-    "release": [(220, 247), (220, 240), (220, 233), (220, 223)],
-    "neutral": [(220, 223), (220, 225), (220, 223), (220, 225)],
-}
+def build_sine_melody_sequences(pad_root: float) -> dict:
+    """v9: key_palette의 pad_root 기반으로 SINE_MELODY_SEQUENCES 동적 생성.
+    하드코딩된 220Hz 대신 실제 선택된 키의 음정을 사용.
+    beat_offset: 맥놀이 주파수 (Hz) — 작을수록 느린 비팅
+    """
+    r = pad_root
+    # 스케일 음정 비율 (단조: 1, 9/8, 6/5, 4/3, 3/2, 8/5, 9/5)
+    scale = [r, r * 9/8, r * 6/5, r * 4/3, r * 3/2, r * 8/5, r * 9/5, r * 2]
+    def bp(f, beat): return (round(f, 1), round(f + beat, 1))
+    return {
+        "ascending":  [bp(scale[0], 3), bp(scale[2], 4), bp(scale[4], 3), bp(scale[6], 5)],
+        "descending": [bp(scale[6], 5), bp(scale[4], 3), bp(scale[2], 4), bp(scale[0], 3)],
+        "tension":    [bp(scale[0], 7), bp(scale[0], 13), bp(scale[0], 20), bp(scale[0], 27)],
+        "release":    [bp(scale[4], 27), bp(scale[4], 20), bp(scale[4], 13), bp(scale[4], 7)],
+        "neutral":    [bp(scale[0], 3), bp(scale[2], 3), bp(scale[0], 3), bp(scale[2], 3)],
+    }
+
+# 기본값 (generate_music_script에서 키 선택 후 덮어씌움)
+SINE_MELODY_SEQUENCES = build_sine_melody_sequences(329.6)  # E_minor 기본
 
 # 감정 → 시퀀스 매핑
 EMOTION_TO_MELODY = {
@@ -2435,35 +2962,35 @@ EMOTION_TO_MELODY = {
 
 SONG_ARC_PRESETS = {
     "narrative": {
-        "description": "기승전결 — intro(sparse) → buildup(accumulate) → climax(max) → outro(fade)",
+        "description": "v10: 공격적 기승전결 — intro(active) → buildup(intense) → climax(brutal) → outro(fade)",
         "phases": [
             {
                 "name": "intro",
                 "start_pct": 0.0,
-                "end_pct": 0.15,
-                "energy_range": (0.25, 0.45),
-                "density_mult": 0.5,
+                "end_pct": 0.12,
+                "energy_range": (0.7, 0.9),   # v10: 0.25-0.45 → 0.7-0.9 (intro도 공격적)
+                "density_mult": 0.8,
             },
             {
                 "name": "buildup",
-                "start_pct": 0.15,
-                "end_pct": 0.55,
-                "energy_range": (0.45, 0.85),
-                "density_mult": 1.0,
+                "start_pct": 0.12,
+                "end_pct": 0.50,
+                "energy_range": (0.9, 1.2),   # v10: 0.45-0.85 → 0.9-1.2
+                "density_mult": 1.1,
             },
             {
                 "name": "climax",
-                "start_pct": 0.55,
+                "start_pct": 0.50,
                 "end_pct": 0.80,
-                "energy_range": (0.85, 1.2),
-                "density_mult": 1.4,
+                "energy_range": (1.2, 1.5),   # v10: 0.85-1.2 → 1.2-1.5 (브루탈)
+                "density_mult": 1.5,
             },
             {
                 "name": "outro",
                 "start_pct": 0.80,
                 "end_pct": 1.0,
-                "energy_range": (0.7, 0.15),
-                "density_mult": 0.6,
+                "energy_range": (0.9, 0.2),   # v10: 0.7-0.15 → 0.9-0.2 (더 늦게 떨어짐)
+                "density_mult": 0.7,
             },
         ],
     },
@@ -2512,34 +3039,39 @@ SONG_ARC_PRESETS = {
 
 GENRE_PRESETS = {
     "ikeda": {
-        "bpm_override": 60,
+        # v9: BPM 135 (Matrix 스타일 — 텐션 피크에서 162BPM까지 변조됨)
+        "bpm_override": 135,
         "volume_scale": {
-            "sine_interference": 1.5,
-            "data_click": 1.3,
-            "ultrahigh_texture": 1.0,
-            "pulse_train": 1.0,
-            "bass_drone": 0.3,
-            "clicks": 0.8,
-            "sub_pulse": 0.2,
-            # v8 absorbed elements:
-            "kick": 0.2,          # C-5: 극저 볼륨 서브킥 (from techno)
-            "hi_hat": 0.1,        # C-5: 극저 볼륨 하이햇 (from techno)
-            "bytebeat": 0.08,     # C-3: 극저볼륨 디지털 텍스처 (from bytebeat)
-            "feedback": 0.0,      # C-2: 기본 꺼짐, EMOTION_MAP이 활성화
-            "arpeggio": 0.0,      # 미사용
+            # v9: 리듬 레이어 볼륨 정상화 (거의 안 들리던 수준에서 탈출)
+            "kick": 0.8,          # 강한 킥
+            "hi_hat": 0.5,        # 충분히 들리는 하이햇
+            "saw_sequence": 1.0,  # 쏘우파 시퀀서 메인
+            "arpeggio": 0.5,      # 아르페지오 서포트
+            "bass_drone": 0.4,    # 드론 서브
+            "sub_pulse": 0.35,    # 서브 베이스
+            # ikeda 시그니처 텍스처
+            "sine_interference": 0.8,
+            "data_click": 0.9,
+            "pulse_train": 0.7,
+            "ultrahigh_texture": 0.6,
+            "clicks": 0.6,
+            # 절제된 레이어
+            "bytebeat": 0.15,
+            "feedback": 0.0,       # EMOTION_MAP이 고에너지 섹션에서만 활성화
             "fm_bass": 0,
             "chiptune_lead": 0, "chiptune_drum": 0,
-            "synth_lead": 0, "acid_bass": 0,
+            "synth_lead": 0, "acid_bass": 0.4,  # acid_bass는 허용 (느낌 좋음)
         },
-        "force_active": ["sine_interference", "data_click", "clicks", "pulse_train"],
-        "force_inactive": ["chiptune_lead", "chiptune_drum", "fm_bass", "acid_bass", "synth_lead"],
-        # NOTE: kick, hi_hat, bytebeat, feedback are NOT in force_inactive anymore
-        # They're controlled by EMOTION_MAP per-section
+        "force_active": [
+            "saw_sequence", "sine_interference", "data_click", "pulse_train",
+        ],
+        # v9: acid_bass + chiptune_lead 허용 (EMOTION_MAP에서 제어)
+        "force_inactive": ["chiptune_lead", "chiptune_drum", "fm_bass", "synth_lead"],
         "synthesis_overrides": {
             "ikeda_mode": True,
-            "rhythm_mode": "euclidean",  # C-1: 유클리드 리듬 패턴
+            "rhythm_mode": "euclidean",  # 유클리드 리듬 패턴 유지
         },
-        "description": "ENOMETA v8 — 확장 ikeda: 데이터아트 + 유클리드리듬 + 피드백텍스처 + 멜로딕시퀀스",
+        "description": "ENOMETA v9 — Matrix 스타일 확장 ikeda: 쏘우파 시퀀서 + 강한 리듬 + 디스토션 텍스처",
     },
 }
 
@@ -2874,6 +3406,19 @@ def generate_music_script(visual_script: dict, narration_timing: dict = None,
     selected_key = _select_key_from_history(music_history, genre_label)
     arp_idx, selected_arp = _select_arp_pattern_from_history(music_history)
     key_palette = KEY_PRESETS[selected_key]
+
+    # v9: episode 해시 기반 랜덤 시드 — 에피소드마다 다른 텍스처 패턴
+    import hashlib
+    ep_str = episode if episode else (title + selected_key)
+    ep_hash = int(hashlib.md5(ep_str.encode()).hexdigest(), 16) % (2**31)
+    random.seed(ep_hash)
+    np.random.seed(ep_hash)
+    print(f"  [v9] random seed={ep_hash} (episode: {ep_str})")
+
+    # v9: SINE_MELODY_SEQUENCES를 선택된 키의 pad_root 기반으로 동적 생성
+    global SINE_MELODY_SEQUENCES
+    SINE_MELODY_SEQUENCES = build_sine_melody_sequences(key_palette["pad_root"])
+    print(f"  [v9] SINE_MELODY_SEQUENCES built for key={selected_key} (pad_root={key_palette['pad_root']:.1f}Hz)")
 
     if episode or project_dir:
         print(f"  [music_history] key={selected_key}, arp_pattern={arp_idx}")
