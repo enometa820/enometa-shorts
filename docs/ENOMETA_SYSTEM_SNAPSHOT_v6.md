@@ -1,8 +1,8 @@
 # ENOMETA System Snapshot v6
 > **역할**: SNAPSHOT=설계도 (아키텍처, 히스토리). 실전 매뉴얼은 ClaudeCode_Brief 참조.
-> 최종 업데이트: 2026-03-03
-> 상태: v8 ikeda 단일 장르 + Hybrid 전용화 + ikeda 확장
-> **last_updated**: 2026-03-03 — ikeda 팔레트 추가 + PixelGrid/PixelWaveform ikeda 통합 + 레거시 클린업
+> 최종 업데이트: 2026-03-04
+> 상태: v10 음악엔진 + EP007 완료 + 자막/볼륨/ShapeMotion 업그레이드
+> **last_updated**: 2026-03-04 — 자막 붕괴 수정(문장 단위 1:1) + 4종 모션 패턴 + ShapeMotion.tsx 신규 + narration 0.90/bgm 1.0 + publish 가이드 풍부화
 
 ---
 
@@ -37,12 +37,11 @@
          ⚠ 컨펌 전: 제목/음악/비주얼 제안 일체 금지
          → 수정 요청 시 STEP 2 재제출
 [STEP 4] 제목 추천 → 5개 후보 (컨펌 후)
-[STEP 5] 팩트체크 → 과학적 주장 근거 확인
-[STEP 6] publish.md 생성 (업로드 메타데이터)
+[STEP 5] ★ publish.md 생성 ★ — 제목 선택 직후, 제작 파이프라인 시작 전
+         → 구성: 제목 / 대본 / YouTube 설명란 / 고정 댓글 / 해시태그 5개
          → 태그: 카테고리 상위 5개만 (#쇼츠/#shorts/#ENOMETA/#이노메타/#데이터아트 제외)
-         → 설명란/고정댓글 하단에 시스템 소개 고정 멘트 자동 삽입:
-           "존재와 사유, 그 경계를 초월하다 / 대본→바이트+주파수 분해 / SI가 음악 텍스처+비주얼 파티클 실시간 제어 / 3중 리액티브(시간×오디오×의미) / 코드로 쓰는 철학. 데이터로 그리는 존재론."
-[STEP 7] 영상 제작 파이프라인
+         → 설명란/고정댓글 하단 고정 멘트: "존재와 사유, 그 경계를 초월하다 / 3중 리액티브(시간×오디오×의미) / 코드로 쓰는 철학. 데이터로 그리는 존재론."
+[STEP 6] 영상 제작 파이프라인
          → script.txt → TTS → BGM(+raw_visual_data.npz) → 믹싱
          → Python 비주얼 렌더링(hybrid) 또는 FFT(legacy) → Remotion 합성
 ```
@@ -90,10 +89,10 @@
 - `scripts/subtitle_grouper.py` — narration_timing.json → subtitle_groups.json (2줄씩)
 
 ### 3-5. 오디오 믹싱 / FFT
-- 오디오 믹싱: **TTS:BGM = 4:6** (나레이션 67% + BGM 100%), 음악이 더 큰 비율
-- **사이드체인 덕킹** (v6): narration_timing.json 기반 — 나레이션 구간 BGM -3dB, 무음 구간 풀 볼륨
-- **CLI**: `--bgm-volume 1.0 --sidechain episodes/epXXX/narration_timing.json`
-- FFT 분석: 30fps, bass/mid/high/rms/onset (legacy 모드용)
+- 오디오 믹싱: narration 55% + BGM 150%, **사이드체인 없음**
+- EBU R128 loudnorm: `-14 LUFS / TP=-1.5dB / LRA=11` (클리핑 방지, TTS/BGM 균형 자동 처리)
+- **CLI**: `--bgm-volume 1.5` (사이드체인 옵션 제거됨)
+- FFT 분석: 30fps, bass/mid/high/rms/onset
 
 ### 3-6. Python 비주얼 렌더링 (Hybrid 모드, v6.1 Dual-Source)
 - `scripts/visual_renderer.py` — raw_visual_data.npz + script_data.json → frames/000000.png~
@@ -223,14 +222,16 @@ GENRE_LAYER_PRESETS: Music 3 + TTS 4 = 7레이어.
 
 ## 5. 음악 엔진 v8
 
-### 장르 프리셋 (v8: ikeda 단일)
+### 장르 프리셋 (v10: ikeda 단일)
 
 | 장르 | BPM | 핵심 | 비고 |
 |------|-----|------|------|
-| **ikeda** | **60** | **사인파 간섭 + 데이터 클릭 + 초고주파 + 텍스처 모듈** | **v8 단일 장르** |
+| **ikeda** | **135 (±20%)** | **10레이어 + gap_burst + sawtooth 시퀀서 + SI 95~105% 변조** | **v10 단일 장르** |
 
-- v8 확장: 유클리드 리듬(from algorave) + 피드백 텍스처(from harsh_noise) + bytebeat 미세 텍스처 + 킥/리듬 백본(from techno) + 멜로딕 사인 시퀀스(SINE_MELODY_SEQUENCES 5종)
+- v10 확장: `sawtooth()` / `saw_sequence()` 추가 — 쏘우파 게이트 시퀀서 ('뚜두두' 패턴)
+- 10레이어: rhythm + saw + arpeggio + 5개 텍스처 + gate_stutter + gap_burst
 - TEXTURE_MODULES 시스템: 에피소드별 3~4개 텍스처 모듈 자동 선택 (music_history.json 기반)
+- 에피소드 해시 시드 (`random.seed(42)` 제거 → 매 에피소드 다른 음악)
 
 ### v6 ikeda 합성 함수 (3개 신규)
 - **sine_interference**: 순수 사인파 2개 합 → 맥놀이, script_data의 숫자가 주파수 결정
@@ -238,9 +239,10 @@ GENRE_LAYER_PRESETS: Music 3 + TTS 4 = 7레이어.
 - **ultrahigh_texture**: 8-20kHz 대역통과 노이즈, 매우 조용한 디지털 공기 역할
 - **⚠ EP005 교훈**: 위 3개만으로는 음악이 아닌 노이즈. 최소한의 리듬(kick/click 패턴)+멜로디(sine 시퀀스) 필수
 
-### v8 마스터링 체인 (ikeda 전용)
+### v10 마스터링 체인 (ikeda 전용)
 ```
-피크 노멀라이즈 → 소프트 새츄레이션 (tanh drive=1.2) → RMS 노멀라이즈 (-10dB) → 피크 리미팅 (0.95) → 16bit WAV
+피크 노멀라이즈 → 강한 새츄레이션 (tanh drive=3.0) → RMS 노멀라이즈 (-6dB) → 피크 리미팅 (0.95) → 16bit WAV
+→ audio_mixer.py: narration_volume=0.90, bgm_volume=1.0, loudnorm=I=-14:TP=-1.5:LRA=11 (EBU R128 최종 정규화)
 ```
 
 ### v6.1 Song Arc 시스템 (기승전결)
@@ -262,8 +264,8 @@ GENRE_LAYER_PRESETS: Music 3 + TTS 4 = 7레이어.
 - `_quantize_to_bar()` 헬퍼: `round(time / bar_duration) * bar_duration`
 - 6개 전 장르 지원, 인접 섹션 연속성 + 최소 1마디 보장
 
-### v7-P1 semantic_intensity → 음악 연동
-- script_data의 si(0~1) → 음악 마스터 볼륨 변조 (0.7+si×0.6) + 텍스처 밀도 변조 (0.5+si)
+### v10 semantic_intensity → 음악 연동
+- script_data의 si(0~1) → 음악 마스터 볼륨 변조 (`0.95+si×0.1`, 95~105% 안정화) + 텍스처 밀도 변조 (`max(0.6, si)`, 최소 60% 보장)
 - `_build_si_envelope()`: 시간 도메인 si 배열, 0.5초 스무딩
 - **음악-비주얼-대사 삼위일체**: 비주얼과 동일한 si 소스를 음악이 공유
 
@@ -323,7 +325,11 @@ enometa-shorts/
 │   │   ├── VisualSection.tsx           # VOCAB_MAP (37키) + hybrid 전용 (Python배경+vocab오버레이)
 │   │   ├── PythonFrameBackground.tsx   # v5.1: Hybrid 모드 프레임 배경
 │   │   ├── LogoEndcard.tsx             # v2: 파티클 수렴 엔드카드 (다이나미즘 강화)
-│   │   ├── TitleSection.tsx            # 제목 표시 (endcardStartFrame fade-out 연동)
+│   │   ├── TitleSection.tsx            # 제목 표시 (endcardStartFrame fade-out 연동, fitText)
+│   │   ├── SubtitleSection.tsx         # v2: 문장 단위 1:1 + 4종 모션 패턴 (emotion별 분기)
+│   │   │                               #   A슬라이드업/B스케일인/C타이프라이터/D플래시컷
+│   │   ├── ShapeMotion.tsx             # 신규: emotion별 기하학적 도형 레이어
+│   │   │                               #   tension=사각형/climax=원형펄스/awakening=수평선/intro=점3개
 │   │   └── vocab/                      # 22개 비주얼 컴포넌트
 │   │       ├── (기존 20개)
 │   │       ├── PixelGrid.tsx           # 8bit 격자 (4모드) — v8 ikeda 팔레트 연동
@@ -388,6 +394,20 @@ enometa-shorts/
   - Remotion vocab 미활용 → hybrid에서도 vocab 오버레이 필수
   - 오디오 민감도 과포화 → semantic_intensity 기반 다이나믹 레인지 필요
 
+### EP006 — "모든 선택은 이미 다음 선택의 중력을 품고 있다"
+- 주제: 선택의 연쇄/중력 (철학 × 인문학)
+- ikeda v10 음악엔진 + @remotion/captions + fitText + calculateMetadata 첫 적용
+- **완전 실패 (참고 금지)**
+
+### EP007 — "알고리즘은 쌓지 않는다. 덜어낸다"
+- 주제: 이진 탐색(컴퓨팅) × 내려놓음의 공포(철학) × 나아감의 패러다임(인문학)
+- 나레이션 132.344초, edge-tts, 4170프레임 (+ 6s 엔드카드)
+- 음악: ikeda D_minor 135BPM, v10 10레이어, gap_burst
+- 비주얼: hybrid, 16씬, vocab 11종, SI 0.06~0.61
+- highlightWords: ["탐색", "덜어낸다"]
+- **시스템 최적화 점수 98/100** (최고점)
+- custom_dictionary.json 대폭 확장 (탐색/내려놓음/잠식/섀넌 등 신규 어휘)
+
 ### v5 업그레이드 (EP003 이후)
 - 음악 v4→v5: 6개 Raw Synthesis 함수, 장르 전면 교체 (bytebeat/algorave/harsh_noise/chiptune)
 - 비주얼 v5: PixelGrid + PixelWaveform 8bit 컴포넌트, 장르-비주얼 자동 연동
@@ -419,6 +439,10 @@ v7-P7  [█████████░] 에피소드 간 음악 이력: KEY_PRES
 v7-P6  [█████████░] 가변 BPM: si 기반 섹션별 ±15% 템포 변조 + 이벤트 기반 리듬 배치 (v7 9/9 완료)
 v6.6   [█████████░] Hybrid Vocab Overlay: VisualSection.tsx hybrid 모드에서 vocab 시맨틱 레이어 오버레이 활성화
 v8     [█████████░] ikeda 단일 장르 + Hybrid 전용화 + ikeda 확장 (5개 장르 제거, SINE_MELODY_SEQUENCES, TEXTURE_MODULES)
+v10    [█████████░] SI 변조 95~105% 안정화 + tanh 3.0 + RMS -6dB + song arc 상향 + sawtooth + gap_burst
+       — @remotion/captions + fitText + calculateMetadata (Remotion 자동화)
+       — 사이드체인 제거 + loudnorm EBU R128 -14 LUFS
+EP007  [█████████░] 이진탐색×내려놓음 (98점) — custom_dict 확장 + 11vocab + 132초
 EP010  [█████████░] 표현 다양화 (35+ vocab, GPU 가속 레이어)
 EP020+ [██████████] 디지털 아트 완성체 (Remotion 제거 → Python only)
 ```

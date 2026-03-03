@@ -8,6 +8,7 @@ import {
 import { TitleSection } from "./components/TitleSection";
 import { VisualSection } from "./components/VisualSection";
 import { SubtitleSection } from "./components/SubtitleSection";
+import { ShapeMotion } from "./components/ShapeMotion";
 import { LogoEndcard } from "./components/LogoEndcard";
 import { getPalette } from "./utils/palettes";
 import { VisualScript, NarrationSegment } from "./types";
@@ -91,13 +92,16 @@ export const EnometaShorts: React.FC<EnometaShortsProps> = ({
           />
         </div>
 
-        {/* 자막: 비주얼 안쪽 하단에 오버레이 (y=1450 - 80 - textHeight 근처) */}
+        {/* 자막: 비주얼 안쪽 하단에 오버레이 */}
         <SubtitleSection
           scenes={script.scenes}
           audio={audio}
           accentColor={palette.accent}
           narrationSegments={narrationSegments}
         />
+
+        {/* 도형 모션그래픽: emotion별 기하학적 장식 레이어 */}
+        <ShapeMotion scenes={script.scenes} />
 
         {/* 엔드카드: 로고 애니메이션 (에피소드 팔레트 적용) */}
         <LogoEndcard

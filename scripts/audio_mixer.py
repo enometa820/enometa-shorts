@@ -2,8 +2,8 @@
 ENOMETA 오디오 믹서
 - 나레이션 + BGM → mixed.wav
 - ffmpeg 기반
-- TTS:BGM = 4:6 비율 (나레이션 67% + BGM 100%)
-- 사이드체인 덕킹: 나레이션 구간에 BGM -3dB, 무음 구간 풀볼륨
+- narration 90% + BGM 100%, 사이드체인 없음
+- EBU R128 loudnorm (-14 LUFS) 최종 정규화
 """
 
 import sys
@@ -17,7 +17,7 @@ def mix_audio(
     narration_path: str,
     bgm_path: str,
     output_path: str,
-    narration_volume: float = 0.67,
+    narration_volume: float = 0.90,
     bgm_volume: float = 1.0,
     sidechain_path: str = None,
 ):
@@ -70,11 +70,12 @@ def mix_audio(
             (
                 f"[0:a]volume={narration_volume}[nar];"
                 f"[1:a]atrim=0:{duration},volume='{vol_expr}':eval=frame[bgm];"
-                f"[nar][bgm]amix=inputs=2:duration=first:dropout_transition=1[out]"
+                f"[nar][bgm]amix=inputs=2:duration=first:dropout_transition=1:normalize=0[mixed];"
+                f"[mixed]loudnorm=I=-14:TP=-1.5:LRA=11[out]"
             ),
             "-map", "[out]",
-            "-ar", "22050",
-            "-ac", "1",
+            "-ar", "44100",
+            "-ac", "2",
             output_path,
         ]
     else:
@@ -87,11 +88,12 @@ def mix_audio(
             (
                 f"[0:a]volume={narration_volume}[nar];"
                 f"[1:a]atrim=0:{duration},volume={bgm_volume}[bgm];"
-                f"[nar][bgm]amix=inputs=2:duration=first:dropout_transition=1[out]"
+                f"[nar][bgm]amix=inputs=2:duration=first:dropout_transition=1:normalize=0[mixed];"
+                f"[mixed]loudnorm=I=-14:TP=-1.5:LRA=11[out]"
             ),
             "-map", "[out]",
-            "-ar", "22050",
-            "-ac", "1",
+            "-ar", "44100",
+            "-ac", "2",
             output_path,
         ]
 
@@ -114,13 +116,13 @@ def main():
     parser.add_argument("output", nargs="?", default="audio/mixed.wav",
                         help="출력 WAV 경로 (기본: audio/mixed.wav)")
     parser.add_argument("--bgm-volume", type=float, default=1.0,
-                        help="BGM 볼륨 (0-1, 기본 1.0)")
+                        help="BGM 볼륨 (0-2, 기본 1.0)")
     parser.add_argument("--sidechain", dest="sidechain",
                         help="narration_timing.json 경로 (사이드체인 덕킹)")
     args = parser.parse_args()
 
     mix_audio(args.narration, args.bgm, args.output,
-              narration_volume=0.67,
+              narration_volume=0.90,
               bgm_volume=args.bgm_volume,
               sidechain_path=args.sidechain)
 

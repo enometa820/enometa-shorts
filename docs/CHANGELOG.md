@@ -5,6 +5,181 @@
 
 ---
 
+## 2026-03-04 — EP007 피드백 반영: 자막/볼륨/모션 전면 업그레이드
+
+### 코드 변경
+
+**`src/components/SubtitleSection.tsx`** (STEP 1+3 통합)
+- **자막 붕괴 수정**: `segmentsToWordCaptions` (단어별 선형 분할) → `segmentsToCaptions` (문장 단위 1:1 매핑)
+  - 이유: 단어 간 타이밍 누적 오차 → 페이지 경계 어긋남 + Infinity clamp 미흡 해결
+- **페이지 전환 간격**: `combineTokensWithinMilliseconds 1500` → `4000` (2~3문장 자연 묶기)
+- **durationInFrames 안전화**: `Infinity` 상한 → `totalFrames` 클램프 추가
+- **premountFor={fps}** 추가 (Sequence 사전 로드)
+- **4종 모션 패턴 추가** (emotion별 분기):
+  - A: 슬라이드 업 — intro, resolution, default (spring translateY)
+  - B: 스케일 인 — tension, climax (spring scale)
+  - C: 타이프라이터 — awakening (string slice, CSS animation 금지 준수)
+  - D: 플래시 컷 — buildup (frame % 기반 opacity/translateX)
+- **emotion별 색상/위치/크기 매핑** (EMOTION_COLORS 상수 테이블)
+
+**`scripts/audio_mixer.py`** (STEP 2)
+- `narration_volume`: `0.55` → `0.90` (TTS:BGM ≈ 1:1 균형)
+- `bgm_volume` 기본값: `1.5` → `1.0`
+- 함수 기본값 `0.67` → `0.90` 동기화
+- 주석: "narration 55% + BGM 150%" → "narration 90% + BGM 100%"
+
+**`src/components/ShapeMotion.tsx`** (STEP 4 신규)
+- emotion별 기하학적 도형 레이어 (EnometaShorts 자막 위에 오버레이)
+  - tension: 사각형 테두리 (spring scale + 회전)
+  - climax: 원형 펄스 (opacity 파동 + scale, frame % 기반)
+  - awakening: 수평선 2개 (좌→우 spring scaleX)
+  - intro: 점 3개 stagger 페이드인
+- 모든 애니메이션 `useCurrentFrame()` 기반 (CSS animation 금지 준수)
+
+**`src/EnometaShorts.tsx`**
+- `ShapeMotion` import + SubtitleSection 하단에 렌더링 추가
+
+**`skills/enometa-publish.md`** (규칙 업그레이드)
+- 설명란: 2~3문장 → **5~7문장** (훅/철학/ENOMETA 관점 3단 구조)
+- 고정댓글: "1~2줄 + 질문 1개" → **인용 + 맥락 2~3줄 + 질문 1~2개** 3단 구조
+
+**`episodes/ep007/publish.md`** — 새 규칙 소급 적용 (설명란 4문장, 고정댓글 5줄)
+
+### 반영 문서
+| 문서 | 반영 내용 |
+|------|----------|
+| SYSTEM_SNAPSHOT_v6 | Remotion 컴포넌트 섹션 업데이트 (ShapeMotion, SubtitleSection v2) |
+| CHANGELOG | 이 항목 |
+| MEMORY.md | 오디오 믹싱 절대 규칙 + Remotion 컴포넌트 현황 업데이트 |
+| skills/enometa-publish.md | 설명란/고정댓글 가이드라인 풍부화 |
+| episodes/ep007/publish.md | 새 규칙 소급 적용 |
+
+---
+
+## 2026-03-04 — EP007 완료 + publish.md 워크플로우 변경
+
+### 에피소드
+- **EP007** "알고리즘은 쌓지 않는다. 덜어낸다" — 제작 완료
+  - 이진 탐색(컴퓨팅) × 내려놓음의 공포(철학) × 나아감의 패러다임(인문학)
+  - 시스템 최적화 점수 98/100 (최고점)
+  - custom_dictionary.json 대폭 확장 (탐색/내려놓음/잠식/섀넌 등 신규 어휘)
+  - 132.344초, ikeda D_minor 135BPM, 16씬 vocab 11종, SI 0.06~0.61
+  - durationInFrames: 4170, highlightWords: ["탐색", "덜어낸다"]
+
+### 시스템 변경
+- **publish.md 워크플로우**: 제작 완료 후 → **제목 선택 직후** (제작 파이프라인 전)
+  - 구성 단순화: 제목 / 대본 / YouTube 설명란 / 고정 댓글 / 해시태그 5개 섹션만
+  - 기존 "제목 후보", "스타일", "키워드 하이라이트" 등 불필요 항목 제거
+- **skills/enometa-writing.md**: STEP 4 추가 (제목 선택 직후 publish.md 자동 생성)
+- **skills/enometa-publish.md**: 전제 조건 변경 + 템플릿 단순화
+
+### 반영 문서
+| 문서 | 반영 내용 |
+|------|----------|
+| SYSTEM_SNAPSHOT_v6 | EP006/EP007 에피소드 로그, 워크플로우 STEP 5 publish.md 수정, v10 음악 엔진/마스터링, 오디오 믹싱 |
+| ClaudeCode_Brief_v6 | 사전 단계 STEP 4 publish.md 추가, 업로드 메타데이터 섹션 전면 개정 |
+| CHANGELOG | 이 항목 |
+| MEMORY.md | EP007 에피소드 로그, publish.md 절대 규칙 업데이트 |
+| skills/enometa-writing.md | STEP 4 publish.md 생성 단계 추가 |
+| skills/enometa-publish.md | 전제 조건 + 템플릿 단순화 |
+| episodes/ep007/publish.md | EP007 퍼블리시 문서 신규 생성 |
+
+---
+
+## 2026-03-04 — 오디오 믹싱: 사이드체인 덕킹 제거 + narration_volume 0.55
+
+### 코드 변경
+- **`audio_mixer.py`**: narration_volume 기본값 `0.67` → `0.55`
+  - 이유: 나레이션 구간 대부분(90초+)이 덕킹 상태라 BGM 악기/리듬이 묻힌 문제 해결
+  - loudnorm (-14 LUFS)이 TTS/BGM 전체 균형 자동 처리하므로 TTS는 여전히 명확
+- **`scripts/enometa_render.py`** `step_mix()`: 사이드체인 덕킹 비활성화
+  - `--sidechain narration_timing.json` 옵션 제거
+  - 결과: 나레이션 전 구간에서 BGM 리듬/멜로디 존재감 유지
+- **`src/components/SubtitleSection.tsx`**: TikTokPage 타이밍 계산 버그 수정
+  - `page.durationMs` 기반 → Remotion 공식 `nextPage.startMs` 기반으로 교체
+  - 모든 자막이 동시에 표시되던 현상 해결
+
+### 반영 문서
+| 문서 | 반영 내용 |
+|------|----------|
+| MEMORY.md | 오디오 절대 규칙, 음악 엔진 v10 섹션 업데이트 |
+| CHANGELOG | 이 항목 |
+| ClaudeCode_Brief_v6 | 오디오 믹싱 섹션, mix 개별 실행 명령 |
+
+---
+
+## 2026-03-03 — 음악 엔진 v10 + audio loudnorm + Remotion @remotion/captions + fitText + calculateMetadata
+
+### 코드 변경
+- **`enometa_music_engine.py` v9→v10**: 음량 과도 감쇠 3요소 동시 완화
+  - SI 변조: `0.7 + si*0.6` → `0.95 + si*0.1` (변동폭 70~130% → 95~105%)
+  - density_scale: `si^1.5` (si=0.2→0.7%) → `max(0.6, si)` (최소 60% 보장)
+  - tanh drive: `1.2` → `3.0` (더 강한 디스토션 → 실제 음량 증가)
+  - RMS target: `-10dB` → `-6dB` (마스터 출력 +4dB)
+  - Song arc narrative 에너지 전체 상향: intro 0.25~0.45→0.7~0.9, buildup 0.45~0.85→0.9~1.2, climax 0.85~1.2→1.2~1.5
+  - 킥 볼륨: `si_g * 1.2` → `si_g * 2.5`, 하이햇: `si_g * 1.0` → `si_g * 1.8`
+  - saw_sequence default 볼륨: `0.4` → `0.7`
+- **`audio_mixer.py`**: EBU R128 loudnorm 정규화 추가 + bgm_volume 기본값 상향
+  - ffmpeg 필터에 `[mixed]loudnorm=I=-14:TP=-1.5:LRA=11[out]` 추가 (클리핑 방지)
+  - bgm_volume CLI default: `1.0` → `1.5`
+  - **버그 수정**: `-ar 22050 -ac 1` → `-ar 44100 -ac 2` (22050Hz 모노 → 44100Hz 스테레오)
+- **`src/components/SubtitleSection.tsx`**: @remotion/captions 전면 도입
+  - `createTikTokStyleCaptions()` — 단어 단위 타이밍 자동 분할
+  - `TikTokPage` (durationMs, startMs, tokens) 기반 단어 하이라이트
+  - 잘리던 단어 오버플로우 문제 근본 해결
+- **`src/components/TitleSection.tsx`**: @remotion/layout-utils fitText 도입
+  - `fitText({ text, withinWidth: 920, fontFamily, fontWeight })` → 자동 fontSize
+  - 최대 72px 상한 유지 (긴 제목도 자동 축소)
+- **`src/Root.tsx`**: calculateMetadata 자동 duration 계산
+  - `CalculateMetadataFunction<any>` — `audioAnalysis.duration_sec + endcardDurationSec` 기반
+  - EP001~EP006 모든 Composition에 `calculateMetadata={calcMeta}` 적용
+- **`scripts/visual_renderer.py`**: TTS 레이어 SI_INTENSITY_SCALE 상향
+  - 기존: TextData 0.70, DataStream 0.50, Barcode 0.40
+  - 신규: TextData 0.95, DataStream 0.75, Barcode 0.65
+
+### 반영 문서
+| 문서 | 반영 내용 |
+|------|----------|
+| MEMORY.md | 음악 엔진 v9→v10, Remotion 변경, EP006 완료 로그 |
+| CHANGELOG | 이 항목 |
+| ClaudeCode_Brief_v6 | last_updated, bgm_volume 1.5, loudnorm, @remotion/captions, fitText |
+| Music_Engine_Spec_v6 | v10 변경사항 (SI 변조/density/마스터링/song arc/킥하이햇/saw) |
+
+---
+
+## 2026-03-03 — 파이프라인 v2 + SI 비주얼 연동 + 음악 엔진 레이어 10
+
+### 코드 변경
+- **`enometa_render.py` v2 전면 재작성**: 단일 명령 통합 파이프라인
+  - 구버전: Chatterbox TTS + ACE-Step BGM + 개별 CLI 명령 조합
+  - 신버전: `py scripts/enometa_render.py <episode_dir> --title "제목" --palette phantom`
+  - 내부 단계: TTS → script_data → visual_script → BGM → mix → python_frames → Remotion
+  - `py` 명령 통일 (Python311 하드코딩 제거), Chatterbox/ACE-Step 완전 제거
+- **`enometa_music_engine.py`**: 레이어 10 `_render_gap_stutter_burst()` 추가
+  - 나레이션 세그먼트 사이 무음 구간(≥30ms) 감지 → 쏘우+스퀘어 brutal burst 삽입
+  - drive 5.0~10.0 (burst_energy 비례), 32분음표 게이트, vol 0.5~0.85
+  - 이전+다음 세그먼트 SI 평균 → burst_energy 결정
+- **`visual_renderer.py`**: SI 기반 레이어 강도 동적 조절 (`SI_INTENSITY_SCALE`)
+  - render_frame() 매 프레임마다 SI값으로 레이어 intensity 실시간 스케일
+  - SineWaveLayer: `max(0.35, 1-si*0.45)` (배경→서브), Particle: `si^1.5` (민감)
+  - `_init_layers()`에서 `_base_intensity` 저장 → 프레임마다 동적 적용
+- **`visual_script_generator.py`**: SI → vocab/reactivity/max_layers 연동
+  - `build_scene(si=...)` 파라미터 추가
+  - SI 기반 reactivity: si≥0.88→max, si≥0.72→high, si≤0.25→low
+  - SI 기반 max_layers: `int(si*3.5)` 기준 (si=0.25→1, si=0.75+→3)
+  - 세그먼트 합칠 때 평균 SI 계산 → scene에 전달
+
+### 반영 문서
+| 문서 | 반영 내용 |
+|------|----------|
+| MEMORY.md | 음악 엔진 v9 레이어 수 8→10, render v2, SI 비주얼 연동 섹션 추가 |
+| CHANGELOG | 이 항목 |
+| ClaudeCode_Brief_v6 | 파이프라인 CLI enometa_render.py v2로 통합, 검증 체크리스트 갱신 |
+| Music_Engine_Spec_v6 | 레이어 10 gap_stutter_burst 설명 추가, BPM 135, v9 합성 함수 추가 |
+| Hybrid_Visual_Architecture | SI_INTENSITY_SCALE, SI 기반 reactivity/max_layers 섹션 추가 |
+
+---
+
 ## 2026-03-03 — PixelGrid/PixelWaveform ikeda 통합 + 레거시 클린업
 
 ### 코드 변경
