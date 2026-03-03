@@ -1658,8 +1658,8 @@ class EnometaMusicEngine:
             next_si = segments[i + 1].get("analysis", {}).get("semantic_intensity", 0.5)
             burst_energy = (prev_si + next_si) / 2
 
-            # 쏘우파 + 강한 디스토션 (gap에서는 항상 brutal)
-            drive = 5.0 + burst_energy * 5.0  # 5.0~10.0
+            # 쏘우파 + 디스토션 (v10.1: drive 완화, 5~10→2~3.5)
+            drive = 2.0 + burst_energy * 1.5  # 2.0~3.5 (이전: 5.0~10.0)
             freq_L = self.bass_freq * 2
             freq_R = self.bass_freq * 2 * 1.006  # 약간 detuned (stereo width)
 
@@ -1689,8 +1689,8 @@ class EnometaMusicEngine:
                 gated_L[-fade_len:] *= np.linspace(1, 0, fade_len)
                 gated_R[-fade_len:] *= np.linspace(1, 0, fade_len)
 
-            # 볼륨: 에너지 비례 (0.5~0.85)
-            vol = 0.5 + burst_energy * 0.35
+            # 볼륨: 에너지 비례 (v10.1: 0.25~0.45, 이전: 0.5~0.85)
+            vol = 0.25 + burst_energy * 0.2
 
             burst_L[gap_start:gap_start + min_len] = gated_L * vol
             burst_R[gap_start:gap_start + min_len] = gated_R * vol
@@ -2238,7 +2238,7 @@ class EnometaMusicEngine:
         peak = np.max(np.abs(stereo))
         if peak > 0:
             stereo = stereo / peak
-        stereo = np.tanh(stereo * 3.0)  # v10: 강한 새츄레이션 — 원초적 디스토션 (이전: 1.2)
+        stereo = np.tanh(stereo * 1.5)  # v10.1: 새츄레이션 완화 (3.0→1.5, 너무 정신없음 피드백)
 
         # RMS 타겟 -6dB (0.5 linear) — v10: 더 큰 음악 볼륨 (이전: -10dB 0.316)
         rms = np.sqrt(np.mean(stereo ** 2))
