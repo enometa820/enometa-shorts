@@ -269,11 +269,11 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
   );
   const opacity = fadeIn * fadeOut;
 
-  // 태그라인 등장 (v2: 더 일찍, 더 오래)
+  // 태그라인 등장 (v3: 더 크고 밝게)
   const taglineOpacity = interpolate(
     localFrame,
-    [fps * 2.8, fps * 3.5],
-    [0, 0.5],
+    [fps * 2.0, fps * 2.8],
+    [0, 0.85],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
 
@@ -325,10 +325,10 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
           textAlign: "center",
           opacity: taglineOpacity,
           fontFamily: "Pretendard Variable, sans-serif",
-          fontSize: 18,
-          letterSpacing: "0.4em",
+          fontSize: 30,
+          letterSpacing: "0.3em",
           color: p.accent,
-          fontWeight: 300,
+          fontWeight: 400,
         }}
       >
         존재와 사유, 그 경계를 초월하다

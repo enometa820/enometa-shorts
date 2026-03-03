@@ -582,13 +582,18 @@ def generate_vocab_params(vocab: str, palette: dict, rng: random.Random) -> dict
             "position": rng.choice(["center", "top", "bottom"]),
         }
     elif vocab == "text_reveal":
+        # 모드 다양화: 4가지 모드 랜덤 선택
+        mode = rng.choice(["typewriter", "wave", "glitch", "scatter"])
+        # 색상 다양화: accent, glow, 또는 팔레트 컬러에서 선택
+        text_color = rng.choice([accent, glow, colors[0], "#FFFFFF", "#FFD700", "#00FFFF"])
         return {
             "text": "",
-            "mode": "wave",
-            "fontSize": rng.choice([48, 56, 64, 72]),
-            "color": accent,
-            "position": "center",
+            "mode": mode,
+            "fontSize": rng.choice([56, 64, 72, 80]),
+            "color": text_color,
+            "position": rng.choice(["center", "center", "top", "bottom"]),
             "glowColor": glow,
+            "staggerMs": rng.choice([60, 80, 100, 120]),
         }
     # --- 8bit / 레트로 비주얼 ---
     elif vocab.startswith("pixel_grid"):
@@ -740,14 +745,36 @@ def build_scene(
         semantic.append(secondary_entry)
 
     # 텍스트 비주얼 추가 (전략의 text_chance 반영)
+    # 단어/구/문장 단위 다양화: 키워드 1개 외에도 구절이나 짧은 문장 표시
     text_chance = strategy.get("text_chance", 0.5)
     force_text_mode = strategy.get("force_text_mode")
     keyword = extract_highlight_word(sentence)
     if keyword and rng.random() < text_chance:
         text_mode = force_text_mode or pool.get("text_mode", "wave")
         text_params = generate_vocab_params("text_reveal", palette, rng)
-        text_params["text"] = keyword
         text_params["mode"] = text_mode
+
+        # 텍스트 범위 다양화: 단어(60%), 구절(25%), 짧은 문장(15%)
+        text_roll = rng.random()
+        if text_roll < 0.6:
+            # 단어 (기존)
+            text_params["text"] = keyword
+        elif text_roll < 0.85:
+            # 구절: 쉼표나 마침표 기준으로 짧은 구 추출
+            parts = [p.strip() for p in re.split(r'[.,]', sentence) if p.strip()]
+            # 키워드를 포함하는 구절 우선 선택
+            phrase = next((p for p in parts if keyword in p), parts[0] if parts else keyword)
+            # 너무 길면 공백 기준 앞 4단어까지
+            words = phrase.split()
+            if len(words) > 4:
+                phrase = " ".join(words[:4])
+            text_params["text"] = phrase
+        else:
+            # 짧은 문장: 마침표 기준 첫 문장 (20자 이내)
+            sentences_list = [s.strip() for s in sentence.split('.') if s.strip()]
+            short = next((s for s in sentences_list if len(s) <= 20), None)
+            text_params["text"] = (short + ".") if short else keyword
+
         semantic.append({"vocab": "text_reveal", "params": text_params})
         if keyword not in highlight_words:
             highlight_words.append(keyword)

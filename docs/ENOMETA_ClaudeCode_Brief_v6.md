@@ -4,7 +4,7 @@
 > 이 문서를 Claude Code에 전달하면 에피소드 제작을 시작할 수 있다.
 > 상세 시스템 문서: ENOMETA_SYSTEM_SNAPSHOT_v6.md 참조
 > 음악 엔진 상세: ENOMETA_Music_Engine_Spec_v6.md 참조
-> **last_updated**: 2026-03-04 — EP007 완료 + publish.md 타이밍 변경 (제목 선택 직후, 제작 전)
+> **last_updated**: 2026-03-04 — EP007 완료 + audio_mixer 엔드카드 BGM 연장 + SubtitleSection 문장분할 + ShapeMotion/TextReveal 강화
 
 ---
 
@@ -26,7 +26,7 @@
 | BGM 생성 | enometa_music_engine.py v10 | Pure Python, ikeda 10레이어 + gap burst + SI 변조 안정화(95~105%) |
 | 비주얼 엔진 | Canvas 2D + SVG (Remotion) + Python (numpy+Pillow) | Hybrid: Python 배경 + Remotion 오버레이 |
 | 오디오 분석 | numpy FFT | 프레임별 bass/mid/high/rms/onset |
-| 오디오 믹싱 | ffmpeg | narration 55% + BGM 150%, 사이드체인 없음 + EBU R128 loudnorm (-14 LUFS) |
+| 오디오 믹싱 | ffmpeg | narration 90% + BGM 100%, output=max(nar,bgm), loudnorm -14 LUFS, 엔드카드 BGM 자동 연장 |
 | 대본 데이터 | script_data_extractor.py | 숫자/화학물질/바이트 인코딩 + **semantic_intensity** (v11.1: VERB 101개+EMOTION 68개+SCIENCE 85개+CHEM 19개+BODY 30개) + custom_dictionary.json 자동 로드 + 미등록 단어 감지 |
 | 비주얼 스크립트 | visual_script_generator.py | 대본+장르 → 씬 → 감정 → vocab 자동 매핑 |
 | 대본 분석 | Claude Code 자체 | Claude Max 포함, API 비용 없음 |
@@ -61,7 +61,7 @@
 [3] 대본 데이터 추출  → script_data.json (semantic_intensity / data_density / numbers)
 [4] 비주얼 스크립트   → visual_script.json (SI 기반 reactivity/max_layers 자동 조절)
 [5] BGM 생성          → bgm.wav + bgm_raw_visual_data.npz (v10: 10레이어 + gap burst + SI 95~105%)
-[6] 오디오 믹싱       → mixed.wav (narration 55% + BGM 150%, 사이드체인 없음, loudnorm)
+[6] 오디오 믹싱       → mixed.wav (narration 90% + BGM 100%, output=max(nar,bgm), loudnorm -14 LUFS)
 [7] Python 비주얼     → frames/*.png (SI 기반 레이어 강도 동적 조절)
 [8] Remotion 합성     → output.mp4 (hybrid: Python 배경 + vocab 오버레이 + 제목/자막)
 
@@ -142,12 +142,11 @@ py -X utf8 scripts/visual_renderer.py \
   episodes/epXXX --genre ikeda
 # → v9: SI_INTENSITY_SCALE 실시간 적용 (si 높을수록 Particle/Waveform 강해짐)
 
-# [mix] 오디오 믹싱 (narration 55% + BGM 150%, 사이드체인 없음)
+# [mix] 오디오 믹싱 (narration 90% + BGM 100%, 엔드카드 BGM 연장, loudnorm -14 LUFS)
 py -X utf8 scripts/audio_mixer.py \
   episodes/epXXX/narration.wav \
   episodes/epXXX/bgm.wav \
-  episodes/epXXX/mixed.wav \
-  --bgm-volume 1.5
+  episodes/epXXX/mixed.wav
 
 # [render] Remotion 합성 (Root.tsx durationInFrames 업데이트 후)
 npx remotion render src/index.tsx EnometaShorts \
@@ -229,7 +228,11 @@ ENOMETA | 데이터아트 × 철학
   - si≥0.88 구간 → "max" reactivity
   - si≤0.25 구간 → "low" reactivity + layers=1
 □ mixed.wav 음량 확인: -14 LUFS 근처, TP 최대 -1.5dB (loudnorm 정상 작동)
-□ Remotion 자막: SubtitleSection @remotion/captions 단어 하이라이트 정상 작동 확인
+□ Remotion 자막: SubtitleSection 문장 단위 표시, 35자 초과 시 마침표 분할, smartLineBreak(18) 적용 확인
+□ Remotion 타이포: TextReveal 4모드(typewriter/wave/glitch/scatter) 색상/크기 다양성 확인
+□ Remotion ShapeMotion: 비주얼 영역(y=370~1450) 내 도형 표시, emotion별 패턴 작동 확인
+□ 엔드카드: BGM이 마지막까지 이어지는지 확인 (output_duration=max(nar,bgm))
+□ 엔드카드: 태그라인 가독성 (fontSize≥30, opacity≥0.85)
 □ Root.tsx calculateMetadata: durationInFrames = (audioAnalysis.duration_sec + 6) × 30 자동 계산 확인
 ```
 

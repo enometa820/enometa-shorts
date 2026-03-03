@@ -1,0 +1,154 @@
+{
+  "voice": "ko-KR-SunHiNeural",
+  "rate": "+5%",
+  "segments": [
+    {
+      "index": 0,
+      "text": "10억 개 중 하나를 찾는다.",
+      "start_sec": 0.0,
+      "end_sec": 2.736,
+      "duration_sec": 2.736
+    },
+    {
+      "index": 1,
+      "text": "이진 탐색이 쓰는 횟수. 30번.",
+      "start_sec": 2.986,
+      "end_sec": 7.354,
+      "duration_sec": 4.368
+    },
+    {
+      "index": 2,
+      "text": "처음부터 하나씩 확인하면. 평균 5억 번.",
+      "start_sec": 7.604,
+      "end_sec": 12.332,
+      "duration_sec": 4.728
+    },
+    {
+      "index": 3,
+      "text": "차이는 방법 하나다.",
+      "start_sec": 12.582,
+      "end_sec": 15.006,
+      "duration_sec": 2.424
+    },
+    {
+      "index": 4,
+      "text": "이진 탐색은 답을 찾지 않는다.",
+      "start_sec": 15.256,
+      "end_sec": 18.376,
+      "duration_sec": 3.12
+    },
+    {
+      "index": 5,
+      "text": "절반을 덜어낸다.",
+      "start_sec": 18.626,
+      "end_sec": 20.834,
+      "duration_sec": 2.208
+    },
+    {
+      "index": 6,
+      "text": "중간을 고른다. 답보다 크면 위쪽 전부를 지운다. 답보다 작으면 아래쪽 전부를 지운다. 다시 중간을 고른다.",
+      "start_sec": 21.084,
+      "end_sec": 32.004,
+      "duration_sec": 10.92
+    },
+    {
+      "index": 7,
+      "text": "덜어낼 때마다 탐색 공간이 절반으로 줄어든다. 30번의 결단이 10억을 하나로 만든다.",
+      "start_sec": 32.254,
+      "end_sec": 39.742,
+      "duration_sec": 7.488
+    },
+    {
+      "index": 8,
+      "text": "섀넌은 수식으로 증명했다. 한 비트의 정보는 불확실성을 정확히 절반으로 줄인다고. 이진 탐색은 그 수식의 가장 순수한 구현체다.",
+      "start_sec": 39.992,
+      "end_sec": 51.704,
+      "duration_sec": 11.712
+    },
+    {
+      "index": 9,
+      "text": "이것은 효율의 문제가 아니다.",
+      "start_sec": 51.954,
+      "end_sec": 54.762,
+      "duration_sec": 2.808
+    },
+    {
+      "index": 10,
+      "text": "어떻게 나아가는가의 문제다.",
+      "start_sec": 55.012,
+      "end_sec": 57.796,
+      "duration_sec": 2.784
+    },
+    {
+      "index": 11,
+      "text": "쌓는다는 것은 가능성을 확장하는 일이다. 하지만 탐색은 확장이 아니다. 제거다.",
+      "start_sec": 58.046,
+      "end_sec": 66.446,
+      "duration_sec": 8.4
+    },
+    {
+      "index": 12,
+      "text": "우리는 오래 믿어왔다. 나아간다는 것은 쌓는 것이라고. 더 많은 정보, 더 많은 선택지, 더 많은 가능성. 덜어내면 잃는다고.",
+      "start_sec": 66.696,
+      "end_sec": 79.464,
+      "duration_sec": 12.768
+    },
+    {
+      "index": 13,
+      "text": "그래서 우리는 선택지를 놓지 않는다. 이 직업도, 저 관계도, 이 가능성도 동시에 쥐고 있는다.",
+      "start_sec": 79.714,
+      "end_sec": 88.546,
+      "duration_sec": 8.832
+    },
+    {
+      "index": 14,
+      "text": "하지만 탐색 공간이 줄지 않으면 알고리즘은 닫히지 않는다. 무한히 헤맨다. 어제와 같은 자리를 맴돈다.",
+      "start_sec": 88.796,
+      "end_sec": 98.492,
+      "duration_sec": 9.696
+    },
+    {
+      "index": 15,
+      "text": "컴퓨터는 알고 있다.",
+      "start_sec": 98.742,
+      "end_sec": 101.118,
+      "duration_sec": 2.376
+    },
+    {
+      "index": 16,
+      "text": "어느 방향이 맞는지 몰라도 된다. 어느 방향이 틀렸는지만 확인하면. 그 순간 우리는 이미 절반을 전진한 것이다.",
+      "start_sec": 101.368,
+      "end_sec": 111.256,
+      "duration_sec": 9.888
+    },
+    {
+      "index": 17,
+      "text": "우리가 결정을 두려워하는 이유는 틀릴까봐가 아니다.",
+      "start_sec": 111.506,
+      "end_sec": 115.682,
+      "duration_sec": 4.176
+    },
+    {
+      "index": 18,
+      "text": "내려놓음의 공포. 그것이 우리를 잠식한다.",
+      "start_sec": 115.932,
+      "end_sec": 120.9,
+      "duration_sec": 4.968
+    },
+    {
+      "index": 19,
+      "text": "하지만 모든 탐색은 내려놓음으로 완성된다.",
+      "start_sec": 121.15,
+      "end_sec": 125.23,
+      "duration_sec": 4.08
+    },
+    {
+      "index": 20,
+      "text": "절반을 지워내는 것. 그것이 10억 개의 혼돈을 하나의 답으로 이끄는 유일한 알고리즘이었다.",
+      "start_sec": 125.48,
+      "end_sec": 132.344,
+      "duration_sec": 6.864
+    }
+  ],
+  "total_duration_sec": 132.344
+}

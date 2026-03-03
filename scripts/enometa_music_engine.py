@@ -3271,7 +3271,8 @@ def generate_music_script(visual_script: dict, narration_timing: dict = None,
     title = visual_script.get("title", "ENOMETA")
 
     total_duration = max(s["end_sec"] for s in scenes) if scenes else 60
-    total_duration = total_duration + 5
+    # 엔드카드(6초) + 여유(2초) 포함하여 BGM이 엔드카드까지 이어지도록
+    total_duration = total_duration + 8
 
     # v8: 항상 ikeda 프리셋 적용
     genre_preset = GENRE_PRESETS["ikeda"]
@@ -3351,15 +3352,16 @@ def generate_music_script(visual_script: dict, narration_timing: dict = None,
             "start_sec": last_end,
             "end_sec": total_duration,
             "emotion": "fade",
-            "energy": 0.1,
+            "energy": 0.2,
             "instruments": {
-                "bass_drone": {"active": True, "volume": 0.25},
-                "fm_bass": {"active": True, "volume": 0.15},
+                "bass_drone": {"active": True, "volume": 0.3},
+                "fm_bass": {"active": True, "volume": 0.2},
+                "arpeggio": {"active": True, "volume": 0.15},
             },
             "effects": {
-                "reverb_decay": 0.7,
-                "filter_cutoff": 500,
-                "stereo_width": 0.3,
+                "reverb_decay": 0.8,
+                "filter_cutoff": 600,
+                "stereo_width": 0.4,
             },
             "transition_in": {"type": "crossfade", "duration_sec": 3.0},
         }

@@ -2,8 +2,9 @@
 
 > Pure Python 전자음악 엔진 — Raw Synthesis, GPU 불필요
 > numpy + scipy만으로 동작.
-> **last_updated**: 2026-03-03 — v10: SI 변조 완화, density_scale 하한 60%, tanh 3.0, RMS -6dB, song arc 에너지 전체 상향
+> **last_updated**: 2026-03-04 — v10: SI 변조 완화, density_scale 하한 60%, tanh 3.0, RMS -6dB, song arc 에너지 전체 상향
 > v9→v10: SI 변조 95~105%로 안정화, density_scale max(0.6,si), 마스터링 강화(tanh 3.0, -6dB), song arc 에너지 상향, 킥/하이햇/saw 볼륨 증가
+> v10.1 (EP007): BGM duration = total_duration + 8 (endcard 6초 + 2초 buffer), outro energy 0.1→0.2
 
 ---
 
@@ -265,7 +266,7 @@ py scripts/enometa_music_engine.py \
 
 | 아크 | 구간 | 에너지 범위 |
 |------|------|------------|
-| **narrative** | intro(0-15%) → buildup(15-55%) → climax(55-80%) → outro(80-100%) | 0.25~1.2 |
+| **narrative** | intro(0-15%) → buildup(15-55%) → climax(55-80%) → outro(80-100%) | 0.7~1.5 (v10 상향) |
 | crescendo | grow(0-85%) → release(85-100%) | 0.2~1.1 |
 | flat | constant(0-100%) | 1.0 (아크 없음) |
 | **adaptive** | si 곡선 기반 동적 경계 (intro→buildup→climax→outro, script_data 필수) | 0.25~1.2 |
@@ -529,4 +530,35 @@ section_bpm = base_bpm × (0.85 + si_avg × 0.30)
 
 ---
 
-*이 문서는 enometa_music_engine.py v8의 동작 스펙을 기술한다. 프로젝트 경로: `C:\옵시디언\enometa\enometa-shorts\`*
+---
+
+## audio_mixer.py 연동 — 오디오 믹싱 + 엔드카드 BGM (EP007 수정)
+
+음악 엔진 출력(bgm.wav)과 나레이션(narration.wav)을 최종 믹싱하는 `audio_mixer.py` 스펙.
+
+### 믹싱 파라미터
+| 파라미터 | 값 | 비고 |
+|---------|-----|------|
+| narration_volume | 0.90 | 하드코딩 |
+| bgm_volume | 1.0 | CLI --bgm-volume으로 조절 가능 |
+| output_duration | max(narration, bgm) | BGM이 더 길면 엔드카드까지 이어짐 |
+| loudnorm | I=-14:TP=-1.5:LRA=11 | EBU R128 최종 정규화 |
+
+### 엔드카드 BGM 연장 메커니즘
+```
+1. 음악 엔진: total_duration + 8초로 BGM 생성 (endcard 6초 + 2초 buffer)
+   - outro 구간: energy 0.2 (이전 0.1), bass_drone 0.3, fm_bass 0.2, arpeggio 0.15
+2. audio_mixer: output_duration = max(narration_duration, bgm_duration)
+   - 나레이션을 apad로 output_duration까지 무음 패딩
+   - BGM은 atrim으로 output_duration까지 재생
+   - amix duration=longest로 더 긴 쪽 기준 출력
+3. 결과: 엔드카드(마지막 6초)에도 BGM이 자연스럽게 지속
+```
+
+### 사이드체인 덕킹 (선택적)
+`--sidechain narration_timing.json` 옵션으로 나레이션 구간에서 BGM -3dB 덕킹 가능.
+기본값은 사이드체인 미사용 (loudnorm이 전체 밸런스 처리).
+
+---
+
+*이 문서는 enometa_music_engine.py v10의 동작 스펙을 기술한다. 프로젝트 경로: `C:\옵시디언\enometa\enometa-shorts\`*

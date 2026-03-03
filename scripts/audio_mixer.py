@@ -21,7 +21,9 @@ def mix_audio(
     bgm_volume: float = 1.0,
     sidechain_path: str = None,
 ):
-    """나레이션과 BGM을 믹싱 (선택적 사이드체인 덕킹)"""
+    """나레이션과 BGM을 믹싱 (선택적 사이드체인 덕킹)
+    BGM이 나레이션보다 길면 엔드카드까지 BGM이 이어짐.
+    """
 
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
 
@@ -35,18 +37,27 @@ def mix_audio(
     duration = float(subprocess.check_output(probe_cmd).decode().strip())
     print(f"Narration duration: {duration:.2f}s")
 
+    # BGM 길이 구하기 (엔드카드까지 이어지도록)
+    bgm_probe_cmd = [
+        "ffprobe", "-v", "quiet",
+        "-show_entries", "format=duration",
+        "-of", "csv=p=0",
+        bgm_path,
+    ]
+    bgm_duration = float(subprocess.check_output(bgm_probe_cmd).decode().strip())
+    # 출력 길이: BGM이 더 길면 BGM 길이 사용 (엔드카드 포함)
+    output_duration = max(duration, bgm_duration)
+    print(f"BGM duration: {bgm_duration:.2f}s, output duration: {output_duration:.2f}s")
+
     if sidechain_path:
         # 사이드체인 덕킹: narration_timing.json 기반 볼륨 오토메이션
         print(f"Sidechain ducking from: {sidechain_path}")
         with open(sidechain_path, 'r', encoding='utf-8') as f:
             timing = json.load(f)
 
-        # 나레이션 구간 → BGM 덕킹 (-3dB = 0.707), 무음 구간 → 풀볼륨
         duck_ratio = 0.707  # -3dB
         segments = timing.get("segments", [])
 
-        # ffmpeg volume 오토메이션 생성 (enable 표현식)
-        # 나레이션 구간에서는 bgm_volume * duck_ratio, 나머지는 bgm_volume
         vol_parts = []
         bgm_ducked = round(bgm_volume * duck_ratio, 3)
 
@@ -56,22 +67,22 @@ def mix_audio(
             vol_parts.append(f"between(t,{s:.3f},{e:.3f})")
 
         if vol_parts:
-            # 나레이션 구간이면 ducked, 아니면 full
             nar_condition = "+".join(vol_parts)
             vol_expr = f"if({nar_condition},{bgm_ducked},{bgm_volume})"
         else:
             vol_expr = str(bgm_volume)
 
+        # narraiton을 output_duration까지 패딩 (엔드카드 구간은 무음)
         cmd = [
             "ffmpeg", "-y",
             "-i", narration_path,
             "-i", bgm_path,
             "-filter_complex",
             (
-                f"[0:a]volume={narration_volume}[nar];"
-                f"[1:a]atrim=0:{duration},volume='{vol_expr}':eval=frame[bgm];"
-                f"[nar][bgm]amix=inputs=2:duration=first:dropout_transition=1:normalize=0[mixed];"
-                f"[mixed]loudnorm=I=-14:TP=-1.5:LRA=11[out]"
+                f"[0:a]volume={narration_volume},apad=whole_dur={output_duration}[nar];"
+                f"[1:a]atrim=0:{output_duration},volume='{vol_expr}':eval=frame[bgm];"
+                f"[nar][bgm]amix=inputs=2:duration=longest:dropout_transition=2:normalize=0[mixed];"
+                f"[mixed]atrim=0:{output_duration},loudnorm=I=-14:TP=-1.5:LRA=11[out]"
             ),
             "-map", "[out]",
             "-ar", "44100",
@@ -79,17 +90,17 @@ def mix_audio(
             output_path,
         ]
     else:
-        # 기존 방식: 고정 볼륨 믹싱
+        # 고정 볼륨 믹싱 — BGM이 나레이션보다 길면 엔드카드까지 이어짐
         cmd = [
             "ffmpeg", "-y",
             "-i", narration_path,
             "-i", bgm_path,
             "-filter_complex",
             (
-                f"[0:a]volume={narration_volume}[nar];"
-                f"[1:a]atrim=0:{duration},volume={bgm_volume}[bgm];"
-                f"[nar][bgm]amix=inputs=2:duration=first:dropout_transition=1:normalize=0[mixed];"
-                f"[mixed]loudnorm=I=-14:TP=-1.5:LRA=11[out]"
+                f"[0:a]volume={narration_volume},apad=whole_dur={output_duration}[nar];"
+                f"[1:a]atrim=0:{output_duration},volume={bgm_volume}[bgm];"
+                f"[nar][bgm]amix=inputs=2:duration=longest:dropout_transition=2:normalize=0[mixed];"
+                f"[mixed]atrim=0:{output_duration},loudnorm=I=-14:TP=-1.5:LRA=11[out]"
             ),
             "-map", "[out]",
             "-ar", "44100",

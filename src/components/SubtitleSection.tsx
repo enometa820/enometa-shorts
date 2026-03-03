@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  useCurrentFrame,
-  useVideoConfig,
-  interpolate,
-  spring,
-  Sequence,
-} from "remotion";
+import { useCurrentFrame, useVideoConfig, interpolate } from "remotion";
 import { AudioFrame } from "../hooks/useAudioData";
 import { Scene, NarrationSegment } from "../types";
 
@@ -16,112 +10,178 @@ interface SubtitleSectionProps {
   narrationSegments?: NarrationSegment[];
 }
 
-// emotion별 색상 매핑
-const EMOTION_COLORS: Record<string, { base: string; highlight: string }> = {
-  awakening: { base: "#FFFFFF", highlight: "#FFD700" },
-  tension:   { base: "#FFCCAA", highlight: "#FF4500" },
-  climax:    { base: "#E0E0FF", highlight: "#00FFFF" },
-  buildup:   { base: "#FFEECC", highlight: "#FFB347" },
-  intro:     { base: "#CCCCCC", highlight: "#FFFFFF" },
-};
+/**
+ * 한국어 자연 줄바꿈: 공백(띄어쓰기) 기준으로만 끊어서 단어 잘림 방지
+ * 텍스트 중간 지점에 가장 가까운 공백에서 2줄로 분할
+ */
+function smartLineBreak(text: string, charLimit: number = 18): string {
+  if (text.length <= charLimit) return text;
 
-const getColors = (emotion: string) =>
-  Object.entries(EMOTION_COLORS).find(([k]) => emotion.includes(k))?.[1] ??
-  { base: "#FFFFFF", highlight: "#FFD700" };
+  const words = text.split(" ");
+  if (words.length <= 1) return text;
 
-const getBottom = (emotion: string) => {
-  if (emotion.includes("awakening")) return 400;
-  if (emotion.includes("climax")) return 320;
-  return 520;
-};
+  // 텍스트 중간에 가장 가까운 공백 위치에서 2줄 분할
+  const mid = text.length / 2;
+  let bestSplitIdx = 0;
+  let bestDist = Infinity;
+  let pos = 0;
 
-const getFontSize = (emotion: string) => {
-  if (emotion.includes("climax")) return 72;
-  if (emotion.includes("awakening")) return 66;
-  if (emotion.includes("tension")) return 58;
-  return 54;
-};
+  for (let i = 0; i < words.length - 1; i++) {
+    pos += words[i].length;
+    const splitPos = pos + 1;
+    const dist = Math.abs(splitPos - mid);
+    if (dist < bestDist && splitPos >= 2 && splitPos <= text.length - 2) {
+      bestDist = dist;
+      bestSplitIdx = i + 1;
+    }
+    pos += 1;
+  }
 
-// 세그먼트 단위 자막 렌더러 — emotion별 4종 모션 패턴
-// createTikTokStyleCaptions 완전 제거: 문장 합침 버그 방지
-const SegmentSubtitle: React.FC<{ text: string; emotion: string }> = ({
-  text,
-  emotion,
+  if (bestSplitIdx === 0) return text;
+
+  const line1 = words.slice(0, bestSplitIdx).join(" ");
+  const line2 = words.slice(bestSplitIdx).join(" ");
+  return line1 + "\n" + line2;
+}
+
+/**
+ * 긴 세그먼트를 문장(마침표) 단위로 분할하여 서브 타이밍을 생성.
+ * EP007처럼 한 세그먼트에 4문장(70자)이 합쳐진 경우,
+ * 세그먼트 시간을 문장 수로 균등 분배하여 순차 표시.
+ */
+function splitSegmentToSentences(
+  text: string,
+  startSec: number,
+  endSec: number,
+): { text: string; startSec: number; endSec: number }[] {
+  // 마침표 뒤에서 분할 (마침표 유지)
+  const sentences = text
+    .split(/(?<=\.)\s*/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+
+  if (sentences.length <= 1) {
+    return [{ text, startSec, endSec }];
+  }
+
+  const totalDur = endSec - startSec;
+  // 글자 수 비례로 시간 분배
+  const totalChars = sentences.reduce((sum, s) => sum + s.length, 0);
+
+  const result: { text: string; startSec: number; endSec: number }[] = [];
+  let t = startSec;
+
+  for (let i = 0; i < sentences.length; i++) {
+    const ratio = sentences[i].length / totalChars;
+    const dur = totalDur * ratio;
+    result.push({
+      text: sentences[i],
+      startSec: t,
+      endSec: t + dur,
+    });
+    t += dur;
+  }
+
+  return result;
+}
+
+export const SubtitleSection: React.FC<SubtitleSectionProps> = ({
+  scenes,
+  audio,
+  accentColor,
+  narrationSegments,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const currentTime = frame / fps;
 
-  const colors = getColors(emotion);
-  const fontSize = getFontSize(emotion);
-  const bottom = getBottom(emotion);
-  const isHeavy = emotion.includes("climax") || emotion.includes("awakening");
+  if (!narrationSegments || narrationSegments.length === 0) return null;
 
-  // 공통 페이드인 (8프레임 = 약 0.27초)
-  const fadeIn = interpolate(frame, [0, 8], [0, 1], {
-    extrapolateRight: "clamp",
-  });
-
-  // 패턴 A: 슬라이드업 — intro, resolution, default
-  const slideSpring = spring({ frame, fps, config: { damping: 200 } });
-  const slideY = interpolate(slideSpring, [0, 1], [28, 0]);
-
-  // 패턴 B: 스케일인 — tension, climax
-  const scaleSpring = spring({ frame, fps, config: { damping: 200 } });
-
-  // 패턴 C: 타이프라이터 — awakening (string slice, CSS animation 금지)
-  const totalChars = text.length;
-  const visibleChars = Math.floor(
-    interpolate(frame, [0, Math.max(1, fps * 0.9)], [0, totalChars], {
-      extrapolateRight: "clamp",
-    }),
+  // 현재 활성 세그먼트 찾기
+  const activeSegment = narrationSegments.find(
+    (s) => currentTime >= s.start_sec && currentTime < s.end_sec,
   );
 
-  // 패턴 D: 플래시컷 — buildup
-  const flashOpacity = interpolate(frame % 6, [0, 2, 4, 6], [1, 0.45, 1, 0.45]);
-  const flashX = interpolate(frame % 8, [0, 2, 4, 6, 8], [0, -3, 3, -2, 0]);
+  if (!activeSegment?.text) return null;
 
-  let transform = "none";
-  let opacity = fadeIn;
+  // 긴 세그먼트(35자 초과)는 문장 단위로 분할
+  const subParts =
+    activeSegment.text.length > 35
+      ? splitSegmentToSentences(
+          activeSegment.text,
+          activeSegment.start_sec,
+          activeSegment.end_sec,
+        )
+      : [
+          {
+            text: activeSegment.text,
+            startSec: activeSegment.start_sec,
+            endSec: activeSegment.end_sec,
+          },
+        ];
 
-  if (emotion.includes("awakening")) {
-    opacity = fadeIn;
-  } else if (emotion.includes("buildup")) {
-    opacity = fadeIn * flashOpacity;
-    transform = `translateX(${flashX}px)`;
-  } else if (emotion.includes("tension") || emotion.includes("climax")) {
-    transform = `scale(${scaleSpring})`;
-  } else {
-    transform = `translateY(${slideY}px)`;
-  }
+  // 현재 시간에 맞는 서브파트 찾기
+  const activePart = subParts.find(
+    (p) => currentTime >= p.startSec && currentTime < p.endSec,
+  );
 
-  const displayText = emotion.includes("awakening")
-    ? text.slice(0, visibleChars)
-    : text;
+  if (!activePart) return null;
+
+  const displayText = activePart.text;
+
+  // 현재 씬 정보 (감정 기반 스타일링용)
+  const activeScene = scenes.find(
+    (s) => currentTime >= s.start_sec && currentTime < s.end_sec,
+  );
+
+  // 서브파트 내 진행도
+  const partDuration = activePart.endSec - activePart.startSec;
+  const partElapsed = currentTime - activePart.startSec;
+
+  // 페이드인/아웃
+  const fadeIn = interpolate(partElapsed, [0, 0.15], [0, 1], {
+    extrapolateRight: "clamp",
+  });
+  const fadeOut = interpolate(
+    partElapsed,
+    [partDuration - 0.15, partDuration],
+    [1, 0],
+    { extrapolateLeft: "clamp" },
+  );
+  const opacity = Math.min(fadeIn, fadeOut);
+
+  // 감정에 따른 스타일
+  const emotion = activeScene?.emotion || "";
+  const isEmphasis =
+    emotion.includes("climax") || emotion.includes("awakening");
+  const fontSize = isEmphasis ? 62 : 54;
+
+  // 한국어 스마트 줄바꿈 적용
+  const formattedText = smartLineBreak(displayText, 18);
 
   return (
     <div
       style={{
         position: "absolute",
-        bottom,
+        bottom: 550,
         left: 0,
         width: 1080,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        padding: "0 80px",
+        padding: "0 100px 0 60px",
         pointerEvents: "none",
-        opacity,
-        transform,
       }}
     >
       <div
         style={{
           fontFamily: "Pretendard Variable, sans-serif",
-          fontWeight: isHeavy ? 700 : 500,
+          fontWeight: isEmphasis ? 700 : 500,
           fontSize,
-          color: colors.base,
+          color: "#FFFFFF",
           textAlign: "center",
           lineHeight: 1.5,
+          opacity,
           textShadow: [
             "0 2px 8px rgba(0,0,0,0.95)",
             "0 0 20px rgba(0,0,0,0.7)",
@@ -130,58 +190,14 @@ const SegmentSubtitle: React.FC<{ text: string; emotion: string }> = ({
           backgroundColor: "rgba(0, 0, 0, 0.35)",
           padding: "16px 36px",
           borderRadius: 12,
-          maxWidth: 920,
+          maxWidth: 900,
           wordBreak: "keep-all",
-          overflowWrap: "normal",
-          whiteSpace: "pre-wrap",
+          overflowWrap: "break-word",
+          whiteSpace: "pre-line",
         }}
       >
-        {displayText}
+        {formattedText}
       </div>
     </div>
-  );
-};
-
-export const SubtitleSection: React.FC<SubtitleSectionProps> = ({
-  scenes,
-  audio,
-  accentColor,
-  narrationSegments,
-}) => {
-  const { fps, durationInFrames: totalFrames } = useVideoConfig();
-
-  if (!narrationSegments || narrationSegments.length === 0) return null;
-
-  return (
-    <>
-      {narrationSegments.map((seg, index) => {
-        const startFrame = Math.floor(seg.start_sec * fps);
-        const nextSeg = narrationSegments[index + 1] ?? null;
-        // 다음 세그먼트 시작까지 또는 영상 끝까지 (최대 8초)
-        const maxDuration = Math.ceil(fps * 8);
-        const endFrame = Math.min(
-          nextSeg ? Math.floor(nextSeg.start_sec * fps) : totalFrames,
-          startFrame + maxDuration,
-          totalFrames,
-        );
-        const durationInFrames = Math.max(1, endFrame - startFrame);
-
-        const activeScene = scenes.find(
-          (s) => seg.start_sec >= s.start_sec && seg.start_sec < s.end_sec,
-        );
-        const emotion = activeScene?.emotion ?? "";
-
-        return (
-          <Sequence
-            key={index}
-            from={startFrame}
-            durationInFrames={durationInFrames}
-            premountFor={fps}
-          >
-            <SegmentSubtitle text={seg.text} emotion={emotion} />
-          </Sequence>
-        );
-      })}
-    </>
   );
 };

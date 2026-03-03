@@ -1,0 +1,135 @@
+{
+  "episode": "ep007",
+  "date": "2026-03-04",
+  "overall": "비주얼 점점 화려해지고 패턴 다양해지는 방향 맞음. 자막/오디오/타이포그래피/ShapeMotion 4개 이슈 수정 완료.",
+  "score": null,
+  "items": [
+    {
+      "id": "F07-01",
+      "area": "audio",
+      "severity": "major",
+      "title": "섀넌 파트 BGM 볼륨 급변",
+      "detail": "섀넌 파트(~40초) 진입 시 BGM이 갑자기 크게 줄어드는 어색한 볼륨 드롭 발생",
+      "cause": "음악 엔진 SI 변조 — 섀넌 씬의 SI값이 낮게 설정되어 density/intensity 급감",
+      "action": "섀넌 파트 visual_script.json SI값 확인 및 볼륨 드롭 방지용 최소 SI 클램프 강화",
+      "resolved": true,
+      "resolution": "v10 SI 변조 0.95+si*0.1 (95~105%) 안정화로 해소"
+    },
+    {
+      "id": "F07-02",
+      "area": "audio",
+      "severity": "major",
+      "title": "TTS:BGM 밸런스 불균형 — BGM 과다",
+      "detail": "BGM이 너무 커서 TTS가 묻힘. TTS:BGM = 1:1 수준으로 조정 요청",
+      "cause": "현재 narration_volume=0.55, bgm_volume=1.5 (1:2.7 비율)",
+      "action": "audio_mixer.py 기본값 수정: narration_volume=0.90, bgm_volume=1.0",
+      "system_impact": true,
+      "resolved": true,
+      "resolution": "audio_mixer.py narration_volume=0.90, bgm_volume=1.0, loudnorm -14 LUFS 적용 완료"
+    },
+    {
+      "id": "F07-03",
+      "area": "remotion/subtitle",
+      "severity": "critical",
+      "title": "자막 알고리즘 붕괴 — 여러 자막 동시 표시",
+      "detail": "EP007 narration_timing.json 세그먼트가 3~4문장(60~71자)을 포함하여 자막이 벽처럼 표시됨",
+      "cause": [
+        "EP007 narration_timing.json 세그먼트가 EP005(평균 20자) 대비 과도하게 김 (평균 35자, 최대 71자)",
+        "v2/v3 SubtitleSection 리라이트가 EP001~5 호환성을 파괴",
+        "@remotion/captions 기반 Sequence 방식이 원본(useCurrentFrame 직접 조회)보다 불안정"
+      ],
+      "action": [
+        "SubtitleSection.tsx를 EP005 원본(commit 3878768)으로 복원",
+        "splitSegmentToSentences() 추가 — 35자 초과 세그먼트를 마침표 기준으로 분할",
+        "글자 수 비례 시간 배분으로 서브파트별 순차 표시",
+        "smartLineBreak(18) + wordBreak: keep-all + pre-line 유지"
+      ],
+      "resolved": true,
+      "resolution": "원본 복원 + splitSegmentToSentences() 문장 분할 로직 추가. @remotion/captions 의존성 제거."
+    },
+    {
+      "id": "F07-04",
+      "area": "remotion/typography",
+      "severity": "major",
+      "title": "타이포그래피 모션 단일 패턴 반복",
+      "detail": "비주얼 영역의 TextReveal이 모든 씬에서 wave 모드 + 흰색만 사용",
+      "cause": "visual_script_generator.py가 text_reveal의 mode='wave', color=accent로 하드코딩",
+      "action": "4모드(typewriter/wave/glitch/scatter) 랜덤 + 6색상 + fontSize/position 다양화",
+      "resolved": true,
+      "resolution": "visual_script_generator.py에서 모드/색상/크기/위치 랜덤화 + TextReveal.tsx 모션 강화(오디오 리액티브, 결정론적 글리치, 수렴 호흡 등)"
+    },
+    {
+      "id": "F07-05",
+      "area": "remotion/typography",
+      "severity": "major",
+      "title": "타이포그래피 텍스트 범위 다양화 요청",
+      "detail": "단어/구절/문장 혼합으로 타이포그래피 텍스트 범위 확장 요청",
+      "action": "visual_script_generator.py text_reveal 텍스트: 60% 단어, 25% 구절(쉼표/마침표 기준), 15% 짧은 문장(≤20자)",
+      "resolved": true,
+      "resolution": "generate_vocab_params()에서 텍스트 범위 다양화 적용. EP007 visual_script.json에 13개 씬 text_reveal 배치 확인."
+    },
+    {
+      "id": "F07-06",
+      "area": "remotion/typography",
+      "severity": "normal",
+      "title": "타이포그래피 색상 고정 흰색 — 컬러 변화 없음",
+      "detail": "모든 text_reveal이 흰색 고정. 다양한 색상 변화 없음",
+      "action": "6색상 풀(accent, glow, colors[0], #FFFFFF, #FFD700, #00FFFF) 랜덤 선택",
+      "resolved": true,
+      "resolution": "visual_script_generator.py에서 6색상 풀 적용. EP007 결과: 흰/회/금/시안 4색 확인."
+    },
+    {
+      "id": "F07-07",
+      "area": "remotion/shapemotion",
+      "severity": "normal",
+      "title": "ShapeMotion 비주얼 영역 밖 배치 + 모션 단순",
+      "detail": "도형이 bottom: 180~290 (y=1630~1740, YouTube UI 존)에 배치되어 안 보임. 모션도 spring 한번이면 끝.",
+      "cause": "초기 구현에서 position 계산 오류 + 모션이 enterSpring 단일 애니메이션",
+      "action": "top: 880~1050 (비주얼 영역 내) 재배치 + 지속 모션(회전/펄스/스캔/부유) 추가",
+      "resolved": true,
+      "resolution": "5패턴(tension=회전사각/climax=동심원/awakening=스캔라인/intro=부유점/buildup=삼각펄스) 재구현. 비주얼 영역 내 배치 완료."
+    },
+    {
+      "id": "F07-08",
+      "area": "remotion/endcard",
+      "severity": "major",
+      "title": "엔드카드 구간 BGM 없음 + 태그라인 가독성",
+      "detail": "엔드카드(마지막 6초)에 음악이 없음. 태그라인 fontSize=18, opacity=0.5로 안 보임.",
+      "cause": [
+        "audio_mixer.py가 atrim=0:{narration_duration}으로 BGM을 나레이션 길이에 맞춰 자르고, duration=first로 출력",
+        "enometa_music_engine.py BGM duration이 endcard 6초를 미포함",
+        "LogoEndcard 태그라인 스타일 값이 너무 작음"
+      ],
+      "action": [
+        "audio_mixer.py: output_duration=max(narration, bgm), apad으로 나레이션 패딩, duration=longest",
+        "enometa_music_engine.py: duration +5→+8초 (endcard 커버)",
+        "LogoEndcard: fontSize 18→30, fontWeight 300→400, letterSpacing 0.4→0.3em, opacity max 0.5→0.85"
+      ],
+      "resolved": true,
+      "resolution": "audio_mixer.py 리팩토링(BGM 길이 측정+패딩+longest), 음악엔진 duration +8, 태그라인 스타일 개선. EP007 output: 140.44초 BGM → 엔드카드까지 음악 지속 확인."
+    }
+  ],
+  "summary": {
+    "critical": 1,
+    "major": 5,
+    "normal": 2,
+    "all_resolved": true,
+    "system_changes_applied": [
+      "audio_mixer.py: narration_volume=0.90, bgm_volume=1.0, output_duration=max(nar,bgm), apad+longest",
+      "SubtitleSection.tsx: 원본 복원 + splitSegmentToSentences() 문장 분할",
+      "ShapeMotion.tsx: 5패턴 재구현, 비주얼 영역 내 배치",
+      "TextReveal.tsx: 4모드 모션 강화 + 오디오 리액티브 + 결정론적 글리치",
+      "visual_script_generator.py: text_reveal 파라미터 다양화 (모드/색상/크기/위치/텍스트범위)",
+      "enometa_music_engine.py: BGM duration +8초 (endcard 커버)",
+      "LogoEndcard.tsx: 태그라인 fontSize 30, opacity 0.85"
+    ]
+  },
+  "lessons_learned": [
+    "SubtitleSection은 EP001~5 원본을 레퍼런스로 유지. @remotion/captions 리라이트는 호환성 파괴 위험",
+    "narration_timing.json 세그먼트 길이가 에피소드마다 다름 — SubtitleSection에 런타임 문장 분할 필요",
+    "'텍스트 모션 다양화' 피드백은 자막이 아닌 비주얼 타이포그래피(TextReveal) 의미 — 명확히 구분",
+    "audio_mixer.py의 output_duration은 반드시 max(narration, bgm)으로 — BGM이 더 길면 엔드카드까지 이어져야 함",
+    "ShapeMotion 위치는 top 기반으로 비주얼 영역(370~1450) 내 배치 — bottom 기반 계산 시 YouTube UI에 가려짐",
+    "TextReveal glitch 모드에서 Math.random() 대신 seededRand(frame*seed) 사용 — Remotion 프레임 결정론 보장"
+  ]
+}

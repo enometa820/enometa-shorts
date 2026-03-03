@@ -1,0 +1,83 @@
+{
+  "episodes": {
+    "ep006": {
+      "genre": "ikeda",
+      "bpm": 135,
+      "key": "E_minor",
+      "arp_pattern_idx": 0,
+      "dominant_instruments": [
+        "acid_bass",
+        "arpeggio",
+        "bass_drone",
+        "bytebeat",
+        "clicks",
+        "data_click",
+        "feedback",
+        "fm_bass",
+        "glitch",
+        "hi_hat",
+        "kick",
+        "metallic_hit",
+        "noise_burst",
+        "pulse_train",
+        "saw_sequence",
+        "sine_interference",
+        "stutter_gate",
+        "sub_pulse"
+      ],
+      "energy_profile": [
+        0.62,
+        0.6,
+        0.52,
+        0.52
+      ],
+      "num_sections": 25,
+      "texture_modules": [
+        "feedback_texture",
+        "bytebeat_texture",
+        "rhythm_backbone",
+        "melodic_sequence"
+      ]
+    },
+    "ep007": {
+      "genre": "ikeda",
+      "bpm": 135,
+      "key": "D_minor",
+      "arp_pattern_idx": 1,
+      "dominant_instruments": [
+        "acid_bass",
+        "arpeggio",
+        "bass_drone",
+        "bytebeat",
+        "clicks",
+        "data_click",
+        "feedback",
+        "fm_bass",
+        "glitch",
+        "hi_hat",
+        "kick",
+        "metallic_hit",
+        "noise_burst",
+        "noise_sweep",
+        "pulse_train",
+        "saw_sequence",
+        "sine_interference",
+        "stutter_gate",
+        "sub_pulse"
+      ],
+      "energy_profile": [
+        0.57,
+        0.62,
+        0.65,
+        0.6
+      ],
+      "num_sections": 17,
+      "texture_modules": [
+        "bytebeat_texture",
+        "feedback_texture",
+        "euclidean_rhythm",
+        "rhythm_backbone"
+      ]
+    }
+  }
+}

@@ -1,0 +1,809 @@
+{
+  "title": "알고리즘은 쌓지 않는다. 덜어낸다",
+  "highlightWords": [
+    "탐색",
+    "차이",
+    "절반"
+  ],
+  "meta": {
+    "strategy": "ikeda",
+    "strategy_description": "Ikeda data art - minimal+terminal+sine",
+    "genre": "ikeda",
+    "palette": "ikeda",
+    "seed": 192564409,
+    "render_mode": "hybrid",
+    "frames_dir": "ep007/frames",
+    "total_frames": 4150
+  },
+  "global": {
+    "color_palette": [
+      "#FFFFFF",
+      "#AAAAAA",
+      "#555555",
+      "#222222"
+    ],
+    "background_color": "#000000",
+    "particle_total": 2000,
+    "font": "Pretendard Variable",
+    "palette": "ikeda"
+  },
+  "scenes": [
+    {
+      "id": "scene_01",
+      "sentence": "10억 개 중 하나를 찾는다. 이진 탐색이 쓰는 횟수. 30번.",
+      "start_sec": 0.0,
+      "end_sec": 7.354,
+      "emotion": "awakening_spark",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "pixel_grid_rain",
+            "params": {
+              "cols": 40,
+              "rows": 24,
+              "mode": "rain",
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "pixelGap": 2,
+              "reactivity": 0.84
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "탐색",
+              "mode": "scatter",
+              "fontSize": 80,
+              "color": "#FFFFFF",
+              "position": "top",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0049,
+            "speed": 0.05,
+            "line_opacity": 0.1,
+            "line_color": "#444444"
+          },
+          "variant": "vortex",
+          "transition_to": "flow_field_turbulent"
+        }
+      }
+    },
+    {
+      "id": "scene_02",
+      "sentence": "처음부터 하나씩 확인하면. 평균 5억 번.",
+      "start_sec": 7.604,
+      "end_sec": 12.332,
+      "emotion": "awakening_spark",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_chain_awaken",
+            "params": {
+              "count": 600,
+              "color": "#FFFFFF",
+              "chain_speed": 1.434,
+              "glow_color": "#CCCCCC"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0023,
+            "speed": 0.05,
+            "line_opacity": 0.092,
+            "line_color": "#888888"
+          },
+          "variant": "vortex",
+          "transition_to": "flow_field_turbulent"
+        }
+      }
+    },
+    {
+      "id": "scene_03",
+      "sentence": "차이는 방법 하나다. 이진 탐색은 답을 찾지 않는다.",
+      "start_sec": 12.582,
+      "end_sec": 18.376,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 500,
+              "color": "#FFFFFF",
+              "rings": 4,
+              "speed": 0.551
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "차이",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#CCCCCC",
+              "position": "bottom",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.003,
+            "speed": 0.05,
+            "line_opacity": 0.047,
+            "line_color": "#222222"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      }
+    },
+    {
+      "id": "scene_04",
+      "sentence": "절반을 덜어낸다. 중간을 고른다. 답보다 크면 위쪽 전부를 지운다. 답보다 작으면 아래쪽 전부를 지운다. 다시 중간을 고른다.",
+      "start_sec": 18.626,
+      "end_sec": 32.004,
+      "emotion": "tension_reveal",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "pixel_waveform_cascade",
+            "params": {
+              "bars": 16,
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "mode": "cascade",
+              "quantize": 10,
+              "mirror": true,
+              "position": "bottom"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "절반을 덜어낸다.",
+              "mode": "glitch",
+              "fontSize": 80,
+              "color": "#00FFFF",
+              "position": "bottom",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 80
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0074,
+            "speed": 0.292,
+            "line_opacity": 0.048,
+            "line_color": "#888888"
+          },
+          "variant": "opposing",
+          "transition_to": "flow_field_calm"
+        }
+      }
+    },
+    {
+      "id": "scene_05",
+      "sentence": "덜어낼 때마다 탐색 공간이 절반으로 줄어든다. 30번의 결단이 10억을 하나로 만든다.",
+      "start_sec": 32.254,
+      "end_sec": 39.742,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 300,
+              "color": "#FFFFFF",
+              "rings": 4,
+              "speed": 0.36
+            }
+          },
+          {
+            "vocab": "pixel_grid_life",
+            "params": {
+              "cols": 32,
+              "rows": 40,
+              "mode": "life",
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "pixelGap": 1,
+              "reactivity": 1.26
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0035,
+            "speed": 0.05,
+            "line_opacity": 0.051,
+            "line_color": "#888888"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_06",
+      "sentence": "섀넌은 수식으로 증명했다. 한 비트의 정보는 불확실성을 정확히 절반으로 줄인다고. 이진 탐색은 그 수식의 가장 순수한 구현체다.",
+      "start_sec": 39.992,
+      "end_sec": 51.704,
+      "emotion": "awakening_climax",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_escape",
+            "params": {
+              "count": 800,
+              "color": "#FFFFFF",
+              "burst_speed": 2.827,
+              "glow": true
+            },
+            "variant": "chain_break"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "섀넌은 수식으로 증명했다",
+              "mode": "scatter",
+              "fontSize": 56,
+              "color": "#FFD700",
+              "position": "top",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 100
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.95 + 0.05",
+          "particle_size": "bass * 7 + 1",
+          "glow_intensity": "bass * 7",
+          "displacement": "bass * 5",
+          "speed_mult": "onset ? 6 : 1",
+          "glitch_trigger": "onset ? 12 : 0"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0072,
+            "speed": 0.162,
+            "line_opacity": 0.045,
+            "line_color": "#222222"
+          },
+          "variant": "vortex"
+        }
+      }
+    },
+    {
+      "id": "scene_07",
+      "sentence": "이것은 효율의 문제가 아니다. 어떻게 나아가는가의 문제다.",
+      "start_sec": 51.954,
+      "end_sec": 57.796,
+      "emotion": "tension_reveal",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_scatter",
+            "params": {
+              "count": 300,
+              "color": "#555555",
+              "glow": true,
+              "expansion_speed": 1.001
+            },
+            "variant": "directional_wind"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "효율",
+              "mode": "glitch",
+              "fontSize": 64,
+              "color": "#CCCCCC",
+              "position": "top",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.008,
+            "speed": 0.161,
+            "line_opacity": 0.048,
+            "line_color": "#222222"
+          },
+          "variant": "vortex"
+        }
+      }
+    },
+    {
+      "id": "scene_08",
+      "sentence": "쌓는다는 것은 가능성을 확장하는 일이다. 하지만 탐색은 확장이 아니다. 제거다.",
+      "start_sec": 58.046,
+      "end_sec": 66.446,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "pixel_waveform_cascade",
+            "params": {
+              "bars": 12,
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "mode": "cascade",
+              "quantize": 6,
+              "mirror": false,
+              "position": "bottom"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "쌓는다",
+              "mode": "wave",
+              "fontSize": 80,
+              "color": "#FFFFFF",
+              "position": "center",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 100
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.002,
+            "speed": 0.05,
+            "line_opacity": 0.09,
+            "line_color": "#222222"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_09",
+      "sentence": "우리는 오래 믿어왔다. 나아간다는 것은 쌓는 것이라고. 더 많은 정보, 더 많은 선택지, 더 많은 가능성. 덜어내면 잃는다고.",
+      "start_sec": 66.696,
+      "end_sec": 79.464,
+      "emotion": "hopeful",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_converge",
+            "params": {
+              "count": 600,
+              "color": "#555555",
+              "target": "center",
+              "speed": 0.871
+            },
+            "variant": "multi_point"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "나아간다",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#CCCCCC",
+              "position": "top",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0032,
+            "speed": 0.05,
+            "line_opacity": 0.066,
+            "line_color": "#444444"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_10",
+      "sentence": "그래서 우리는 선택지를 놓지 않는다. 이 직업도, 저 관계도, 이 가능성도 동시에 쥐고 있는다.",
+      "start_sec": 79.714,
+      "end_sec": 88.546,
+      "emotion": "tension_reveal",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "neural_network",
+            "params": {
+              "count": 60,
+              "color": "#FFFFFF"
+            }
+          },
+          {
+            "vocab": "pixel_grid_rain",
+            "params": {
+              "cols": 40,
+              "rows": 40,
+              "mode": "rain",
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "pixelGap": 1,
+              "reactivity": 1.11
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "선택지",
+              "mode": "glitch",
+              "fontSize": 56,
+              "color": "#FFFFFF",
+              "position": "top",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 100
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0079,
+            "speed": 0.272,
+            "line_opacity": 0.087,
+            "line_color": "#888888"
+          },
+          "transition_to": "flow_field_calm"
+        }
+      }
+    },
+    {
+      "id": "scene_11",
+      "sentence": "하지만 탐색 공간이 줄지 않으면 알고리즘은 닫히지 않는다. 무한히 헤맨다. 어제와 같은 자리를 맴돈다.",
+      "start_sec": 88.796,
+      "end_sec": 98.492,
+      "emotion": "transcendent_open",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {}
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0023,
+            "speed": 0.05,
+            "line_opacity": 0.054,
+            "line_color": "#222222"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_12",
+      "sentence": "컴퓨터는 알고 있다. 어느 방향이 맞는지 몰라도 된다. 어느 방향이 틀렸는지만 확인하면. 그 순간 우리는 이미 절반을 전진한 것이다.",
+      "start_sec": 98.742,
+      "end_sec": 111.256,
+      "emotion": "awakening_spark",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_chain_awaken",
+            "params": {
+              "count": 600,
+              "color": "#FFFFFF",
+              "chain_speed": 1.376,
+              "glow_color": "#CCCCCC"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "컴퓨터는 알고 있다",
+              "mode": "scatter",
+              "fontSize": 56,
+              "color": "#FFD700",
+              "position": "center",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 80
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0027,
+            "speed": 0.05,
+            "line_opacity": 0.045,
+            "line_color": "#888888"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_13",
+      "sentence": "우리가 결정을 두려워하는 이유는 틀릴까봐가 아니다.",
+      "start_sec": 111.506,
+      "end_sec": 115.682,
+      "emotion": "somber_warning",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "pixel_grid_rain",
+            "params": {
+              "cols": 40,
+              "rows": 32,
+              "mode": "rain",
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "pixelGap": 1,
+              "reactivity": 1.23
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "결정",
+              "mode": "glitch",
+              "fontSize": 72,
+              "color": "#FFFFFF",
+              "position": "top",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0051,
+            "speed": 0.226,
+            "line_opacity": 0.094,
+            "line_color": "#222222"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_14",
+      "sentence": "내려놓음의 공포. 그것이 우리를 잠식한다.",
+      "start_sec": 115.932,
+      "end_sec": 120.9,
+      "emotion": "transcendent_open",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {},
+            "variant": "opposing"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "내려놓음",
+              "mode": "wave",
+              "fontSize": 72,
+              "color": "#00FFFF",
+              "position": "top",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0033,
+            "speed": 0.05,
+            "line_opacity": 0.066,
+            "line_color": "#888888"
+          },
+          "variant": "opposing"
+        }
+      }
+    },
+    {
+      "id": "scene_15",
+      "sentence": "하지만 모든 탐색은 내려놓음으로 완성된다.",
+      "start_sec": 121.15,
+      "end_sec": 125.23,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 300,
+              "color": "#FFFFFF",
+              "rings": 5,
+              "speed": 0.66
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "하지만 모든 탐색은 내려놓음으로",
+              "mode": "wave",
+              "fontSize": 72,
+              "color": "#FFFFFF",
+              "position": "bottom",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0026,
+            "speed": 0.05,
+            "line_opacity": 0.071,
+            "line_color": "#444444"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      }
+    },
+    {
+      "id": "scene_16",
+      "sentence": "절반을 지워내는 것. 그것이 10억 개의 혼돈을 하나의 답으로 이끄는 유일한 알고리즘이었다.",
+      "start_sec": 125.48,
+      "end_sec": 132.344,
+      "emotion": "transcendent_open",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {}
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "절반",
+              "mode": "wave",
+              "fontSize": 80,
+              "color": "#00FFFF",
+              "position": "center",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0042,
+            "speed": 0.05,
+            "line_opacity": 0.097,
+            "line_color": "#888888"
+          }
+        }
+      }
+    }
+  ]
+}
