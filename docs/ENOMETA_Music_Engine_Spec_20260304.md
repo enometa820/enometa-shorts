@@ -2,10 +2,9 @@
 
 > Pure Python 전자음악 엔진 — Raw Synthesis, GPU 불필요
 > numpy + scipy만으로 동작.
-> **last_updated**: 2026-03-04 — v10.2: si_gate 연속 함수(min 0.45, 1.0s 스무딩) — 계단 함수/급감쇠 금지
-> v9→v10: SI 변조 95~105%로 안정화, density_scale max(0.6,si), 마스터링 강화(tanh 3.0, -6dB), song arc 에너지 상향
-> v10.1 (EP007): BGM duration = total_duration + 8 (endcard 6초 + 2초 buffer), outro energy 0.1→0.2
-> v10.2 (EP007 피드백): si_gate 계단 함수 → 연속 함수 교체, 급변/급감쇠 방지
+> **last_updated**: 2026-03-04 — v11 패턴 엔진: 대본 리액티브 댄스 뮤직
+> v11 (창작 자유도 감사 F섹션): ikeda→enometa 리네이밍 + snare_drum 합성 + DRUM_PATTERNS(10종 16-step) + 바 카운팅 리듬 + SAW_PATTERNS 로테이션 + 호흡 시스템 + highlight_words 악센트 + call&response + 크로스페이드 raised cosine
+> v10→v11: SI 변조 80~105%, si_gate min 0.25, 3중 에너지(Song Arc × SI × Breath)
 
 ---
 
@@ -33,11 +32,11 @@ bgm.wav (44100Hz, 16bit, Stereo)
 - 소요 시간: 60초 음악 생성에 약 2~3초 (CPU only)
 - 의존성: numpy, scipy (`pip install numpy scipy`)
 - GPU: 불필요
-- 장르: ikeda 단일 (v8, `--genre` 옵션 무시됨)
+- 장르: enometa 단일 (v11, 구 ikeda. `--genre` 옵션 무시됨)
 
 ---
 
-## 합성 함수 (9종: v5 6개 + v6 3개)
+## 합성 함수 (10종: v5 6개 + v6 3개 + v11 1개)
 
 ### 1. bytebeat(formula_id, duration, sr)
 시간 변수 t에 비트연산을 적용해 원시 파형 생성.
@@ -78,6 +77,11 @@ script_data의 숫자가 주파수 결정 (70Hz + 120Hz → 50Hz 비팅).
 8-20kHz 초고주파 텍스처, 매우 조용 (0.05-0.15 진폭).
 대역통과 필터링된 노이즈, "디지털 공기" 역할.
 
+### 10. snare_drum(freq, sr) — v11 신규
+스네어 드럼 — 톤 바디(200→120Hz 피치 다운) + 노이즈 테일(exp decay) + 어택 클릭.
+기존 `chiptune_noise_drum("snare")`는 4bit 칩튠 전용이므로 별도 구현.
+duration=0.18s, tone body 0.5 + noise tail 0.6 + click 0.3.
+
 ---
 
 ## 악기 어휘 (Musical Vocabulary) — v8 (26종)
@@ -109,9 +113,9 @@ bytebeat             v5 신규 — 비트연산 공식 오디오 (12개 공식)
 feedback             v5 신규 — 자기참조 피드백 루프 텍스처
 chiptune_lead        v5 신규 — 듀티사이클 스퀘어 리드 + 4bit 양자화
 chiptune_drum        v5 신규 — LFSR 노이즈 퍼커션 (kick/snare/hihat)
-sine_interference    v6 신규 — 2개 사인파 합 → 맥놀이 (ikeda 장르 핵심)
-data_click           v6 신규 — 대본 숫자 인코딩 정밀 클릭 (ikeda 장르)
-ultrahigh_texture    v6 신규 — 8-20kHz 초고주파 디지털 텍스처 (ikeda 장르)
+sine_interference    v6 신규 — 2개 사인파 합 → 맥놀이 (enometa 장르 핵심)
+data_click           v6 신규 — 대본 숫자 인코딩 정밀 클릭 (enometa 장르)
+ultrahigh_texture    v6 신규 — 8-20kHz 초고주파 디지털 텍스처 (enometa 장르)
 ```
 
 ### 이펙트 / 프로세서
@@ -129,20 +133,21 @@ envelope             ADSR 엔벨로프
 
 ---
 
-## 장르 프리셋 (v9: ikeda 단일)
+## 장르 프리셋 (v11: enometa 단일)
 
 | 장르 | BPM | 핵심 사운드 | synthesis_overrides |
 |------|-----|------------|---------------------|
-| **ikeda** | **135** (±20%) | 쏘우파+스퀘어 brutal + 사인 간섭 + 데이터 클릭 + gap burst | ikeda_mode: True, rhythm_mode: euclidean |
+| **enometa** | **135** (±20%) | 쏘우파+스퀘어 brutal + 사인 간섭 + 데이터 클릭 + gap burst + **드럼 패턴(킥/스네어/하이햇)** | enometa_mode: True, rhythm_mode: euclidean |
 
 > BPM은 SI 기반 가변: `section_bpm = 135 × (0.80 + si_avg × 0.40)` → 108~162 BPM 범위
+> v11: ikeda → enometa 리네이밍 (하위호환: `genre="ikeda"` 입력 시 자동 매핑)
 
-### v9 ikeda 10레이어 구조
+### v11 enometa 10레이어 구조
 
 | 레이어 | 함수 | 역할 |
 |--------|------|------|
-| 1 | `_render_continuous_rhythm` | 킥/하이햇 리듬 백본 |
-| 2 | `_render_continuous_saw_sequence` | 쏘우파 게이트 시퀀서 ('뚜두두') |
+| 1 | `_render_continuous_rhythm` | **v11: 바 카운팅 + DRUM_PATTERNS(킥/스네어/하이햇) + 필/드롭** |
+| 2 | `_render_continuous_saw_sequence` | 쏘우파 게이트 시퀀서 ('뚜두두') — **v11: SAW_PATTERNS 로테이션** |
 | 3 | `_render_continuous_arpeggio` | 고음역 아르페지오 |
 | 4 | `_render_continuous_bass` | 서브 베이스 드론 |
 | 5 | `_render_continuous_sub_pulse` | 서브 펄스 |
@@ -161,11 +166,12 @@ si=0.50 → density_scale=0.60 (최소 하한)
 si=1.00 → density_scale=1.00 (최대)
 ```
 
-### SI 변조 시스템 (v10)
+### SI 변조 시스템 (v11)
 ```
-v9: self._si_modulation = 0.7 + self._si_env * 0.6   (70%~130%)
-v10: self._si_modulation = 0.95 + self._si_env * 0.1  (95%~105%)
-변동폭 축소 → 조용한 구간에서도 음악이 과도하게 감쇠되지 않음
+v9:  self._si_modulation = 0.7 + self._si_env * 0.6    (70%~130%)
+v10: self._si_modulation = 0.95 + self._si_env * 0.1   (95%~105%)
+v11: self._si_modulation = 0.80 + self._si_env * 0.25  (80%~105%)
+v11 변경: v10보다 표현력 확대하되 과도 감쇠 방지 (v9 대비 여전히 안정적)
 ```
 
 ### 레이어 9: gate_stutter 다파형 매핑
@@ -187,6 +193,113 @@ fade: 5ms in/out (클릭 방지)
 vol: 0.5 + burst_energy × 0.35  → 0.50~0.85
 ```
 
+### v11 DRUM_PATTERNS (16-step 기반, 10종)
+
+바 카운팅 시스템과 연동되는 16-step 드럼 패턴 라이브러리.
+
+| 패턴 | 용도 | SI 조건 |
+|------|------|---------|
+| four_on_floor | 기본 그루브 | si 0.3~0.6 |
+| offbeat | 싱코페이션 | si 0.6~0.85 / tension |
+| euclidean_3_8 | 유클리드 기본 | si 0.3~0.6 |
+| euclidean_5_16 | 유클리드 확장 | si 0.6~0.85 |
+| minimal | 미니멀 | si < 0.3 |
+| driving | 인텐스 | si ≥ 0.85 / climax |
+| fill_buildup | 4바마다 필 | 매 4바 마지막 |
+| fill_snare_roll | 8바마다 스네어롤 | 매 8바 마지막 |
+| drop_silence | 드롭 전 무음 | SI 급상승(≥0.3) 전 1바 |
+| drop_impact | 드롭 임팩트 | SI 급상승 후 1바 |
+
+**패턴 선택 로직**: SI + emotion → 패턴 자동 선택
+- euclidean 패턴의 kick/hihat은 `None` → Bjorklund 알고리즘으로 동적 생성
+
+### v11 바 카운팅 리듬 시스템 (_render_continuous_rhythm)
+
+v10: 단일 패턴(euclidean 또는 standard)으로 전체 곡 렌더링
+v11: **바 카운팅 + 섹션별 패턴 선택 + 필/드롭 삽입 + 스네어 렌더링**
+
+```
+렌더링 루프:
+  bar_idx = 0, t = 0.0
+  while t < duration:
+    1) 현재 섹션 결정 → SI+emotion으로 패턴 선택
+    2) 필 체크: 4바마다 fill_buildup, 8바마다 fill_snare_roll
+    3) 드롭 체크: 다음 섹션 SI 급상승(≥0.3) → drop_silence(1바) → drop_impact(1바)
+    4) 16-step 바 렌더링 (킥+스네어+하이햇 동시 배치)
+    5) bar_duration = (60/bpm)*4, bar_idx++
+```
+
+**헬퍼**: `_select_drum_patterns()`, `_section_at()`, `_is_pre_drop()`, `_is_post_drop()`, `_render_bar()`
+
+### v11 SAW_PATTERNS 로테이션
+
+v10: 에너지 레벨별 고정 1개 패턴
+v11: 레벨별 2~3개 패턴 + **4바마다 순환**
+
+```
+SAW_PATTERNS = {
+    "high":    [패턴A, 패턴B, 패턴C],   # 3종 순환
+    "mid":     [패턴A, 패턴B],            # 2종 순환
+    "low":     [패턴A, 패턴B],            # 2종 순환
+    "tension": [패턴A, 패턴B, 패턴C],   # 3종 순환
+}
+pat_idx = (bar_counter // 4) % len(pat_list)
+```
+
+### v11 호흡 시스템 (_compute_breath_envelope) — F-5
+
+모든 레이어에 적용되는 미시적 에너지 변조. Song arc(매크로)와 보완.
+
+```
+3중 에너지 시스템:
+  Song Arc (매크로) × SI modulation (미드 0.80~1.05) × Breath (마이크로 0.70~1.0)
+
+호흡 규칙:
+  매 8바의 7번째 바: 0.85 (살짝 에너지 내림)
+  매 16바의 15번째 바: 0.70 (큰 호흡)
+  0.3초 cumsum 스무딩
+
+적용: generate()에서 song arc 직후 master_L/R *= breath_envelope
+```
+
+### v11 highlight_words → 음악 악센트 — F-6
+
+visual_script.json의 `highlightWords` → music_script.metadata → script_data 세그먼트 텍스트 스캔 → 악센트 시간 추출 → 킥+스네어 동시 히트
+
+```
+_build_accent_times(): script_data segments에서 highlight words 검색 → start_sec 추출
+적용: 리듬 렌더링 후 accent 위치에 kick×1.5 + snare×1.2 볼륨 부스트
+```
+
+### v11 Call & Response — F-7
+
+2바 교대 gain 엔벨로프 — 드럼과 멜로디가 번갈아 전면에 오는 댄스 뮤직 기법.
+
+```
+SI 0.3~0.7 구간에서만 활성 (너무 조용하거나 너무 격렬하면 비활성)
+홀수 2바 그룹: drums 100%, melody 75%
+짝수 2바 그룹: drums 75%, melody 100%
+0.2초 cumsum 스무딩
+
+적용:
+  - _render_continuous_rhythm(): kick/snare/hihat *= cr_drum_env
+  - _render_continuous_saw_sequence(): saw_L/R *= cr_melody_env
+```
+
+### v10→v11 주요 변경 (2026-03-04, 창작 자유도 감사 F섹션)
+- **ikeda → enometa 리네이밍**: 5개 Python 파일, 하위호환(ikeda→enometa 자동 매핑)
+- **snare_drum()**: 10번째 합성 함수 (톤 바디 + 노이즈 테일 + 어택 클릭)
+- **DRUM_PATTERNS**: 10종 16-step 패턴 (four_on_floor, offbeat, euclidean, minimal, driving, fill, drop)
+- **바 카운팅 리듬**: 섹션별 패턴 선택 + 4/8바 필 + SI 급상승 드롭
+- **SAW_PATTERNS 로테이션**: 레벨별 2~3종 패턴, 4바마다 순환
+- **호흡 시스템**: 8/16바 주기 에너지 딥 (0.70~1.0)
+- **highlight_words 악센트**: 대본 핵심어 시점 킥+스네어 동시 히트
+- **Call & Response**: 2바 교대 드럼/멜로디 gain
+- **크로스페이드**: 선형 → raised cosine, 0.5s → 1.0s
+- **SI 변조**: 0.95+0.1 → 0.80+0.25 (표현력 확대)
+- **si_gate**: min 0.45 → 0.25 (다이나믹 레인지 확대)
+- **ARP_PATTERNS**: 5종 → 10종
+
 ### v9→v10 주요 변경 (2026-03-03)
 - **SI 변조 안정화**: `0.7+si*0.6` → `0.95+si*0.1` — 변동폭 60% → 10%로 축소
 - **density_scale 하한 보장**: `si^1.5` → `max(0.6, si)` — 최소 60% 보장
@@ -201,18 +314,18 @@ vol: 0.5 + burst_energy × 0.35  → 0.50~0.85
 - **SINE_MELODY_SEQUENCES**: 감정별 5종 멜로디 시퀀스, key_palette 기반 동적 생성
 - **에피소드 해시 시드**: `random.seed(42)` 제거 → `hashlib.md5(episode_id)`
 
-### 비주얼 레이어 연동 (v9: ikeda 전용)
-ikeda 프리셋: Music 3 + TTS 4 = 7레이어, blend_ratio=0.45, SI_INTENSITY_SCALE 실시간 스케일. 상세: `ENOMETA_Hybrid_Visual_Architecture_20260304.md` 참조
+### 비주얼 레이어 연동 (v11: enometa 전용)
+enometa 프리셋: Music 3 + TTS 4 = 7레이어, blend_ratio=0.45, SI_INTENSITY_SCALE 실시간 스케일. 상세: `ENOMETA_Hybrid_Visual_Architecture_20260304.md` 참조
 
 ---
 
-## v10 마스터링 체인 (ikeda 전용)
+## v10 마스터링 체인 (enometa 전용)
 
 ```python
 def _master(self) -> np.ndarray:
     stereo = np.column_stack([self.master_L, self.master_R])
 
-    # v10: ikeda 전용 마스터링 강화 (v8 대비 drive/RMS 상향)
+    # v10: enometa 전용 마스터링 강화 (v8 대비 drive/RMS 상향)
     # 1. 피크 노멀라이즈
     # 2. 소프트 새츄레이션 (tanh drive=3.0)  ← v9: 1.2
     # 3. RMS 노멀라이즈 (target -6dB, RMS=0.5)  ← v9: -10dB, RMS=0.316
@@ -244,7 +357,7 @@ v5: cumsum 이동평균 → O(n), 즉시 완료
 ## CLI 사용법
 
 ```bash
-# v8: ikeda 단일 장르 + export-raw + script-data + arc
+# v11: enometa 단일 장르 + export-raw + script-data + arc
 py scripts/enometa_music_engine.py \
   --from-visual episodes/epXXX/visual_script.json \
   --export-raw --arc narrative \
@@ -257,7 +370,7 @@ py scripts/enometa_music_engine.py \
 # --script-data: 대본 데이터 기반 주파수/클릭 밀도 자동 설정
 # --arc: Song Arc 프리셋 (narrative|crescendo|flat|adaptive, 기본: narrative)
 # --episode: 에피소드 식별자 (music_history.json 이력 추적용)
-# --genre: (v8 무시됨, 항상 ikeda)
+# --genre: (v11 무시됨, 항상 enometa)
 ```
 
 ### Song Arc 시스템 (v6.1)
@@ -306,7 +419,7 @@ quantized = round(time / bar_duration) * bar_duration
 
 | 장르 | BPM | 1마디 길이 |
 |------|-----|-----------|
-| ikeda | 60 | 4.000초 |
+| enometa | 135 | ~1.778초 |
 
 - `_quantize_to_bar(time_sec, bar_duration)`: 반올림 퀀타이즈 헬퍼
 - 첫 섹션: start = 0.0 고정
@@ -315,16 +428,19 @@ quantized = round(time / bar_duration) * bar_duration
 - 인접 섹션 연속성 보장: `sections[i+1].start = sections[i].end`
 - 원본 경계 보존: `_original_start_sec`, `_original_end_sec` 필드
 
-### 감정 전환 크로스페이드 (v7-P5)
+### 감정 전환 크로스페이드 (v7-P5 → v11 F-8 개선)
 
 섹션별 텍스처 악기의 **기여분(delta)에만** fade-in/fade-out을 적용하여 씬 전환 시 부드러운 크로스페이드를 만든다.
 연속 악기(bass, arp 등)는 영향받지 않음 — 텍스처 기여분만 정밀 페이드.
 
 ```
-fade_duration = min(0.5, section_duration × 0.15)  # 최대 0.5초 또는 15%
+v7:  fade_duration = min(0.5, section_duration × 0.15)  # 선형 페이드
+v11: fade_duration = min(1.0, section_duration × 0.20)  # raised cosine 페이드
+v11 변경: 선형 → raised cosine (0.5*(1-cos)) — 시작/끝이 부드러운 S-curve
+v11 변경: 페이드 길이 확대 (최대 0.5s→1.0s, 15%→20%)
 ```
 
-**구현**: `_render_section_textures()` 에서 렌더 전 마스터 스냅샷 → 렌더 후 delta 추출 → fade 적용 → 복원
+**구현**: `_render_section_textures()` 에서 렌더 전 마스터 스냅샷 → 렌더 후 delta 추출 → raised cosine fade 적용 → 복원
 
 ### Pulse Train / Granular 합성 (v7-P9)
 
@@ -339,7 +455,7 @@ Ikeda 특유의 "뚜두두두두" 고속 클릭 반복 사운드를 구현하는
 
 **연속 렌더러:**
 - `_render_continuous_pulse_train(sections)`: si 기반 rate_curve + 대본 숫자 → click_freq, 그래뉼러 서브레이어
-  - ikeda 모드에서만 호출 (`generate()` ikeda 분기)
+  - enometa 모드에서만 호출 (`generate()` enometa 분기)
   - EMOTION_MAP에서 `pulse_train.volume` → `smooth_envelope()` 모핑
 
 **EMOTION_MAP 추가:**
@@ -366,7 +482,7 @@ Ikeda 특유의 "뚜두두두두" 고속 클릭 반복 사운드를 구현하는
 | A_minor | 110.0 | 440.0 | 659.3 | 293.7 |
 | Bb_minor | 116.5 | 466.2 | 698.5 | 311.1 |
 
-**ARP_PATTERNS (5종)**: 상행-하행, 변형A, 하행-상행, 변형B, 옥타브점프
+**ARP_PATTERNS (10종)**: 상행-하행, 변형A, 하행-상행, 변형B, 옥타브점프 + v11 5종 추가 (펜타토닉, 옥타브 팝, 스텝 등)
 
 **이력 기반 자동 선택**:
 - `_select_key_from_history()`: 최근 2개 에피소드와 다른 키 자동 선택 (KEY_PRIORITY 순위)
@@ -392,18 +508,20 @@ Ikeda 특유의 "뚜두두두두" 고속 클릭 반복 사운드를 구현하는
 - `lookback_window = 2` (vocab_history와 동일)
 - `--episode` 없으면 이력 저장 안 함 (하위호환)
 
-### 연속 악기 si 게이트 (v7-P8 → v10.2 리라이트)
+### 연속 악기 si 게이트 (v7-P8 → v11 리라이트)
 
 조용한 구간(si 낮음)에서 연속 악기(bass, arp, rhythm 등) 볼륨을 자동 감쇠하여 다이나믹 레인지를 확보한다.
 
 ```
-v10.2 연속 함수 (EP007 피드백으로 교체):
-  gate = 0.45 + si * 1.1    (min 0.45, max ~1.55 → clamp 1.0)
+v10.2: gate = 0.45 + si * 1.1    (min 0.45)
+v11:   gate = 0.25 + si * 1.5    (min 0.25, max ~1.75 → clamp 1.0)
   + 1.0초 cumsum 스무딩     (급변 방지)
+
+v11 변경: 최소값 0.45→0.25 확대 — 호흡 시스템(F-5)과 함께 더 큰 다이나믹 레인지 제공
 
 ⚠ 금지 사항:
   - 계단 함수 금지 (si<0.15→0.1 같은 극단적 감쇠 금지)
-  - 최소값 0.45 미만 금지
+  - 최소값 0.25 미만 금지
   - 스무딩 1.0초 미만 금지 (0.3초는 급변 유발)
 ```
 
@@ -432,11 +550,11 @@ section_bpm = base_bpm × (0.85 + si_avg × 0.30)
 + 0.5초 cumsum 스무딩 (섹션 경계 자연스러운 전환)
 ```
 
-**BPM 변동 범위 (ikeda)**:
+**BPM 변동 범위 (enometa)**:
 
 | 장르 | base_bpm | si=0 (85%) | si=1 (115%) |
 |------|----------|-----------|-------------|
-| ikeda | 60 | 51.0 | 69.0 |
+| enometa | 135 | 114.8 | 155.3 |
 
 **가변 BPM 적용 대상**:
 - `_render_continuous_rhythm()`: 이벤트 기반 배치 — 비트마다 `bpm_at(t)` 조회하여 간격 결정
@@ -451,9 +569,9 @@ section_bpm = base_bpm × (0.85 + si_avg × 0.30)
 
 **하위호환**: script_data 없으면 tempo_curve = base_bpm 균일 (무변조)
 
-### script_data 활용 (v8: ikeda 전용)
+### script_data 활용 (v11: enometa 전용)
 
-`_script_data_enrichment(sections)` — script_data의 숫자/키워드/밀도를 ikeda 엔진에서 활용.
+`_script_data_enrichment(sections)` — script_data의 숫자/키워드/밀도를 enometa 엔진에서 활용.
 대본 데이터가 음악의 주파수, 클릭 밀도, 텍스처 모듈 파라미터에 직접 반영된다.
 
 | 활용 요소 | 변조 대상 |
@@ -566,4 +684,4 @@ section_bpm = base_bpm × (0.85 + si_avg × 0.30)
 
 ---
 
-*이 문서는 enometa_music_engine.py v10의 동작 스펙을 기술한다. 프로젝트 경로: `C:\옵시디언\enometa\enometa-shorts\`*
+*이 문서는 enometa_music_engine.py v11(대본 리액티브 댄스 뮤직)의 동작 스펙을 기술한다. 프로젝트 경로: `C:\옵시디언\enometa\enometa-shorts\`*

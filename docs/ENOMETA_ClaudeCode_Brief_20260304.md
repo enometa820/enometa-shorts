@@ -4,7 +4,7 @@
 > 이 문서를 Claude Code에 전달하면 에피소드 제작을 시작할 수 있다.
 > 상세 시스템 문서: ENOMETA_SYSTEM_SNAPSHOT_20260304.md 참조
 > 음악 엔진 상세: ENOMETA_Music_Engine_Spec_20260304.md 참조
-> **last_updated**: 2026-03-04 — EP007 피드백 12건 반영 + Lissajous vocab + z-order + si_gate 연속 함수 + 자막 EP005 규칙
+> **last_updated**: 2026-03-04 — v11 패턴 엔진: ikeda→enometa 리네이밍, DRUM_PATTERNS 10종, 바 카운팅+필/드롭, SAW_PATTERNS 로테이션, 호흡 시스템, SI 80~105%, si_gate min 0.25
 
 ---
 
@@ -13,7 +13,7 @@
 > 상세: SYSTEM_SNAPSHOT Sec.1 참조
 
 대본 + 제목만 입력하면 Claude Code가 나머지 전부를 처리한다.
-**핵심**: 3중 리액티브 비주얼 (시간 x 오디오 x 의미), ikeda 단일 장르, Hybrid 전용 VRAM
+**핵심**: 3중 리액티브 비주얼 (시간 x 오디오 x 의미), enometa 단일 장르 (대본 리액티브 댄스 뮤직), Hybrid 전용
 
 ---
 
@@ -23,7 +23,7 @@
 |------|------|------|
 | 영상 프레임워크 | Remotion (React) | 코드 기반 영상 생성, CPU |
 | TTS 나레이션 | Edge-TTS | 무료, ko-KR-SunHiNeural |
-| BGM 생성 | enometa_music_engine.py v10 | Pure Python, ikeda 10레이어 + gap burst + SI 변조 안정화(95~105%) |
+| BGM 생성 | enometa_music_engine.py v11 | Pure Python, enometa 10레이어 + 패턴 엔진(DRUM_PATTERNS/SAW_PATTERNS) + 호흡 + SI 변조(80~105%) |
 | 비주얼 엔진 | Canvas 2D + SVG (Remotion) + Python (numpy+Pillow) | Hybrid: Python 배경 + Remotion 오버레이 |
 | 오디오 분석 | numpy FFT | 프레임별 bass/mid/high/rms/onset |
 | 오디오 믹싱 | ffmpeg | narration 90% + BGM 100%, output=max(nar,bgm), loudnorm -14 LUFS, 엔드카드 BGM 자동 연장 |
@@ -60,7 +60,7 @@
 [2] TTS 생성          → narration.wav + narration_timing.json 업데이트 (Edge-TTS)
 [3] 대본 데이터 추출  → script_data.json (semantic_intensity / data_density / numbers)
 [4] 비주얼 스크립트   → visual_script.json (SI 기반 reactivity/max_layers 자동 조절)
-[5] BGM 생성          → bgm.wav + bgm_raw_visual_data.npz (v10: 10레이어 + gap burst + SI 95~105%)
+[5] BGM 생성          → bgm.wav + bgm_raw_visual_data.npz (v11: 패턴 엔진 + 10레이어 + 호흡 + SI 80~105%)
 [6] 오디오 믹싱       → mixed.wav (narration 90% + BGM 100%, output=max(nar,bgm), loudnorm -14 LUFS)
 [7] Python 비주얼     → frames/*.png (SI 기반 레이어 강도 동적 조절)
 [8] Remotion 합성     → output.mp4 (hybrid: Python 배경 + vocab 오버레이 + 제목/자막)
@@ -79,10 +79,10 @@
 
 ## 비주얼/음악/팔레트 상세
 
-> 22개 vocab 컴포넌트 목록: SYSTEM_SNAPSHOT Sec.4 참조
-> 음악 엔진 악기 26종 + 합성법 9종: Music_Engine_Spec 참조
+> 24개 vocab 컴포넌트 목록: SYSTEM_SNAPSHOT Sec.4 참조
+> 음악 엔진 악기 26종 + 합성법 10종: Music_Engine_Spec 참조
 > 컬러 팔레트 8종: SYSTEM_SNAPSHOT Sec.7 참조
-> visual_script_generator가 자동 선택. v8: ikeda 팔레트 기본 + PixelGrid/PixelWaveform 25% 확률 주입
+> visual_script_generator가 자동 선택. v11: enometa 팔레트 기본 + PixelGrid/PixelWaveform 25% 확률 주입
 > `--palette` 옵션으로 다른 팔레트 선택 가능 (8bit vocab 색상도 자동 연동)
 
 ---
@@ -127,20 +127,20 @@ py -X utf8 scripts/visual_script_generator.py \
   episodes/epXXX/visual_script.json \
   --episode epXXX --title "에피소드 실제 제목" --palette phantom
 
-# [BGM] v9 ikeda 10레이어 (--from-visual, --export-raw 필수)
+# [BGM] v11 enometa 패턴 엔진 (--from-visual, --export-raw 필수)
 py -X utf8 scripts/enometa_music_engine.py \
   episodes/epXXX/visual_script.json \
   episodes/epXXX/bgm.wav \
   --from-visual --export-raw \
   --script-data episodes/epXXX/script_data.json \
   --episode epXXX
-# → [gap_burst] X gaps filled 로그 확인 (나레이션 gap에 burst 삽입 확인)
+# → 패턴 전환 로그 확인 (바별 drum_pattern/fill/drop 이벤트)
 # --arc: narrative(기승전결) | crescendo | flat | adaptive — 기본 narrative
 
 # [python_frames] SI 기반 레이어 강도 동적 조절
 py -X utf8 scripts/visual_renderer.py \
-  episodes/epXXX --genre ikeda
-# → v9: SI_INTENSITY_SCALE 실시간 적용 (si 높을수록 Particle/Waveform 강해짐)
+  episodes/epXXX --genre enometa
+# → v11: SI_INTENSITY_SCALE 실시간 적용 (si 높을수록 Particle/Waveform 강해짐)
 
 # [mix] 오디오 믹싱 (narration 90% + BGM 100%, 엔드카드 BGM 연장, loudnorm -14 LUFS)
 py -X utf8 scripts/audio_mixer.py \
@@ -213,13 +213,13 @@ ENOMETA | 데이터아트 × 철학
 
 ---
 
-## v10 검증 체크리스트
+## v11 검증 체크리스트
 
 ```
 □ script_data.json에 segments[].semantic_intensity 필드 존재 (0.1~0.9 분포)
-□ BGM 생성 로그에 "SI modulation: range X.XX~X.XX" 확인 (v10: 0.95~1.05 정상, 변동폭 작음이 정상)
+□ BGM 생성 로그에 "SI modulation: range X.XX~X.XX" 확인 (v11: 0.80~1.05, v10보다 넓은 범위)
 □ BGM 생성 로그에 "Tempo curve: XXX~XXX BPM" 확인 (변화 없으면 실패)
-□ BGM 생성 로그에 "[gap_burst] X gaps filled" 확인 (실제 에피소드 TTS 후)
+□ BGM 생성 로그에 드럼 패턴 전환 이벤트 확인 (bar별 pattern/fill/drop)
 □ Python 렌더링 프레임에서 조용한 대사(si≈0.2)↔극적 대사(si≈0.9) 시각 차이 확인
   - SineWaveLayer: si 낮을 때 강하고 si 높을 때 약해짐 (배경 역할)
   - ParticleLayer: si 높을 때 폭발적 (si^1.5 비례)

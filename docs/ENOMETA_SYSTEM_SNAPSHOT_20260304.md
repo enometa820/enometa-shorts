@@ -1,8 +1,8 @@
 # ENOMETA System Snapshot (2026-03-04)
 > **역할**: SNAPSHOT=설계도 (아키텍처, 히스토리). 실전 매뉴얼은 ClaudeCode_Brief 참조.
 > 최종 업데이트: 2026-03-04
-> 상태: v10 음악엔진 + EP007 피드백 12건 전수 해결 + Lissajous vocab + z-order 시스템
-> **last_updated**: 2026-03-04 — EP007 피드백 12건 반영: Lissajous vocab 신규, TextReveal upper 위치, PixelGrid/PostProcess z-order, LogoEndcard 태그라인 v3, si_gate 연속 함수, 자막 EP005 규칙 재정립
+> 상태: v11 음악 패턴 엔진 (대본 리액티브 댄스 뮤직) + EP007 피드백 12건 전수 해결 + 창작 자유도 감사 F섹션 완료
+> **last_updated**: 2026-03-04 — v11 패턴 엔진: ikeda→enometa 리네이밍, snare_drum 합성, DRUM_PATTERNS 10종, 바 카운팅+필/드롭, SAW_PATTERNS 로테이션, 호흡 시스템, highlight_words 악센트, call&response, 크로스페이드 raised cosine
 
 ---
 
@@ -12,7 +12,7 @@
 
 - **장르**: 철학/자기인식/존재론 — "존재와 사유, 그 경계를 초월하다"
 - **비주얼**: 디지털 데이터아트 + 8bit 레트로 (프로시저럴 그래픽, 장르 연동)
-- **음악**: Raw Synthesis 전자음악 (Pure Python v8 엔진, ikeda 단일 장르 + 텍스처 모듈, GPU 불필요)
+- **음악**: Raw Synthesis 전자음악 (Pure Python v11 엔진, enometa 단일 장르 + 패턴 엔진 + 텍스처 모듈, GPU 불필요)
 - **나레이션**: 한국어 여성 TTS (Edge-TTS)
 - **비용**: 0원 (Claude Max 구독만 필요)
 - **GPU**: RTX 3060 Laptop 6GB
@@ -63,7 +63,7 @@
 
 ### 3-1. 대본 → visual_script.json
 - `scripts/visual_script_generator.py`가 대본 + 나레이션 타이밍 + 장르 → JSON 자동 생성
-- v8: 항상 ikeda 단일 장르 + `render_mode: "hybrid"` + `frames_dir`/`total_frames` 자동 계산
+- v11: 항상 enometa 단일 장르 (구 ikeda) + `render_mode: "hybrid"` + `frames_dir`/`total_frames` 자동 계산
 - v8: 8bit vocab (PixelGrid/PixelWaveform) 25% 확률 주입, 팔레트 색상 자동 연동
 
 ### 3-2. TTS 생성
@@ -74,14 +74,14 @@
 - **Chatterbox(`generate_voice.py`) 절대 사용 금지** — 품질 불안정, 타이밍 추정 불가
 
 ### 3-3. BGM 생성
-- `enometa_music_engine.py` v6 (numpy + scipy)
-- **합성법 9종**: 기존 6 + sine_interference, data_click, ultrahigh_texture (v6 ikeda)
+- `enometa_music_engine.py` v11 (numpy + scipy)
+- **합성법 10종**: 기존 6 + sine_interference, data_click, ultrahigh_texture + **snare_drum** (v11)
 - **악기 26종**: 기존 23 + sine_interference, data_click, ultrahigh_texture
-- **장르 1종**: ikeda(60) — v8 단일 장르 (techno/bytebeat/algorave/harsh_noise/chiptune 제거)
-- **ikeda 확장**: 사인파 간섭 + 데이터 클릭 + 초고주파 텍스처 + 텍스처 모듈(TEXTURE_MODULES) + 멜로딕 사인 시퀀스(SINE_MELODY_SEQUENCES 5종)
-- **ikeda 마스터링**: tanh(1.2) 부드러운 새츄레이션, RMS -10dB (기존 -14dB보다 높음 — 음악 존재감)
+- **장르 1종**: enometa (구 ikeda) — v11 단일 장르
+- **v11 패턴 엔진**: DRUM_PATTERNS 10종(16-step) + 바 카운팅 + 필/드롭 + SAW_PATTERNS 로테이션 + 호흡 시스템 + highlight_words 악센트 + call&response
+- **enometa 마스터링**: tanh(3.0) 강한 새츄레이션, RMS -6dB, 3중 에너지(Song Arc × SI × Breath)
 - **최적화**: smooth_envelope O(n) cumsum, 패턴 타일링
-- **음량 가이드라인**: algorave/harsh_noise energy ≤ 0.72, bytebeat/feedback/stutter_gate 최소화, ikeda는 리듬/멜로디 구조 필수
+- **음량 가이드라인**: 순수 노이즈 금지, enometa는 리듬/멜로디 구조 필수
 - **`--export-raw`**: raw_visual_data.npz 동시 출력 (sine_interference_values, data_click_positions 포함)
 - **`--script-data`**: script_data.json 입력 → 대본 데이터 기반 음악 파라미터 자동 설정
 
@@ -110,7 +110,7 @@
   - TextDataLayer: 폰트 16→48px, 카드 90→200px, intensity 연동 색상/jitter/glow/scanlines/chromatic/glitch/wave/data_click
   - DataStreamLayer: 폰트 16→36px, 행별 jitter, 스크롤 si 비례 가속, glow/scanlines/chromatic
   - BarcodeLayer: 선폭 2→12px, BPM 맥동, 선높이 60~100%, scanlines/chromatic/glitch
-- 장르별 레이어 자동 조합 + **ikeda 팔레트: 씬별 accent_color 전환** (공포→빨강, 각성→시안, 몰입→흰)
+- 장르별 레이어 자동 조합 + **enometa 팔레트: 씬별 accent_color 전환** (공포→빨강, 각성→시안, 몰입→흰)
 - 1080x1080, numpy+Pillow, CPU 렌더링
 
 ### 3-7. Remotion 합성
@@ -172,7 +172,7 @@
 pixel_grid, pixel_grid_outline, pixel_grid_life, pixel_grid_rain,
 pixel_waveform, pixel_waveform_steps, pixel_waveform_cascade,
 lissajous
-(v8: ikeda inject_vocabs로 rain/life/cascade/lissajous 활성)
+(v11: enometa inject_vocabs로 rain/life/cascade/lissajous 활성)
 ```
 
 ### Variant 시스템 (v5.1)
@@ -208,7 +208,7 @@ lissajous
 | minimal | 단일 포커스/집중 | 1 | 0.4x |
 | glitch | 글리치+노이즈/긴장 | 3 | 1.0x |
 
-- `--strategy` CLI 옵션 (v8: ikeda 전략 기본, 수동 변경 가능)
+- `--strategy` CLI 옵션 (v11: enometa 전략 기본, 수동 변경 가능)
 - `visual_script.json`에 `"meta"` 필드로 전략 정보 기록
 
 ### Vocab 이력 추적 (v5.1)
@@ -217,37 +217,39 @@ lissajous
 - lookback=2: 최근 2개 에피소드 조합 후순위 처리
 - `--episode` CLI 옵션으로 이력 기록 (경로에서 자동 추출도 가능)
 
-### 장르 → 비주얼 연동 (v8: ikeda 단일)
+### 장르 → 비주얼 연동 (v11: enometa 단일)
 
-ikeda 팔레트(흑백+씬별 accent_color) + hybrid 전용.
+enometa 팔레트(흑백+씬별 accent_color) + hybrid 전용.
 GENRE_LAYER_PRESETS: Music 3 + TTS 4 = 7레이어.
 
 | 장르 | Music (리드+보조) | TTS (강조+기본) | blend | palette |
 |------|------------------|----------------|-------|---------|
-| ikeda | SineWave(0.7)+Waveform(0.4)+Particle(0.3) | TextData(0.7)+Barcode(0.6)+DataStream(0.5)+DataMatrix(0.4) | 0.45 | ikeda |
+| enometa | SineWave(0.7)+Waveform(0.4)+Particle(0.3) | TextData(0.7)+Barcode(0.6)+DataStream(0.5)+DataMatrix(0.4) | 0.45 | enometa |
 
 ---
 
-## 5. 음악 엔진 v8
+## 5. 음악 엔진 v11
 
-### 장르 프리셋 (v10: ikeda 단일)
+### 장르 프리셋 (v11: enometa 단일)
 
 | 장르 | BPM | 핵심 | 비고 |
 |------|-----|------|------|
-| **ikeda** | **135 (±20%)** | **10레이어 + gap_burst + sawtooth 시퀀서 + SI 95~105% 변조** | **v10 단일 장르** |
+| **enometa** | **135 (±20%)** | **10레이어 + 패턴 엔진(DRUM_PATTERNS/SAW_PATTERNS) + 호흡 + SI 80~105% 변조** | **v11 단일 장르** |
 
-- v10 확장: `sawtooth()` / `saw_sequence()` 추가 — 쏘우파 게이트 시퀀서 ('뚜두두' 패턴)
-- 10레이어: rhythm + saw + arpeggio + 5개 텍스처 + gate_stutter + gap_burst
+- v11 패턴 엔진: 바 카운팅 + DRUM_PATTERNS 10종(16-step) + 필/드롭 + SAW_PATTERNS 로테이션 + 호흡
+- 10레이어: rhythm(v11) + saw(v11) + arpeggio + 5개 텍스처 + gate_stutter + gap_burst
 - TEXTURE_MODULES 시스템: 에피소드별 3~4개 텍스처 모듈 자동 선택 (music_history.json 기반)
 - 에피소드 해시 시드 (`random.seed(42)` 제거 → 매 에피소드 다른 음악)
+- ikeda → enometa 리네이밍 (하위호환: genre="ikeda" → 자동 매핑)
 
-### v6 ikeda 합성 함수 (3개 신규)
+### v6 enometa 합성 함수 (3+1개)
 - **sine_interference**: 순수 사인파 2개 합 → 맥놀이, script_data의 숫자가 주파수 결정
 - **data_click**: 극초단(0.003s) 1사이클 사인파 버스트, 대본 숫자를 주파수로 인코딩
 - **ultrahigh_texture**: 8-20kHz 대역통과 노이즈, 매우 조용한 디지털 공기 역할
 - **⚠ EP005 교훈**: 위 3개만으로는 음악이 아닌 노이즈. 최소한의 리듬(kick/click 패턴)+멜로디(sine 시퀀스) 필수
+- **v11 신규**: `snare_drum()` — 톤 바디 + 노이즈 테일 + 어택 클릭 (합성 함수 10번째)
 
-### v10 마스터링 체인 (ikeda 전용)
+### v11 마스터링 체인 (enometa 전용)
 ```
 피크 노멀라이즈 → 강한 새츄레이션 (tanh drive=3.0) → RMS 노멀라이즈 (-6dB) → 피크 리미팅 (0.95) → 16bit WAV
 → audio_mixer.py: narration_volume=0.90, bgm_volume=1.0, loudnorm=I=-14:TP=-1.5:LRA=11 (EBU R128 최종 정규화)
@@ -272,8 +274,9 @@ GENRE_LAYER_PRESETS: Music 3 + TTS 4 = 7레이어.
 - `_quantize_to_bar()` 헬퍼: `round(time / bar_duration) * bar_duration`
 - 6개 전 장르 지원, 인접 섹션 연속성 + 최소 1마디 보장
 
-### v10 semantic_intensity → 음악 연동
-- script_data의 si(0~1) → 음악 마스터 볼륨 변조 (`0.95+si×0.1`, 95~105% 안정화) + 텍스처 밀도 변조 (`max(0.6, si)`, 최소 60% 보장)
+### v11 semantic_intensity → 음악 연동
+- script_data의 si(0~1) → 음악 마스터 볼륨 변조 (`0.80+si×0.25`, 80~105%) + 텍스처 밀도 변조 (`max(0.6, si)`, 최소 60% 보장)
+- v11: SI 변조 폭 확대 (v10 95~105% → v11 80~105%) + 호흡 시스템(8/16바 주기)으로 표현력 강화
 - `_build_si_envelope()`: 시간 도메인 si 배열, 0.5초 스무딩
 - **음악-비주얼-대사 삼위일체**: 비주얼과 동일한 si 소스를 음악이 공유
 
@@ -307,13 +310,13 @@ GENRE_LAYER_PRESETS: Music 3 + TTS 4 = 7레이어.
 
 ---
 
-## 7. 컬러 팔레트 (v8: ikeda 기본, 8종 선택 가능)
+## 7. 컬러 팔레트 (v11: enometa 기본, 8종 선택 가능)
 
-v8 기본: **ikeda 팔레트**. `--palette` CLI 옵션으로 다른 팔레트 선택 가능 (PixelGrid 등 모든 vocab에 자동 적용).
+v11 기본: **enometa 팔레트** (구 ikeda). `--palette` CLI 옵션으로 다른 팔레트 선택 가능 (PixelGrid 등 모든 vocab에 자동 적용).
 
 | 이름 | 배경 | 액센트 | 용도 |
 |------|------|--------|------|
-| **ikeda** | **#000000** | **#FFFFFF** | **v8 기본 — 모노크롬 데이터아트** |
+| **enometa** | **#000000** | **#FFFFFF** | **v11 기본 — 모노크롬 데이터아트** |
 | phantom | #06060A | #8B5CF6 | 성찰/명상 |
 | neon_noir | #050508 | #FF2D55 | 긴장/경고 |
 | cold_steel | #08080C | #00F0FF | 분석/논리 |
@@ -341,13 +344,13 @@ enometa-shorts/
 │   │   └── vocab/                      # 23개 비주얼 컴포넌트
 │   │       ├── (기존 20개)
 │   │       ├── PixelGrid.tsx           # 8bit 격자 (4모드) — zIndex: 5
-│   │       ├── PixelWaveform.tsx       # 8bit 파형 (3모드) — v8 ikeda 팔레트 연동
+│   │       ├── PixelWaveform.tsx       # 8bit 파형 (3모드) — v11 enometa 팔레트 연동
 │   │       └── Lissajous.tsx           # Lissajous 곡선 — Canvas 2D, 오디오 리액티브
 │   ├── types.ts                        # VisualScriptMeta (render_mode 등)
 │   └── utils/
-│       └── palettes.ts                 # 8종 팔레트 (v8: ikeda 기본)
+│       └── palettes.ts                 # 8종 팔레트 (v11: enometa 기본)
 ├── scripts/
-│   ├── enometa_music_engine.py         # v8 (ikeda 단일, 텍스처 모듈 확장)
+│   ├── enometa_music_engine.py         # v11 (enometa 단일, 패턴 엔진 + 텍스처 모듈)
 │   ├── script_data_extractor.py        # v6: 대본 데이터 추출기
 │   ├── visual_renderer.py              # v5.1+v6: Python 비주얼 렌더러
 │   ├── visual_layers/                  # v5.1+v6: 비주얼 레이어 모듈 (9개 + 공유 이펙트)
@@ -362,7 +365,7 @@ enometa-shorts/
 │   │   ├── text_data_layer.py          # v6: 터미널 텍스트 카드 (v6.2 si 다이나믹)
 │   │   ├── tts_effects.py              # v6.2 신규: 10개 공유 이펙트 함수
 │   │   └── composite.py               # additive blend 합성
-│   ├── visual_script_generator.py      # v8 (--strategy --episode, ikeda 전용)
+│   ├── visual_script_generator.py      # v11 (--strategy --episode, enometa 전용)
 │   ├── visual_strategies.py            # v5.1 (6종 전략 프리셋)
 │   ├── subtitle_grouper.py             # v5.1 (자막 2줄 그루핑)
 │   └── (기타 generate_voice_edge, audio_mixer 등)
@@ -454,6 +457,11 @@ v10    [█████████░] SI 변조 95~105% 안정화 + tanh 3.0 +
 EP007  [█████████░] 이진탐색×내려놓음 (98점) — 피드백 12건 전수 해결
        — Lissajous vocab 신규 + TextReveal upper + z-order 시스템 + LogoEndcard v3
        — si_gate 연속 함수 + SubtitleSection EP005 규칙 + FEEDBACK_LOG 신설
+v11    [█████████░] 패턴 엔진 (대본 리액티브 댄스 뮤직) — 창작 자유도 감사 F섹션
+       — ikeda→enometa 리네이밍 + snare_drum 합성 + DRUM_PATTERNS 10종
+       — 바 카운팅+필/드롭 + SAW_PATTERNS 로테이션 + 호흡 시스템
+       — highlight_words 악센트 + call&response + 크로스페이드 raised cosine
+       — SI 변조 80~105% + si_gate min 0.25 + ARP_PATTERNS 10종
 EP010  [█████████░] 표현 다양화 (35+ vocab, GPU 가속 레이어)
 EP020+ [██████████] 디지털 아트 완성체 (Remotion 제거 → Python only)
 ```
@@ -469,7 +477,7 @@ EP020+ [██████████] 디지털 아트 완성체 (Remotion 제
 ## 11. 사용자 선호
 
 - Python 코딩으로 음악 생성 (AI 모델 의존 대신 직접 제어)
-- 음악: Raw Synthesis 전자음악 — bytebeat/algorave/harsh_noise/chiptune/techno
+- 음악: Raw Synthesis 전자음악 — enometa 단일 장르 (대본 리액티브 댄스 뮤직, 패턴 엔진 v11)
 - 8bit/칩튠 사운드 좋아함
 - 패드 사운드 원하지 않음 — raw하고 자극적인 전자음악 본연의 매력 선호
 - 비주얼: 디지털 데이터아트 + 8bit 레트로 (Max Cooper / TouchDesigner 영감)

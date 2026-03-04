@@ -5,6 +5,43 @@
 
 ---
 
+## 2026-03-04 — v11 패턴 엔진 (창작 자유도 감사 F섹션) + ikeda→enometa 리네이밍
+
+### 코드 변경 (commit 077a291)
+
+**`scripts/enometa_music_engine.py`** — F-0~F-8 전체 구현
+- **F-0**: ikeda → enometa 리네이밍 (GENRE_PRESETS, is_ikeda→is_enometa, 하위호환 자동 매핑)
+- **F-1**: `snare_drum()` 합성 함수 (톤 바디 200→120Hz + 노이즈 테일 + 어택 클릭) — 합성 함수 10번째
+- **F-2**: `DRUM_PATTERNS` 10종 (four_on_floor, offbeat, euclidean_3_8/5_16, minimal, driving, fill_buildup, fill_snare_roll, drop_silence, drop_impact)
+- **F-3**: `_render_continuous_rhythm()` 전면 리팩터 — 바 카운팅 + 섹션별 패턴 선택 + 필(4/8바) + 드롭(SI 급상승)
+- **F-4**: `SAW_PATTERNS` 확장 (레벨별 2~3패턴) + 4바마다 로테이션
+- **F-5**: `_compute_breath_envelope()` — 8/16바 주기 에너지 딥(0.85/0.70), 0.3s 스무딩
+- **F-6**: highlight_words → 음악 악센트 (kick×1.5 + snare×1.2)
+- **F-7**: Call & Response — 2바 교대 drum/melody gain 엔벨로프 (SI 0.3~0.7)
+- **F-8**: 크로스페이드 linear → raised cosine, 0.5s → 1.0s, 15% → 20%
+- SI 변조: 0.95+si*0.1 → 0.80+si*0.25 (80~105%)
+- si_gate: min 0.45 → min 0.25
+- ARP_PATTERNS: 5종 → 10종
+
+**`scripts/enometa_render.py`** — ikeda→enometa
+**`scripts/visual_script_generator.py`** — ikeda→enometa
+**`scripts/visual_renderer.py`** — ikeda→enometa (_get_ikeda_accent→_get_enometa_accent)
+**`scripts/visual_strategies.py`** — ikeda→enometa
+
+### 마스터 문서 5종 최신화
+
+| 문서 | 변경 |
+|------|------|
+| SYSTEM_SNAPSHOT_20260304 | v10→v11, ikeda→enometa 전체, 합성 함수 10종, 패턴 엔진, 진화 로그 v11 |
+| ClaudeCode_Brief_20260304 | v10→v11, 기술 스택 enometa, CLI 예시, 검증 체크리스트 v11 |
+| Music_Engine_Spec_20260304 | v10→v11 전면 리라이트 — DRUM_PATTERNS, 바 카운팅, SAW_PATTERNS, 호흡, highlight_words, call&response |
+| Hybrid_Visual_Architecture_20260304 | v8→v11, 장르 레지스트리 enometa, GENRE_LAYER_PRESETS |
+| Visual_Differentiation_Spec_20260304 | v8→v11, 전략 매핑 enometa, GENRE_LAYER_PRESETS, CLI |
+| CHANGELOG | 이 항목 |
+| MEMORY.md | v10→v11, 음악 엔진 섹션 전면 갱신 |
+
+---
+
 ## 2026-03-04 — EP007 추가 피드백 4건 + Lissajous vocab + 피드백 로그 신설
 
 ### 피드백 반영 (F07-09~12)

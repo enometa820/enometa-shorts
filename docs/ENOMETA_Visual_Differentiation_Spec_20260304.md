@@ -1,8 +1,8 @@
 # ENOMETA 비주얼 차별화 시스템 명세서 (2026-03-04)
 
 > 최종 업데이트: 2026-03-04
-> 상태: **Phase 1~4 구현 완료** / v8 ikeda 단일 장르 + ikeda 확장
-> **last_updated**: 2026-03-04 — Lissajous vocab, z-order 시스템, EMOTION_VOCAB_POOL lissajous 추가
+> 상태: **Phase 1~4 구현 완료** / v11 enometa 단일 장르 (구 ikeda)
+> **last_updated**: 2026-03-04 — v11 ikeda→enometa 리네이밍, Lissajous vocab, z-order 시스템, EMOTION_VOCAB_POOL lissajous 추가
 
 ---
 
@@ -61,15 +61,15 @@ visual_script.json → VocabEntry.variant → VisualSection.tsx → Component(va
 | minimal | 단일 포커스 | 1 | 최소 | 집중력 |
 | glitch | 글리치+노이즈 | 2~3 | 변동 | 불안정+긴장감 |
 
-### 2.3 장르 → 기본 전략 매핑 (v8: ikeda 단일)
+### 2.3 장르 → 기본 전략 매핑 (v11: enometa 단일)
 
 | 장르 | 기본 전략 |
 |------|----------|
-| **ikeda** | **ikeda** |
+| **enometa** | **enometa** |
 
-> v8에서 techno/algorave/harsh_noise/bytebeat/chiptune 제거. 모든 에피소드가 ikeda 전략 사용.
+> v11: ikeda→enometa 리네이밍. 모든 에피소드가 enometa 전략 사용. (하위호환: "ikeda" → 자동 매핑)
 
-### 2.5 v6 ikeda 전략 (신규)
+### 2.5 v6 enometa 전략
 
 | 속성 | 값 | 비고 |
 |------|-----|------|
@@ -87,8 +87,8 @@ visual_script.json → VocabEntry.variant → VisualSection.tsx → Component(va
 | **Music** | SineWaveLayer | 오실로스코프 사인파 (sine_interference_values → 파형) |
 | **Music** | WaveformLayer | 오디오 파형 직접 렌더링 |
 | **Music** | ParticleLayer | 파티클 시뮬레이션 (오디오 에너지 → 물리) |
-| **Music** | BytebeatLayer | bytebeat 공식 → 픽셀 (v8 ikeda 미사용) |
-| **Music** | FeedbackLayer | 자기참조 피드백 루프 (v8 ikeda 미사용) |
+| **Music** | BytebeatLayer | bytebeat 공식 → 픽셀 (v11 enometa 미사용) |
+| **Music** | FeedbackLayer | 자기참조 피드백 루프 (v11 enometa 미사용) |
 | **TTS** | BarcodeLayer | UTF-8 바이트 → 바코드 스트라이프 |
 | **TTS** | DataStreamLayer | 데이터 스트림 수평 스크롤 |
 | **TTS** | TextDataLayer | 터미널 스타일 텍스트 카드 |
@@ -97,17 +97,17 @@ visual_script.json → VocabEntry.variant → VisualSection.tsx → Component(va
 > Music 레이어는 `arc_energy`에 의해 강도가 변조됨 (기승전결 반영)
 > TTS 레이어는 대본 데이터(script_data)에 반응, 아크 영향 없음
 
-**GENRE_LAYER_PRESETS (v8: ikeda 전용)**:
+**GENRE_LAYER_PRESETS (v11: enometa 전용)**:
 
 | 장르 | Music 리드 | Music 보조 | TTS 강조 | TTS 기본 | blend |
 |------|-----------|-----------|---------|---------|-------|
-| ikeda | SineWave(0.7) | Waveform(0.4)+Particle(0.3) | TextData(0.7) | Barcode(0.6)+DataStream(0.5)+DataMatrix(0.4) | 0.45 |
+| enometa | SineWave(0.7) | Waveform(0.4)+Particle(0.3) | TextData(0.7) | Barcode(0.6)+DataStream(0.5)+DataMatrix(0.4) | 0.45 |
 
-### 2.4 CLI 사용 (v8)
+### 2.4 CLI 사용 (v11)
 ```bash
 py scripts/visual_script_generator.py episodes/epXXX/narration_timing.json \
-  --strategy ikeda --episode epXXX --title "제목"
-# v8: --genre 옵션 제거 (항상 ikeda)
+  --strategy enometa --episode epXXX --title "제목"
+# v11: --genre 옵션 제거 (항상 enometa)
 ```
 
 ---
@@ -220,7 +220,7 @@ vocab 컴포넌트 간 렌더링 우선순위를 명시적 zIndex로 관리.
 | Props | ratioA, ratioB, phaseOffset, color, lineWidth, trailLength |
 | 오디오 리액티브 | rms → 선 굵기/글로우, bass → 위상 속도 |
 | EMOTION_VOCAB_POOL | neutral_analytical, transcendent_open, awakening_spark (secondary) |
-| inject_vocabs | ikeda 25% 확률 주입 |
+| inject_vocabs | enometa 25% 확률 주입 |
 
 ---
 
