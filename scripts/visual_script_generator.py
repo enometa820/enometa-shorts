@@ -71,7 +71,7 @@ PALETTES = {
         "colors": ["#A59ADE", "#7869C4", "#FFFFFF", "#FFFACD"],
         "particles": ["#7869C4", "#A59ADE", "#FFFFFF", "#6C5EB5", "#FFFACD"],
     },
-    "ikeda": {
+    "enometa": {
         "bg": "#000000",
         "accent": "#FFFFFF",
         "glow": "#CCCCCC",
@@ -223,8 +223,8 @@ GENRE_VISUAL_OVERRIDES = {
         "force_bg_pixel": False,
     },
     # techno: 기본 비주얼 유지, 오버라이드 없음
-    "ikeda": {
-        "palette": "ikeda",
+    "enometa": {
+        "palette": "enometa",
         "inject_vocabs": ["pixel_grid_rain", "pixel_grid_life", "pixel_waveform_cascade", "lissajous"],
         "inject_chance": 0.25,  # 씬의 25% 확률로 8bit 격자/파형 등장
         "force_bg_pixel": False,
@@ -1025,7 +1025,7 @@ def generate_visual_script(
         "meta": {
             "strategy": strategy_name,
             "strategy_description": strategy.get("description", ""),
-            "genre": "ikeda",
+            "genre": "enometa",
             "palette": palette_name,
             "seed": seed,
             "render_mode": "hybrid",
@@ -1050,7 +1050,7 @@ def main():
         print()
         print("Options:")
         print("  --palette <name>     팔레트 (phantom/neon_noir/cold_steel/ember/synapse/gameboy/c64)")
-        print("  --genre <name>       (v8: 무시됨, 항상 ikeda)")
+        print("  --genre <name>       (v8: 무시됨, 항상 enometa)")
         print("  --strategy <name>    비주얼 전략 (dense/breathing/collision/layered/minimal/glitch)")
         print("  --episode <id>       에피소드 ID (이력 추적용, 예: ep005)")
         print("  --title <title>      에피소드 제목")
@@ -1100,15 +1100,18 @@ def main():
         # narration_timing.json과 같은 디렉토리에 visual_script.json
         output = os.path.join(os.path.dirname(narration_timing), "visual_script.json")
 
-    # v8: 장르 항상 ikeda (단일 장르 시스템)
-    if genre and genre != "ikeda":
-        print(f"⚠ WARNING: --genre {genre} 무시됨. v8부터 ikeda 단일 장르 시스템입니다.")
-    genre = "ikeda"
+    # v8: 장르 항상 enometa (단일 장르 시스템)
+    # 하위호환: "ikeda" → "enometa" 자동 매핑
+    if genre == "ikeda":
+        genre = "enometa"
+    if genre and genre != "enometa":
+        print(f"⚠ WARNING: --genre {genre} 무시됨. v8부터 enometa 단일 장르 시스템입니다.")
+    genre = "enometa"
 
     print(f"=== ENOMETA Visual Script Generator v8 ===")
     print(f"Narration timing: {narration_timing}")
     print(f"Palette: {palette_name}")
-    print(f"Genre: ikeda (v8 단일 장르)")
+    print(f"Genre: enometa (v8 단일 장르)")
     if strategy_name:
         print(f"Strategy: {strategy_name}")
     if not title:

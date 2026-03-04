@@ -72,8 +72,8 @@ STRATEGIES: Dict[str, Dict[str, Any]] = {
         "reactivity_boost": 1,
         "force_text_mode": "glitch",
     },
-    "ikeda": {
-        "description": "Ikeda data art - minimal+terminal+sine",
+    "enometa": {
+        "description": "ENOMETA data art - minimal+terminal+sine",
         "max_semantic_layers": 2,
         "particle_density": 0.0,
         "text_chance": 0.9,
@@ -95,7 +95,8 @@ GENRE_DEFAULT_STRATEGY: Dict[str, str] = {
     "harsh_noise": "glitch",
     "bytebeat": "minimal",
     "chiptune": "layered",
-    "ikeda": "ikeda",
+    "enometa": "enometa",
+    "ikeda": "enometa",  # 하위호환
 }
 
 # ============================================================

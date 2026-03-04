@@ -118,7 +118,7 @@ def step_visual_script(episode_dir: str, title: str, episode_id: str,
 
 
 def step_bgm(episode_dir: str, episode_id: str, force: bool = False):
-    """[5] BGM 생성 (ikeda, from visual_script)"""
+    """[5] BGM 생성 (enometa, from visual_script)"""
     visual = os.path.join(episode_dir, "visual_script.json")
     script_data = os.path.join(episode_dir, "script_data.json")
     output = os.path.join(episode_dir, "bgm.wav")
@@ -129,7 +129,7 @@ def step_bgm(episode_dir: str, episode_id: str, force: bool = False):
         print("  [skip] bgm.wav 이미 존재")
         return output
 
-    print("  BGM 생성 중 (ikeda, from-visual)...")
+    print("  BGM 생성 중 (enometa, from-visual)...")
     cmd = [PYTHON, os.path.join(SCRIPTS_DIR, "enometa_music_engine.py"),
            visual, output,
            "--from-visual",
@@ -170,9 +170,9 @@ def step_python_frames(episode_dir: str, force: bool = False):
         print("  [skip] frames/ 이미 존재")
         return frames_dir
 
-    print("  Python 비주얼 프레임 렌더링 중 (ikeda)...")
+    print("  Python 비주얼 프레임 렌더링 중 (enometa)...")
     cmd = [PYTHON, os.path.join(SCRIPTS_DIR, "visual_renderer.py"),
-           episode_dir, "--genre", "ikeda"]
+           episode_dir, "--genre", "enometa"]
     run(cmd, "python_frames", timeout=3600)  # 최대 1시간 (120초 영상 기준 ~20분)
     return frames_dir
 

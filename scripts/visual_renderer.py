@@ -38,18 +38,19 @@ PALETTES = {
     "synapse":    {"bg": (6, 6, 24),    "accent": (65, 105, 225),  "mid": (30, 50, 110)},
     "gameboy":    {"bg": (15, 56, 15),  "accent": (155, 188, 15),  "mid": (48, 98, 48)},
     "c64":        {"bg": (64, 49, 141), "accent": (165, 154, 222), "mid": (110, 100, 180)},
-    "ikeda":      {"bg": (0, 0, 0),     "accent": (255, 255, 255), "mid": (80, 80, 80)},
+    "enometa":    {"bg": (0, 0, 0),     "accent": (255, 255, 255), "mid": (80, 80, 80)},
 }
 
-# v8: ikeda 단일 장르 — 팔레트 항상 ikeda
+# v8: enometa 단일 장르 — 팔레트 항상 enometa
 GENRE_PALETTE = {
-    "ikeda": "ikeda",
+    "enometa": "enometa",
+    "ikeda": "enometa",  # 하위호환
 }
 
 # ============================================================
-# Ikeda 씬별 색 전환 시스템
+# ENOMETA 씬별 색 전환 시스템
 # ============================================================
-IKEDA_EMOTION_COLORS = {
+ENOMETA_EMOTION_COLORS = {
     "neutral":    (255, 255, 255),  # 순백
     "neutral_curious": (200, 200, 255),
     "neutral_analytical": (180, 220, 255),
@@ -85,7 +86,7 @@ IKEDA_EMOTION_COLORS = {
 #   1. 모든 장르에 TTS 4레이어 기본 장착 (script_data만 있으면 동작)
 #   2. 음악 레이어 3개 (장르 리드 + 범용 보조 2개)
 #   3. 장르 차별화 = intensity 분배 + blend_ratio + palette
-#   4. 데이터 의존성: BytebeatLayer→bytebeat/chiptune, SineWaveLayer→ikeda
+#   4. 데이터 의존성: BytebeatLayer→bytebeat/chiptune, SineWaveLayer→enometa
 #
 # intensity 설계 철학:
 #   리드 레이어: 0.7~0.9 (장르 시그니처)
@@ -93,12 +94,12 @@ IKEDA_EMOTION_COLORS = {
 #   TTS 레이어: 장르별 강약 조절 (0.3~0.7)
 # ============================================================
 
-# v8: ikeda 단일 장르 — 모든 비주얼 레이어 프리셋
+# v8: enometa 단일 장르 — 모든 비주얼 레이어 프리셋
 GENRE_LAYER_PRESETS = {
-    # ── ikeda (60bpm) ── ENOMETA v8 단일 장르: 데이터아트 + 확장 텍스처
+    # ── enometa (60bpm) ── ENOMETA v8 단일 장르: 데이터아트 + 확장 텍스처
     # Music: SineWave (간섭 패턴) + Waveform (파형) + Particle (에너지)
     # TTS: TextData (데이터 카드) + Barcode (바이트 스트라이프) + DataStream + DataMatrix
-    "ikeda": {
+    "enometa": {
         "music_layers": [
             {"layer": "SineWaveLayer",   "intensity": 0.7},
             {"layer": "WaveformLayer",   "intensity": 0.4},
@@ -151,7 +152,7 @@ class VisualRenderer:
         self.height = height
         self.fps = fps
 
-        palette_name = GENRE_PALETTE.get(genre, "ikeda")
+        palette_name = GENRE_PALETTE.get(genre, "enometa")
         self.palette = PALETTES[palette_name]
 
         self.raw_data = self._load_raw_data()
@@ -160,7 +161,7 @@ class VisualRenderer:
         self.total_frames = int(self.raw_data["total_frames"])
         self.layers = self._init_layers()
 
-        # Ikeda 색 전환: 이전 accent 색 (페이드용)
+        # ENOMETA 색 전환: 이전 accent 색 (페이드용)
         self._prev_accent = None
 
     def _load_raw_data(self) -> dict:
@@ -175,14 +176,14 @@ class VisualRenderer:
         return {"scenes": []}
 
     def _load_script_data(self) -> dict:
-        """script_data.json 로딩 (ikeda 비주얼용)"""
+        """script_data.json 로딩 (enometa 비주얼용)"""
         sd_path = self.episode_dir / "script_data.json"
         if sd_path.exists():
             return json.loads(sd_path.read_text(encoding="utf-8"))
         return None
 
     def _init_layers(self) -> dict:
-        preset = GENRE_LAYER_PRESETS.get(self.genre, GENRE_LAYER_PRESETS["ikeda"])
+        preset = GENRE_LAYER_PRESETS.get(self.genre, GENRE_LAYER_PRESETS["enometa"])
 
         # 하위호환: flat list 입력 시 전부 music_layers로 취급
         if isinstance(preset, list):
@@ -214,12 +215,12 @@ class VisualRenderer:
                 return scene
         return {}
 
-    def _get_ikeda_accent(self, emotion: str) -> tuple:
-        """Ikeda 씬별 accent 색 결정 (기본 흰색, 감정별 색 전환)"""
-        target = IKEDA_EMOTION_COLORS.get(emotion)
+    def _get_enometa_accent(self, emotion: str) -> tuple:
+        """ENOMETA 씬별 accent 색 결정 (기본 흰색, 감정별 색 전환)"""
+        target = ENOMETA_EMOTION_COLORS.get(emotion)
         if not target:
             base = emotion.split("_")[0] if emotion else "neutral"
-            target = IKEDA_EMOTION_COLORS.get(base, (255, 255, 255))
+            target = ENOMETA_EMOTION_COLORS.get(base, (255, 255, 255))
 
         # 부드러운 색 전환 (3-5프레임 페이드)
         if self._prev_accent is None:
@@ -261,7 +262,7 @@ class VisualRenderer:
             ctx["arc_energy"] = 1.0
             ctx["arc_phase"] = "constant"
 
-        # Ikeda 전용 데이터
+        # ENOMETA 전용 데이터
         if "sine_interference_values" in self.raw_data:
             ctx["sine_interference_values"] = self.raw_data["sine_interference_values"][frame_idx]
         if "data_click_positions" in self.raw_data:
@@ -292,10 +293,10 @@ class VisualRenderer:
         if scene:
             ctx["emotion"] = scene.get("emotion", "neutral")
 
-        # Ikeda accent 색 결정
-        if self.genre == "ikeda":
+        # ENOMETA accent 색 결정
+        if self.genre in ("enometa", "ikeda"):
             emotion = ctx.get("emotion", "neutral")
-            ctx["accent_color"] = self._get_ikeda_accent(emotion)
+            ctx["accent_color"] = self._get_enometa_accent(emotion)
         else:
             ctx["accent_color"] = self.palette.get("accent")
 
@@ -361,9 +362,9 @@ class VisualRenderer:
 def main():
     parser = argparse.ArgumentParser(description="ENOMETA Python 비주얼 렌더러")
     parser.add_argument("episode_dir", help="에피소드 디렉토리 경로")
-    parser.add_argument("--genre", default="techno",
+    parser.add_argument("--genre", default="enometa",
                         choices=["techno", "bytebeat", "algorave", "harsh_noise",
-                                 "chiptune", "ikeda"])
+                                 "chiptune", "enometa", "ikeda"])
     parser.add_argument("--width", type=int, default=1080)
     parser.add_argument("--height", type=int, default=1080)
     parser.add_argument("--fps", type=int, default=30)

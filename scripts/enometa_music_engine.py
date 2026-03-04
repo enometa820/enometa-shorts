@@ -1,13 +1,13 @@
 """
-ENOMETA Generative Music Engine v9 — ikeda Matrix Style
+ENOMETA Generative Music Engine v11 — Pattern Engine
 대본의 감정을 읽고 1곡의 연속적 음악을 생성하는 엔진.
 GPU 불필요. numpy + scipy만으로 동작.
 
 v9 변경사항 (Matrix 스타일 확장):
 - sawtooth() + sawtooth_distorted(): 쏘우파 원초적 전자음 파형 추가
 - saw_sequence(): 게이트된 쏘우파 시퀀서 — '뚜두두 뚜두 뚜 뚜 뚜~' 패턴
-- _render_continuous_saw_sequence(): ikeda 분기의 핵심 리듬 레이어
-- ikeda generate() 분기: rhythm + arpeggio + saw_sequence 모두 활성화 (8레이어)
+- _render_continuous_saw_sequence(): enometa 분기의 핵심 리듬 레이어
+- enometa generate() 분기: rhythm + arpeggio + saw_sequence 모두 활성화 (10레이어)
 - BPM 60 → 120: Matrix 스타일 강렬한 리듬
 - kick/hihat volume 0.1~0.2 → 0.5~0.8: 드럼 리듬 실체 복원
 - random.seed(42) 제거: 에피소드 해시 기반 시드 (매번 다른 텍스처)
@@ -15,9 +15,9 @@ v9 변경사항 (Matrix 스타일 확장):
 - EMOTION_MAP: tension/awakening 계열에 saw_sequence 활성화
 
 v8 변경사항:
-- 6장르 → ikeda 단일 장르 통합
+- 6장르 → enometa 단일 장르 통합
 - TEXTURE_MODULES: 에피소드 간 텍스처 조합 다양화 시스템
-- 마스터링 통합: tanh(1.2) + RMS -10dB (ikeda 전용)
+- 마스터링 통합: tanh(1.5) + RMS -6dB (enometa 전용)
 - EMOTION_MAP: 고에너지 상태에 feedback 텍스처 활성화
 
 사용법:
@@ -620,6 +620,24 @@ def hi_hat(open_hat=False, sr=SAMPLE_RATE):
     return n
 
 
+def snare_drum(freq=200, sr=SAMPLE_RATE):
+    """스네어 드럼 v11 — 톤 바디 + 노이즈 테일 + 어택 클릭"""
+    duration = 0.18
+    t = np.linspace(0, duration, int(sr * duration), endpoint=False)
+    # 톤 바디: freq → freq*0.6 피치 다운
+    pitch_env = freq * (1 + 2 * np.exp(-t * 50))
+    phase = np.cumsum(2 * np.pi * pitch_env / sr)
+    tone = np.sin(phase) * np.exp(-t * 25) * 0.5
+    # 노이즈 테일: 밝은 노이즈
+    n = noise(duration, sr) * np.exp(-t * 18) * 0.6
+    wave = tone + n
+    # 어택 클릭
+    click_dur = 0.003
+    click = noise(click_dur, sr) * np.exp(-np.linspace(0, click_dur, int(sr * click_dur)) * 1000)
+    wave[:len(click)] += click * 0.3
+    return wave
+
+
 def synth_lead(freq, duration, sr=SAMPLE_RATE):
     """신스 리드 v4 — lowpass 제거, reverb 경량화, 볼륨 업"""
     t = np.linspace(0, duration, int(sr * duration), endpoint=False)
@@ -969,6 +987,9 @@ class EnometaMusicEngine:
         self._script_data = None  # script_data.json 로딩 시 사용
         self._si_env = None       # semantic_intensity 시간 도메인 엔벨로프
         self._si_modulation = None  # si → 볼륨 변조 배열 (0.7~1.3)
+        # F-6: highlight_words → accent times
+        self._highlight_words = meta.get("highlight_words", [])
+        self._accent_times = []  # load_script_data() 후 빌드
 
         palette = script.get("palette", {})
         self.bass_freq = palette.get("bass_freq", 82.4)
@@ -1113,20 +1134,21 @@ class EnometaMusicEngine:
         self._add_mono(fm, 0, 1.0)
 
     def _render_continuous_rhythm(self, sections):
-        """전체 길이 킥 + 하이햇 v7-P6 — 가변 BPM 이벤트 배치 + 유클리드 모드
+        """v11 패턴 엔진: 바 카운팅 + 섹션별 패턴 선택 + 필/드롭
 
-        v5: 정적 BPM → 패턴 사전 렌더 → 타일링
-        v7-P6: 가변 tempo_curve → 비트별 이벤트 배치 (간격이 시간에 따라 변화)
+        F-3: 단일 패턴 → 16-step 패턴 라이브러리 + 바 단위 렌더링
+        - SI + emotion → DRUM_PATTERNS 패턴 선택
+        - 4바마다 fill_buildup, 8바마다 fill_snare_roll
+        - SI 급상승 섹션 경계에서 drop_silence → drop_impact
+        - snare_drum() 배치 추가
         """
-        overrides = self.script.get("metadata", {}).get("synthesis_overrides", {})
-        rhythm_mode = overrides.get("rhythm_mode", "standard")
         has_tempo = hasattr(self, '_tempo_curve') and self._tempo_curve is not None
         bpm_info = ""
         if has_tempo:
             bpm_min, bpm_max = float(self._tempo_curve.min()), float(self._tempo_curve.max())
             if abs(bpm_max - bpm_min) > 0.5:
                 bpm_info = f", bpm={bpm_min:.1f}~{bpm_max:.1f}"
-        print(f"  [rhythm] continuous drums (mode={rhythm_mode}{bpm_info})...", flush=True)
+        print(f"  [rhythm] v11 pattern engine (bars+fills+drops{bpm_info})...", flush=True)
 
         # BPM 조회 함수
         def bpm_at(t_sec):
@@ -1137,73 +1159,144 @@ class EnometaMusicEngine:
 
         # 원샷 사운드 사전 렌더
         k = kick_drum(self.bass_freq * 0.5, self.sr)
+        sn = snare_drum(self.bass_freq * 1.5, self.sr)
 
-        # 가변 간격 이벤트 버퍼
+        # 이벤트 버퍼
         kick_full = np.zeros(self.total_samples)
+        snare_full = np.zeros(self.total_samples)
         hihat_full_L = np.zeros(self.total_samples)
         hihat_full_R = np.zeros(self.total_samples)
 
-        if rhythm_mode == "euclidean":
-            # v5 유클리드 리듬 — 8스텝 비대칭 패턴 + 가변 BPM 간격
-            steps = 8
-            kick_pattern = euclidean_rhythm(steps, 3)   # E(3,8)
-            hihat_pattern = euclidean_rhythm(steps, 5)  # E(5,8)
+        # 섹션별 SI 평균 + 패턴 이름 사전 계산
+        section_si = {}
+        section_pattern = {}
+        for sec in sections:
+            sid = sec.get("id", "?")
+            s_start = int(sec["start_sec"] * self.sr)
+            s_end = min(int(sec["end_sec"] * self.sr), self.total_samples)
+            if self._si_env is not None and s_start < s_end:
+                si_avg = float(np.mean(self._si_env[s_start:s_end]))
+            else:
+                si_avg = sec.get("energy", 0.5)
+            section_si[sid] = si_avg
+            emotion = sec.get("emotion", "neutral")
+            section_pattern[sid] = _select_drum_pattern(si_avg, emotion)
 
-            t = 0.0
-            step_idx = 0
-            while t < self.duration:
-                beat_interval = 60.0 / bpm_at(t)
-                pos = int(t * self.sr)
+        # 드롭 감지: 다음 섹션의 SI가 현재보다 0.3+ 높은 경계
+        drop_boundaries = set()  # 섹션 start_sec들
+        for i in range(len(sections) - 1):
+            sid_cur = sections[i].get("id", "?")
+            sid_next = sections[i + 1].get("id", "?")
+            si_cur = section_si.get(sid_cur, 0.5)
+            si_next = section_si.get(sid_next, 0.5)
+            if si_next - si_cur >= 0.3:
+                drop_boundaries.add(sections[i + 1]["start_sec"])
+
+        # 현재 섹션 조회 헬퍼
+        def section_at(t_sec):
+            for sec in sections:
+                if sec["start_sec"] <= t_sec < sec["end_sec"]:
+                    return sec
+            return sections[-1] if sections else None
+
+        # 에피소드 시드 기반 결정론적 랜덤
+        rng = random.Random(self.seed if hasattr(self, 'seed') else 42)
+
+        # ── 바 단위 렌더링 루프 ──
+        t = 0.0
+        bar_idx = 0
+        drop_state = 0  # 0=normal, 1=pre_drop(silence), 2=post_drop(impact)
+
+        while t < self.duration:
+            cur_bpm = bpm_at(t)
+            step_interval = (60.0 / cur_bpm) / 4  # 16th note interval
+            bar_duration = step_interval * 16      # 4/4 1바 = 16 sixteenths
+
+            sec = section_at(t)
+            if sec is None:
+                t += bar_duration
+                bar_idx += 1
+                continue
+
+            sid = sec.get("id", "?")
+            base_pattern_name = section_pattern.get(sid, "four_on_floor")
+
+            # ── 드롭 메커닉 ──
+            bar_end_t = t + bar_duration
+            next_bar_end_t = bar_end_t + bar_duration
+
+            # 다음 바 시작이 드롭 경계에 가까운지 체크
+            is_near_drop = False
+            for db in drop_boundaries:
+                if abs(bar_end_t - db) < bar_duration * 1.5:
+                    is_near_drop = True
+                    break
+
+            if drop_state == 1:
+                # post_drop: impact 패턴
+                pattern_name = "drop_impact"
+                drop_state = 0  # 리셋
+            elif is_near_drop and drop_state == 0:
+                # pre_drop: 다음 바에 silence
+                pattern_name = "drop_silence"
+                drop_state = 1
+            elif bar_idx % 8 == 7:
+                # 8바마다 마지막: snare roll
+                pattern_name = "fill_snare_roll"
+            elif bar_idx % 4 == 3:
+                # 4바마다 마지막: buildup fill
+                pattern_name = "fill_buildup"
+            else:
+                pattern_name = base_pattern_name
+
+            # 패턴 해석
+            pat = _resolve_drum_pattern(pattern_name)
+
+            # ── 16-step 렌더링 ──
+            for step in range(16):
+                step_t = t + step * step_interval
+                pos = int(step_t * self.sr)
                 if pos >= self.total_samples:
                     break
 
-                step_in = step_idx % steps
-
                 # 킥
-                if kick_pattern[step_in]:
+                if pat["kick"][step]:
                     end = min(pos + len(k), self.total_samples)
                     kick_full[pos:end] += k[:end - pos]
 
+                # 스네어
+                if pat["snare"][step]:
+                    end = min(pos + len(sn), self.total_samples)
+                    snare_full[pos:end] += sn[:end - pos]
+
                 # 하이햇
-                if hihat_pattern[step_in]:
-                    is_open = random.random() > 0.6
+                if pat["hihat"][step]:
+                    is_open = rng.random() > 0.65
                     h = hi_hat(open_hat=is_open, sr=self.sr)
-                    pan = random.uniform(-0.2, 0.2)
+                    pan = rng.uniform(-0.2, 0.2)
                     s = stereo_pan(h, pan)
                     end = min(pos + len(h), self.total_samples)
                     hihat_full_L[pos:end] += s[:end - pos, 0]
                     hihat_full_R[pos:end] += s[:end - pos, 1]
 
-                t += beat_interval
-                step_idx += 1
-        else:
-            # 표준 4-on-the-floor + 가변 BPM 간격
-            t = 0.0
-            beat_idx = 0
-            while t < self.duration:
-                beat_interval = 60.0 / bpm_at(t)
-                pos = int(t * self.sr)
-                if pos >= self.total_samples:
-                    break
+            t += bar_duration
+            bar_idx += 1
 
-                beat_in_bar = beat_idx % 4
+        total_bars = bar_idx
+        print(f"    → {total_bars} bars rendered", flush=True)
 
-                # 킥: beat 0, 2
-                if beat_in_bar in [0, 2]:
-                    end = min(pos + len(k), self.total_samples)
-                    kick_full[pos:end] += k[:end - pos]
-
-                # 하이햇: 매 비트 (open=1,3 / closed=0,2)
-                is_open = beat_in_bar in [1, 3]
-                h = hi_hat(open_hat=is_open, sr=self.sr)
-                pan = 0.15 if is_open else -0.1
-                s = stereo_pan(h, pan)
-                end = min(pos + len(h), self.total_samples)
-                hihat_full_L[pos:end] += s[:end - pos, 0]
-                hihat_full_R[pos:end] += s[:end - pos, 1]
-
-                t += beat_interval
-                beat_idx += 1
+        # F-6: highlight_words accent — 킥+스네어 동시 히트
+        accent_count = 0
+        for at in self._accent_times:
+            pos = int(at * self.sr)
+            if 0 <= pos < self.total_samples:
+                end_k = min(pos + len(k), self.total_samples)
+                kick_full[pos:end_k] += k[:end_k - pos] * 1.5  # 강조 볼륨
+                end_s = min(pos + len(sn), self.total_samples)
+                snare_full[pos:end_s] += sn[:end_s - pos] * 1.2
+                accent_count += 1
+        if accent_count:
+            print(f"    → {accent_count} accent hits placed", flush=True)
 
         # 볼륨 엔벨로프 적용
         kick_vol_env = smooth_envelope(
@@ -1214,12 +1307,18 @@ class EnometaMusicEngine:
             self.total_samples, sections, "hi_hat", "volume",
             default=0.0, morph_sec=0.5, sr=self.sr
         )
+        # 스네어는 킥 볼륨 엔벨로프를 공유 (별도 악기 키 없으면)
+        snare_vol_env = kick_vol_env
 
-        si_g = self._si_gate[:self.total_samples]  # v7-P8: si gate
-        self.master_L += kick_full * kick_vol_env * si_g * 2.5  # v10: 1.2 → 2.5 (킥 강화)
-        self.master_R += kick_full * kick_vol_env * si_g * 2.5
-        self.master_L += hihat_full_L * hihat_vol_env * si_g * 1.8  # v10: 1.0 → 1.8
-        self.master_R += hihat_full_R * hihat_vol_env * si_g * 1.8
+        si_g = self._si_gate[:self.total_samples]
+        # F-7: 콜앤리스폰스 드럼 엔벨로프
+        cr_d = self._cr_drum_env[:self.total_samples] if hasattr(self, '_cr_drum_env') else 1.0
+        self.master_L += kick_full * kick_vol_env * si_g * cr_d * 2.5
+        self.master_R += kick_full * kick_vol_env * si_g * cr_d * 2.5
+        self.master_L += snare_full * snare_vol_env * si_g * cr_d * 2.0
+        self.master_R += snare_full * snare_vol_env * si_g * cr_d * 2.0
+        self.master_L += hihat_full_L * hihat_vol_env * si_g * cr_d * 1.8
+        self.master_R += hihat_full_R * hihat_vol_env * si_g * cr_d * 1.8
 
     def _render_continuous_sub_pulse(self, sections):
         """전체 길이 서브 펄스"""
@@ -1417,20 +1516,34 @@ class EnometaMusicEngine:
         self._add_stereo(pt, random.uniform(-0.3, 0.3), 0, 1.0)
 
     def _render_continuous_saw_sequence(self, sections):
-        """v9: 전체 길이 쏘우파 게이트 시퀀서 — ikeda 리듬의 핵심 뼈대
+        """v9: 전체 길이 쏘우파 게이트 시퀀서 — enometa 리듬의 핵심 뼈대
         '뚜두두 뚜두 뚜 뚜 뚜~' 패턴을 섹션별 감정에 따라 변화시킴.
         고에너지 섹션 → 16분음표 빠른 패턴 / 저에너지 → 4분음표 느린 패턴
         """
         print("  [saw_seq] continuous sawtooth gate sequencer...", flush=True)
         bpm = self.script.get("metadata", {}).get("base_bpm", 120)
 
-        # 섹션별 쏘우파 시퀀스 렌더링 (에너지별 패턴 다름)
+        # F-4: 에너지별 다중 패턴 + 4바 로테이션
         SAW_PATTERNS = {
-            # energy 레벨별 게이트 패턴 (1=on, 0=rest로 해석하지 않고 음정 비율)
-            "high":   [1, 1, 0.75, 1.5, 1, 1, 2, 0.5],   # 16분음표, 역동적
-            "mid":    [1, 1.5, 1, 0.75, 1.333, 1],          # 8분음표, 중간
-            "low":    [1, 1.5, 2, 1.5],                      # 4분음표, 느긋
-            "tension":[1, 1, 1, 1.5, 0.75, 1, 1.25, 0.5],  # 반복+긴장
+            # energy 레벨별 게이트 패턴 (음정 비율). 4바마다 순환.
+            "high": [
+                [1, 1, 0.75, 1.5, 1, 1, 2, 0.5],         # A: 기본 역동
+                [1, 0.75, 1, 1.5, 2, 1, 0.75, 1],         # B: 변형
+                [1, 1, 1, 0.5, 1.5, 1.5, 2, 1],           # C: 옥타브 강조
+            ],
+            "mid": [
+                [1, 1.5, 1, 0.75, 1.333, 1],              # A: 기본
+                [1, 0.75, 1.333, 1, 1.5, 1],              # B: 역행
+            ],
+            "low": [
+                [1, 1.5, 2, 1.5],                          # A: 기본
+                [1, 2, 1.5, 1],                            # B: 역행
+            ],
+            "tension": [
+                [1, 1, 1, 1.5, 0.75, 1, 1.25, 0.5],      # A: 기본
+                [1, 1, 0.75, 0.75, 1, 1, 1.5, 1.5],       # B: 쌍둥이
+                [0.5, 1, 0.5, 1, 0.5, 1, 1.5, 2],         # C: 계단
+            ],
         }
         GATE_DIV = {
             "high": 16, "mid": 8, "low": 4, "tension": 16
@@ -1441,6 +1554,9 @@ class EnometaMusicEngine:
         # 디튠된 쏘우 시퀀스 (R 채널, 약간 높은 음역)
         saw_R = np.zeros(self.total_samples)
 
+        # F-4: 바 카운터 기반 — 섹션 내에서 4바마다 패턴 인덱스 순환
+        bar_counter = 0  # 전체 곡 기준 바 카운터
+
         for sec in sections:
             energy = sec.get("energy", 0.3)
             emotion = sec.get("emotion", "neutral")
@@ -1450,7 +1566,7 @@ class EnometaMusicEngine:
             if dur < 0.1:
                 continue
 
-            # 패턴 선택
+            # 패턴 키 선택 (에너지/감정 기반)
             if "tension" in emotion or "frustrated" in emotion:
                 pat_key = "tension"
             elif energy >= 0.7:
@@ -1460,36 +1576,62 @@ class EnometaMusicEngine:
             else:
                 pat_key = "low"
 
-            pattern = SAW_PATTERNS[pat_key]
             gate_div = GATE_DIV[pat_key]
-            note_len = 0.85 if pat_key in ["low", "mid"] else 0.6  # 빠른 패턴은 더 스타카토
+            note_len = 0.85 if pat_key in ["low", "mid"] else 0.6
 
-            # 쏘우 시퀀스 생성 (메인: bass_freq, 디튠: bass_freq * 1.003)
-            chunk_L = saw_sequence(self.bass_freq, dur, pattern,
-                                   gate_div=gate_div, note_len_ratio=note_len,
-                                   bpm=bpm, distort=True, sr=self.sr)
-            chunk_R = saw_sequence(self.bass_freq * 1.003, dur, pattern,
-                                   gate_div=gate_div, note_len_ratio=note_len,
-                                   bpm=bpm, distort=True, sr=self.sr)
-            # 섹션 내 페이드
-            fade_s = min(int(0.05 * self.sr), len(chunk_L) // 4)
-            if fade_s > 0:
-                chunk_L[:fade_s] *= np.linspace(0, 1, fade_s)
-                chunk_R[:fade_s] *= np.linspace(0, 1, fade_s)
-                chunk_L[-fade_s:] *= np.linspace(1, 0, fade_s)
-                chunk_R[-fade_s:] *= np.linspace(1, 0, fade_s)
+            # 섹션을 4바 청크로 분할, 각 청크마다 패턴 로테이션
+            bar_dur = (60.0 / bpm) * 4  # 4/4 1바 길이
+            chunk_bars = 4  # 4바마다 패턴 전환
+            chunk_dur = bar_dur * chunk_bars
+            pat_list = SAW_PATTERNS[pat_key]
 
-            chunk_len = end - start
-            saw_L[start:end] += chunk_L[:chunk_len]
-            saw_R[start:end] += chunk_R[:chunk_len]
+            sec_t = 0.0  # 섹션 내 상대 시간
+            while sec_t < dur:
+                # 4바 로테이션: 전체 바 카운터 기반
+                pat_idx = (bar_counter // chunk_bars) % len(pat_list)
+                pattern = pat_list[pat_idx]
+
+                # 이번 청크 길이 (섹션 끝 넘지 않도록)
+                this_chunk_dur = min(chunk_dur, dur - sec_t)
+                if this_chunk_dur < 0.05:
+                    break
+
+                # 쏘우 시퀀스 생성
+                chunk_L = saw_sequence(self.bass_freq, this_chunk_dur, pattern,
+                                       gate_div=gate_div, note_len_ratio=note_len,
+                                       bpm=bpm, distort=True, sr=self.sr)
+                chunk_R = saw_sequence(self.bass_freq * 1.003, this_chunk_dur, pattern,
+                                       gate_div=gate_div, note_len_ratio=note_len,
+                                       bpm=bpm, distort=True, sr=self.sr)
+
+                # 청크 페이드 (짧은 크로스페이드)
+                fade_s = min(int(0.03 * self.sr), len(chunk_L) // 4)
+                if fade_s > 0:
+                    chunk_L[:fade_s] *= np.linspace(0, 1, fade_s)
+                    chunk_R[:fade_s] *= np.linspace(0, 1, fade_s)
+                    chunk_L[-fade_s:] *= np.linspace(1, 0, fade_s)
+                    chunk_R[-fade_s:] *= np.linspace(1, 0, fade_s)
+
+                # 버퍼에 배치
+                abs_start = start + int(sec_t * self.sr)
+                abs_end = min(abs_start + len(chunk_L), end, self.total_samples)
+                chunk_len = abs_end - abs_start
+                if chunk_len > 0:
+                    saw_L[abs_start:abs_end] += chunk_L[:chunk_len]
+                    saw_R[abs_start:abs_end] += chunk_R[:chunk_len]
+
+                sec_t += this_chunk_dur
+                bar_counter += chunk_bars
 
         # 섹션별 볼륨 모핑
         vol_env = smooth_envelope(
             self.total_samples, sections, "saw_sequence", "volume",
             default=0.7, morph_sec=0.8, sr=self.sr  # v10: 0.4 → 0.7 (베이스라인 강화)
         )
-        saw_L *= vol_env * self._si_gate[:self.total_samples]
-        saw_R *= vol_env * self._si_gate[:self.total_samples]
+        # F-7: 콜앤리스폰스 멜로디 엔벨로프
+        cr_m = self._cr_melody_env[:self.total_samples] if hasattr(self, '_cr_melody_env') else 1.0
+        saw_L *= vol_env * self._si_gate[:self.total_samples] * cr_m
+        saw_R *= vol_env * self._si_gate[:self.total_samples] * cr_m
 
         saw_L = fade_in(fade_out(saw_L, 2.0), 0.5)
         saw_R = fade_in(fade_out(saw_R, 2.0), 0.5)
@@ -1707,7 +1849,8 @@ class EnometaMusicEngine:
     def _render_section_textures(self, section):
         """섹션별 텍스처 악기 렌더링 (클릭, 글리치, 쉬머, 스윕, 리드, 애시드)
 
-        v7-P5: 텍스처 기여분에 fade-in/fade-out 적용 → 씬 전환 크로스페이드
+        v7-P5 + F-8: 텍스처 기여분에 fade-in/fade-out 적용 → 섹션 간 크로스페이드
+        F-8: fade duration을 늘리고 raised cosine 블렌드로 더 부드러운 전환
         """
         start = section["start_sec"]
         dur = section["end_sec"] - section["start_sec"]
@@ -1717,7 +1860,7 @@ class EnometaMusicEngine:
         effects = section.get("effects", {})
         stereo_width = effects.get("stereo_width", 0.5)
 
-        # v7-P5 크로스페이드: 텍스처 렌더 전 마스터 버퍼 스냅샷
+        # F-8: 크로스페이드 영역 확장 — 텍스처 렌더 전 마스터 버퍼 스냅샷
         sec_start_sample = int(self.sr * start)
         sec_end_sample = min(int(self.sr * section["end_sec"]), self.total_samples)
         snapshot_L = self.master_L[sec_start_sample:sec_end_sample].copy()
@@ -1989,16 +2132,17 @@ class EnometaMusicEngine:
                 t_click += random.uniform(interval * 0.7, interval * 1.3)
                 freq_idx += 1
 
-        # v7-P5 크로스페이드: 텍스처 기여분(delta)에 fade-in/fade-out 적용
-        fade_duration = min(0.5, dur * 0.15)  # 최대 0.5초 또는 섹션 길이의 15%
+        # F-8: 텍스처 크로스페이드 — raised cosine으로 더 부드러운 전환
+        fade_duration = min(1.0, dur * 0.20)  # F-8: 0.5→1.0초, 15%→20% (더 넉넉한 크로스페이드)
         fade_samples = int(fade_duration * self.sr)
         seg_len = sec_end_sample - sec_start_sample
         if fade_samples > 0 and seg_len > 2 * fade_samples:
             delta_L = self.master_L[sec_start_sample:sec_end_sample] - snapshot_L
             delta_R = self.master_R[sec_start_sample:sec_end_sample] - snapshot_R
 
-            fade_in_env = np.linspace(0, 1, fade_samples)
-            fade_out_env = np.linspace(1, 0, fade_samples)
+            # F-8: raised cosine (linear → cosine) — 더 자연스러운 에너지 전환
+            fade_in_env = 0.5 * (1 - np.cos(np.linspace(0, np.pi, fade_samples)))
+            fade_out_env = 0.5 * (1 + np.cos(np.linspace(0, np.pi, fade_samples)))
             delta_L[:fade_samples] *= fade_in_env
             delta_R[:fade_samples] *= fade_in_env
             delta_L[-fade_samples:] *= fade_out_env
@@ -2014,11 +2158,31 @@ class EnometaMusicEngine:
             with open(script_data_path, 'r', encoding='utf-8') as f:
                 self._script_data = json.load(f)
             print(f"  Script data loaded: {script_data_path}")
+            # F-6: highlight_words → accent times 빌드
+            self._build_accent_times()
+
+    def _build_accent_times(self):
+        """F-6: script_data 세그먼트에서 highlight_words 포함 세그먼트의 시작 시간 추출"""
+        if not self._highlight_words or not self._script_data:
+            return
+        segments = self._script_data.get("segments", [])
+        accent_set = set()
+        for seg in segments:
+            text = seg.get("text", "")
+            for hw in self._highlight_words:
+                if hw in text:
+                    t = seg.get("start_sec", None)
+                    if t is not None:
+                        accent_set.add(round(t, 3))
+                    break
+        self._accent_times = sorted(accent_set)
+        if self._accent_times:
+            print(f"  [F-6] Accent times: {len(self._accent_times)} hits for {self._highlight_words}")
 
     def _script_data_enrichment(self, sections):
         """script_data로 섹션별 악기 파라미터를 장르에 맞게 풍부화 (v7-P3)
 
-        ikeda는 기존 로직(data_click freq) 유지.
+        enometa는 기존 로직(data_click freq) 유지.
         나머지 5개 장르: 숫자/키워드/바이트 데이터를 악기 파라미터에 매핑.
         """
         if not self._script_data:
@@ -2087,7 +2251,7 @@ class EnometaMusicEngine:
                         chip["pattern"] = ratios
                         enriched += 1
 
-            # ikeda는 기존 data_click 로직 유지 (이미 _render_section_textures에서 처리)
+            # enometa는 기존 data_click 로직 유지 (이미 _render_section_textures에서 처리)
 
         if enriched > 0:
             print(f"  [script_data] {genre}: enriched {enriched} instrument params", flush=True)
@@ -2135,7 +2299,7 @@ class EnometaMusicEngine:
         sections = self.script.get("sections", [])
         total = len(sections)
         overrides = self.script.get("metadata", {}).get("synthesis_overrides", {})
-        is_ikeda = overrides.get("ikeda_mode", False)
+        is_enometa = overrides.get("enometa_mode", False)
         arc_name = self.script.get("metadata", {}).get("song_arc", "narrative")
         print(f"  Rendering {total} sections as one continuous track...", flush=True)
         print(f"  Song arc: {arc_name} ({SONG_ARC_PRESETS.get(arc_name, {}).get('description', '?')})", flush=True)
@@ -2160,7 +2324,7 @@ class EnometaMusicEngine:
         # v9: si 기반 레이어 밀도 동적 제어
         # 상위 레이어는 si 낮은 섹션에서 볼륨 감소 → 미니멀 구간 실현
         # scale = si^1.5 (비선형: 낮을수록 급격히 감소, si=0.25→0.09, si=0.5→0.35, si=1.0→1.0)
-        if self._script_data and is_ikeda:
+        if self._script_data and is_enometa:
             sd_segs = self._script_data.get("segments", [])
             density_layers = ["saw_sequence", "arpeggio", "pulse_train", "ultrahigh",
                                "sine_interference", "gate_stutter"]
@@ -2181,7 +2345,10 @@ class EnometaMusicEngine:
         self._song_arc_env = self._compute_song_arc(arc_name)
         self._song_arc_name = arc_name
 
-        if is_ikeda:
+        # F-7: 콜앤리스폰스 엔벨로프 사전 계산
+        self._cr_drum_env, self._cr_melody_env = self._compute_call_response_envelopes()
+
+        if is_enometa:
             # v9 Ikeda 확장: 쏘우파 시퀀서 + 리듬 + 아르페지오 + 펄스 트레인 + 드론
             # 레이어 1: 리듬 뼈대 (킥 + 하이햇)
             self._render_continuous_rhythm(sections)
@@ -2192,7 +2359,7 @@ class EnometaMusicEngine:
             # 레이어 4: 서브 베이스 드론 (바닥 에너지)
             self._render_continuous_bass(sections)
             self._render_continuous_sub_pulse(sections)
-            # 레이어 5: ikeda 시그니처 텍스처 (사인파 간섭, 펄스, 초고주파)
+            # 레이어 5: enometa 시그니처 텍스처 (사인파 간섭, 펄스, 초고주파)
             self._render_continuous_sine_interference(sections)
             self._render_continuous_pulse_train(sections)
             self._render_continuous_ultrahigh(sections)
@@ -2227,14 +2394,20 @@ class EnometaMusicEngine:
             self.master_L *= self._si_modulation
             self.master_R *= self._si_modulation
 
+        # F-5: 호흡 시스템 — 8~16바 주기 미시적 에너지 딥
+        breath_env = self._compute_breath_envelope()
+        print(f"  Applying breath envelope (min={breath_env.min():.2f})...", flush=True)
+        self.master_L *= breath_env
+        self.master_R *= breath_env
+
         return self._master()
 
     def _master(self) -> np.ndarray:
-        """마스터링 v8: ikeda 단일 마스터링 체인 — tanh(1.2) + RMS -10dB + 페이드"""
-        print("  Mastering v8 (ikeda: saturation + RMS normalize)...", flush=True)
+        """마스터링 v11: enometa 마스터링 체인 — tanh(1.5) + RMS -6dB + 페이드"""
+        print("  Mastering v11 (enometa: saturation + RMS normalize)...", flush=True)
         stereo = np.column_stack([self.master_L, self.master_R])
 
-        # v8: ikeda 마스터링 — 부드러운 새츄레이션
+        # v11: enometa 마스터링 — 부드러운 새츄레이션
         peak = np.max(np.abs(stereo))
         if peak > 0:
             stereo = stereo / peak
@@ -2264,6 +2437,100 @@ class EnometaMusicEngine:
         return audio_16bit
 
     # ============================================================
+    # F-5: 호흡 엔벨로프 — 미시적 에너지 딥
+    # ============================================================
+
+    def _compute_breath_envelope(self) -> np.ndarray:
+        """8~16바 주기의 미시적 호흡: 바 단위 에너지 딥(dip)
+
+        Song arc(매크로)와 보완하는 미시적 에너지 변조.
+        매 8바의 7번째 바: 85%, 매 16바의 15번째 바: 70% (큰 호흡).
+        0.3초 스무딩으로 계단 제거.
+        """
+        breath = np.ones(self.total_samples, dtype=np.float64)
+        bar_dur = (60.0 / self.bpm) * 4  # 4/4 1바 (기본 BPM 기준)
+        bar_samples = max(1, int(bar_dur * self.sr))
+        total_bars = self.total_samples // bar_samples
+
+        for bar in range(total_bars):
+            start = bar * bar_samples
+            end = min(start + bar_samples, self.total_samples)
+
+            # 매 16바의 15번째: 더 깊은 호흡 (0.70)
+            if bar % 16 == 14:
+                breath[start:end] = 0.70
+            # 매 8바의 7번째: 가벼운 호흡 (0.85)
+            elif bar % 8 == 6:
+                breath[start:end] = 0.85
+
+        # 0.3초 cumsum 스무딩 (계단 → 부드러운 곡선)
+        window = int(0.3 * self.sr)
+        if window > 1 and self.total_samples > window:
+            cumsum = np.cumsum(breath)
+            cumsum = np.insert(cumsum, 0, 0)
+            smoothed = (cumsum[window:] - cumsum[:-window]) / window
+            pad_left = window // 2
+            pad_right = self.total_samples - len(smoothed) - pad_left
+            breath = np.concatenate([
+                np.full(pad_left, smoothed[0]),
+                smoothed,
+                np.full(max(0, pad_right), smoothed[-1])
+            ])[:self.total_samples]
+
+        return breath
+
+    def _compute_call_response_envelopes(self) -> tuple:
+        """F-7: 콜앤리스폰스 — 드럼/멜로디 교대 gain 엔벨로프
+
+        2바 주기로 드럼↔멜로디 gain이 교대:
+        - 홀수 2바 그룹: 드럼 100%, 멜로디 75%
+        - 짝수 2바 그룹: 드럼 75%, 멜로디 100%
+        SI 0.3~0.7 구간에서만 활성 (극단값은 교대 불필요).
+        """
+        drum_env = np.ones(self.total_samples, dtype=np.float64)
+        melody_env = np.ones(self.total_samples, dtype=np.float64)
+        bar_dur = (60.0 / self.bpm) * 4
+        bar_samples = max(1, int(bar_dur * self.sr))
+        total_bars = self.total_samples // bar_samples
+
+        for bar in range(total_bars):
+            start = bar * bar_samples
+            end = min(start + bar_samples, self.total_samples)
+
+            # SI 체크: 해당 바 중앙의 SI
+            mid_idx = min((start + end) // 2, self.total_samples - 1)
+            si_val = float(self._si_env[mid_idx]) if self._si_env is not None else 0.5
+
+            # SI 0.3~0.7 에서만 활성
+            if 0.3 <= si_val <= 0.7:
+                group = (bar // 2) % 2  # 0 또는 1
+                if group == 0:
+                    # 드럼 강조, 멜로디 절제
+                    drum_env[start:end] = 1.0
+                    melody_env[start:end] = 0.75
+                else:
+                    # 멜로디 강조, 드럼 절제
+                    drum_env[start:end] = 0.75
+                    melody_env[start:end] = 1.0
+
+        # 0.2초 스무딩
+        window = int(0.2 * self.sr)
+        if window > 1 and self.total_samples > window:
+            for env in [drum_env, melody_env]:
+                cumsum = np.cumsum(env)
+                cumsum = np.insert(cumsum, 0, 0)
+                smoothed = (cumsum[window:] - cumsum[:-window]) / window
+                pad_left = window // 2
+                pad_right = self.total_samples - len(smoothed) - pad_left
+                result = np.concatenate([
+                    np.full(pad_left, smoothed[0]),
+                    smoothed,
+                    np.full(max(0, pad_right), smoothed[-1])
+                ])[:self.total_samples]
+                env[:] = result
+
+        return drum_env, melody_env
+
     # Song Arc — 기승전결 매크로 에너지 엔벨로프
     # ============================================================
 
@@ -2766,7 +3033,7 @@ EMOTION_MAP = {
         "sub_pulse": {"active": True, "volume": 0.9},
         "stutter_gate": {"active": True, "divisions": 16, "blend": 0.4},
         "bytebeat": {"active": True, "volume": 0.25, "formula": "industrial"},
-        "feedback": {"active": True, "volume": 0.1},  # v8 C-2: ikeda 피드백 텍스처
+        "feedback": {"active": True, "volume": 0.1},  # v8 C-2: enometa 피드백 텍스처
         "chiptune_lead": {"active": False},
         "chiptune_drum": {"active": False},
     },
@@ -3033,12 +3300,12 @@ SONG_ARC_PRESETS = {
 
 
 # ============================================================
-# 장르 프리셋 v8 — ENOMETA Single Genre: ikeda
-# 6장르 통합 → ikeda 단일 장르 + 타 장르 요소 흡수
+# 장르 프리셋 v11 — ENOMETA Single Genre: enometa (대본 리액티브 댄스 뮤직)
+# 6장르 통합 → enometa 단일 장르 + 패턴 엔진
 # ============================================================
 
 GENRE_PRESETS = {
-    "ikeda": {
+    "enometa": {
         # v9: BPM 135 (Matrix 스타일 — 텐션 피크에서 162BPM까지 변조됨)
         "bpm_override": 135,
         "volume_scale": {
@@ -3049,7 +3316,7 @@ GENRE_PRESETS = {
             "arpeggio": 0.5,      # 아르페지오 서포트
             "bass_drone": 0.4,    # 드론 서브
             "sub_pulse": 0.35,    # 서브 베이스
-            # ikeda 시그니처 텍스처
+            # enometa 시그니처 텍스처
             "sine_interference": 0.8,
             "data_click": 0.9,
             "pulse_train": 0.7,
@@ -3068,10 +3335,10 @@ GENRE_PRESETS = {
         # v9: acid_bass + chiptune_lead 허용 (EMOTION_MAP에서 제어)
         "force_inactive": ["chiptune_lead", "chiptune_drum"],  # B-4: fm_bass, synth_lead 제거
         "synthesis_overrides": {
-            "ikeda_mode": True,
+            "enometa_mode": True,
             "rhythm_mode": "euclidean",  # 유클리드 리듬 패턴 유지
         },
-        "description": "ENOMETA v9 — Matrix 스타일 확장 ikeda: 쏘우파 시퀀서 + 강한 리듬 + 디스토션 텍스처",
+        "description": "ENOMETA v11 — 대본 리액티브 댄스 뮤직: 패턴 엔진 + 드럼 뼈대 + build/drop 문법",
     },
 }
 
@@ -3107,6 +3374,107 @@ ARP_PATTERNS = [
     [1, 2, 1.5, 1.25],                  # 4음 역행
     [1, 1.25, 1.5, 2, 1.75, 1.5, 1.25, 1],  # 8음 호흡
 ]
+
+# ── F-2: 16-step 드럼 패턴 라이브러리 ────────────────────────────
+# 각 패턴: kick/snare/hihat — 16-step boolean 배열 (4/4, 1바)
+# None → euclidean_rhythm()으로 동적 생성
+DRUM_PATTERNS = {
+    # ── 기본 그루브 ──
+    "four_on_floor": {
+        "kick":   [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0],
+        "snare":  [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+        "hihat":  [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0],
+    },
+    "offbeat": {
+        "kick":   [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,0,1,0],
+        "snare":  [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,1],
+        "hihat":  [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1],
+    },
+    # ── 유클리드 ──
+    "euclidean_3_8": {
+        "kick":   None,  # E(3,16) 동적 생성
+        "snare":  [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+        "hihat":  None,  # E(5,16) 동적 생성
+    },
+    "euclidean_5_16": {
+        "kick":   None,  # E(5,16) 동적 생성
+        "snare":  [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0],
+        "hihat":  None,  # E(7,16) 동적 생성
+    },
+    # ── 미니멀 (SI 낮을 때) ──
+    "minimal": {
+        "kick":   [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0],
+        "snare":  [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+        "hihat":  [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0],
+    },
+    # ── 인텐스 (SI 높을 때) ──
+    "driving": {
+        "kick":   [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0],
+        "snare":  [0,0,0,0, 1,0,0,1, 0,0,0,0, 1,0,0,1],
+        "hihat":  [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1],
+    },
+    # ── 필 패턴 ──
+    "fill_buildup": {
+        "kick":   [1,0,1,0, 1,0,1,1, 1,1,1,0, 1,1,1,1],
+        "snare":  [0,0,0,1, 0,0,1,0, 0,1,0,1, 1,0,1,0],
+        "hihat":  [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1],
+    },
+    "fill_snare_roll": {
+        "kick":   [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+        "snare":  [0,0,1,0, 1,0,1,0, 1,1,1,0, 1,1,1,1],
+        "hihat":  [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+    },
+    # ── 드롭 (silence → impact) ──
+    "drop_silence": {
+        "kick":   [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+        "snare":  [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+        "hihat":  [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+    },
+    "drop_impact": {
+        "kick":   [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0],
+        "snare":  [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+        "hihat":  [0,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0],
+    },
+}
+
+
+def _select_drum_pattern(si: float, emotion: str = "") -> str:
+    """SI + emotion → 드럼 패턴 이름 선택"""
+    if "climax" in emotion:
+        return "driving"
+    if "tension" in emotion:
+        return "offbeat"
+    if si >= 0.85:
+        return "driving"
+    if si >= 0.6:
+        return "offbeat" if "tension" in emotion else "euclidean_5_16"
+    if si >= 0.3:
+        return "four_on_floor"
+    return "minimal"
+
+
+def _resolve_drum_pattern(name: str) -> dict:
+    """패턴 이름 → 실제 16-step 배열 (None은 유클리드로 생성)"""
+    pat = DRUM_PATTERNS[name]
+    resolved = {}
+    for inst in ("kick", "snare", "hihat"):
+        arr = pat[inst]
+        if arr is None:
+            # 유클리드 패턴 동적 생성
+            if name == "euclidean_3_8":
+                if inst == "kick":
+                    arr = euclidean_rhythm(3, 16)
+                else:  # hihat
+                    arr = euclidean_rhythm(5, 16)
+            elif name == "euclidean_5_16":
+                if inst == "kick":
+                    arr = euclidean_rhythm(5, 16)
+                else:  # hihat
+                    arr = euclidean_rhythm(7, 16)
+            else:
+                arr = [0] * 16
+        resolved[inst] = arr
+    return resolved
 
 
 def _load_music_history(project_dir: str) -> dict:
@@ -3257,21 +3625,23 @@ def _quantize_to_bar(time_sec: float, bar_duration: float) -> float:
 
 
 def generate_music_script(visual_script: dict, narration_timing: dict = None,
-                          genre: str = "ikeda", episode: str = None,
+                          genre: str = "enometa", episode: str = None,
                           project_dir: str = None) -> dict:
     """
     visual_script.json + narration_timing.json → music_script.json
     대본의 씬별 감정을 읽어서 악기 배치를 자동 결정.
-    genre: v8부터 ikeda 단일 장르. 하위호환을 위해 파라미터 유지.
+    genre: v8부터 enometa 단일 장르. 하위호환을 위해 파라미터 유지.
     episode: 에피소드 ID (ep006 등) — 이력 추적용
     project_dir: 프로젝트 루트 — music_history.json 위치
     """
-    # v8: ikeda 단일 장르 — 다른 장르가 전달되면 경고 후 ikeda 사용
-    if genre and genre != "ikeda":
-        print(f"  [v8 WARNING] Genre '{genre}' is deprecated. Using 'ikeda' (single genre system).")
-        genre = "ikeda"
+    # v11: enometa 단일 장르 — 하위호환: "ikeda" 입력 시 자동 매핑
+    if genre == "ikeda":
+        genre = "enometa"
+    if genre and genre != "enometa":
+        print(f"  [v11 WARNING] Genre '{genre}' is deprecated. Using 'enometa' (single genre system).")
+        genre = "enometa"
     if not genre:
-        genre = "ikeda"
+        genre = "enometa"
 
     scenes = visual_script.get("scenes", [])
     title = visual_script.get("title", "ENOMETA")
@@ -3280,8 +3650,8 @@ def generate_music_script(visual_script: dict, narration_timing: dict = None,
     # 엔드카드(6초) + 여유(2초) 포함하여 BGM이 엔드카드까지 이어지도록
     total_duration = total_duration + 8
 
-    # v8: 항상 ikeda 프리셋 적용
-    genre_preset = GENRE_PRESETS["ikeda"]
+    # v11: 항상 enometa 프리셋 적용
+    genre_preset = GENRE_PRESETS["enometa"]
     base_bpm = genre_preset["bpm_override"]
 
     sections = []
@@ -3406,8 +3776,8 @@ def generate_music_script(visual_script: dict, narration_timing: dict = None,
     if sections:
         total_duration = sections[-1]["end_sec"]
 
-    genre_label = "ikeda"  # v8: always ikeda
-    synthesis_overrides = {"ikeda_mode": True}  # v8: always ikeda mastering
+    genre_label = "enometa"  # v11: always enometa
+    synthesis_overrides = {"enometa_mode": True}  # v11: always enometa mastering
 
     # v7-P7: 에피소드 이력 기반 키/패턴 자동 선택
     music_history = _load_music_history(project_dir) if project_dir else {"episodes": {}}
@@ -3441,6 +3811,9 @@ def generate_music_script(visual_script: dict, narration_timing: dict = None,
             if isinstance(inst_val, dict) and inst_val.get("active", False):
                 dominant_instruments.add(inst_key)
 
+    # F-6: visual_script → highlight_words 전달
+    highlight_words = visual_script.get("highlightWords", [])
+
     music_script = {
         "metadata": {
             "title": title,
@@ -3451,6 +3824,7 @@ def generate_music_script(visual_script: dict, narration_timing: dict = None,
             "genre": genre_label,
             "song_arc": "narrative",
             "synthesis_overrides": synthesis_overrides,
+            "highlight_words": highlight_words,
         },
         "palette": {
             "bass_freq": key_palette["bass_freq"],
@@ -3499,17 +3873,17 @@ def generate_music_script(visual_script: dict, narration_timing: dict = None,
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description="ENOMETA Generative Music Engine v8 (ikeda single genre)")
+    parser = argparse.ArgumentParser(description="ENOMETA Generative Music Engine v11 (pattern engine)")
     parser.add_argument("input", help="music_script.json 또는 --from-visual 모드")
     parser.add_argument("extra", nargs="*", help="추가 인자")
     parser.add_argument("--from-visual", action="store_true", dest="from_visual",
                         help="visual_script.json에서 자동 생성")
-    parser.add_argument("--genre", default="ikeda",
-                        help="v8: ikeda 단일 장르 (하위호환용 — 다른 값 무시)")
+    parser.add_argument("--genre", default="enometa",
+                        help="v11: enometa 단일 장르 (하위호환: ikeda 입력 시 자동 매핑)")
     parser.add_argument("--export-raw", action="store_true", dest="export_raw",
                         help="raw_visual_data.npz 동시 출력 (Hybrid Visual Architecture)")
     parser.add_argument("--script-data", dest="script_data",
-                        help="script_data.json 경로 (ikeda 장르용)")
+                        help="script_data.json 경로 (enometa 장르용)")
     parser.add_argument("--arc", choices=list(SONG_ARC_PRESETS.keys()),
                         default=None,
                         help=f"Song arc: {', '.join(SONG_ARC_PRESETS.keys())} (기본: metadata 또는 narrative)")
@@ -3545,15 +3919,17 @@ def main():
         if not output_path:
             output_path = os.path.join(os.path.dirname(visual_path), "bgm.wav")
 
-        # --genre 플래그 체크 (v8: 하위호환 — 항상 ikeda 사용)
+        # --genre 플래그 체크 (v11: 하위호환 — 항상 enometa 사용)
         genre = args.genre
         if not genre:
             for i, u in enumerate(unknown):
                 if u == "--genre" and i + 1 < len(unknown):
                     genre = unknown[i + 1]
-        if genre and genre != "ikeda":
-            print(f"  [v8 WARNING] --genre '{genre}' is deprecated. Using 'ikeda'.")
-        genre = "ikeda"  # v8: always ikeda
+        if genre == "ikeda":
+            genre = "enometa"
+        if genre and genre != "enometa":
+            print(f"  [v11 WARNING] --genre '{genre}' is deprecated. Using 'enometa'.")
+        genre = "enometa"  # v11: always enometa
 
         with open(visual_path, 'r', encoding='utf-8') as f:
             visual_script = json.load(f)
@@ -3565,7 +3941,7 @@ def main():
 
         print("=== ENOMETA v8 Music Script Generator ===")
         print(f"Visual script: {visual_path}")
-        print(f"Genre: ikeda - {GENRE_PRESETS['ikeda']['description']}")
+        print(f"Genre: enometa - {GENRE_PRESETS['enometa']['description']}")
         # v7-P7: --episode CLI 옵션
         episode = args.episode
         if not episode:
@@ -3616,7 +3992,7 @@ def main():
 
     engine = EnometaMusicEngine(music_script)
 
-    # script_data 로딩 (ikeda 장르용)
+    # script_data 로딩 (enometa 장르용)
     script_data_path = args.script_data
     if not script_data_path:
         for i, u in enumerate(unknown):
