@@ -1016,9 +1016,9 @@ class EnometaMusicEngine:
 
         si = self._si_env
 
-        # 연속 게이트: np.clip(0.45 + si * 1.1, 0.45, 1.0)
-        # si=0→0.45, si=0.2→0.67, si=0.5→1.0, si=1.0→1.0
-        gate = np.clip(0.45 + si * 1.1, 0.45, 1.0)
+        # 연속 게이트: np.clip(0.25 + si * 0.75, 0.25, 1.0)
+        # B-3: si=0→0.25(침묵 아닌 미니멀), si=0.5→0.625, si=1.0→1.0
+        gate = np.clip(0.25 + si * 0.75, 0.25, 1.0)
 
         # 1.0초 cumsum 스무딩 (급변 방지)
         window = int(1.0 * self.sr)
@@ -2142,7 +2142,7 @@ class EnometaMusicEngine:
 
         # semantic_intensity 엔벨로프 사전 빌드 (adaptive arc가 참조하므로 arc 전에 빌드)
         self._si_env = self._build_si_envelope()
-        self._si_modulation = 0.95 + self._si_env * 0.1  # v10: si=0→0.95, si=1→1.05 (거의 상수 — 전구간 공격적 유지)
+        self._si_modulation = 0.80 + self._si_env * 0.25  # B-2: si=0→0.80, si=1→1.05 (변화폭 31% — EP006 실패 반복 않되 대비 복원)
         self._si_gate = self._build_si_gate()  # v7-P8: 연속 악기 si 게이트
         self._tempo_curve = self._compute_tempo_curve()  # v7-P6: 가변 BPM 곡선
         if self._script_data:
@@ -3057,16 +3057,16 @@ GENRE_PRESETS = {
             "clicks": 0.6,
             # 절제된 레이어
             "bytebeat": 0.15,
-            "feedback": 0.0,       # EMOTION_MAP이 고에너지 섹션에서만 활성화
-            "fm_bass": 0,
+            "feedback": 0.2,       # B-4: 기본 활성화 (볼륨 상한 0.3)
+            "fm_bass": 0.15,       # B-4: 기본 활성화
             "chiptune_lead": 0, "chiptune_drum": 0,
-            "synth_lead": 0, "acid_bass": 0.4,  # acid_bass는 허용 (느낌 좋음)
+            "synth_lead": 0.15, "acid_bass": 0.4,  # B-4: synth_lead 기본 활성화
         },
         "force_active": [
             "saw_sequence", "sine_interference", "data_click", "pulse_train",
         ],
         # v9: acid_bass + chiptune_lead 허용 (EMOTION_MAP에서 제어)
-        "force_inactive": ["chiptune_lead", "chiptune_drum", "fm_bass", "synth_lead"],
+        "force_inactive": ["chiptune_lead", "chiptune_drum"],  # B-4: fm_bass, synth_lead 제거
         "synthesis_overrides": {
             "ikeda_mode": True,
             "rhythm_mode": "euclidean",  # 유클리드 리듬 패턴 유지
@@ -3095,11 +3095,17 @@ KEY_PRIORITY = ["E_minor", "D_minor", "G_minor", "A_minor", "C_minor", "F_minor"
 
 # 아르페지오 패턴 변형 (이력 기반 다양화)
 ARP_PATTERNS = [
-    [1, 1.25, 1.5, 2, 1.5, 1.25],      # 기본 상행-하행
-    [1, 1.5, 1.25, 2, 1.25, 1.5],      # 변형 A
-    [2, 1.5, 1.25, 1, 1.25, 1.5],      # 하행-상행
-    [1, 1.25, 2, 1.5, 1, 1.25],        # 변형 B
-    [1, 2, 1.5, 1.25, 1.5, 2],         # 옥타브 점프
+    [1, 1.25, 1.5, 2, 1.5, 1.25],      # 기본 상행-하행 (6음)
+    [1, 1.5, 1.25, 2, 1.25, 1.5],      # 변형 A (6음)
+    [2, 1.5, 1.25, 1, 1.25, 1.5],      # 하행-상행 (6음)
+    [1, 1.25, 2, 1.5, 1, 1.25],        # 변형 B (6음)
+    [1, 2, 1.5, 1.25, 1.5, 2],         # 옥타브 점프 (6음)
+    # B-5: 3음/4음/8음 비대칭 패턴 추가
+    [1, 1.5, 2],                        # 3음 상행 (빠른 루프)
+    [2, 1.5, 1],                        # 3음 하행 (빠른 루프)
+    [1, 1.25, 1.5, 2],                  # 4음 상행
+    [1, 2, 1.5, 1.25],                  # 4음 역행
+    [1, 1.25, 1.5, 2, 1.75, 1.5, 1.25, 1],  # 8음 호흡
 ]
 
 

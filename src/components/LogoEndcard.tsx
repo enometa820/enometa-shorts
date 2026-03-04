@@ -32,12 +32,14 @@ interface LogoEndcardProps {
   startFrame: number;
   durationFrames: number;
   palette?: Palette;
+  tagline?: string;  // B-9: 에피소드별 태그라인 (기본: "존재와 사유, 그 경계를 초월하다")
 }
 
 export const LogoEndcard: React.FC<LogoEndcardProps> = ({
   startFrame,
   durationFrames,
   palette,
+  tagline = "존재와 사유, 그 경계를 초월하다",
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -388,7 +390,7 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
             alignItems: "center",
           }}
         >
-          {"존재와 사유, 그 경계를 초월하다".split("").map((char, i) => {
+          {tagline.split("").map((char, i) => {
             const charDelay = i * 2;
             const charLocalFrame = localFrame - fps * 2.0 - charDelay;
             const charOpacity = interpolate(

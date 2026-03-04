@@ -24,6 +24,7 @@ interface EnometaShortsProps {
   narrationSegments?: NarrationSegment[];
   highlightWords?: string[];
   endcardDurationSec?: number; // 엔드카드 길이 (초), 기본 6초
+  tagline?: string;  // B-9: 에피소드별 태그라인
 }
 
 export const EnometaShorts: React.FC<EnometaShortsProps> = ({
@@ -34,6 +35,7 @@ export const EnometaShorts: React.FC<EnometaShortsProps> = ({
   narrationSegments,
   highlightWords,
   endcardDurationSec = 6,
+  tagline,
 }) => {
   const script = visualScript || testVisualScript;
   const palette = getPalette(script.global.palette || "phantom");
@@ -41,6 +43,7 @@ export const EnometaShorts: React.FC<EnometaShortsProps> = ({
   const realAudio = useAudioData(audioAnalysis);
   const audio = audioAnalysis ? realAudio : simulatedAudio;
   const displayTitle = title || (script as any).title || "ENOMETA";
+  const resolvedTagline = tagline || (script as any).tagline;
 
   // 엔드카드: 마지막 씬 종료 후 시작
   const lastScene = script.scenes[script.scenes.length - 1];
@@ -108,6 +111,7 @@ export const EnometaShorts: React.FC<EnometaShortsProps> = ({
           startFrame={endcardStartFrame}
           durationFrames={endcardDurationFrames}
           palette={palette}
+          tagline={resolvedTagline}
         />
       </div>
     </AbsoluteFill>

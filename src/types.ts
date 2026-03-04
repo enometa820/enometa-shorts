@@ -28,6 +28,13 @@ export interface SceneLayers {
   background?: BackgroundConfig;
 }
 
+// ShapeMotion 파라미터 (B-6: visual_script에서 수신)
+export interface ShapeParams {
+  speed?: number;   // 속도 배율 (기본: 1.0)
+  scale?: number;   // 크기 배율 (기본: 1.0)
+  count?: number;   // 요소 개수 배율 (기본: 1)
+}
+
 // 씬 정의
 export interface Scene {
   id: string;
@@ -36,6 +43,7 @@ export interface Scene {
   end_sec: number;
   emotion: string;
   layers: SceneLayers;
+  shape_params?: ShapeParams;  // B-6: ShapeMotion 파라미터 오버라이드
 }
 
 // 전환 설정

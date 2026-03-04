@@ -286,80 +286,80 @@ EMOTION_KEYWORDS = {
 # ============================================================
 EMOTION_VOCAB_POOL = {
     "neutral_curious": {
-        "primary": ["particle_birth", "particle_orbit", "flow_field_calm"],
-        "secondary": ["waveform", "counter_up", "brightness_pulse"],
+        "primary": ["particle_birth", "particle_orbit", "flow_field_calm", "lissajous", "waveform"],
+        "secondary": ["waveform", "counter_up", "brightness_pulse", "data_bar", "grid_mesh"],
         "text_mode": "wave",
-        "bg_mode": "calm",
+        "bg_mode": "subtle",  # B-8: calm→subtle (더 조용한 배경)
         "reactivity": "low",
     },
     "tension_reveal": {
-        "primary": ["particle_scatter", "neural_network", "fractal_crack"],
-        "secondary": ["grid_morph", "waveform_spectrum", "color_shift"],
+        "primary": ["particle_scatter", "neural_network", "fractal_crack", "grid_morph", "waveform_spectrum"],
+        "secondary": ["grid_morph", "waveform_spectrum", "color_shift", "data_bar", "loop_ring"],
         "text_mode": "glitch",
         "bg_mode": "turbulent",
         "reactivity": "high",
     },
     "neutral_analytical": {
-        "primary": ["grid_morph", "data_bar", "neural_network"],
-        "secondary": ["waveform_spectrum", "counter_up", "grid_mesh", "lissajous"],
+        "primary": ["grid_morph", "data_bar", "neural_network", "lissajous", "counter_up"],
+        "secondary": ["waveform_spectrum", "counter_up", "grid_mesh", "lissajous", "brightness_pulse"],
         "text_mode": "typewriter",
         "bg_mode": "calm",
         "reactivity": "medium",
     },
     "somber_reflective": {
-        "primary": ["particle_converge", "color_shift", "flow_field_calm"],
-        "secondary": ["loop_ring", "brightness_pulse", "light_source"],
+        "primary": ["particle_converge", "color_shift", "flow_field_calm", "loop_ring", "brightness_pulse"],
+        "secondary": ["loop_ring", "brightness_pulse", "light_source", "waveform", "lissajous"],
         "text_mode": "wave",
-        "bg_mode": "calm",
+        "bg_mode": "subtle",  # B-8: calm→subtle
         "reactivity": "low",
     },
     "somber_warning": {
-        "primary": ["fractal_crack", "color_drain", "particle_scatter"],
-        "secondary": ["waveform", "data_bar", "grid_morph"],
+        "primary": ["fractal_crack", "color_drain", "particle_scatter", "waveform_spectrum", "neural_network"],
+        "secondary": ["waveform", "data_bar", "grid_morph", "color_shift", "loop_ring"],
         "text_mode": "glitch",
         "bg_mode": "turbulent",
         "reactivity": "high",
     },
     "awakening_spark": {
-        "primary": ["particle_escape", "light_source", "particle_chain_awaken"],
-        "secondary": ["brightness_pulse", "color_bloom", "waveform_circular", "lissajous"],
+        "primary": ["particle_escape", "light_source", "particle_chain_awaken", "color_bloom", "lissajous"],
+        "secondary": ["brightness_pulse", "color_bloom", "waveform_circular", "lissajous", "particle_orbit"],
         "text_mode": "scatter",
         "bg_mode": "calm",
         "reactivity": "medium",
     },
     "tension_transformative": {
-        "primary": ["grid_morph", "particle_split_ratio", "fractal_crack"],
-        "secondary": ["neural_network", "waveform_spectrum", "color_shift"],
+        "primary": ["grid_morph", "particle_split_ratio", "fractal_crack", "waveform_spectrum", "neural_network"],
+        "secondary": ["neural_network", "waveform_spectrum", "color_shift", "data_bar", "particle_scatter"],
         "text_mode": "glitch",
-        "bg_mode": "turbulent",
+        "bg_mode": "intense",  # B-8: turbulent→intense (더 강렬)
         "reactivity": "high",
     },
     "tension_redefine": {
-        "primary": ["particle_split_ratio", "grid_mesh", "data_bar"],
-        "secondary": ["loop_ring", "color_shift", "waveform"],
+        "primary": ["particle_split_ratio", "grid_mesh", "data_bar", "fractal_crack", "color_drain"],
+        "secondary": ["loop_ring", "color_shift", "waveform", "grid_morph", "neural_network"],
         "text_mode": "glitch",
         "bg_mode": "turbulent",
         "reactivity": "high",
     },
     "hopeful": {
-        "primary": ["light_source", "particle_converge", "color_bloom"],
-        "secondary": ["brightness_pulse", "particle_orbit", "waveform_circular"],
+        "primary": ["light_source", "particle_converge", "color_bloom", "particle_orbit", "waveform_circular"],
+        "secondary": ["brightness_pulse", "particle_orbit", "waveform_circular", "lissajous", "color_shift"],
         "text_mode": "wave",
         "bg_mode": "calm",
         "reactivity": "medium",
     },
     "awakening_climax": {
-        "primary": ["particle_chain_awaken", "particle_escape", "fractal_crack"],
-        "secondary": ["waveform_circular", "brightness_pulse", "light_source"],
+        "primary": ["particle_chain_awaken", "particle_escape", "fractal_crack", "color_bloom", "waveform_circular"],
+        "secondary": ["waveform_circular", "brightness_pulse", "light_source", "particle_scatter", "lissajous"],
         "text_mode": "scatter",
-        "bg_mode": "turbulent",
+        "bg_mode": "intense",  # B-8: turbulent→intense
         "reactivity": "max",
     },
     "transcendent_open": {
-        "primary": ["particle_orbit", "light_source", "flow_field_calm"],
-        "secondary": ["color_bloom", "brightness_pulse", "waveform_circular", "lissajous"],
+        "primary": ["particle_orbit", "light_source", "flow_field_calm", "lissajous", "color_bloom"],
+        "secondary": ["color_bloom", "brightness_pulse", "waveform_circular", "lissajous", "particle_converge"],
         "text_mode": "wave",
-        "bg_mode": "calm",
+        "bg_mode": "subtle",  # B-8: calm→subtle
         "reactivity": "medium",
     },
 }
@@ -430,16 +430,18 @@ def detect_emotion(sentence: str, prev_emotion: str = "") -> str:
 
 
 def extract_highlight_word(sentence: str) -> Optional[str]:
-    """문장에서 핵심 키워드(한글 명사) 추출 — 텍스트 비주얼용"""
-    # 한자어/전문용어 우선 (2~4글자, 조사 앞)
+    """문장에서 핵심 키워드 추출 — 텍스트 비주얼용 (B-10: 동사/형용사 포함)"""
+    # 한자어/전문용어/명사 우선 (2~4글자, 조사 앞)
     patterns = [
         r'([가-힣]{2,4})(?:이?라|을|를|은|는|이|가|의|에|도|만|와|과|로|으로)',
         r'([가-힣]{2,4})(?:하다|한다|된다|이다|하는|되는|인)',
+        # B-10: 동사/형용사도 포함
+        r'([가-힣]{2,4})(?:어라|아라|아서|어서|면서|이며|지만)',
+        r'([가-힣]{2,5})(?:한다|된다|있다|없다|많다|크다|작다)',
     ]
     candidates = []
     for p in patterns:
         matches = re.findall(p, sentence)
-        # findall with groups returns group(1) directly
         candidates.extend(matches)
 
     # 일반적인 단어 제외
@@ -591,7 +593,7 @@ def generate_vocab_params(vocab: str, palette: dict, rng: random.Random) -> dict
             "mode": mode,
             "fontSize": rng.choice([56, 64, 72, 80]),
             "color": text_color,
-            "position": rng.choice(["center", "center", "top", "upper"]),
+            "position": rng.choice(["center", "top", "upper", "bottom"]),
             "glowColor": glow,
             "staggerMs": rng.choice([60, 80, 100, 120]),
         }
@@ -641,32 +643,49 @@ def generate_vocab_params(vocab: str, palette: dict, rng: random.Random) -> dict
 
 
 def generate_background(emotion: str, palette: dict, rng: random.Random, scene_idx: int) -> dict:
-    """감정에 따른 배경 생성"""
+    """감정에 따른 배경 생성 (B-8: subtle/intense 추가)"""
     pool = EMOTION_VOCAB_POOL.get(emotion, EMOTION_VOCAB_POOL["neutral_curious"])
     bg_mode = pool.get("bg_mode", "calm")
 
-    vocab = f"flow_field_{bg_mode}"
-    speed = 0.05 if bg_mode == "calm" else rng.uniform(0.15, 0.3)
-    noise_scale = rng.uniform(0.002, 0.005) if bg_mode == "calm" else rng.uniform(0.004, 0.008)
+    # B-8: subtle(거의 정적) / calm / turbulent / intense(격렬) 4단계
+    # subtle과 intense는 flow_field_calm/turbulent로 매핑하되 파라미터 조정
+    bg_mode_mapped = {"subtle": "calm", "intense": "turbulent"}.get(bg_mode, bg_mode)
+    vocab = f"flow_field_{bg_mode_mapped}"
+
+    if bg_mode == "subtle":
+        speed = rng.uniform(0.02, 0.04)
+        noise_scale = rng.uniform(0.001, 0.003)
+        line_opacity = round(rng.uniform(0.04, 0.07), 3)
+    elif bg_mode == "calm":
+        speed = 0.05
+        noise_scale = rng.uniform(0.002, 0.005)
+        line_opacity = round(rng.uniform(0.04, 0.1), 3)
+    elif bg_mode == "turbulent":
+        speed = rng.uniform(0.15, 0.3)
+        noise_scale = rng.uniform(0.004, 0.008)
+        line_opacity = round(rng.uniform(0.06, 0.12), 3)
+    else:  # intense
+        speed = rng.uniform(0.25, 0.5)
+        noise_scale = rng.uniform(0.006, 0.012)
+        line_opacity = round(rng.uniform(0.08, 0.15), 3)
 
     bg: Dict[str, Any] = {
         "vocab": vocab,
         "params": {
             "noise_scale": round(noise_scale, 4),
             "speed": round(speed, 3),
-            "line_opacity": round(rng.uniform(0.04, 0.1), 3),
+            "line_opacity": line_opacity,
             "line_color": rng.choice(palette["particles"][-3:]),
         },
     }
-    # 배경에도 variant 적용 (확률적)
     bg_variant = select_variant(vocab, rng)
     if bg_variant and bg_variant != "default" and rng.random() > 0.5:
         bg["variant"] = bg_variant
 
     # 일부 씬에서 배경 전환
-    if bg_mode == "calm" and rng.random() > 0.7:
+    if bg_mode in ("subtle", "calm") and rng.random() > 0.7:
         bg["transition_to"] = "flow_field_turbulent"
-    elif bg_mode == "turbulent" and rng.random() > 0.7:
+    elif bg_mode in ("turbulent", "intense") and rng.random() > 0.7:
         bg["transition_to"] = "flow_field_calm"
 
     return bg
@@ -817,6 +836,12 @@ def build_scene(
     else:
         background = generate_background(emotion, palette, rng, idx)
 
+    # B-6: ShapeMotion 파라미터 — emotion별 기본값, SI 기반 변조
+    shape_speed = round(0.7 + si * 0.8, 2)   # si=0→0.7, si=1→1.5
+    shape_scale = round(0.8 + si * 0.5, 2)   # si=0→0.8, si=1→1.3
+    shape_count = 2 if si >= 0.7 else 1
+    shape_params = {"speed": shape_speed, "scale": shape_scale, "count": shape_count}
+
     return {
         "id": f"scene_{idx + 1:02d}",
         "sentence": sentence,
@@ -828,6 +853,7 @@ def build_scene(
             "audio_reactive": audio_reactive,
             "background": background,
         },
+        "shape_params": shape_params,
     }
 
 
@@ -848,6 +874,17 @@ def generate_visual_script(
         timing_data = json.load(f)
 
     segments = timing_data["segments"]
+
+    # B-9: script_path에서 tagline 추출 (없으면 기본값)
+    tagline = "존재와 사유, 그 경계를 초월하다"
+    if script_path:
+        try:
+            with open(script_path, 'r', encoding='utf-8') as f:
+                script_raw = json.load(f)
+            if "tagline" in script_raw:
+                tagline = script_raw["tagline"]
+        except Exception:
+            pass
 
     # 문장 합치기 (짧은 문장은 합침) + SI 평균 계산
     merged_scenes: List[Dict] = []
@@ -969,7 +1006,7 @@ def generate_visual_script(
         # 폴백: 제목에서 추출
         title_words = re.findall(r'[가-힣]{2,4}', title)
         highlight_words = title_words[:2] if title_words else []
-    highlight_words = highlight_words[:3]  # 최대 3개
+    highlight_words = highlight_words[:5]  # B-10: 최대 5개 (3→5)
 
     # 이력 기록 (episode_id가 있으면)
     if episode_id:
@@ -983,6 +1020,7 @@ def generate_visual_script(
 
     return {
         "title": title,
+        "tagline": tagline,  # B-9: 엔드카드 태그라인
         "highlightWords": highlight_words,
         "meta": {
             "strategy": strategy_name,

@@ -13,7 +13,7 @@ import { VocabComponentProps } from "../../types";
  *   mode: string            — typewriter | wave | glitch | scatter (기본: typewriter)
  *   fontSize: number        — 폰트 크기 (기본: 64)
  *   color: string           — 텍스트 색상 (기본: #FFFFFF)
- *   position: string        — center | top | bottom (기본: center)
+ *   position: string        — center | top | upper | bottom (기본: center). 자막 영역(y≥1230 전체 캔버스) 침범 금지
  *   staggerMs: number       — 글자 간 딜레이 ms (기본: 80)
  *   glowColor: string       — 글로우 색상 (기본: #8B5CF6)
  */
@@ -47,7 +47,7 @@ export const TextReveal: React.FC<VocabComponentProps> = ({
   const posY =
     position === "top" ? height * 0.15 :
     position === "upper" ? height * 0.32 :
-    position === "bottom" ? height * 0.55 :  // legacy 방어: 자막 안전 영역
+    position === "bottom" ? height * 0.72 :  // 자막 영역(y≥1230) 상단, 비주얼 하단 배치
     height * 0.48;  // center
 
   return (

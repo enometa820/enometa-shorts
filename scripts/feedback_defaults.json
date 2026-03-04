@@ -112,7 +112,7 @@
     "ratio_note": "TTS:BGM ≈ 1:1 (loudnorm -14 LUFS가 균형 처리)",
     "si_gate_rules": [
       {"rule": "si_gate는 연속 함수 사용 권장 (계단 함수 비권장)", "source": "ep007_feedback_v2"},
-      {"rule": "si_gate 최소값 0.45 이상 권장 — 극단적 감쇠 주의", "source": "ep007_feedback_v2"},
+      {"rule": "si_gate 최소값 0.25 이상 — 완전 소음 방지. 침묵 아닌 미니멀 허용", "source": "ep007_feedback_v2+B3_20260304"},
       {"rule": "si_gate 스무딩 최소 1.0초 권장 — 0.3초는 급변 유발", "source": "ep007_feedback_v2"}
     ]
   }
