@@ -1,7 +1,7 @@
 {
   "version": 3,
-  "last_updated": "2026-03-02",
-  "last_updated_from": "volume_balance_4_6",
+  "last_updated": "2026-03-04",
+  "last_updated_from": "ep007_feedback_v2_subtitle_rules",
 
   "music_defaults": {
     "volume_caps": {
@@ -26,6 +26,14 @@
       {"rule": "hybrid 모드에서도 Remotion vocab 컴포넌트를 Python 배경 위에 반드시 오버레이", "source": "ep005_feedback"},
       {"rule": "파티클, 모션그래픽, 텍스트 애니메이션 등 다양한 패턴 혼합 필수", "source": "ep005_feedback"},
       {"rule": "단조로운 반복 금지 - 씬마다 다른 비주얼 전략 적용", "source": "ep005_feedback"}
+    ],
+    "text_reveal_rules": [
+      {"rule": "TextReveal position='bottom' 금지 — 자막 영역과 충돌. 'upper'(h*0.32) 사용", "source": "ep007_feedback_v2"},
+      {"rule": "TextReveal posY는 화면 y=1100 미만 유지 (자막: y≈1230 시작)", "source": "ep007_feedback_v2"}
+    ],
+    "z_order_rules": [
+      {"rule": "PixelGrid: zIndex 5 — 다른 vocab 위에 부각", "source": "ep007_feedback_v2"},
+      {"rule": "PostProcess: zIndex 10 — 모든 vocab 위 포스트프로세싱", "source": "ep007_feedback_v2"}
     ],
     "background_rules": {
       "flow_field_calm": {"min_line_opacity": 0.06, "note": "0.05 이하 거의 안 보임"}
@@ -52,6 +60,45 @@
     ]
   },
 
+  "subtitle_rules": {
+    "reference": "EP005 원본 (commit 3878768)",
+    "font": {
+      "family": "Pretendard Variable, sans-serif",
+      "size_base": 54,
+      "size_emphasis": 62,
+      "weight_base": 500,
+      "weight_emphasis": 700,
+      "emphasis_condition": "emotion includes 'climax' or 'awakening'"
+    },
+    "position": {
+      "bottom": 550,
+      "width": 1080,
+      "padding": "0 100px 0 60px",
+      "maxWidth": 900,
+      "note": "bottom:550 → 화면 y≈1370. 비주얼 영역(370~1450)과 겹치지 않도록"
+    },
+    "style": {
+      "color": "#FFFFFF",
+      "textAlign": "center",
+      "lineHeight": 1.5,
+      "backgroundColor": "rgba(0, 0, 0, 0.35)",
+      "borderRadius": 12,
+      "innerPadding": "16px 36px",
+      "textShadow": "3단계: 0 2px 8px 0.95 / 0 0 20px 0.7 / 0 0 40px 0.4"
+    },
+    "animation": {
+      "fadeIn_sec": 0.2,
+      "fadeOut_sec": 0.2,
+      "note": "useCurrentFrame 기반. CSS animation 금지"
+    },
+    "text_processing": {
+      "smartLineBreak_charLimit": 18,
+      "splitSegment_charLimit": 35,
+      "wordBreak": "keep-all",
+      "whiteSpace": "pre-line"
+    }
+  },
+
   "narration_defaults": {
     "voice": "ko-KR-SunHiNeural",
     "rate": "+5%",
@@ -61,7 +108,12 @@
 
   "mixing_defaults": {
     "bgm_volume": 1.0,
-    "narration_volume": 0.67,
-    "ratio_note": "TTS:BGM = 4:6 (음악이 더 큰 비율)"
+    "narration_volume": 0.90,
+    "ratio_note": "TTS:BGM ≈ 1:1 (loudnorm -14 LUFS가 균형 처리)",
+    "si_gate_rules": [
+      {"rule": "si_gate는 연속 함수 사용 — 계단 함수 금지", "source": "ep007_feedback_v2"},
+      {"rule": "si_gate 최소값 0.45 이상 — 0.1 같은 극단적 감쇠 금지", "source": "ep007_feedback_v2"},
+      {"rule": "si_gate 스무딩 최소 1.0초 — 0.3초는 급변 유발", "source": "ep007_feedback_v2"}
+    ]
   }
 }

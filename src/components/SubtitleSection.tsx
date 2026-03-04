@@ -139,12 +139,12 @@ export const SubtitleSection: React.FC<SubtitleSectionProps> = ({
   const partElapsed = currentTime - activePart.startSec;
 
   // 페이드인/아웃
-  const fadeIn = interpolate(partElapsed, [0, 0.15], [0, 1], {
+  const fadeIn = interpolate(partElapsed, [0, 0.2], [0, 1], {
     extrapolateRight: "clamp",
   });
   const fadeOut = interpolate(
     partElapsed,
-    [partDuration - 0.15, partDuration],
+    [partDuration - 0.2, partDuration],
     [1, 0],
     { extrapolateLeft: "clamp" },
   );

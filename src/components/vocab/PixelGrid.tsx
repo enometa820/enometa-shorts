@@ -142,6 +142,7 @@ export const PixelGrid: React.FC<VocabComponentProps> = ({
         opacity: reveal,
         pointerEvents: "none",
         imageRendering: "pixelated",
+        zIndex: 5,
       }}
     >
       <svg

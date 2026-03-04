@@ -1,9 +1,8 @@
-# ENOMETA 비주얼 차별화 시스템 명세서
+# ENOMETA 비주얼 차별화 시스템 명세서 (2026-03-04)
 
-> 버전: 2.0
-> 최종 업데이트: 2026-03-02 — v8 ikeda 단일 장르 + Hybrid 전용화
+> 최종 업데이트: 2026-03-04
 > 상태: **Phase 1~4 구현 완료** / v8 ikeda 단일 장르 + ikeda 확장
-> **last_updated**: 2026-03-03 — BytebeatLayer/FeedbackLayer v8 미사용 표시
+> **last_updated**: 2026-03-04 — Lissajous vocab, z-order 시스템, EMOTION_VOCAB_POOL lissajous 추가
 
 ---
 
@@ -77,8 +76,9 @@ visual_script.json → VocabEntry.variant → VisualSection.tsx → Component(va
 | max_semantic_layers | 2 | 최소 레이어 |
 | particle_density | 0.0 | 파티클 없음 (Python 레이어가 대체) |
 | text_chance | 0.9 | 텍스트 데이터 중심 |
-| prefer_vocabs | text_reveal | Remotion 텍스트 애니메이션 |
+| prefer_vocabs | text_reveal, lissajous | Remotion 텍스트 애니메이션 + Lissajous 곡선 |
 | avoid_vocabs | particle_birth/scatter, color_bloom, neural_network, light_source, fractal_crack, data_bar, counter_up | 비데이터아트 배제 |
+| inject_vocabs | pixel_grid_rain, pixel_grid_life, pixel_waveform_cascade, **lissajous** | 25% 확률 주입 |
 
 **Python 레이어 9종 — Dual-Source 분류 (v6.1)**:
 
@@ -199,5 +199,30 @@ py scripts/visual_script_generator.py episodes/epXXX/narration_timing.json \
 
 ---
 
+## Phase 부록 2: z-order 시스템 (EP007 신규)
+
+vocab 컴포넌트 간 렌더링 우선순위를 명시적 zIndex로 관리.
+
+| 레이어 | zIndex | 비고 |
+|--------|--------|------|
+| 일반 vocab | auto | DOM 순서 기본 |
+| PixelGrid | 5 | 코드 비주얼 부각 |
+| PostProcess | 10 | 최상위 포스트프로세싱 |
+
+## Phase 부록 3: Lissajous vocab (EP007 신규)
+
+수학적 기하학 패턴 — 두 사인파의 위상차로 기하학적 곡선 생성.
+
+| 속성 | 설명 |
+|------|------|
+| 파일 | `src/components/vocab/Lissajous.tsx` |
+| 렌더링 | Canvas 2D, `useCurrentFrame()` 기반 |
+| Props | ratioA, ratioB, phaseOffset, color, lineWidth, trailLength |
+| 오디오 리액티브 | rms → 선 굵기/글로우, bass → 위상 속도 |
+| EMOTION_VOCAB_POOL | neutral_analytical, transcendent_open, awakening_spark (secondary) |
+| inject_vocabs | ikeda 25% 확률 주입 |
+
+---
+
 *이 문서는 ENOMETA 비주얼 차별화 시스템의 설계 명세서이다.*
-*Phase 1~4 전부 구현 완료. 구현 상태는 MEMORY.md에서 추적한다.*
+*Phase 1~4 + 부록 2~3 구현 완료. 구현 상태는 MEMORY.md에서 추적한다.*

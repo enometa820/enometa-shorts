@@ -1,10 +1,11 @@
-# ENOMETA Generative Music Engine v8 — Claude Code 실행 문서
+# ENOMETA Generative Music Engine — Claude Code 실행 문서 (2026-03-04)
 
 > Pure Python 전자음악 엔진 — Raw Synthesis, GPU 불필요
 > numpy + scipy만으로 동작.
-> **last_updated**: 2026-03-04 — v10: SI 변조 완화, density_scale 하한 60%, tanh 3.0, RMS -6dB, song arc 에너지 전체 상향
-> v9→v10: SI 변조 95~105%로 안정화, density_scale max(0.6,si), 마스터링 강화(tanh 3.0, -6dB), song arc 에너지 상향, 킥/하이햇/saw 볼륨 증가
+> **last_updated**: 2026-03-04 — v10.2: si_gate 연속 함수(min 0.45, 1.0s 스무딩) — 계단 함수/급감쇠 금지
+> v9→v10: SI 변조 95~105%로 안정화, density_scale max(0.6,si), 마스터링 강화(tanh 3.0, -6dB), song arc 에너지 상향
 > v10.1 (EP007): BGM duration = total_duration + 8 (endcard 6초 + 2초 buffer), outro energy 0.1→0.2
+> v10.2 (EP007 피드백): si_gate 계단 함수 → 연속 함수 교체, 급변/급감쇠 방지
 
 ---
 
@@ -201,7 +202,7 @@ vol: 0.5 + burst_energy × 0.35  → 0.50~0.85
 - **에피소드 해시 시드**: `random.seed(42)` 제거 → `hashlib.md5(episode_id)`
 
 ### 비주얼 레이어 연동 (v9: ikeda 전용)
-ikeda 프리셋: Music 3 + TTS 4 = 7레이어, blend_ratio=0.45, SI_INTENSITY_SCALE 실시간 스케일. 상세: `ENOMETA_Hybrid_Visual_Architecture.md` 참조
+ikeda 프리셋: Music 3 + TTS 4 = 7레이어, blend_ratio=0.45, SI_INTENSITY_SCALE 실시간 스케일. 상세: `ENOMETA_Hybrid_Visual_Architecture_20260304.md` 참조
 
 ---
 
@@ -391,15 +392,19 @@ Ikeda 특유의 "뚜두두두두" 고속 클릭 반복 사운드를 구현하는
 - `lookback_window = 2` (vocab_history와 동일)
 - `--episode` 없으면 이력 저장 안 함 (하위호환)
 
-### 연속 악기 si 게이트 (v7-P8)
+### 연속 악기 si 게이트 (v7-P8 → v10.2 리라이트)
 
 조용한 구간(si 낮음)에서 연속 악기(bass, arp, rhythm 등) 볼륨을 자동 감쇠하여 다이나믹 레인지를 확보한다.
 
 ```
-si < 0.15 → gate = 0.1 (거의 무음)
-si < 0.30 → gate = 0.4 (반감)
-si ≥ 0.30 → gate = 1.0 (풀 볼륨)
-+ 0.3초 cumsum 스무딩 (급격한 온/오프 방지)
+v10.2 연속 함수 (EP007 피드백으로 교체):
+  gate = 0.45 + si * 1.1    (min 0.45, max ~1.55 → clamp 1.0)
+  + 1.0초 cumsum 스무딩     (급변 방지)
+
+⚠ 금지 사항:
+  - 계단 함수 금지 (si<0.15→0.1 같은 극단적 감쇠 금지)
+  - 최소값 0.45 미만 금지
+  - 스무딩 1.0초 미만 금지 (0.3초는 급변 유발)
 ```
 
 **적용 대상**: 모든 7개 연속 렌더러
@@ -412,7 +417,7 @@ si ≥ 0.30 → gate = 1.0 (풀 볼륨)
 - `_render_continuous_ultrahigh`: `texture *= vol_env * si_gate`
 
 **구현**:
-- `_build_si_gate()`: si_env → gate 배열 (0.1/0.4/1.0) + 0.3초 스무딩
+- `_build_si_gate()`: si_env → 연속 함수 `0.45 + si * 1.1` + 1.0초 스무딩
 - `generate()`에서 si_modulation 직후 `self._si_gate = self._build_si_gate()` 계산
 - script_data 없으면 gate = 1.0 전체 (무변조, 하위호환)
 

@@ -5,6 +5,98 @@
 
 ---
 
+## 2026-03-04 — EP007 추가 피드백 4건 + Lissajous vocab + 피드백 로그 신설
+
+### 피드백 반영 (F07-09~12)
+
+**`scripts/visual_script_generator.py`**
+- TextReveal position `"bottom"` → `"upper"` 교체 (L582, L594)
+- Lissajous vocab 파라미터 생성 블록 추가
+- ikeda `inject_vocabs`에 `"lissajous"` 추가
+- EMOTION_VOCAB_POOL 3개 감정에 `"lissajous"` secondary 추가
+
+**`src/components/vocab/TextReveal.tsx`**
+- `"upper"` 위치 추가 (h*0.32), `"bottom"` 안전 클램프 (h*0.55)
+
+**`src/components/vocab/PixelGrid.tsx`**
+- 외부 div에 `zIndex: 5` 추가
+
+**`src/components/vocab/PostProcess.tsx`**
+- Fragment `<>` → `<div>` 래퍼 (`zIndex: 10`)
+
+**`src/components/LogoEndcard.tsx`**
+- 태그라인 전면 강화: 글자별 2프레임 스태거, SVG 밑줄 드로잉, 180개 파티클
+- fontSize 30→48, fontWeight 400→700
+
+**`scripts/enometa_music_engine.py`**
+- `_build_si_gate()`: 계단 함수 → 연속 함수 (min 0.45, 1.0s 스무딩)
+
+### 신규 컴포넌트
+
+**`src/components/vocab/Lissajous.tsx`** — Lissajous 곡선 vocab
+- Canvas 2D, `x=sin(at+δ), y=cos(bt)` 수학적 패턴
+- 오디오 리액티브 (rms→선 굵기, bass→위상, onset→교차점 글로우)
+- sceneProgress 기반 점진적 복잡도 증가
+
+**`src/components/VisualSection.tsx`**
+- VOCAB_MAP에 `lissajous`, `lissajous_complex` 추가
+
+### 문서 신설/업데이트
+
+| 문서 | 변경 |
+|------|------|
+| `docs/FEEDBACK_LOG.md` | 신규 — 전 에피소드 피드백 통합 로그 |
+| `docs/ENOMETA_Audiovisual_Reference.md` | 신규 — 오디오비주얼 아트 레퍼런스 복사 |
+| `scripts/feedback_defaults.json` | text_reveal_rules, z_order_rules, si_gate_rules 추가 |
+| `episodes/ep007/feedback.json` | F07-09~12 항목 추가 |
+| `docs/CHANGELOG.md` | 이 항목 |
+| `memory/MEMORY.md` | EP007 추가 교훈 + ikeda 다양성 + si_gate 수정 |
+
+---
+
+## 2026-03-04 — 마스터 문서 5종 전면 최신화 + 날짜 기반 리네이밍 + 규칙 체계 신설
+
+### 마스터 문서 리네이밍
+
+버전 기반(`_v6`) → 날짜 기반(`_YYYYMMDD`) 네이밍으로 전환:
+
+| 이전 파일명 | 새 파일명 |
+|------------|----------|
+| `ENOMETA_SYSTEM_SNAPSHOT_v6.md` | `ENOMETA_SYSTEM_SNAPSHOT_20260304.md` |
+| `ENOMETA_ClaudeCode_Brief_v6.md` | `ENOMETA_ClaudeCode_Brief_20260304.md` |
+| `ENOMETA_Music_Engine_Spec_v6.md` | `ENOMETA_Music_Engine_Spec_20260304.md` |
+| `ENOMETA_Hybrid_Visual_Architecture.md` | `ENOMETA_Hybrid_Visual_Architecture_20260304.md` |
+| `ENOMETA_Visual_Differentiation_Spec.md` | `ENOMETA_Visual_Differentiation_Spec_20260304.md` |
+
+### 마스터 문서 최신화 내용
+
+**SYSTEM_SNAPSHOT**: Vocab 24종 + z-order 시스템 + VOCAB_MAP 38+ + 오디오 파라미터 수정 + LogoEndcard v3 + si_gate 연속함수 + EP007 진화 로그 확장
+
+**ClaudeCode_Brief**: 검증 체크리스트 v10 (TextReveal position/z-order/엔드카드 검증 항목 추가)
+
+**Hybrid_Visual_Architecture**: SubtitleSection fadeIn/Out 0.2s + TextReveal posY 매핑 테이블 + LogoEndcard v3 + z-order 시스템 섹션
+
+**Music_Engine_Spec**: v10.2 si_gate 연속 함수 (min 0.45, 1.0s 스무딩) + 금지 사항 명시
+
+**Visual_Differentiation_Spec**: Lissajous vocab + z-order 부록 + ikeda inject_vocabs 업데이트
+
+### 규칙 체계 신설
+
+**`.claude/rules/master-docs.md`** — 신규
+- 마스터 문서 목록 테이블 + 네이밍 규칙
+- 최신화 트리거 5가지 조건
+- 최신화 체크리스트 (마스터 5종 + 보조 5종)
+- 상호 참조 규칙 + 커밋 규칙
+
+### 상호 참조 점검
+
+- 마스터 문서 간 상호 참조: 신규 파일명으로 업데이트 완료
+- `memory/MEMORY.md`: 문서 테이블 + 네이밍 규칙 업데이트
+- 코드 파일(ts/tsx/py/json): 마스터 문서 참조 없음 (깨짐 없음)
+- `CHANGELOG.md` 역사적 기록: 의도적 보존 (과거 파일명 유지)
+
+---
+
 ## 2026-03-04 — EP007 피드백 반영: 자막/볼륨/모션 전면 업그레이드
 
 ### 코드 변경

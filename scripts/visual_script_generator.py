@@ -225,7 +225,7 @@ GENRE_VISUAL_OVERRIDES = {
     # techno: 기본 비주얼 유지, 오버라이드 없음
     "ikeda": {
         "palette": "ikeda",
-        "inject_vocabs": ["pixel_grid_rain", "pixel_grid_life", "pixel_waveform_cascade"],
+        "inject_vocabs": ["pixel_grid_rain", "pixel_grid_life", "pixel_waveform_cascade", "lissajous"],
         "inject_chance": 0.25,  # 씬의 25% 확률로 8bit 격자/파형 등장
         "force_bg_pixel": False,
     },
@@ -301,7 +301,7 @@ EMOTION_VOCAB_POOL = {
     },
     "neutral_analytical": {
         "primary": ["grid_morph", "data_bar", "neural_network"],
-        "secondary": ["waveform_spectrum", "counter_up", "grid_mesh"],
+        "secondary": ["waveform_spectrum", "counter_up", "grid_mesh", "lissajous"],
         "text_mode": "typewriter",
         "bg_mode": "calm",
         "reactivity": "medium",
@@ -322,7 +322,7 @@ EMOTION_VOCAB_POOL = {
     },
     "awakening_spark": {
         "primary": ["particle_escape", "light_source", "particle_chain_awaken"],
-        "secondary": ["brightness_pulse", "color_bloom", "waveform_circular"],
+        "secondary": ["brightness_pulse", "color_bloom", "waveform_circular", "lissajous"],
         "text_mode": "scatter",
         "bg_mode": "calm",
         "reactivity": "medium",
@@ -357,7 +357,7 @@ EMOTION_VOCAB_POOL = {
     },
     "transcendent_open": {
         "primary": ["particle_orbit", "light_source", "flow_field_calm"],
-        "secondary": ["color_bloom", "brightness_pulse", "waveform_circular"],
+        "secondary": ["color_bloom", "brightness_pulse", "waveform_circular", "lissajous"],
         "text_mode": "wave",
         "bg_mode": "calm",
         "reactivity": "medium",
@@ -579,7 +579,7 @@ def generate_vocab_params(vocab: str, palette: dict, rng: random.Random) -> dict
             "rays": rng.choice([12, 16, 20]),
             "color": accent,
             "intensity": R(rng.uniform(0.4, 0.8)),
-            "position": rng.choice(["center", "top", "bottom"]),
+            "position": rng.choice(["center", "top", "upper"]),
         }
     elif vocab == "text_reveal":
         # 모드 다양화: 4가지 모드 랜덤 선택
@@ -591,9 +591,20 @@ def generate_vocab_params(vocab: str, palette: dict, rng: random.Random) -> dict
             "mode": mode,
             "fontSize": rng.choice([56, 64, 72, 80]),
             "color": text_color,
-            "position": rng.choice(["center", "center", "top", "bottom"]),
+            "position": rng.choice(["center", "center", "top", "upper"]),
             "glowColor": glow,
             "staggerMs": rng.choice([60, 80, 100, 120]),
+        }
+    # --- 수학적 패턴 ---
+    elif vocab.startswith("lissajous"):
+        return {
+            "ratioA": rng.choice([1, 2, 3, 4, 5]),
+            "ratioB": rng.choice([1, 2, 3, 4, 5]),
+            "phaseOffset": round(rng.uniform(0, 6.28), 2),
+            "color": rng.choice([accent, glow, "#FFFFFF", "#00FFFF"]),
+            "glowColor": glow,
+            "lineWidth": rng.choice([1.5, 2, 2.5, 3]),
+            "trailLength": rng.choice([600, 800, 1000]),
         }
     # --- 8bit / 레트로 비주얼 ---
     elif vocab.startswith("pixel_grid"):

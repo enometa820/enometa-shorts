@@ -27,6 +27,7 @@ import { GridMorph } from "./vocab/GridMorph";
 import { WaveformVisualizer } from "./vocab/WaveformVisualizer";
 import { PixelGrid } from "./vocab/PixelGrid";
 import { PixelWaveform } from "./vocab/PixelWaveform";
+import { Lissajous } from "./vocab/Lissajous";
 
 // 비주얼 어휘 → 컴포넌트 매핑
 const VOCAB_MAP: Record<string, React.FC<VocabComponentProps>> = {
@@ -70,6 +71,9 @@ const VOCAB_MAP: Record<string, React.FC<VocabComponentProps>> = {
   pixel_waveform: PixelWaveform,
   pixel_waveform_steps: PixelWaveform,
   pixel_waveform_cascade: PixelWaveform,
+  // 수학적 패턴
+  lissajous: Lissajous,
+  lissajous_complex: Lissajous,
 };
 
 interface VisualSectionProps {

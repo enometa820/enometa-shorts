@@ -45,9 +45,10 @@ export const TextReveal: React.FC<VocabComponentProps> = ({
   const staggerFrames = (staggerMs / 1000) * fps;
 
   const posY =
-    position === "top" ? height * 0.2 :
-    position === "bottom" ? height * 0.75 :
-    height * 0.48;
+    position === "top" ? height * 0.15 :
+    position === "upper" ? height * 0.32 :
+    position === "bottom" ? height * 0.55 :  // legacy 방어: 자막 안전 영역
+    height * 0.48;  // center
 
   return (
     <div

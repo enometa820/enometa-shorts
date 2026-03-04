@@ -107,12 +107,56 @@
       ],
       "resolved": true,
       "resolution": "audio_mixer.py 리팩토링(BGM 길이 측정+패딩+longest), 음악엔진 duration +8, 태그라인 스타일 개선. EP007 output: 140.44초 BGM → 엔드카드까지 음악 지속 확인."
+    },
+    {
+      "id": "F07-09",
+      "area": "remotion/visual",
+      "severity": "major",
+      "title": "TextReveal 자막 영역 침범",
+      "detail": "TextReveal position='bottom' → posY=h*0.75=810 → 화면 y=1180. 자막(bottom:550 → y≈1230)과 큰 fontSize에서 겹침",
+      "cause": "visual_script_generator.py가 position='bottom' 생성",
+      "action": "position 'bottom'→'upper' 교체 + TextReveal.tsx에 'upper' 위치(h*0.32) 추가 + 'bottom' 안전 클램프(h*0.55)",
+      "resolved": true,
+      "resolution": "visual_script_generator.py L582,L594 교체 + TextReveal.tsx posY 4단계 매핑"
+    },
+    {
+      "id": "F07-10",
+      "area": "remotion/visual",
+      "severity": "normal",
+      "title": "PixelGrid 코드 비주얼 부각 부족",
+      "detail": "PixelGrid가 다른 vocab 아래 렌더되어 코드 형식 비주얼이 충분히 보이지 않음",
+      "cause": "VisualSection .map() 배열 순서에 따른 DOM paint order",
+      "action": "PixelGrid zIndex: 5, PostProcess zIndex: 10 div 래퍼",
+      "resolved": true,
+      "resolution": "PixelGrid.tsx zIndex:5, PostProcess.tsx Fragment→div zIndex:10"
+    },
+    {
+      "id": "F07-11",
+      "area": "remotion/endcard",
+      "severity": "major",
+      "title": "태그라인 크기/화려함 부족",
+      "detail": "태그라인 fontSize=30, fontWeight=400, 단순 div. 파티클/밑줄 없음",
+      "cause": "초기 구현에서 최소 스타일만 적용",
+      "action": "fontSize 48, fontWeight 700, 글자별 스태거 + SVG 밑줄 + 파티클 180개",
+      "resolved": true,
+      "resolution": "LogoEndcard.tsx 태그라인 전면 강화 (스태거 애니메이션 + 밑줄 드로잉 + 파티클 수렴/호흡)"
+    },
+    {
+      "id": "F07-12",
+      "area": "audio",
+      "severity": "major",
+      "title": "BGM 볼륨 갑자기 급감 (si_gate)",
+      "detail": "음악의 볼륨이 갑자기 확 작아져서 부자연스러움. 사이드체인처럼 느껴짐",
+      "cause": "si_gate가 계단 함수(si<0.15→0.1=90% 감쇠) + 0.3초 스무딩으로 급변",
+      "action": "연속 함수(0.45+si*1.1, min 0.45) + 1.0초 스무딩으로 교체",
+      "resolved": true,
+      "resolution": "enometa_music_engine.py _build_si_gate() 연속 함수 리라이트"
     }
   ],
   "summary": {
     "critical": 1,
-    "major": 5,
-    "normal": 2,
+    "major": 7,
+    "normal": 4,
     "all_resolved": true,
     "system_changes_applied": [
       "audio_mixer.py: narration_volume=0.90, bgm_volume=1.0, output_duration=max(nar,bgm), apad+longest",
@@ -121,7 +165,13 @@
       "TextReveal.tsx: 4모드 모션 강화 + 오디오 리액티브 + 결정론적 글리치",
       "visual_script_generator.py: text_reveal 파라미터 다양화 (모드/색상/크기/위치/텍스트범위)",
       "enometa_music_engine.py: BGM duration +8초 (endcard 커버)",
-      "LogoEndcard.tsx: 태그라인 fontSize 30, opacity 0.85"
+      "LogoEndcard.tsx: 태그라인 fontSize 30, opacity 0.85",
+      "visual_script_generator.py: TextReveal 'bottom'→'upper' + Lissajous vocab 추가",
+      "TextReveal.tsx: 'upper' 위치 추가 + 'bottom' 안전 클램프",
+      "PixelGrid.tsx: zIndex 5, PostProcess.tsx: zIndex 10 래퍼",
+      "LogoEndcard.tsx: 태그라인 스태거+밑줄+파티클 전면 강화",
+      "enometa_music_engine.py: si_gate 연속 함수 (min 0.45, 1.0s 스무딩)",
+      "Lissajous.tsx: 신규 Lissajous 곡선 vocab 컴포넌트"
     ]
   },
   "lessons_learned": [

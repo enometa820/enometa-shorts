@@ -1004,24 +1004,24 @@ class EnometaMusicEngine:
         return None
 
     def _build_si_gate(self) -> np.ndarray:
-        """v7-P8: si 기반 연속 악기 게이트 — 조용한 구간에서 연속 악기 볼륨 감쇠
-        si < 0.15 → 0.1 (거의 무음)
-        si < 0.30 → 0.4 (반감)
-        si >= 0.30 → 1.0 (풀 볼륨)
-        0.3초 스무딩으로 갑작스러운 전환 방지
+        """v7-P8 → v11: si 기반 연속 악기 게이트 — 조용한 구간에서 연속 악기 볼륨 감쇠
+        v11 변경: 계단 함수 → 연속 함수, 최소 0.45 (이전: 0.1)
+        si=0.0 → 0.45 (최소 45%)
+        si=0.5 → 1.0 (풀 볼륨)
+        si=1.0 → 1.0
+        1.0초 스무딩으로 갑작스러운 전환 방지 (이전: 0.3초)
         """
         if self._si_env is None:
             return np.ones(self.total_samples)
 
-        gate = np.ones(self.total_samples)
         si = self._si_env
 
-        # 구간별 게이트 적용
-        gate[si < 0.30] = 0.4
-        gate[si < 0.15] = 0.1
+        # 연속 게이트: np.clip(0.45 + si * 1.1, 0.45, 1.0)
+        # si=0→0.45, si=0.2→0.67, si=0.5→1.0, si=1.0→1.0
+        gate = np.clip(0.45 + si * 1.1, 0.45, 1.0)
 
-        # 0.3초 cumsum 스무딩 (계단→곡선)
-        window = int(0.3 * self.sr)
+        # 1.0초 cumsum 스무딩 (급변 방지)
+        window = int(1.0 * self.sr)
         if window > 1 and len(gate) > window:
             cumsum = np.cumsum(gate)
             cumsum = np.insert(cumsum, 0, 0)

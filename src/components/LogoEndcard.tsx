@@ -252,6 +252,60 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
       ctx.fillStyle = grad;
       ctx.fillRect(0, scanY - 40, W, 80);
     }
+
+    // ===== 태그라인 파티클 (v3) =====
+    const taglineY = H - 580; // bottom: 580 → top 기준
+    const taglineStartSec = 2.0;
+    if (t > taglineStartSec) {
+      const TAG_PARTICLE_COUNT = 180;
+      const tagProgress = Math.min((t - taglineStartSec) / 1.5, 1);
+      const tagEased = easeInOutQuart(tagProgress);
+
+      for (let i = 0; i < TAG_PARTICLE_COUNT; i++) {
+        const r1 = seededRandom(i + 50000);
+        const r2 = seededRandom(i + 60000);
+        const r3 = seededRandom(i + 70000);
+        const r4 = seededRandom(i + 80000);
+
+        // 초기: 태그라인 주변 흩어짐
+        const spreadX = (r1 - 0.5) * 800;
+        const spreadY = (r2 - 0.5) * 200;
+        // 목표: 태그라인 텍스트 근처
+        const targetX = W / 2 + (r1 - 0.5) * 500;
+        const targetY = taglineY + (r2 - 0.5) * 30;
+
+        const startX = targetX + spreadX;
+        const startY = targetY + spreadY;
+        const delay = r4 * 0.4;
+        const pp = Math.max(0, Math.min(1, (tagEased - delay) / (1 - delay)));
+
+        const px = startX + (targetX - startX) * pp;
+        const py = startY + (targetY - startY) * pp;
+
+        // 안착 후 호흡
+        const bx = pp > 0.8 ? Math.sin(t * 1.5 + i * 3) * 2.0 : 0;
+        const by = pp > 0.8 ? Math.cos(t * 1.1 + i * 2) * 1.5 : 0;
+
+        const alpha = 0.15 + pp * 0.5;
+        const size = 0.4 + r3 * 0.8;
+
+        // 글로우 펄스
+        const isGlow = r3 > 0.85;
+        const color = isGlow ? p.accent : p.particles[Math.floor(r3 * p.particles.length) % p.particles.length];
+
+        ctx.beginPath();
+        ctx.arc(px + bx, py + by, size, 0, Math.PI * 2);
+        ctx.fillStyle = hexToRGBA(color, alpha);
+        ctx.fill();
+
+        if (isGlow && pp > 0.7) {
+          ctx.beginPath();
+          ctx.arc(px + bx, py + by, size * 6, 0, Math.PI * 2);
+          ctx.fillStyle = hexToRGBA(p.glow, 0.04);
+          ctx.fill();
+        }
+      }
+    }
   }, [frame, localFrame, t]);
 
   // 엔드카드 영역 밖이면 렌더링하지 않음
@@ -315,7 +369,7 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
         }}
       />
 
-      {/* 태그라인 */}
+      {/* 태그라인 v3 — 글자별 스태거 + 밑줄 + 글로우 */}
       <div
         style={{
           position: "absolute",
@@ -323,15 +377,81 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
           left: 0,
           width: W,
           textAlign: "center",
-          opacity: taglineOpacity,
-          fontFamily: "Pretendard Variable, sans-serif",
-          fontSize: 30,
-          letterSpacing: "0.3em",
-          color: p.accent,
-          fontWeight: 400,
+          pointerEvents: "none",
         }}
       >
-        존재와 사유, 그 경계를 초월하다
+        {/* 글자별 스태거 애니메이션 */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {"존재와 사유, 그 경계를 초월하다".split("").map((char, i) => {
+            const charDelay = i * 2;
+            const charLocalFrame = localFrame - fps * 2.0 - charDelay;
+            const charOpacity = interpolate(
+              charLocalFrame,
+              [0, fps * 0.3],
+              [0, 1],
+              { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+            );
+            const charY = interpolate(
+              charLocalFrame,
+              [0, fps * 0.4],
+              [12, 0],
+              { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+            );
+            const breathe =
+              charLocalFrame > fps * 0.5
+                ? 1 + Math.sin(localFrame * 0.06 + i * 0.4) * 0.03
+                : 1;
+
+            return (
+              <span
+                key={i}
+                style={{
+                  fontFamily: "Pretendard Variable, sans-serif",
+                  fontSize: 48,
+                  fontWeight: 700,
+                  letterSpacing: "0.25em",
+                  color: p.accent,
+                  opacity: charOpacity * taglineOpacity,
+                  transform: `translateY(${charY}px) scale(${breathe})`,
+                  display: "inline-block",
+                  textShadow: `0 0 20px ${p.glow}60, 0 0 40px ${p.glow}30`,
+                }}
+              >
+                {char === " " ? "\u00A0" : char}
+              </span>
+            );
+          })}
+        </div>
+
+        {/* 애니메이션 밑줄 */}
+        <svg
+          width={600}
+          height={4}
+          style={{ margin: "16px auto 0", display: "block" }}
+        >
+          <line
+            x1={0}
+            y1={2}
+            x2={600}
+            y2={2}
+            stroke={p.accent}
+            strokeWidth={2}
+            strokeDasharray={600}
+            strokeDashoffset={interpolate(
+              localFrame - fps * 2.5,
+              [0, fps * 1.0],
+              [600, 0],
+              { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+            )}
+            opacity={taglineOpacity * 0.7}
+          />
+        </svg>
       </div>
     </div>
   );

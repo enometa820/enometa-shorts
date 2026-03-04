@@ -29,7 +29,17 @@ export const PostProcess: React.FC<PostProcessProps> = ({
   const vignetteIntensity = 0.5 + audio.bass * 0.25;
 
   return (
-    <>
+    <div
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width,
+        height,
+        zIndex: 10,
+        pointerEvents: "none",
+      }}
+    >
       {/* 비네트 — 항상 적용, 가장자리를 어둡게 */}
       <div
         style={{
@@ -128,6 +138,6 @@ export const PostProcess: React.FC<PostProcessProps> = ({
           pointerEvents: "none",
         }}
       />
-    </>
+    </div>
   );
 };

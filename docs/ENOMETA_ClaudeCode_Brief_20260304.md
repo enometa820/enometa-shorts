@@ -1,10 +1,10 @@
-# ENOMETA Shorts Pipeline v6 — Claude Code 실행 기획안
+# ENOMETA Shorts Pipeline — Claude Code 실행 기획안 (2026-03-04)
 
 > **역할**: Brief=실전 매뉴얼 (CLI 명령, 검증 체크리스트). 설계도는 SNAPSHOT 참조.
 > 이 문서를 Claude Code에 전달하면 에피소드 제작을 시작할 수 있다.
-> 상세 시스템 문서: ENOMETA_SYSTEM_SNAPSHOT_v6.md 참조
-> 음악 엔진 상세: ENOMETA_Music_Engine_Spec_v6.md 참조
-> **last_updated**: 2026-03-04 — EP007 완료 + audio_mixer 엔드카드 BGM 연장 + SubtitleSection 문장분할 + ShapeMotion/TextReveal 강화
+> 상세 시스템 문서: ENOMETA_SYSTEM_SNAPSHOT_20260304.md 참조
+> 음악 엔진 상세: ENOMETA_Music_Engine_Spec_20260304.md 참조
+> **last_updated**: 2026-03-04 — EP007 피드백 12건 반영 + Lissajous vocab + z-order + si_gate 연속 함수 + 자막 EP005 규칙
 
 ---
 
@@ -213,7 +213,7 @@ ENOMETA | 데이터아트 × 철학
 
 ---
 
-## v9 검증 체크리스트
+## v10 검증 체크리스트
 
 ```
 □ script_data.json에 segments[].semantic_intensity 필드 존재 (0.1~0.9 분포)
@@ -227,12 +227,14 @@ ENOMETA | 데이터아트 × 철학
 □ visual_script.json 씬별 reactivity 값 확인
   - si≥0.88 구간 → "max" reactivity
   - si≤0.25 구간 → "low" reactivity + layers=1
+□ visual_script.json TextReveal position에 "bottom" 없음 확인 ("upper"/"center"/"top"만 허용)
 □ mixed.wav 음량 확인: -14 LUFS 근처, TP 최대 -1.5dB (loudnorm 정상 작동)
-□ Remotion 자막: SubtitleSection 문장 단위 표시, 35자 초과 시 마침표 분할, smartLineBreak(18) 적용 확인
+□ Remotion 자막: SubtitleSection 문장 단위 표시, 35자 초과 시 마침표 분할, smartLineBreak(18), fadeIn/Out 0.2s
 □ Remotion 타이포: TextReveal 4모드(typewriter/wave/glitch/scatter) 색상/크기 다양성 확인
 □ Remotion ShapeMotion: 비주얼 영역(y=370~1450) 내 도형 표시, emotion별 패턴 작동 확인
+□ Remotion z-order: PixelGrid(zIndex 5) 다른 vocab 위에 부각, PostProcess(zIndex 10) 최상위
 □ 엔드카드: BGM이 마지막까지 이어지는지 확인 (output_duration=max(nar,bgm))
-□ 엔드카드: 태그라인 가독성 (fontSize≥30, opacity≥0.85)
+□ 엔드카드: 태그라인 가독성 (fontSize 48, fontWeight 700, 스태거+밑줄+파티클)
 □ Root.tsx calculateMetadata: durationInFrames = (audioAnalysis.duration_sec + 6) × 30 자동 계산 확인
 ```
 
