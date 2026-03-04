@@ -78,6 +78,47 @@
         "euclidean_rhythm",
         "rhythm_backbone"
       ]
+    },
+    "ep008": {
+      "genre": "enometa",
+      "bpm": 138,
+      "key": "E_minor",
+      "arp_pattern_idx": -1,
+      "seq_drum_type": 0,
+      "seq_bpm": 138,
+      "dominant_instruments": [
+        "acid_bass",
+        "arpeggio",
+        "bass_drone",
+        "bytebeat",
+        "clicks",
+        "data_click",
+        "feedback",
+        "fm_bass",
+        "gate_stutter",
+        "hi_hat",
+        "kick",
+        "pulse_train",
+        "saw_sequence",
+        "sine_interference",
+        "snare",
+        "sub_pulse",
+        "synth_lead",
+        "ultrahigh_texture"
+      ],
+      "energy_profile": [
+        0.5,
+        0.8,
+        1.0,
+        0.4
+      ],
+      "num_sections": 6,
+      "texture_modules": [
+        "rhythm_backbone",
+        "bytebeat_texture",
+        "euclidean_rhythm",
+        "melodic_sequence"
+      ]
     }
   }
 }

@@ -6,13 +6,14 @@ narration_timing.json → 완성된 쇼츠 MP4
   - episodes/<id>/narration_timing.json 존재 (대본 세그먼트 포함)
 
 파이프라인:
-  [2] TTS          generate_voice_edge.py    → narration.wav
-  [3] script_data  script_data_extractor.py  → script_data.json
-  [4] visual_script visual_script_generator.py → visual_script.json
-  [5] BGM          enometa_music_engine.py   → bgm.wav + bgm_raw_visual_data.npz
-  [6] mix          audio_mixer.py            → mixed.wav
-  [7] python_frames visual_renderer.py       → frames/
-  [8] render        Remotion                 → output.mp4
+  [2] TTS            generate_voice_edge.py    → narration.wav
+  [3] script_data    script_data_extractor.py  → script_data.json
+  [4] visual_script  visual_script_generator.py → visual_script.json
+  [5] BGM            enometa_music_engine.py   → bgm.wav + bgm_raw_visual_data.npz
+  [6] mix            audio_mixer.py            → mixed.wav
+  [7] audio_analysis audio_analyzer.py         → audio_analysis.json
+  [8] python_frames  visual_renderer.py        → frames/
+  [9] render         Remotion                  → output.mp4
 
 사용법:
   py scripts/enometa_render.py episodes/ep006 --title "제목" --palette phantom
@@ -33,13 +34,13 @@ SCRIPTS_DIR = os.path.join(PROJECT_DIR, "scripts")
 
 PYTHON = "py"
 
-STEPS = ["tts", "script_data", "visual_script", "bgm", "mix", "python_frames", "render"]
+STEPS = ["tts", "script_data", "visual_script", "bgm", "mix", "audio_analysis", "python_frames", "render"]
 
 
-def run(cmd: list, label: str, cwd: str | None = None, timeout: int = 900):
+def run(cmd: list, label: str, cwd: str | None = None, timeout: int = 900, shell: bool = False):
     """subprocess 실행 + 실패 시 예외"""
     print(f"  $ {' '.join(cmd)}")
-    result = subprocess.run(cmd, cwd=cwd or PROJECT_DIR, timeout=timeout)
+    result = subprocess.run(cmd, cwd=cwd or PROJECT_DIR, timeout=timeout, shell=shell)
     if result.returncode != 0:
         raise RuntimeError(f"{label} 실패 (exit {result.returncode})")
 
@@ -162,6 +163,23 @@ def step_mix(episode_dir: str, force: bool = False):
     return output
 
 
+def step_audio_analysis(episode_dir: str, force: bool = False):
+    """[6.5] 오디오 분석 (mixed.wav → audio_analysis.json)"""
+    mixed = os.path.join(episode_dir, "mixed.wav")
+    output = os.path.join(episode_dir, "audio_analysis.json")
+
+    if not os.path.exists(mixed):
+        raise FileNotFoundError(f"mixed.wav 없음: {mixed}")
+    if os.path.exists(output) and not force:
+        print("  [skip] audio_analysis.json 이미 존재")
+        return output
+
+    print("  오디오 분석 중 (FFT → audio_analysis.json)...")
+    run([PYTHON, os.path.join(SCRIPTS_DIR, "audio_analyzer.py"),
+         mixed, output], "audio_analysis")
+    return output
+
+
 def step_python_frames(episode_dir: str, force: bool = False):
     """[7] Python 비주얼 프레임 렌더링"""
     frames_dir = os.path.join(episode_dir, "frames")
@@ -177,6 +195,28 @@ def step_python_frames(episode_dir: str, force: bool = False):
     return frames_dir
 
 
+def step_copy_public(episode_dir: str, episode_id: str):
+    """[7.5] public 디렉토리에 frames + mixed.wav 복사 (Remotion용)"""
+    import shutil
+    public_dir = os.path.join(PROJECT_DIR, "public", episode_id)
+    os.makedirs(public_dir, exist_ok=True)
+
+    # mixed.wav 복사
+    mixed_src = os.path.join(episode_dir, "mixed.wav")
+    mixed_dst = os.path.join(public_dir, "mixed.wav")
+    if os.path.exists(mixed_src) and not os.path.exists(mixed_dst):
+        shutil.copy2(mixed_src, mixed_dst)
+        print(f"  copied mixed.wav → public/{episode_id}/")
+
+    # frames 복사
+    frames_src = os.path.join(episode_dir, "frames")
+    frames_dst = os.path.join(public_dir, "frames")
+    if os.path.isdir(frames_src) and not os.path.isdir(frames_dst):
+        shutil.copytree(frames_src, frames_dst)
+        n = len(os.listdir(frames_dst))
+        print(f"  copied frames ({n} files) → public/{episode_id}/frames/")
+
+
 def step_render(episode_dir: str, force: bool = False):
     """[8] Remotion 렌더링"""
     output = os.path.join(episode_dir, "output.mp4")
@@ -190,7 +230,7 @@ def step_render(episode_dir: str, force: bool = False):
            "src/index.tsx", "EnometaShorts",
            output,
            "--concurrency=2"]
-    run(cmd, "Remotion render")
+    run(cmd, "Remotion render", shell=True)
     return output
 
 
@@ -220,13 +260,14 @@ def run_pipeline(
         if step is not None and step != name:
             return
         label_map = {
-            "tts": "[2/8] TTS 나레이션",
-            "script_data": "[3/8] Script data",
-            "visual_script": "[4/8] Visual script",
-            "bgm": "[5/8] BGM",
-            "mix": "[6/8] 오디오 믹싱",
-            "python_frames": "[7/8] Python 프레임",
-            "render": "[8/8] Remotion 렌더링",
+            "tts": "[2/9] TTS 나레이션",
+            "script_data": "[3/9] Script data",
+            "visual_script": "[4/9] Visual script",
+            "bgm": "[5/9] BGM",
+            "mix": "[6/9] 오디오 믹싱",
+            "audio_analysis": "[7/9] 오디오 분석",
+            "python_frames": "[8/9] Python 프레임",
+            "render": "[9/9] Remotion 렌더링",
         }
         print(label_map.get(name, name))
         fn()
@@ -239,8 +280,10 @@ def run_pipeline(
         do("script_data",  lambda: step_script_data(episode_dir, force))
         do("visual_script",lambda: step_visual_script(episode_dir, title, episode_id, palette, force))
         do("bgm",          lambda: step_bgm(episode_dir, episode_id, force))
-        do("mix",          lambda: step_mix(episode_dir, force))
-        do("python_frames",lambda: step_python_frames(episode_dir, force))
+        do("mix",            lambda: step_mix(episode_dir, force))
+        do("audio_analysis", lambda: step_audio_analysis(episode_dir, force))
+        do("python_frames",  lambda: step_python_frames(episode_dir, force))
+        step_copy_public(episode_dir, episode_id)
         do("render",       lambda: step_render(episode_dir, force))
 
     except Exception as e:

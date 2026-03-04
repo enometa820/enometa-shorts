@@ -171,6 +171,7 @@ export const SubtitleSection: React.FC<SubtitleSectionProps> = ({
         alignItems: "center",
         padding: "0 100px 0 60px",
         pointerEvents: "none",
+        zIndex: 50,
       }}
     >
       <div

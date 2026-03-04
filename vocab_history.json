@@ -60,6 +60,25 @@
         "pixel_waveform_cascade:default",
         "text_reveal:default"
       ]
+    },
+    "ep008": {
+      "used_combos": [
+        "color_drain:default",
+        "flow_field_calm:opposing",
+        "flow_field_calm:vortex",
+        "flow_field_turbulent:opposing",
+        "flow_field_turbulent:vortex",
+        "grid_morph:wave_propagation",
+        "lissajous:default",
+        "particle_chain_awaken:default",
+        "particle_escape:default",
+        "pixel_grid_life:default",
+        "pixel_waveform_cascade:default",
+        "text_reveal:default",
+        "waveform:default",
+        "waveform_circular:default",
+        "waveform_spectrum:default"
+      ]
     }
   }
 }

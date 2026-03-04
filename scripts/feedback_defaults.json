@@ -1,7 +1,7 @@
 {
-  "version": 4,
-  "last_updated": "2026-03-04",
-  "last_updated_from": "audit_20260304_creative_freedom",
+  "version": 5,
+  "last_updated": "2026-03-05",
+  "last_updated_from": "ep008_feedback",
 
   "music_defaults": {
     "volume_caps": {
@@ -18,7 +18,18 @@
       "feedback": "볼륨 상한 0.3 유지 — 과도 사용 비권장",
       "stutter_gate": "볼륨 상한 0.3 유지",
       "general": "리듬(킥/클릭 패턴) + 멜로디(시퀀스) 구조 권장. sine_interference/ultrahigh 단독 사용 비권장"
-    }
+    },
+    "bpm_rules": [
+      {"rule": "에피소드 전체 고정 BPM — 가변 BPM 금지. 섹션별 BPM 변화는 리듬 끊김 유발", "source": "ep008_feedback"},
+      {"rule": "최소 BPM 120 보장 — 110 이하는 에너지 부족", "source": "ep008_feedback"}
+    ],
+    "fill_rules": [
+      {"rule": "필인 빈도: 8바마다 fill_buildup + 16바마다 fill_snare_roll. 4바마다 필인은 과도", "source": "ep008_feedback"}
+    ],
+    "continuity_rules": [
+      {"rule": "saw_sequence 음정 패턴은 에피소드 전체에서 1개 고정 — 섹션별 변경 금지", "source": "ep008_feedback"},
+      {"rule": "에너지 차이는 볼륨(smooth_envelope)과 si_gate로만 표현", "source": "ep008_feedback"}
+    ]
   },
 
   "visual_defaults": {
@@ -33,7 +44,9 @@
     ],
     "z_order_rules": [
       {"rule": "PixelGrid: zIndex 5 — 다른 vocab 위에 부각", "source": "ep007_feedback_v2"},
-      {"rule": "PostProcess: zIndex 10 — 모든 vocab 위 포스트프로세싱", "source": "ep007_feedback_v2"}
+      {"rule": "PostProcess: zIndex 10 — 모든 vocab 위 포스트프로세싱", "source": "ep007_feedback_v2"},
+      {"rule": "SubtitleSection: zIndex 50 — 자막은 반드시 비주얼 위 최상위", "source": "ep008_feedback"},
+      {"rule": "LogoEndcard: zIndex 100 — 절대 최상위", "source": "ep007_feedback_v2"}
     ],
     "background_rules": {
       "flow_field_calm": {"min_line_opacity": 0.06, "note": "0.05 이하 거의 안 보임"}

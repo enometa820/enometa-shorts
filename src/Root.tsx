@@ -50,6 +50,13 @@ import {
   ep007AudioSrc,
   ep007NarrationSegments,
 } from "./ep007Script";
+import {
+  ep008VisualScript,
+  ep008Title,
+  ep008AudioAnalysis,
+  ep008AudioSrc,
+  ep008NarrationSegments,
+} from "./ep008Script";
 
 // calculateMetadata: audioAnalysis.duration_sec 기반 durationInFrames 자동 계산
 // endcardDurationSec 기본 6초 포함
@@ -182,6 +189,25 @@ export const Root: React.FC = () => {
           audioSrc: ep007AudioSrc,
           narrationSegments: ep007NarrationSegments,
           highlightWords: ["탐색", "덜어낸다"],
+        }}
+      />
+
+      {/* EP008: 질서는 안정에서 오지 않았다 */}
+      <Composition
+        id="EP008"
+        component={EnometaShorts}
+        durationInFrames={3999}
+        fps={30}
+        width={1080}
+        height={1920}
+        calculateMetadata={calcMeta}
+        defaultProps={{
+          visualScript: ep008VisualScript,
+          title: ep008Title,
+          audioAnalysis: ep008AudioAnalysis,
+          audioSrc: ep008AudioSrc,
+          narrationSegments: ep008NarrationSegments,
+          highlightWords: ["혼돈", "연료", "창조"],
         }}
       />
 
