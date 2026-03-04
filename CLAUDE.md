@@ -6,7 +6,7 @@
 - **TTS**: `scripts/generate_voice_edge.py` 전용. `generate_voice.py`(Chatterbox) **절대 금지**
 - **글쓰기**: 대본 컨펌 전 제목/음악/비주얼 등 후속 단계 진행 **금지** (글 컨펌 게이트)
 - **비주얼**: render_mode 항상 `"hybrid"` (legacy 모드 제거됨)
-- **음악**: ikeda 단일 장르. 순수 노이즈 금지, 리듬+멜로디 최소 구조 필수
+- **음악**: 대본 리액티브 댄스 뮤직. 리듬 구조 권장, 순수 노이즈는 의도적 선택 시 허용. (ikeda 단일 장르 규칙은 F단계 패턴 엔진 완료 시 폐기 예정)
 - **오디오**: narration_volume=0.90, bgm_volume=1.0, 사이드체인 없음, loudnorm -14 LUFS, 엔드카드 BGM 자동 연장
 - **태그**: 주제 기반 5개만. 고정 제외 태그(`#쇼츠` `#shorts` `#ENOMETA` `#이노메타` `#데이터아트`) 포함 금지
 
