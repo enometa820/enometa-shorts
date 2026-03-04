@@ -71,8 +71,8 @@
 | 비주얼 | 혼자 시스템 설계 | 아티스트 협업 | **Python 자체 생성** |
 | 데이터 | 데이터 그 자체가 작품 | 데이터는 내러티브의 재료 | **대본(텍스트) → 데이터 → 비주얼** |
 | 관객 경험 | 지각의 한계 테스트 | 감정적 몰입 | **철학적 사유 + 감정적 몰입** |
-| 음악 | 사인파/노이즈 | 일렉트로니카/테크노 | **앰비언트 + 미니멀 일렉트로니카** |
-| 도구 | 커스텀 소프트웨어 | Ableton + Resolume | **Ableton + Python + Remotion** |
+| 음악 | 사인파/노이즈 | 일렉트로니카/테크노 | **enometa** (대본 리액티브 댄스 뮤직) |
+| 도구 | 커스텀 소프트웨어 | Ableton + Resolume | **Python 음악엔진 + Remotion** |
 | 포맷 | 갤러리 설치작 | 라이브 쇼 + 앨범 | **쇼츠(1080x1920) + 유튜브** |
 
 ---
@@ -97,12 +97,55 @@
 - Lissajous 곡선 — 두 사인파의 위상 차이로 생기는 기하학적 패턴
 - 보로노이 다이어그램 — 공간 분할 패턴. 자연물(잎맥, 거북 등딱지) 닮음
 
-### ENOMETA 적용 비주얼 아이디어
+### ENOMETA 구현 비주얼 시스템 (v11)
 
-- **대본 키워드 매핑**: "꽃" → 파티클 블룸, "바다" → 웨이브 노이즈, "별" → 포인트 클라우드
-- **감정 매핑**: 긴장 → 글리치/스트로브, 평온 → 플로우 필드, 각성 → 바이너리 그리드 확장
-- **텍스트 비주얼**: 대본 텍스트를 모노스페이스로 타이핑 효과 + 터미널 미학
-- **데이터 트랜지션**: 숫자/데이터로 시작 → 서서히 유기적 형태로 변환 (데이터아트형 콘텐츠)
+#### Python 렌더링 레이어 (1080×1080)
+
+| 레이어 | 역할 | SI 반응 |
+|--------|------|---------|
+| SineWaveLayer | 사인파 간섭 패턴 (배경) | SI 낮을수록 강함 |
+| WaveformLayer | 파형 시각화 | SI 비례 |
+| ParticleLayer | 파티클 에너지 | SI^1.5 (민감) |
+| TextDataLayer | 데이터 카드 | 0.70 + SI×0.30 |
+| BarcodeLayer | 바이트 스트라이프 | 0.60 + SI×0.40 |
+| DataStreamLayer | 데이터 스트림 | 0.50 + SI×0.50 |
+| DataMatrixLayer | 매트릭스 패턴 | SI^0.8 |
+
+#### Remotion 모션 컴포넌트
+
+| 컴포넌트 | 역할 | 특징 |
+|----------|------|------|
+| ShapeMotion | 감정별 기하학 도형 | tension=회전사각형, climax=동심원, awakening=스캔라인 |
+| TextReveal | 타이포그래피 (4모드) | typewriter/wave/glitch/scatter, 오디오 리액티브 |
+| Lissajous | Lissajous 곡선 | Canvas 2D, rms→선굵기, bass→위상 |
+| PixelGrid | 픽셀 그리드 | zIndex:5, 7가지 변형 (outline/life/rain/waveform 등) |
+| PostProcess | 후처리 효과 | zIndex:10 |
+
+#### 비주얼 어휘 (vocab) 23종
+
+- **파티클** (7): birth, scatter, converge, orbit, escape, chain_awaken, split_ratio
+- **타이포** (1): text_reveal (wave/glitch/scatter/typewriter)
+- **그리드** (2): grid_morph, grid_mesh
+- **네트워크** (1): neural_network
+- **링** (1): loop_ring
+- **프랙탈** (1): fractal_crack
+- **데이터** (3): data_bar, data_ring, counter_up
+- **파형** (3): waveform, waveform_spectrum, waveform_circular
+- **색상** (5): color_shift, color_drain, color_bloom, color_shift_warm, color_shift_cold
+- **조명** (2): brightness_pulse, light_source
+- **픽셀** (7): pixel_grid, pixel_grid_outline, pixel_grid_life, pixel_grid_rain, pixel_waveform, pixel_waveform_steps, pixel_waveform_cascade
+
+#### 감정 → 비주얼 매핑
+
+- **tension** → 글리치/스트로브 + 회전사각형 + 빨강 계열
+- **climax** → 파티클 폭발 + 동심원 + 초록 계열
+- **awakening** → 스캔라인 + 시안 계열
+- **intro** → 부유점 + 흰색 계열
+- **buildup** → 삼각형 펄스 + flash
+
+#### 팔레트 8종
+
+`phantom` · `neon_noir` · `cold_steel` · `ember` · `synapse` · `gameboy` · `c64` · `enometa`
 
 ---
 
@@ -119,6 +162,23 @@
 | 비트 패턴 | 드럼머신적 리듬이지만 정적 텍스처로 기능 |
 | 무음/침묵 | 소리의 부재 자체를 소재로 활용 |
 
+### ENOMETA 사운드 팔레트 (v11 구현)
+
+| 요소 | 레이어 | 설명 |
+|------|--------|------|
+| 킥 드럼 | rhythm | 사인파 body(60Hz) + 어택 클릭. 16-step 패턴 10종 |
+| 하이햇 | rhythm | 필터드 노이즈. 오픈/클로즈 변형 |
+| 스네어 | rhythm | 톤 바디(200Hz) + 노이즈 테일 + 어택 클릭 (0.18초) |
+| 쏘우파 시퀀스 | saw_sequence | 게이트 시퀀서. 메인 멜로디 역할. 레벨별 2~3 변형 |
+| 아르페지오 | arpeggio | 고음역 반복 음형. 3음/4음/8음 비대칭 패턴 10종 |
+| 딥 베이스 | bass | 사인파 기반 저음역 드론 |
+| 서브 펄스 | sub_pulse | 서브 베이스 영역 펄스 |
+| 사인파 간섭 | sine_interference | 두 주파수 간섭 — enometa 시그니처 텍스처 |
+| 펄스 트레인 | pulse_train | 극초단 클릭 (데이터 음각) |
+| 초고주파 | ultrahigh | 8~20kHz 텍스처 |
+| 게이트 스터터 | gate_stutter | 리듬 게이팅 + 스터터 효과 |
+| 갭 버스트 | gap_stutter_burst | 나레이션 공백에 임팩트 |
+
 ### 쿠퍼 사운드 팔레트
 
 | 요소 | 설명 |
@@ -130,77 +190,119 @@
 | 피아노/스트링 | 클래식 악기와 일렉트로닉의 융합 (Tom Hodge 협업) |
 | 바이노럴/이머시브 오디오 | Dolby Atmos 3D 공간 음향 |
 
-### ENOMETA 사운드 방향
+### ENOMETA 사운드 방향 (v11)
 
-- 기본 톤: 앰비언트 + 미니멀 일렉트로니카 (쿠퍼 쪽)
-- 텍스처: 사인파 레이어 + 서브베이스 (이케다 쪽)
-- 리듬: 미니멀 비트 또는 비트리스 (콘텐츠 톤에 따라)
-- 특수 요소: TTS 나레이션이 사운드스케이프의 일부로 통합
-- 제작 도구: Ableton Suite + FL Studio (기존 경험 활용)
+ENOMETA의 음악은 독자적인 장르 — **"대본 리액티브 댄스 뮤직"**. DAW 없이 Python(NumPy + SciPy)으로 직접 합성한다.
+
+- **장르**: enometa (구 ikeda). Ryoji Ikeda "Matrix"를 미학적 레퍼런스로 하되, 리듬/멜로디를 추가한 독자 노선
+- **엔진**: `enometa_music_engine.py` — 10레이어 연속 합성 (44100Hz)
+- **리듬**: 드럼 패턴(킥/하이햇/스네어) 중심. 16-step × 10패턴 (four_on_floor, euclidean, offbeat 등)
+- **멜로디**: 쏘우파 게이트 시퀀서 + 아르페지오 (레벨당 2~3 변형, 4바 로테이션)
+- **텍스처**: 사인파 간섭 + 펄스 트레인(데이터 클릭) + 초고주파(8~20kHz) + gate_stutter
+- **구조**: Song Arc(매크로) × SI 변조(미드) × 호흡 시스템(마이크로) — 3중 에너지 변조
+- **BPM**: 기본 135 (±20%), 에피소드 해시 시드 기반 변동
+- **특수 요소**: highlight_words → 킥+스네어 악센트, 나레이션 갭 → gap_burst 임팩트
+- **마스터링**: EBU R128 -14 LUFS, narration 0.90 + BGM 1.0, 사이드체인 미사용
 
 ---
 
 ## 5. 도구 & 기술 스택
 
-### 사운드 제작
+### 음악 생성 (Python 직접 합성)
 
 | 도구 | 용도 | 비고 |
 |------|------|------|
-| **Ableton Live Suite** | 메인 DAW. 작곡, 편곡, 믹싱 | 쿠퍼의 주 도구. MIDI out으로 비주얼 트리거 가능 |
-| **Max for Live** | Ableton 내 커스텀 디바이스 제작 | 사운드↔비주얼 브릿지 역할 |
-| **FL Studio** | 보조 DAW / 비트 스케치 | 기존 경험 활용 |
-| **패드+노브 컨트롤러** | 실시간 파라미터 조작 | 퍼포먼스 및 즉흥 작업용 |
+| **enometa_music_engine.py** | 10레이어 BGM 합성 (44100Hz) | DAW 없이 Python으로 직접 생성 |
+| **NumPy** | 파형 합성, 수학적 패턴 생성 | 사인파, 쏘우파, 노이즈 합성 |
+| **SciPy** | 오디오 필터링, WAV 출력 | 버터워스 필터, signal processing |
+| **audio_mixer.py** | 나레이션 + BGM 믹싱 | ffmpeg 기반. loudnorm -14 LUFS |
 
-### 비주얼 생성 (Python 파이프라인)
-
-| 도구 | 용도 | 비고 |
-|------|------|------|
-| **py5** | 제너러티브 아트 프레임 렌더링 | Processing의 Python 버전. 파티클, 노이즈, 기하학 패턴 |
-| **librosa** | 음악 분석 (BPM, onset, 스펙트럼) | 비주얼 싱크 포인트 추출 |
-| **NumPy** | 수학적 패턴 생성, 데이터 처리 | 사인파 합성, 노이즈 생성 |
-| **Pillow / Cairo** | 정적 프레임 기반 이미지 생성 | py5 대안으로 사용 가능 |
-| **MoviePy** | 이미지 시퀀스 → 영상 합성 | 최종 mp4 출력 |
-| **Claude API** | 대본 텍스트 → 키워드/감정/타이밍 추출 | NLP 기반 장면 분석 |
-
-### 최종 컴포지션
+### TTS (나레이션)
 
 | 도구 | 용도 | 비고 |
 |------|------|------|
-| **Remotion** | 모션 그래픽, 타이포, 레이아웃, 최종 합성 | 기존 파이프라인 활용 |
-| **TTS 엔진** | 대본 나레이션 음성 생성 | 사운드스케이프에 통합 |
+| **Edge-TTS** | 대본 → 나레이션 WAV 생성 | `generate_voice_edge.py` 전용. 비용 0원 |
+
+### 비주얼 생성 (Hybrid 파이프라인)
+
+| 도구 | 용도 | 비고 |
+|------|------|------|
+| **visual_renderer.py** | 제너러티브 아트 프레임 렌더링 (1080×1080 PNG) | PIL + NumPy. 7레이어(음악 3 + TTS 4) |
+| **visual_script_generator.py** | 대본 → 비주얼 스크립트 생성 | 감정/SI 기반 vocab 매핑. 23종 vocab |
+| **script_data_extractor.py** | 대본 → semantic_intensity + 키워드 추출 | 씬별 SI값, highlight_words |
+| **NumPy** | 수학적 패턴 생성, 오디오 데이터 처리 | 사인파, 노이즈, 파티클 궤적 |
+| **Pillow (PIL)** | 프레임 이미지 생성/합성 | 레이어별 드로잉 + 알파 블렌딩 |
+
+### 최종 컴포지션 (Remotion)
+
+| 도구 | 용도 | 비고 |
+|------|------|------|
+| **Remotion** | 모션 그래픽, 타이포, 자막, 최종 합성 | React + TypeScript. 1080×1920 출력 |
+| **@remotion/layout-utils** | fitText — 제목 fontSize 자동 조절 | 글자수 기반 최적 크기 |
+| **Pretendard Variable** | 한글 폰트 | 자막 54~62px, 태그라인 48px |
+
+### 자동화 파이프라인
+
+| 도구 | 용도 | 비고 |
+|------|------|------|
+| **enometa_render.py** | 7단계 파이프라인 단일 명령 실행 | TTS→데이터→비주얼→BGM→믹스→프레임→렌더 |
+| **ffmpeg** | 오디오 믹싱, loudnorm, 포맷 변환 | audio_mixer.py 내부 사용 |
 
 ### 향후 확장 가능
 
 | 도구 | 용도 | 비고 |
 |------|------|------|
 | **TouchDesigner** | 실시간 인터랙티브 비주얼 | Python 연동 가능 (OSC/MIDI). 라이브 퍼포먼스 시 |
-| **Resolume** | VJ 소프트웨어. 라이브 비주얼 믹싱 | 쿠퍼가 사용. 라이브 쇼 확장 시 |
-| **Stable Diffusion API** | AI 이미지 생성 | 키워드 기반 배경 소스 생성 |
-| **GLSL Shader** | GPU 기반 실시간 비주얼 | 고급 단계. 퍼포먼스 최적화 |
+| **GLSL Shader** | GPU 기반 실시간 비주얼 | Remotion Three.js 연동 가능 |
+| **@remotion/three** | 3D 비주얼 | Three.js + React Three Fiber |
 
 ---
 
 ## 6. ENOMETA 파이프라인 설계
 
+단일 명령으로 전체 자동 실행: `py scripts/enometa_render.py <episode_dir> --title "제목" --palette phantom`
+
 ```
-[대본 작성]
-    │
+[1] TTS (Edge-TTS)
+    │  generate_voice_edge.py → narration.wav
     ▼
-[Claude API] ── 키워드 추출 (시각 요소, 감정, 색감)
-    │            타이밍 매핑 (문장별 시간 배분)
+[2] Script Data
+    │  script_data_extractor.py → script_data.json
+    │  (세그먼트별 semantic_intensity, 키워드, highlight_words)
     ▼
-[Python 비주얼 엔진]
-    │  ├─ librosa: 음악 분석 (BPM, 비트 포인트)
-    │  ├─ py5: 제너러티브 비주얼 프레임 렌더링
-    │  │   ├─ 키워드 → 비주얼 함수 매핑
-    │  │   ├─ 감정 → 색상/밀도/속도 매핑  
-    │  │   └─ 음악 → 비트 싱크
-    │  └─ MoviePy: 프레임 → 영상 출력
+[3] Visual Script
+    │  visual_script_generator.py → visual_script.json
+    │  (씬별 감정 + vocab 매핑 + SI 기반 reactivity)
     ▼
-[Remotion] ── 비주얼 소스 + 텍스트 모션 + 레이아웃 합성
-    │            TTS 나레이션 + 사운드트랙 결합
+[4] BGM
+    │  enometa_music_engine.py → bgm.wav + bgm_raw_visual_data.npz
+    │  (10레이어 합성 + SI 변조 + Song Arc + 드럼 패턴)
     ▼
-[최종 출력] ── 1080x1920 세로 mp4 (쇼츠)
+[5] Audio Mix
+    │  audio_mixer.py → mixed.wav
+    │  (narration 0.90 + BGM 1.0, loudnorm -14 LUFS)
+    ▼
+[6] Python Frames
+    │  visual_renderer.py → frames/*.png (1080×1080)
+    │  (7레이어: SineWave/Waveform/Particle + TextData/Barcode/DataStream/DataMatrix)
+    ▼
+[7] Remotion Render
+    │  React + TypeScript → output.mp4 (1080×1920)
+    │  (Title + VisualSection + Subtitle + ShapeMotion + TextReveal + Endcard)
+    ▼
+[최종 출력] ── YouTube Shorts 1080×1920 세로 mp4
+```
+
+### 데이터 흐름
+
+```
+대본(텍스트)
+  ├─→ script_data.json (SI값, 키워드, 감정)
+  │     ├─→ visual_script.json (비주얼 결정)
+  │     ├─→ BGM의 SI 변조 + highlight_words 악센트
+  │     └─→ Remotion의 자막 싱크 + ShapeMotion 감정
+  ├─→ narration.wav (Edge-TTS)
+  └─→ bgm_raw_visual_data.npz (프레임별 RMS/bass/onset → Remotion 오디오 리액티브)
 ```
 
 ---
@@ -222,5 +324,5 @@
 
 ---
 
-*최종 업데이트: 2026.03.02*
+*최종 업데이트: 2026.03.04*
 *ENOMETA — 존재와 사유, 그 경계를 초월하다*
