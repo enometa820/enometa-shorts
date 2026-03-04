@@ -5,6 +5,42 @@
 
 ---
 
+## 2026-03-04 — v11 D섹션: 글쓰기 3종 구조 + 도메인 5+5 + SI 커브 7종 + 동적 믹싱
+
+### 글쓰기 스킬 변경
+
+**`skills/enometa-writing.md`** — D-1~D-3a 구현
+- **D-1**: "유일한 구조" → 3종 선택 시스템 (A: 3단계 변환 / B: 역순 각성 / C: 이중 나선)
+- **D-2**: 5대 → 5+5 도메인 (확장: 물리학/생물학/수학/경제학/예술, 코어 1개 필수)
+- **D-3a**: SI 커브 3→7종 (추가: 파동/충격파/계단/미니멀)
+- 채점: "3단계 전환"→"구조 설계" 리네이밍, 구조별 채점 기준 추가
+- 체크리스트: 구조 선택/도메인 확장/SI 커브 7종 항목 추가
+
+### 코드 변경
+
+**`scripts/enometa_music_engine.py`** — D-3b
+- SONG_ARC_PRESETS 4→7종: wave(이중 피크), shockwave(충격→감쇠), staircase(계단식 상승) 추가
+- `--arc` CLI 자동 확장 (choices=list(SONG_ARC_PRESETS.keys()))
+
+**`scripts/audio_mixer.py`** — D-4
+- `_build_dynamic_bgm_expr()`: script_data SI → ffmpeg 볼륨 수식 (BGM×(1.0-0.15×si))
+- `--dynamic-mix` CLI 옵션 (기본 OFF, narration 0.90 절대 고정)
+- 2초 스무딩, 나레이션 없는 구간 BGM 100% 유지
+
+### 마스터 문서 5종 최신화
+
+| 문서 | 변경 |
+|------|------|
+| SYSTEM_SNAPSHOT_20260304 | Song Arc 7종, 오디오 동적 믹싱, 진화 로그 v11-D |
+| ClaudeCode_Brief_20260304 | --arc 7종, --dynamic-mix CLI, 검증 체크리스트 |
+| Music_Engine_Spec_20260304 | Song Arc 테이블 7종, CLI --arc 확장 |
+| Hybrid_Visual_Architecture_20260304 | audio_mixer 동적 믹싱 섹션 |
+| Visual_Differentiation_Spec_20260304 | 헤더만 (비주얼 변경 없음) |
+| CHANGELOG | 이 항목 |
+| MEMORY.md | 글쓰기 v11 D섹션 업데이트 |
+
+---
+
 ## 2026-03-04 — v11 패턴 엔진 (창작 자유도 감사 F섹션) + ikeda→enometa 리네이밍
 
 ### 코드 변경 (commit 077a291)

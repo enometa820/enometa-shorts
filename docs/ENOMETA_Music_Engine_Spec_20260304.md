@@ -2,8 +2,8 @@
 
 > Pure Python 전자음악 엔진 — Raw Synthesis, GPU 불필요
 > numpy + scipy만으로 동작.
-> **last_updated**: 2026-03-04 — v11 패턴 엔진: 대본 리액티브 댄스 뮤직
-> v11 (창작 자유도 감사 F섹션): ikeda→enometa 리네이밍 + snare_drum 합성 + DRUM_PATTERNS(10종 16-step) + 바 카운팅 리듬 + SAW_PATTERNS 로테이션 + 호흡 시스템 + highlight_words 악센트 + call&response + 크로스페이드 raised cosine
+> **last_updated**: 2026-03-04 — v11 패턴 엔진 + D섹션: SONG_ARC_PRESETS 7종(+wave/shockwave/staircase) + 동적 믹싱(audio_mixer --dynamic-mix)
+> v11 (창작 자유도 감사): ikeda→enometa 리네이밍 + snare_drum 합성 + DRUM_PATTERNS(10종 16-step) + 바 카운팅 리듬 + SAW_PATTERNS 로테이션 + 호흡 시스템 + highlight_words 악센트 + call&response + 크로스페이드 raised cosine
 > v10→v11: SI 변조 80~105%, si_gate min 0.25, 3중 에너지(Song Arc × SI × Breath)
 
 ---
@@ -368,7 +368,7 @@ py scripts/enometa_music_engine.py \
 
 # --export-raw: raw_visual_data.npz 동시 출력 (Hybrid 비주얼 엔진용)
 # --script-data: 대본 데이터 기반 주파수/클릭 밀도 자동 설정
-# --arc: Song Arc 프리셋 (narrative|crescendo|flat|adaptive, 기본: narrative)
+# --arc: Song Arc 프리셋 (narrative|crescendo|flat|adaptive|wave|shockwave|staircase, 기본: narrative)
 # --episode: 에피소드 식별자 (music_history.json 이력 추적용)
 # --genre: (v11 무시됨, 항상 enometa)
 ```
@@ -384,6 +384,9 @@ py scripts/enometa_music_engine.py \
 | crescendo | grow(0-85%) → release(85-100%) | 0.2~1.1 |
 | flat | constant(0-100%) | 1.0 (아크 없음) |
 | **adaptive** | si 곡선 기반 동적 경계 (intro→buildup→climax→outro, script_data 필수) | 0.25~1.2 |
+| **wave** | rise1(0-25%) → dip(25-45%) → rise2(45-75%) → fade(75-100%) | 0.6~1.4 (이중 피크) |
+| **shockwave** | spike(0-15%) → decay(15-55%) → aftershock(55-75%) → settle(75-100%) | 0.2~1.5 (충격→감쇠) |
+| **staircase** | step1(0-25%) → step2(25-50%) → step3(50-75%) → step4(75-100%) | 0.6~1.4 (계단식 상승) |
 
 - `_compute_song_arc()`: 페이즈별 np.linspace → 연결 → cumsum 1.5s smoothing, adaptive 분기
 - `_build_arc_from_phases()`: phase 리스트 → 에너지 엔벨로프 공통 로직 (v7-P2)

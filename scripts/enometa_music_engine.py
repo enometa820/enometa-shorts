@@ -3296,6 +3296,106 @@ SONG_ARC_PRESETS = {
         "description": "적응형 — semantic_intensity 곡선에서 내러티브 구조 자동 추출 (script_data 필수, 없으면 narrative fallback)",
         "phases": [],  # 동적 생성 — _compute_adaptive_arc()에서 계산
     },
+    # ── D-3b: 추가 arc 프리셋 3종 (v11.2) ──
+    "wave": {
+        "description": "파동 — 두 개의 피크, 중간에 밸리. 이중 나선 구조(C)에 적합",
+        "phases": [
+            {
+                "name": "rise1",
+                "start_pct": 0.0,
+                "end_pct": 0.25,
+                "energy_range": (0.8, 1.1),
+                "density_mult": 1.0,
+            },
+            {
+                "name": "dip",
+                "start_pct": 0.25,
+                "end_pct": 0.45,
+                "energy_range": (1.1, 0.6),
+                "density_mult": 0.8,
+            },
+            {
+                "name": "rise2",
+                "start_pct": 0.45,
+                "end_pct": 0.75,
+                "energy_range": (0.6, 1.4),
+                "density_mult": 1.3,
+            },
+            {
+                "name": "fade",
+                "start_pct": 0.75,
+                "end_pct": 1.0,
+                "energy_range": (1.0, 0.3),
+                "density_mult": 0.6,
+            },
+        ],
+    },
+    "shockwave": {
+        "description": "충격파 — 강한 시작, 긴 감쇠, 여진. 역순 각성 구조(B)에 적합",
+        "phases": [
+            {
+                "name": "spike",
+                "start_pct": 0.0,
+                "end_pct": 0.15,
+                "energy_range": (1.4, 1.5),
+                "density_mult": 1.5,
+            },
+            {
+                "name": "decay",
+                "start_pct": 0.15,
+                "end_pct": 0.55,
+                "energy_range": (1.2, 0.6),
+                "density_mult": 0.8,
+            },
+            {
+                "name": "aftershock",
+                "start_pct": 0.55,
+                "end_pct": 0.75,
+                "energy_range": (0.6, 0.9),
+                "density_mult": 1.0,
+            },
+            {
+                "name": "settle",
+                "start_pct": 0.75,
+                "end_pct": 1.0,
+                "energy_range": (0.7, 0.2),
+                "density_mult": 0.5,
+            },
+        ],
+    },
+    "staircase": {
+        "description": "계단 — 점진적 4단계 상승. 3단계 변환 구조(A)의 점진형 변형",
+        "phases": [
+            {
+                "name": "step1",
+                "start_pct": 0.0,
+                "end_pct": 0.25,
+                "energy_range": (0.6, 0.7),
+                "density_mult": 0.7,
+            },
+            {
+                "name": "step2",
+                "start_pct": 0.25,
+                "end_pct": 0.50,
+                "energy_range": (0.8, 0.9),
+                "density_mult": 0.9,
+            },
+            {
+                "name": "step3",
+                "start_pct": 0.50,
+                "end_pct": 0.75,
+                "energy_range": (1.0, 1.2),
+                "density_mult": 1.2,
+            },
+            {
+                "name": "step4",
+                "start_pct": 0.75,
+                "end_pct": 1.0,
+                "energy_range": (1.3, 1.0),
+                "density_mult": 1.4,
+            },
+        ],
+    },
 }
 
 

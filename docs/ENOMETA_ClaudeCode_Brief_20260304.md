@@ -4,7 +4,7 @@
 > 이 문서를 Claude Code에 전달하면 에피소드 제작을 시작할 수 있다.
 > 상세 시스템 문서: ENOMETA_SYSTEM_SNAPSHOT_20260304.md 참조
 > 음악 엔진 상세: ENOMETA_Music_Engine_Spec_20260304.md 참조
-> **last_updated**: 2026-03-04 — v11 패턴 엔진: ikeda→enometa 리네이밍, DRUM_PATTERNS 10종, 바 카운팅+필/드롭, SAW_PATTERNS 로테이션, 호흡 시스템, SI 80~105%, si_gate min 0.25
+> **last_updated**: 2026-03-04 — D섹션: SONG_ARC_PRESETS 7종(+wave/shockwave/staircase), audio_mixer --dynamic-mix, 글쓰기 3종 구조+도메인 5+5+SI 커브 7종
 
 ---
 
@@ -135,7 +135,7 @@ py -X utf8 scripts/enometa_music_engine.py \
   --script-data episodes/epXXX/script_data.json \
   --episode epXXX
 # → 패턴 전환 로그 확인 (바별 drum_pattern/fill/drop 이벤트)
-# --arc: narrative(기승전결) | crescendo | flat | adaptive — 기본 narrative
+# --arc: narrative(기승전결) | crescendo | flat | adaptive | wave(이중피크) | shockwave(충격파) | staircase(계단) — 기본 narrative
 
 # [python_frames] SI 기반 레이어 강도 동적 조절
 py -X utf8 scripts/visual_renderer.py \
@@ -147,6 +147,9 @@ py -X utf8 scripts/audio_mixer.py \
   episodes/epXXX/narration.wav \
   episodes/epXXX/bgm.wav \
   episodes/epXXX/mixed.wav
+# 동적 믹싱 (선택): SI 기반 BGM 볼륨 미세 조절 (si↑ → BGM 최대 15% 감소)
+# py -X utf8 scripts/audio_mixer.py nar.wav bgm.wav out.wav \
+#   --dynamic-mix episodes/epXXX/script_data.json
 
 # [render] Remotion 합성 (Root.tsx durationInFrames 업데이트 후)
 npx remotion render src/index.tsx EnometaShorts \
@@ -229,6 +232,7 @@ ENOMETA | 데이터아트 × 철학
   - si≤0.25 구간 → "low" reactivity + layers=1
 □ visual_script.json TextReveal position에 "bottom" 없음 확인 ("upper"/"center"/"top"만 허용)
 □ mixed.wav 음량 확인: -14 LUFS 근처, TP 최대 -1.5dB (loudnorm 정상 작동)
+□ (선택) --dynamic-mix 사용 시: si 높은 구간에서 BGM 볼륨 미세 감소 확인 (최대 15%)
 □ Remotion 자막: SubtitleSection 문장 단위 표시, 35자 초과 시 마침표 분할, smartLineBreak(18), fadeIn/Out 0.2s
 □ Remotion 타이포: TextReveal 4모드(typewriter/wave/glitch/scatter) 색상/크기 다양성 확인
 □ Remotion ShapeMotion: 비주얼 영역(y=370~1450) 내 도형 표시, emotion별 패턴 작동 확인

@@ -2,7 +2,7 @@
 
 > 최종 업데이트: 2026-03-04
 > 상태: **Phase 1~4 구현 완료** / v11 enometa 단일 장르 (구 ikeda)
-> **last_updated**: 2026-03-04 — v11 ikeda→enometa 리네이밍, Lissajous vocab, z-order 시스템, EMOTION_VOCAB_POOL lissajous 추가
+> **last_updated**: 2026-03-04 — D섹션: 글쓰기 3종 구조(A/B/C) + 도메인 5+5 + SI 커브 7종 (글쓰기 스킬 변경, 비주얼 코드 변경 없음)
 
 ---
 
