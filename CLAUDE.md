@@ -65,12 +65,35 @@ TTS / 비주얼 / BGM이 하나의 통합 유기체로 움직여야 한다.
 2. 변경 성격 판단 → prefix 결정
 3. 관련 파일만 명시적으로 add
 4. 메시지 형식: `prefix: 한 줄 요약 (한국어 또는 영어)`
-5. 커밋 실행 후 `git status`로 결과 확인
+5. 커밋 실행 후 아래 브리핑 출력
+
+**커밋 브리핑 형식:**
+```
+✅ 커밋 완료
+├─ [prefix] 메시지
+├─ 파일 N개 변경 (+추가 -삭제)
+└─ 해시: xxxxxxx
+```
 
 ### "푸시해줘" 요청 시 수행 절차
-1. `git log --oneline -5`로 미푸시 커밋 확인
-2. 내용 요약 후 **푸시 전 확인 요청** (자동 푸시 없음)
-3. 승인 후 `git push origin main`
+1. `git log --oneline`으로 미푸시 커밋 확인
+2. 아래 브리핑 형식으로 요약 후 **승인 요청**
+3. 승인 후 `git push origin main` 실행
+
+**푸시 전 브리핑 형식:**
+```
+🚀 푸시 대상 커밋 N개
+├─ xxxxxxx feat: ...
+├─ xxxxxxx docs: ...
+└─ xxxxxxx ep: ...
+푸시할까요?
+```
+
+**푸시 후 브리핑 형식:**
+```
+✅ 푸시 완료 → origin/main
+└─ N개 커밋 반영
+```
 
 ### CHANGELOG.md 업데이트
 시스템 변경(feat/fix/refactor) 커밋 시 `docs/CHANGELOG.md` 상단에 항목 추가:
