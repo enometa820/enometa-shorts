@@ -2479,7 +2479,7 @@ class EnometaMusicEngine:
     _MOOD_DRUM_DEFAULT = {
         "ambient": False, "ikeda": False, "experimental": True,
         "minimal": True,  "chill": True,  "glitch": True,
-        "raw": True,      "intense": True,
+        "raw": True,      "intense": True, "techno": True,
     }
     _MOOD_LAYERS = {
         "ambient":      {"bass_drone": {"active": True, "volume": 0.8}, "sine_interference": {"active": True, "volume": 0.9}, "pulse_train": {"active": True, "volume": 0.6}, "saw_sequence": {"active": False}, "arpeggio": {"active": False}, "kick": {"active": False}, "snare": {"active": False}},
@@ -2490,11 +2490,12 @@ class EnometaMusicEngine:
         "glitch":       {"kick": {"active": True, "volume": 0.8, "pattern": "irregular"}, "stutter_gate": {"active": True, "volume": 0.9}, "gap_burst": {"active": True, "volume": 1.0}, "data_click": {"active": True, "volume": 0.8}, "snare": {"active": True, "volume": 0.6}},
         "raw":          {"kick": {"active": True, "volume": 0.9}, "snare": {"active": True, "volume": 0.8}, "saw_sequence": {"active": True, "volume": 1.0}, "arpeggio": {"active": True, "volume": 0.7}},
         "intense":      {"kick": {"active": True, "volume": 1.0}, "snare": {"active": True, "volume": 1.0}, "saw_sequence": {"active": True, "volume": 1.0}, "arpeggio": {"active": True, "volume": 0.9}, "ultrahigh_texture": {"active": True, "volume": 0.8}, "feedback_loop": {"active": True, "volume": 0.6}},
+        "techno":       {"kick": {"active": True, "volume": 1.0}, "snare": {"active": True, "volume": 0.7}, "saw_sequence": {"active": True, "volume": 0.9}, "arpeggio": {"active": True, "volume": 0.9}, "fm_bass": {"active": True, "volume": 0.7}, "ultrahigh_texture": {"active": True, "volume": 0.6}},
     }
     _GAP_FILL_INTENSITY = {
         "ambient": 0.0, "ikeda": 0.3, "experimental": 1.0,
         "minimal": 0.2, "chill": 0.3, "glitch": 0.8,
-        "raw": 0.6,     "intense": 0.9,
+        "raw": 0.6,     "intense": 0.9, "techno": 0.7,
     }
 
     def apply_mood_to_sections(self, sections: list, mood: str, drum_override=None):

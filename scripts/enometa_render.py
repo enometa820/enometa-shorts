@@ -73,7 +73,7 @@ def step_gen_timing(episode_dir: str, bpm: float = 135, music_mood: str = "raw",
     timing_json = os.path.join(episode_dir, "narration_timing.json")
 
     if not os.path.exists(script_txt):
-        print("  [skip] script.txt 없음 — narration_timing.json 직접 사용")
+        print("  [skip] script.txt 없음 - narration_timing.json 직접 사용")
         return
     if os.path.exists(timing_json):
         print("  [skip] narration_timing.json 이미 존재")
@@ -164,12 +164,10 @@ def step_bgm(episode_dir: str, episode_id: str, force: bool = False):
 
     print("  BGM 생성 중 (enometa, from-visual)...")
     cmd = [PYTHON, os.path.join(SCRIPTS_DIR, "enometa_music_engine.py"),
-           visual, output,
-           "--from-visual",
+           "--script-data", script_data,
+           "--visual-script", visual,
            "--export-raw",
-           "--episode", episode_id]
-    if os.path.exists(script_data):
-        cmd += ["--script-data", script_data]
+           output]
     run(cmd, "BGM")
     return output
 
@@ -357,7 +355,7 @@ def main():
     parser.add_argument("--bpm", type=float, default=135,
                         help="gen_timing BPM (기본: 135)")
     parser.add_argument("--music-mood", default="raw",
-                        choices=["ambient", "ikeda", "experimental", "minimal", "chill", "glitch", "raw", "intense"],
+                        choices=["ambient", "ikeda", "experimental", "minimal", "chill", "glitch", "raw", "intense", "techno"],
                         help="음악 무드 (기본: raw)")
     parser.add_argument("--visual-mood", default=None,
                         choices=["ikeda", "cooper", "abstract", "data"],

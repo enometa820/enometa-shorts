@@ -999,7 +999,7 @@ def generate_visual_script(
         genre_override = {**genre_override, **mood_override}
         if mood_override.get("palette") and palette_name in ("phantom", genre_override.get("palette", "")):
             palette_name = mood_override["palette"]
-        print(f"  Visual mood: {visual_mood} — {mood_override.get('description', '')}")
+        print(f"  Visual mood: {visual_mood} - {mood_override.get('description', '')}")
 
     # 팔레트
     palette = PALETTES.get(palette_name, PALETTES["phantom"])

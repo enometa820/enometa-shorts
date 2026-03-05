@@ -147,7 +147,7 @@ def main():
     parser.add_argument("--voice", default=DEFAULT_VOICE)
     parser.add_argument("--rate", default=DEFAULT_RATE)
     parser.add_argument("--music-mood", default="raw",
-                        choices=["ambient", "ikeda", "experimental", "minimal", "chill", "glitch", "raw", "intense"])
+                        choices=["ambient", "ikeda", "experimental", "minimal", "chill", "glitch", "raw", "intense", "techno"])
     parser.add_argument("--visual-mood", default=None,
                         choices=["ikeda", "cooper", "abstract", "data"])
     parser.add_argument("--drum", action="store_true", default=None,

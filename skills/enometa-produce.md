@@ -13,7 +13,49 @@ description: >
 - ★ 대본이 **컨펌 완료** 상태여야 함 (글 컨펌 게이트 통과)
 - ★ 제목이 **확정** 상태여야 함
 - 에피소드 폴더 준비: `episodes/epXXX/`
-- 필수 입력 파일: `episodes/epXXX/narration_timing.json` (대본 + 타이밍)
+- 필수 입력 파일: `episodes/epXXX/script.txt` (대본 원문)
+
+## 파이프라인 실행 전 옵션 안내 규칙
+
+**반드시 `enometa_render.py`의 `choices=` 값을 코드에서 직접 확인한 후 출력한다. 기억으로 나열 금지.**
+
+사용자에게 아래 형식으로 번호를 붙여 안내한다 (타이핑 편의):
+
+```
+팔레트 선택:
+1. phantom  — 기본값, 어두운 보라/청색
+2. neon_noir
+3. cold_steel
+4. ember    — 붉은/주황
+5. synapse
+6. gameboy  — 8비트
+7. c64      — 레트로
+
+음악 무드:
+1. raw         — 기본값, 거친 전자음
+2. ambient
+3. ikeda       — Ryoji Ikeda 스타일
+4. experimental
+5. minimal
+6. chill
+7. glitch
+8. intense     — 풀 에너지
+9. techno      — 4-on-the-floor 킥 + TB-303 arpeggio + FM bass, 기계적 드라이빙 그루브
+
+비주얼 무드:
+1. ikeda    — 기본값
+2. cooper
+3. abstract
+4. data
+
+드럼:
+1. 무드 기본값 (--drum/--no-drum 미지정)
+2. 강제 ON  (--drum)
+3. 강제 OFF (--no-drum)
+```
+
+사용자가 번호로 답하면 해당 옵션으로 매핑하여 실행한다.
+옵션은 한 번에 묻지 않고 **팔레트 → 음악 무드 → 비주얼 무드 → 드럼 순서로 하나씩 질문한다.**
 
 ## 실행 순서
 

@@ -57,6 +57,13 @@ import {
   ep008AudioSrc,
   ep008NarrationSegments,
 } from "./ep008Script";
+import {
+  ep009VisualScript,
+  ep009Title,
+  ep009AudioAnalysis,
+  ep009AudioSrc,
+  ep009NarrationSegments,
+} from "./ep009Script";
 
 // calculateMetadata: audioAnalysis.duration_sec 기반 durationInFrames 자동 계산
 // endcardDurationSec 기본 6초 포함
@@ -208,6 +215,25 @@ export const Root: React.FC = () => {
           audioSrc: ep008AudioSrc,
           narrationSegments: ep008NarrationSegments,
           highlightWords: ["혼돈", "연료", "창조"],
+        }}
+      />
+
+      {/* EP009: 우리의 뇌는 지금 누구를 위해 일하는가 */}
+      <Composition
+        id="EP009"
+        component={EnometaShorts}
+        durationInFrames={4213}
+        fps={30}
+        width={1080}
+        height={1920}
+        calculateMetadata={calcMeta}
+        defaultProps={{
+          visualScript: ep009VisualScript,
+          title: ep009Title,
+          audioAnalysis: ep009AudioAnalysis,
+          audioSrc: ep009AudioSrc,
+          narrationSegments: ep009NarrationSegments,
+          highlightWords: ["전전두엽", "메타인지", "감시", "투자"],
         }}
       />
 
