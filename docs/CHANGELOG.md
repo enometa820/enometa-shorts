@@ -5,6 +5,31 @@
 
 ---
 
+## 2026-03-05 — v15: 마디 동기화 + 음악 무드 8종 + visual_mood 4종 + 시스템 다이어트
+
+### Added
+- `scripts/gen_timing.py`: TTS 실측 → ceil(actual/SEC_PER_BAR) 마디 snap → narration_timing.json. 빈줄=드롭, drops[] 필드 기록
+- `scripts/enometa_music/tables.py`: MUSIC_MOOD_PRESETS 8종(ambient/ikeda/experimental/minimal/chill/glitch/raw/intense), CRASH_RULES, FILL_RULES, GAP_FILL_INTENSITY
+- `scripts/enometa_music/engine.py`: `_insert_gap_events()`, `apply_mood_to_sections()` 메서드
+- `scripts/enometa_music_engine.py`: 동일 메서드 + drum 오버라이드 로직
+- `scripts/visual_script_generator.py`: VISUAL_MOOD_OVERRIDES 4종(ikeda/cooper/abstract/data), `--visual-mood` CLI 옵션
+- `CLAUDE.md`: 커밋 & 푸시 규칙 섹션 추가
+- `CLAUDE.md`: v15 시스템 철학 (마디 동기화 3원칙)
+
+### Changed
+- `enometa_music_engine.py`: SI 볼륨 변조 0.80+0.25 → 0.85+0.15 (±15% 이내, 레이어 ON/OFF 에너지 주도)
+- `enometa_render.py`: gen_timing 스텝 추가, visual_mood/music_mood/drum 파라미터 전달
+- `.claude/rules/master-docs.md`: 마스터 문서 3종으로 축소
+
+### Removed
+- `docs/ENOMETA_Audiovisual_Reference_20260304.md` (코드로 통합)
+- `docs/ENOMETA_Creative_Freedom_Audit_20260304.md` (감사 완료, git 보존)
+- `docs/ENOMETA_Music_Engine_Spec_20260304.md` (코드가 진실의 소스)
+- `docs/ENOMETA_Visual_Differentiation_Spec_20260304.md` (코드로 통합)
+- `scripts/generate_music.py`, `scripts/subtitle_grouper.py` (레거시 제거)
+
+---
+
 ## 2026-03-04 — v11 D섹션: 글쓰기 3종 구조 + 도메인 5+5 + SI 커브 7종 + 동적 믹싱
 
 ### 글쓰기 스킬 변경

@@ -4,8 +4,10 @@ narration_timing.json → 완성된 쇼츠 MP4
 
 전제조건:
   - episodes/<id>/narration_timing.json 존재 (대본 세그먼트 포함)
+  - 또는 episodes/<id>/script.txt 존재 → gen_timing.py가 자동 생성
 
 파이프라인:
+  [1] gen_timing     gen_timing.py             → narration_timing.json (script.txt 있고 json 없을 때만)
   [2] TTS            generate_voice_edge.py    → narration.wav
   [3] script_data    script_data_extractor.py  → script_data.json
   [4] visual_script  visual_script_generator.py → visual_script.json
@@ -34,7 +36,7 @@ SCRIPTS_DIR = os.path.join(PROJECT_DIR, "scripts")
 
 PYTHON = "py"
 
-STEPS = ["tts", "script_data", "visual_script", "bgm", "mix", "audio_analysis", "python_frames", "render"]
+STEPS = ["gen_timing", "tts", "script_data", "visual_script", "bgm", "mix", "audio_analysis", "python_frames", "render"]
 
 
 def run(cmd: list, label: str, cwd: str | None = None, timeout: int = 900, shell: bool = False):
@@ -60,6 +62,33 @@ def save_status(episode_dir: str, status: dict):
 
 
 # ── 단계별 함수 ────────────────────────────────────────────────
+
+
+def step_gen_timing(episode_dir: str, bpm: float = 135, music_mood: str = "raw",
+                    visual_mood: str | None = None, drum: bool | None = None):
+    """[1] 마디 기반 타이밍 생성 (script.txt → narration_timing.json)
+    조건: script.txt 있고 narration_timing.json 없을 때만 실행
+    """
+    script_txt = os.path.join(episode_dir, "script.txt")
+    timing_json = os.path.join(episode_dir, "narration_timing.json")
+
+    if not os.path.exists(script_txt):
+        print("  [skip] script.txt 없음 — narration_timing.json 직접 사용")
+        return
+    if os.path.exists(timing_json):
+        print("  [skip] narration_timing.json 이미 존재")
+        return
+
+    print(f"  script.txt → narration_timing.json (BPM={bpm}, mood={music_mood})")
+    cmd = [PYTHON, os.path.join(SCRIPTS_DIR, "gen_timing.py"),
+           script_txt, "--bpm", str(bpm), "--music-mood", music_mood]
+    if visual_mood:
+        cmd += ["--visual-mood", visual_mood]
+    if drum is True:
+        cmd += ["--drum"]
+    elif drum is False:
+        cmd += ["--no-drum"]
+    run(cmd, "gen_timing")
 
 
 def step_tts(episode_dir: str, force: bool = False):
@@ -97,7 +126,8 @@ def step_script_data(episode_dir: str, force: bool = False):
 
 
 def step_visual_script(episode_dir: str, title: str, episode_id: str,
-                       palette: str = "phantom", force: bool = False):
+                       palette: str = "phantom", force: bool = False,
+                       visual_mood: str = ""):
     """[4] visual_script.json 생성"""
     timing = os.path.join(episode_dir, "narration_timing.json")
     output = os.path.join(episode_dir, "visual_script.json")
@@ -114,6 +144,8 @@ def step_visual_script(episode_dir: str, title: str, episode_id: str,
            "--palette", palette,
            "--episode", episode_id,
            "--title", title]
+    if visual_mood:
+        cmd += ["--visual-mood", visual_mood]
     run(cmd, "visual_script")
     return output
 
@@ -244,6 +276,10 @@ def run_pipeline(
     palette: str = "phantom",
     step: str | None = None,
     force: bool = False,
+    bpm: float = 135,
+    music_mood: str = "raw",
+    visual_mood: str | None = None,
+    drum: bool | None = None,
 ):
     os.makedirs(episode_dir, exist_ok=True)
     status = load_status(episode_dir)
@@ -260,14 +296,15 @@ def run_pipeline(
         if step is not None and step != name:
             return
         label_map = {
-            "tts": "[2/9] TTS 나레이션",
-            "script_data": "[3/9] Script data",
+            "gen_timing":    "[1/9] 마디 타이밍 생성",
+            "tts":           "[2/9] TTS 나레이션",
+            "script_data":   "[3/9] Script data",
             "visual_script": "[4/9] Visual script",
-            "bgm": "[5/9] BGM",
-            "mix": "[6/9] 오디오 믹싱",
-            "audio_analysis": "[7/9] 오디오 분석",
+            "bgm":           "[5/9] BGM",
+            "mix":           "[6/9] 오디오 믹싱",
+            "audio_analysis":"[7/9] 오디오 분석",
             "python_frames": "[8/9] Python 프레임",
-            "render": "[9/9] Remotion 렌더링",
+            "render":        "[9/9] Remotion 렌더링",
         }
         print(label_map.get(name, name))
         fn()
@@ -276,9 +313,10 @@ def run_pipeline(
         completed.append(name)
 
     try:
+        do("gen_timing",   lambda: step_gen_timing(episode_dir, bpm, music_mood, visual_mood, drum))
         do("tts",          lambda: step_tts(episode_dir, force))
         do("script_data",  lambda: step_script_data(episode_dir, force))
-        do("visual_script",lambda: step_visual_script(episode_dir, title, episode_id, palette, force))
+        do("visual_script",lambda: step_visual_script(episode_dir, title, episode_id, palette, force, visual_mood or ""))
         do("bgm",          lambda: step_bgm(episode_dir, episode_id, force))
         do("mix",            lambda: step_mix(episode_dir, force))
         do("audio_analysis", lambda: step_audio_analysis(episode_dir, force))
@@ -316,11 +354,25 @@ def main():
     parser.add_argument("--step", default=None, choices=STEPS,
                         help="특정 단계만 실행")
     parser.add_argument("--force", action="store_true", help="기존 파일 덮어쓰기")
+    parser.add_argument("--bpm", type=float, default=135,
+                        help="gen_timing BPM (기본: 135)")
+    parser.add_argument("--music-mood", default="raw",
+                        choices=["ambient", "ikeda", "experimental", "minimal", "chill", "glitch", "raw", "intense"],
+                        help="음악 무드 (기본: raw)")
+    parser.add_argument("--visual-mood", default=None,
+                        choices=["ikeda", "cooper", "abstract", "data"],
+                        help="비주얼 무드 (선택)")
+    parser.add_argument("--drum", action="store_true", default=None,
+                        help="드럼 강제 ON")
+    parser.add_argument("--no-drum", action="store_true",
+                        help="드럼 강제 OFF")
 
     args = parser.parse_args()
 
     episode_dir = os.path.abspath(args.episode_dir)
     episode_id = args.episode or os.path.basename(episode_dir)
+
+    drum = False if args.no_drum else (True if args.drum else None)
 
     run_pipeline(
         episode_dir=episode_dir,
@@ -329,6 +381,10 @@ def main():
         palette=args.palette,
         step=args.step,
         force=args.force,
+        bpm=args.bpm,
+        music_mood=args.music_mood,
+        visual_mood=args.visual_mood,
+        drum=drum,
     )
 
 

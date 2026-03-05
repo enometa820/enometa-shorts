@@ -231,6 +231,38 @@ GENRE_VISUAL_OVERRIDES = {
     },
 }
 
+# v15: visual_mood 4종 — narration_timing.json "visual_mood" 필드로 선택
+VISUAL_MOOD_OVERRIDES = {
+    "ikeda": {
+        "palette": "cold_steel",
+        "inject_vocabs": ["pixel_grid", "pixel_waveform", "data_bar", "waveform_spectrum"],
+        "inject_chance": 0.8,
+        "force_bg_pixel": True,
+        "description": "이케다: 흑백 데이터, 밀도 높은 격자",
+    },
+    "cooper": {
+        "palette": "phantom",
+        "inject_vocabs": ["particle_birth", "fractal_crack", "neural_network", "color_shift"],
+        "inject_chance": 0.7,
+        "force_bg_pixel": False,
+        "description": "쿠퍼: 유기적 파티클, 자연 성장",
+    },
+    "abstract": {
+        "palette": "phantom",
+        "inject_vocabs": ["color_shift", "loop_ring", "lissajous", "grid_morph"],
+        "inject_chance": 0.75,
+        "force_bg_pixel": False,
+        "description": "추상/기하학: 색상+곡선+변형",
+    },
+    "data": {
+        "palette": "cold_steel",
+        "inject_vocabs": ["counter_up", "data_ring", "waveform_spectrum", "data_bar"],
+        "inject_chance": 0.85,
+        "force_bg_pixel": False,
+        "description": "수치/분석: 카운터+스펙트럼+바",
+    },
+}
+
 # ============================================================
 # 감정 키워드 사전 (한국어)
 # ============================================================
@@ -866,6 +898,7 @@ def generate_visual_script(
     genre: str = "",
     strategy_name: str = "",
     episode_id: str = "",
+    visual_mood: str = "",
 ) -> dict:
     """전체 비주얼 스크립트 생성 (v5: 장르+전략+이력 기반 비주얼 선택)"""
 
@@ -959,6 +992,14 @@ def generate_visual_script(
     genre_override = GENRE_VISUAL_OVERRIDES.get(genre, {})
     if genre_override.get("palette") and palette_name == "phantom":
         palette_name = genre_override["palette"]
+
+    # v15: visual_mood 오버라이드 — genre_override보다 우선 적용
+    if visual_mood and visual_mood in VISUAL_MOOD_OVERRIDES:
+        mood_override = VISUAL_MOOD_OVERRIDES[visual_mood]
+        genre_override = {**genre_override, **mood_override}
+        if mood_override.get("palette") and palette_name in ("phantom", genre_override.get("palette", "")):
+            palette_name = mood_override["palette"]
+        print(f"  Visual mood: {visual_mood} — {mood_override.get('description', '')}")
 
     # 팔레트
     palette = PALETTES.get(palette_name, PALETTES["phantom"])
@@ -1070,6 +1111,7 @@ def main():
     genre = ""
     strategy_name = ""
     episode_id = ""
+    visual_mood = ""
 
     i = 2
     while i < len(sys.argv):
@@ -1090,6 +1132,9 @@ def main():
             i += 2
         elif sys.argv[i] == "--seed" and i + 1 < len(sys.argv):
             seed = int(sys.argv[i + 1])
+            i += 2
+        elif sys.argv[i] == "--visual-mood" and i + 1 < len(sys.argv):
+            visual_mood = sys.argv[i + 1]
             i += 2
         else:
             if output is None and not sys.argv[i].startswith("--"):
@@ -1137,6 +1182,7 @@ def main():
         genre=genre,
         strategy_name=strategy_name,
         episode_id=episode_id,
+        visual_mood=visual_mood,
     )
 
     with open(output, 'w', encoding='utf-8') as f:

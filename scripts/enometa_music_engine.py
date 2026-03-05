@@ -1,4 +1,4 @@
-"""
+﻿"""
 ENOMETA Generative Music Engine v11 — Pattern Engine
 대본의 감정을 읽고 1곡의 연속적 음악을 생성하는 엔진.
 GPU 불필요. numpy + scipy만으로 동작.
@@ -21,8 +21,7 @@ v8 변경사항:
 - EMOTION_MAP: 고에너지 상태에 feedback 텍스처 활성화
 
 사용법:
-  python enometa_music_engine.py <music_script.json> [output.wav]
-  python enometa_music_engine.py --from-visual <visual_script.json> [narration_timing.json] [output.wav]
+  python enometa_music_engine.py --script-data <script_data.json> [--visual-script <visual_script.json>] [output.wav]
 """
 
 import sys
@@ -2476,6 +2475,95 @@ class EnometaMusicEngine:
 
         return si_env
 
+    # ── v15 무드 시스템 ──────────────────────────────────────────────────
+    _MOOD_DRUM_DEFAULT = {
+        "ambient": False, "ikeda": False, "experimental": True,
+        "minimal": True,  "chill": True,  "glitch": True,
+        "raw": True,      "intense": True,
+    }
+    _MOOD_LAYERS = {
+        "ambient":      {"bass_drone": {"active": True, "volume": 0.8}, "sine_interference": {"active": True, "volume": 0.9}, "pulse_train": {"active": True, "volume": 0.6}, "saw_sequence": {"active": False}, "arpeggio": {"active": False}, "kick": {"active": False}, "snare": {"active": False}},
+        "ikeda":        {"sine_interference": {"active": True, "volume": 1.0}, "data_click": {"active": True, "volume": 0.7}, "pulse_train": {"active": True, "volume": 0.8}, "ultrahigh_texture": {"active": True, "volume": 0.5}, "saw_sequence": {"active": False}, "arpeggio": {"active": False}, "kick": {"active": False}, "snare": {"active": False}},
+        "experimental": {"bytebeat": {"active": True, "volume": 0.8}, "feedback_loop": {"active": True, "volume": 0.6}, "stutter_gate": {"active": True, "volume": 0.7}, "glitch": {"active": True, "volume": 0.9}, "kick": {"active": True, "volume": 0.7}, "snare": {"active": True, "volume": 0.5}},
+        "minimal":      {"fm_bass": {"active": True, "volume": 0.9}, "bass_drone": {"active": True, "volume": 0.7}, "arpeggio": {"active": True, "volume": 0.6}, "kick": {"active": True, "volume": 0.5}, "saw_sequence": {"active": False}, "snare": {"active": False}},
+        "chill":        {"kick": {"active": True, "volume": 0.5}, "arpeggio": {"active": True, "volume": 0.9}, "bass_drone": {"active": True, "volume": 0.7}, "saw_sequence": {"active": True, "volume": 0.4}, "snare": {"active": False}},
+        "glitch":       {"kick": {"active": True, "volume": 0.8, "pattern": "irregular"}, "stutter_gate": {"active": True, "volume": 0.9}, "gap_burst": {"active": True, "volume": 1.0}, "data_click": {"active": True, "volume": 0.8}, "snare": {"active": True, "volume": 0.6}},
+        "raw":          {"kick": {"active": True, "volume": 0.9}, "snare": {"active": True, "volume": 0.8}, "saw_sequence": {"active": True, "volume": 1.0}, "arpeggio": {"active": True, "volume": 0.7}},
+        "intense":      {"kick": {"active": True, "volume": 1.0}, "snare": {"active": True, "volume": 1.0}, "saw_sequence": {"active": True, "volume": 1.0}, "arpeggio": {"active": True, "volume": 0.9}, "ultrahigh_texture": {"active": True, "volume": 0.8}, "feedback_loop": {"active": True, "volume": 0.6}},
+    }
+    _GAP_FILL_INTENSITY = {
+        "ambient": 0.0, "ikeda": 0.3, "experimental": 1.0,
+        "minimal": 0.2, "chill": 0.3, "glitch": 0.8,
+        "raw": 0.6,     "intense": 0.9,
+    }
+
+    def apply_mood_to_sections(self, sections: list, mood: str, drum_override=None):
+        """v15: 무드 프리셋에 따라 섹션별 instrument active/volume 적용."""
+        mood_layers = self._MOOD_LAYERS.get(mood, self._MOOD_LAYERS["raw"])
+        drum_on = self._MOOD_DRUM_DEFAULT.get(mood, True) if drum_override is None else drum_override
+        drum_layers = {"kick", "snare", "hi_hat"}
+        print(f"  [mood] {mood}: drum={'ON' if drum_on else 'OFF'}", flush=True)
+        for section in sections:
+            instruments = section.setdefault("instruments", {})
+            for layer_name, config in mood_layers.items():
+                if layer_name in drum_layers:
+                    instruments[layer_name] = dict(config, active=drum_on and config.get("active", True))
+                else:
+                    instruments[layer_name] = dict(config)
+        return sections
+
+    def _insert_gap_events(self, drops: list, mood: str = "raw"):
+        """v15: drops[] 구간에 무드별 강도로 gap_burst/stutter/impact 삽입."""
+        intensity = self._GAP_FILL_INTENSITY.get(mood, 0.5)
+        if not drops or intensity == 0:
+            return
+        bpm = float(self.bpm)
+        spb = (60.0 / bpm) * 4  # SEC_PER_BAR
+        print(f"  [gap_events] {len(drops)} drops, mood={mood}, intensity={intensity:.1f}", flush=True)
+        for drop in drops:
+            start_sample = int(drop["start_sec"] * self.sr)
+            end_sample = min(int(drop["end_sec"] * self.sr), self.total_samples)
+            duration = drop["end_sec"] - drop["start_sec"]
+            if start_sample >= self.total_samples:
+                continue
+            # 1마디 이상: gap_burst
+            if duration >= spb and intensity >= 0.3:
+                burst_dur = min(spb * 0.5, 0.4)
+                burst = noise(burst_dur, self.sr)
+                burst = lowpass(burst, 3000, self.sr)
+                burst = fade_in(fade_out(burst, burst_dur * 0.5), 0.01)
+                burst *= intensity * 0.4
+                end_b = min(start_sample + len(burst), self.total_samples)
+                length = end_b - start_sample
+                self.master_L[start_sample:end_b] += burst[:length]
+                self.master_R[start_sample:end_b] += burst[:length]
+            # 2마디 이상: 중간 stutter
+            if duration >= spb * 2 and intensity >= 0.5:
+                mid_sample = (start_sample + end_sample) // 2
+                mid_sample = min(mid_sample, self.total_samples - self.sr)
+                stutter_len = int(0.1 * self.sr)
+                if mid_sample + stutter_len <= self.total_samples:
+                    src = self.master_L[mid_sample:mid_sample + stutter_len].copy()
+                    for rep in range(3):
+                        pos = mid_sample + rep * stutter_len
+                        end_r = min(pos + stutter_len, self.total_samples)
+                        length = end_r - pos
+                        vol = (1.0 - rep * 0.3) * intensity * 0.3
+                        self.master_L[pos:end_r] += src[:length] * vol
+                        self.master_R[pos:end_r] += src[:length] * vol
+            # 3마디 이상 + 강도 높음: impact
+            if duration >= spb * 3 and intensity >= 0.7:
+                impact_start = max(0.0, drop["end_sec"] - 0.05)
+                impact = transition_impact(self.sr)
+                impact *= intensity * 0.5
+                pos = int(impact_start * self.sr)
+                end_p = min(pos + len(impact), self.total_samples)
+                length = end_p - pos
+                self.master_L[pos:end_p] += impact[:length]
+                self.master_R[pos:end_p] += impact[:length]
+
+    # ─────────────────────────────────────────────────────────────────────
+
     def generate(self) -> np.ndarray:
         """music_script.json의 모든 섹션을 1곡으로 렌더링"""
         sections = self.script.get("sections", [])
@@ -2488,7 +2576,7 @@ class EnometaMusicEngine:
 
         # semantic_intensity 엔벨로프 사전 빌드 (adaptive arc가 참조하므로 arc 전에 빌드)
         self._si_env = self._build_si_envelope()
-        self._si_modulation = 0.80 + self._si_env * 0.25  # B-2: si=0→0.80, si=1→1.05 (변화폭 31% — EP006 실패 반복 않되 대비 복원)
+        self._si_modulation = 0.85 + self._si_env * 0.15  # v15: ±15% 이내 — 레이어 ON/OFF가 에너지 주도
         self._si_gate = self._build_si_gate()  # v7-P8: 연속 악기 si 게이트
         self._tempo_curve = self._compute_tempo_curve()  # v7-P6: 가변 BPM 곡선
         if self._script_data:
@@ -2530,6 +2618,15 @@ class EnometaMusicEngine:
         # F-7: 콜앤리스폰스 엔벨로프 사전 계산
         self._cr_drum_env, self._cr_melody_env = self._compute_call_response_envelopes()
 
+        # v15: 무드 기반 레이어 ON/OFF 적용
+        music_mood = self.script.get("metadata", {}).get("music_mood", "raw")
+        drum_override = self.script.get("metadata", {}).get("drum_override", None)
+        if music_mood and music_mood != "raw":
+            self.apply_mood_to_sections(sections, music_mood, drum_override)
+        elif drum_override is not None:
+            # raw 무드에서도 drum_override 적용
+            self.apply_mood_to_sections(sections, "raw", drum_override)
+
         if is_enometa:
             # v9 Ikeda 확장: 쏘우파 시퀀서 + 리듬 + 아르페지오 + 펄스 트레인 + 드론
             # 레이어 1: 리듬 뼈대 (킥 + 하이햇)
@@ -2549,6 +2646,10 @@ class EnometaMusicEngine:
             self._render_continuous_gate_stutter(sections)
             # 레이어 10: 무음 갭 쏘우 스터터 버스트 (나레이션 없는 구간 임팩트)
             self._render_gap_stutter_burst()
+            # v15: drops[] 기반 gap_events 삽입 (music_mood 강도 적용)
+            drops = self.script.get("metadata", {}).get("drops", [])
+            if drops:
+                self._insert_gap_events(drops, music_mood)
         else:
             # Phase 1: 기반 악기 — 전체 길이 연속 렌더링
             self._render_continuous_bass(sections)
@@ -4037,193 +4138,90 @@ def _quantize_to_bar(time_sec: float, bar_duration: float) -> float:
     return round(time_sec / bar_duration) * bar_duration
 
 
-def generate_music_script(visual_script: dict, narration_timing: dict = None,
-                          genre: str = "enometa", episode: str = None,
-                          project_dir: str = None) -> dict:
+def generate_music_script(script_data_path: str, visual_script_path: str = None) -> dict:
+    """script_data.json(마디 기반) 정보로 음악/오디오 섹션 스크립트를 생성합니다.
+    시드 기반 랜덤 확정성 부여 (에피소드 이름/경로 해시 기반)
+    visual_script는 선택 사항이며, 카메라 모션을 이용해 텍스처를 더할 수도 있습니다.
     """
-    visual_script.json + narration_timing.json → music_script.json
-    대본의 씬별 감정을 읽어서 악기 배치를 자동 결정.
-    genre: v8부터 enometa 단일 장르. 하위호환을 위해 파라미터 유지.
-    episode: 에피소드 ID (ep006 등) — 이력 추적용
-    project_dir: 프로젝트 루트 — music_history.json 위치
-    """
-    # v11: enometa 단일 장르 — 하위호환: "ikeda" 입력 시 자동 매핑
-    if genre == "ikeda":
-        genre = "enometa"
-    if genre and genre != "enometa":
-        print(f"  [v11 WARNING] Genre '{genre}' is deprecated. Using 'enometa' (single genre system).")
-        genre = "enometa"
-    if not genre:
-        genre = "enometa"
+    with open(script_data_path, 'r', encoding='utf-8') as f:
+        script_data = json.load(f)
 
-    scenes = visual_script.get("scenes", [])
-    title = visual_script.get("title", "ENOMETA")
-
-    total_duration = max(s["end_sec"] for s in scenes) if scenes else 60
-    # 엔드카드(6초) + 여유(2초) 포함하여 BGM이 엔드카드까지 이어지도록
-    total_duration = total_duration + 8
-
-    # v11: 항상 enometa 프리셋 적용
-    genre_preset = GENRE_PRESETS["enometa"]
-
-    # v13: BPM을 에피소드 시드에서 결정 (하드코딩 135 제거)
-    import hashlib as _hl
-    # 시드 소스: episode > visual_script.metadata.episode > title
-    _seed_src = episode or visual_script.get("metadata", {}).get("episode") or title
-    _pre_seed = int(_hl.md5(_seed_src.encode()).hexdigest(), 16) % (2**31)
-    from sequence_generators import derive_episode_sequences
-    _seq_config = derive_episode_sequences(_pre_seed)
-    base_bpm = _seq_config.bpm
-
-    # ── v12: 대본 씬 종속 → 댄스 음악 자율 구조 ──
-    # 대본에서 3개만 읽음: total_duration, climax_time, outro_time
-    # 나머지는 음악이 자체 문법(8바/16바)으로 결정
-
-    # climax_time: SI(semantic_intensity)가 가장 높은 씬의 시작 시점
-    # SI가 없으면 emotion 이름에서 에너지 추정 (climax/awakening/tension = 고에너지)
-    _EMOTION_ENERGY_HINT = {
-        "climax": 1.0, "transcendent": 0.9, "awakening": 0.85, "tension": 0.8,
-        "hopeful": 0.6, "neutral": 0.4, "somber": 0.3, "intro": 0.2, "fade": 0.1,
-    }
-    climax_time = None
-    if scenes:
-        best_energy = -1
-        for s in scenes:
-            si = s.get("semantic_intensity", s.get("energy", None))
-            if si is None:
-                # emotion 이름에서 추정
-                emotion = s.get("emotion", "neutral")
-                base_emo = emotion.split("_")[0]
-                si = _EMOTION_ENERGY_HINT.get(base_emo, 0.4)
-            if si > best_energy:
-                best_energy = si
-                climax_time = s["start_sec"]
-
-    # outro_time: 마지막 씬의 시작 시점
-    outro_time = scenes[-1]["start_sec"] if scenes else None
-
-    climax_str = f"{climax_time:.1f}s" if climax_time is not None else "auto(60%)"
-    outro_str = f"{outro_time:.1f}s" if outro_time is not None else "auto(80%)"
-    print(f"  [v12] Script inputs: total={total_duration:.1f}s, climax={climax_str}, outro={outro_str}")
-
-    # 곡 구조 자동 생성 (intro→buildup→drop→breakdown→drop2→outro)
-    sections, actual_duration = _plan_song_structure(
-        total_duration=total_duration,
-        bpm=base_bpm,
-        climax_time=climax_time,
-        outro_time=outro_time,
-    )
-    total_duration = actual_duration
-
-    genre_label = "enometa"  # v11: always enometa
-    synthesis_overrides = {"enometa_mode": True}  # v11: always enometa mastering
-
-    # v7-P7: 에피소드 이력 기반 키/패턴 자동 선택
-    music_history = _load_music_history(project_dir) if project_dir else {"episodes": {}}
-    selected_key = _select_key_from_history(music_history, genre_label)
-    # v13: ARP 패턴도 시퀀스 기반 생성 (하드코딩 ARP_PATTERNS 제거)
-    from sequence_generators import generate_pitch_pattern
-    selected_arp = generate_pitch_pattern(_seq_config, "mid")
-    arp_idx = -1  # v13: 더 이상 인덱스 기반이 아님
-    key_palette = KEY_PRESETS[selected_key]
-
-    # v9: episode 해시 기반 랜덤 시드 — 에피소드마다 다른 텍스처 패턴
+    meta = script_data.get("metadata", {})
+    episode_id = meta.get("episode", "default")
+    
     import hashlib
-    ep_str = episode if episode else (title + selected_key)
-    ep_hash = int(hashlib.md5(ep_str.encode()).hexdigest(), 16) % (2**31)
-    random.seed(ep_hash)
-    np.random.seed(ep_hash)
-    print(f"  [v9] random seed={ep_hash} (episode: {ep_str})")
+    seed_val = int(hashlib.md5(episode_id.encode()).hexdigest(), 16) % (2**32)
+    random.seed(seed_val)
+    np.random.seed(seed_val)
+    print(f"  [MusicEngine] Fixed seed for episode '{episode_id}': {seed_val}")
 
-    # v9: SINE_MELODY_SEQUENCES를 선택된 키의 pad_root 기반으로 동적 생성
-    global SINE_MELODY_SEQUENCES
-    SINE_MELODY_SEQUENCES = build_sine_melody_sequences(key_palette["pad_root"])
-    print(f"  [v9] SINE_MELODY_SEQUENCES built for key={selected_key} (pad_root={key_palette['pad_root']:.1f}Hz)")
+    segments = script_data.get("segments", [])
+    total_dur = script_data.get("global", {}).get("total_duration_sec", 60.0)
+    bpm = script_data.get("global", {}).get("bpm", 120)
 
-    if episode or project_dir:
-        print(f"  [music_history] key={selected_key}, arp_pattern={arp_idx}")
-        recent_eps = sorted(music_history.get("episodes", {}).keys(), reverse=True)[:2]
-        if recent_eps:
-            print(f"  [music_history] recent episodes: {recent_eps}")
+    base_freq = 60.0
+    sections = []
 
-    # 주요 악기 사용 통계 (이력 저장용)
-    dominant_instruments = set()
-    for sec in sections:
-        for inst_key, inst_val in sec.get("instruments", {}).items():
-            if isinstance(inst_val, dict) and inst_val.get("active", False):
-                dominant_instruments.add(inst_key)
+    for seg in segments:
+        s_start = seg.get("start_sec", 0.0)
+        s_end = seg.get("end_sec", 0.0)
+        analysis = seg.get("analysis", {})
+        si = analysis.get("semantic_intensity", 0.5)
 
-    # F-6: visual_script → highlight_words 전달
-    highlight_words = visual_script.get("highlightWords", [])
+        energy = 0.3 + (si * 0.7)
+        emotion = "neutral"
+        if si > 0.8:
+            emotion = "tension"
+        elif si > 0.6:
+            emotion = "awakening"
+        elif si < 0.2:
+            emotion = "empty"
 
-    music_script = {
-        "metadata": {
-            "title": title,
-            "duration": total_duration,
-            "sample_rate": SAMPLE_RATE,
-            "key": selected_key,
-            "base_bpm": base_bpm,
-            "genre": genre_label,
-            "song_arc": "song_structure",  # v12: role 기반 자동 arc
-            "synthesis_overrides": synthesis_overrides,
-            "highlight_words": highlight_words,
-            # v13: 시퀀스 설정 (렌더링 시 사용)
-            "seq_config": {
-                "drum_seq_type": _seq_config.drum_seq_type,
-                "drum_rotation": _seq_config.drum_rotation,
-                "pitch_rotation": _seq_config.pitch_rotation,
-                "pitch_length": _seq_config.pitch_length,
-                # v14: 음색 파라미터
-                "saw_harmonics": {str(k): v for k, v in _seq_config.saw_harmonics.items()},
-                "filter_cutoff_base": _seq_config.filter_cutoff_base,
-                "chorus_depth_ms": _seq_config.chorus_depth_ms,
-                "fm_mod_ratio": _seq_config.fm_mod_ratio,
-                "bass_detune": _seq_config.bass_detune,
-                "kick_character": _seq_config.kick_character,
+        section = {
+            "id": f"sec_{seg.get('index', 0)}",
+            "start_sec": s_start,
+            "end_sec": s_end,
+            "bpm": bpm,
+            "energy": energy,
+            "emotion": emotion,
+            "_segment_index": seg.get("index", 0),
+            "instruments": {
+                "bass_drone": {"active": True, "volume": 0.4 + si * 0.3, "freq": base_freq},
+                "fm_bass": {"active": energy > 0.6, "volume": 0.3, "freq": base_freq * 2},
+                "arpeggio": {"active": energy > 0.4, "volume": 0.3, "speed": 0.15 + si * 0.2, "freq": base_freq * 4},
+                "synth_lead": {"active": energy > 0.7, "volume": 0.35, "pattern": [1, 1.25, 1.5, 2]},
+                "sine_interference": {"active": True, "volume": 0.2 + energy * 0.2},
+                "ultrahigh_texture": {"active": True, "volume": 0.05 + energy * 0.1},
+                "pulse_train": {"active": True, "volume": 0.1 + energy * 0.3},
+                "saw_sequence": {"active": True, "volume": 0.4 + energy * 0.4},
+                "gate_stutter": {"active": energy > 0.5, "volume": 0.3 + energy * 0.2},
+                "sub_pulse": {"active": True, "volume": 0.6},
+                "glitch": {"active": energy > 0.7, "density": si * 1.5},
+                "data_click": {"active": True, "volume": 0.5, "density": si * 1.5},
+                "clicks": {"active": True, "density": si * 0.5},
             },
+            "effects": {
+                "stereo_width": 0.5 + si * 0.5
+            }
+        }
+        sections.append(section)
+
+    return {
+        "metadata": {
+            "duration": total_dur,
+            "base_bpm": bpm,
+            "episode": episode_id,
+            "genre": "enometa"
         },
         "palette": {
-            "bass_freq": key_palette["bass_freq"],
-            "pad_root": key_palette["pad_root"],
-            "pad_fifth": key_palette["pad_fifth"],
-            "arp_root": key_palette["arp_root"],
-            "arp_pattern": selected_arp,
+            "bass_freq": base_freq,
+            "pad_root": base_freq * 2,
+            "pad_fifth": base_freq * 3,
+            "arp_root": base_freq * 4,
+            "arp_pattern": [1, 1.25, 1.5, 2, 1.5, 1.25]
         },
-        "sections": sections,
+        "sections": sections
     }
-
-    # v8 C-6: 텍스처 모듈 선택
-    texture_modules = _select_texture_modules_from_history(project_dir) if project_dir else list(AVAILABLE_TEXTURE_MODULES[:4])
-    music_script["metadata"]["texture_modules"] = texture_modules
-
-    # v7-P7 + v8: 이력 저장
-    if episode and project_dir:
-        # 에너지 프로파일 추출 (4구간 평균)
-        energy_profile = []
-        if sections:
-            chunk_size = max(1, len(sections) // 4)
-            for ci in range(4):
-                chunk = sections[ci * chunk_size: (ci + 1) * chunk_size]
-                if chunk:
-                    avg_e = sum(s.get("energy", 0.3) for s in chunk) / len(chunk)
-                    energy_profile.append(round(avg_e, 2))
-
-        music_history["episodes"][episode] = {
-            "genre": genre_label,
-            "bpm": base_bpm,
-            "key": selected_key,
-            "arp_pattern_idx": arp_idx,  # v13: deprecated (-1), kept for compat
-            "seq_drum_type": _seq_config.drum_seq_type,
-            "seq_bpm": _seq_config.bpm,
-            "dominant_instruments": sorted(list(dominant_instruments)),
-            "energy_profile": energy_profile,
-            "num_sections": len(sections),
-            "texture_modules": texture_modules,  # v8 C-6: 텍스처 모듈 이력
-        }
-        _save_music_history(project_dir, music_history)
-
-    return music_script
-
 
 # ============================================================
 # CLI
@@ -4231,148 +4229,55 @@ def generate_music_script(visual_script: dict, narration_timing: dict = None,
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description="ENOMETA Generative Music Engine v11 (pattern engine)")
-    parser.add_argument("input", help="music_script.json 또는 --from-visual 모드")
-    parser.add_argument("extra", nargs="*", help="추가 인자")
-    parser.add_argument("--from-visual", action="store_true", dest="from_visual",
-                        help="visual_script.json에서 자동 생성")
-    parser.add_argument("--genre", default="enometa",
-                        help="v11: enometa 단일 장르 (하위호환: ikeda 입력 시 자동 매핑)")
-    parser.add_argument("--export-raw", action="store_true", dest="export_raw",
-                        help="raw_visual_data.npz 동시 출력 (Hybrid Visual Architecture)")
-    parser.add_argument("--script-data", dest="script_data",
-                        help="script_data.json 경로 (enometa 장르용)")
-    parser.add_argument("--arc", choices=list(SONG_ARC_PRESETS.keys()),
-                        default=None,
-                        help=f"Song arc: {', '.join(SONG_ARC_PRESETS.keys())} (기본: metadata 또는 narrative)")
-    parser.add_argument("--episode", dest="episode",
-                        help="에피소드 ID (ep006 등) — music_history.json 이력 추적")
-    args, unknown = parser.parse_known_args()
+    parser = argparse.ArgumentParser(description="ENOMETA Generative Music Engine v12 (Music-First)")
+    parser.add_argument("--script-data", required=True, help="script_data.json 경로")
+    parser.add_argument("--visual-script", help="visual_script.json 경로 (선택적 텍스처용)")
+    parser.add_argument("output", nargs="?", default="audio/bgm.wav", help="출력 WAV 파일 경로")
+    parser.add_argument("--export-raw", action="store_true", help="비주얼용 원시 배열 저장 (*_raw_visual_data.npz)")
+    args = parser.parse_args()
 
-    import os
-
-    # --from-visual 모드 감지 (argparse + legacy 방식 모두 지원)
-    if args.from_visual or args.input == "--from-visual":
-        if args.input == "--from-visual":
-            # legacy 방식: python engine.py --from-visual visual.json [timing.json] [out.wav]
-            remaining = args.extra
-            visual_path = remaining[0] if remaining else None
-            remaining = remaining[1:] if len(remaining) > 1 else []
-        else:
-            visual_path = args.input
-            remaining = args.extra
-
-        if not visual_path:
-            print("Error: visual_script.json 경로가 필요합니다")
-            sys.exit(1)
-
-        narration_path = None
-        output_path = None
-        for r in remaining:
-            if r.endswith(".wav"):
-                output_path = r
-            elif r.endswith(".json"):
-                narration_path = r
-
-        if not output_path:
-            output_path = os.path.join(os.path.dirname(visual_path), "bgm.wav")
-
-        # --genre 플래그 체크 (v11: 하위호환 — 항상 enometa 사용)
-        genre = args.genre
-        if not genre:
-            for i, u in enumerate(unknown):
-                if u == "--genre" and i + 1 < len(unknown):
-                    genre = unknown[i + 1]
-        if genre == "ikeda":
-            genre = "enometa"
-        if genre and genre != "enometa":
-            print(f"  [v11 WARNING] --genre '{genre}' is deprecated. Using 'enometa'.")
-        genre = "enometa"  # v11: always enometa
-
-        with open(visual_path, 'r', encoding='utf-8') as f:
-            visual_script = json.load(f)
-
-        narration_timing = None
-        if narration_path:
-            with open(narration_path, 'r', encoding='utf-8') as f:
-                narration_timing = json.load(f)
-
-        print("=== ENOMETA v8 Music Script Generator ===")
-        print(f"Visual script: {visual_path}")
-        print(f"Genre: enometa - {GENRE_PRESETS['enometa']['description']}")
-        # v7-P7: --episode CLI 옵션
-        episode = args.episode
-        if not episode:
-            for i, u in enumerate(unknown):
-                if u == "--episode" and i + 1 < len(unknown):
-                    episode = unknown[i + 1]
-        # project_dir = visual_script 기준 상위 2단계 (episodes/epXXX → project root)
-        project_dir = os.path.dirname(os.path.dirname(os.path.abspath(visual_path)))
-        if episode:
-            print(f"Episode: {episode} (music history tracking)")
-
-        music_script = generate_music_script(visual_script, narration_timing, genre=genre,
-                                              episode=episode, project_dir=project_dir)
-
-        ms_path = os.path.join(os.path.dirname(output_path), "music_script.json")
-        with open(ms_path, 'w', encoding='utf-8') as f:
-            json.dump(music_script, f, ensure_ascii=False, indent=2)
-        print(f"Music script saved: {ms_path}")
-
-    else:
-        script_path = args.input
-        output_path = args.extra[0] if args.extra else "bgm.wav"
-
-        with open(script_path, 'r', encoding='utf-8') as f:
-            music_script = json.load(f)
-
-    print()
-    genre_label = music_script['metadata'].get('genre', 'default')
-    print(f"=== ENOMETA Generative Music Engine v8 ===")
-    print(f"Duration: {music_script['metadata']['duration']:.1f}s")
-    print(f"Sections: {len(music_script['sections'])}")
-    print(f"Key: {music_script['metadata'].get('key', 'E_minor')}")
-    print(f"BPM: {music_script['metadata'].get('base_bpm', 80)}")
-    print(f"Genre: {genre_label}")
-    print()
-
-    # --arc CLI 오버라이드 (metadata보다 우선)
-    arc_flag = args.arc
-    if not arc_flag:
-        for i, u in enumerate(unknown):
-            if u == "--arc" and i + 1 < len(unknown):
-                arc_flag = unknown[i + 1]
-    if arc_flag:
-        music_script["metadata"]["song_arc"] = arc_flag
-    arc_label = music_script["metadata"].get("song_arc", "narrative")
-    print(f"Song Arc: {arc_label}")
-    print()
-
-    engine = EnometaMusicEngine(music_script)
-
-    # script_data 로딩 (enometa 장르용)
     script_data_path = args.script_data
-    if not script_data_path:
-        for i, u in enumerate(unknown):
-            if u == "--script-data" and i + 1 < len(unknown):
-                script_data_path = unknown[i + 1]
-    if script_data_path:
-        engine.load_script_data(script_data_path)
+    visual_script_path = args.visual_script
+    out_path = args.output
 
+    if not os.path.exists(script_data_path):
+        print(f"[Error] script_data.json을 찾을 수 없습니다: {script_data_path}")
+        sys.exit(1)
+
+    print("=== ENOMETA Music-First Engine v12 ===")
+    print(f"Script Data: {script_data_path}")
+    if visual_script_path:
+        print(f"Visual Script: {visual_script_path}")
+
+    # 1. 스크립트 기반 Music Script 생성
+    m_script = generate_music_script(script_data_path, visual_script_path)
+    print(f"Generated music script for {len(m_script['sections'])} sections.")
+
+    out_dir = os.path.dirname(out_path) or "."
+    os.makedirs(out_dir, exist_ok=True)
+    ms_path = os.path.join(out_dir, "music_script.json")
+    with open(ms_path, 'w', encoding='utf-8') as f:
+        json.dump(m_script, f, ensure_ascii=False, indent=2)
+    print(f"Music script saved: {ms_path}")
+
+    print()
+    print(f"Duration: {m_script['metadata']['duration']:.1f}s")
+    print(f"Base BPM: {m_script['metadata'].get('base_bpm', 135)}")
+    print()
+
+    # 2. 엔진 렌더링
+    engine = EnometaMusicEngine(m_script)
+    engine.load_script_data(script_data_path)  # 시맨틱 데이터 로드
     audio = engine.generate()
 
-    wavfile.write(output_path, SAMPLE_RATE, audio)
+    os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
+    wavfile.write(out_path, SAMPLE_RATE, audio)
     print()
-    print(f"Output: {output_path}")
+    print(f"Output: {out_path}")
     print(f"Format: {SAMPLE_RATE}Hz, 16bit, Stereo")
 
-    # Hybrid Visual Architecture: raw_visual_data.npz 출력
-    export_raw = args.export_raw
-    if not export_raw:
-        # unknown args에서도 체크
-        export_raw = "--export-raw" in unknown
-    if export_raw:
-        raw_path = output_path.replace(".wav", "_raw_visual_data.npz")
+    if args.export_raw:
+        raw_path = out_path.replace(".wav", "_raw_visual_data.npz")
         engine.export_raw_visual_data(raw_path)
 
     print("Done!")

@@ -1,11 +1,12 @@
 """
-ENOMETA Script Data Extractor
+ENOMETA Script Data Extractor (Music-First v12)
 
-대본 텍스트를 컴퓨터가 해석하는 과정 자체를 데이터로 변환.
-음악 엔진과 비주얼 렌더러 양쪽에 공급.
+대본 텍스트(.txt)를 읽어 각 줄을 1개의 마디(Bar)로 해석하고, 
+데이터를 변환하여 script_data.json을 생성합니다. (TTS 독립형)
+기본 마디 길이는 135 BPM 기준 1.77초입니다.
 
 사용법:
-  py scripts/script_data_extractor.py episodes/ep005/narration_timing.json
+  py scripts/script_data_extractor.py episodes/ep005/script.txt
 """
 
 import sys
@@ -619,20 +620,60 @@ def extract_units(text):
 
 
 # ============================================================
-# 메인: 전체 추출
+# 메인: 전체 추출 (Music-First v12 텍스트 기반)
 # ============================================================
-def extract_script_data(narration_timing_path):
-    """narration_timing.json → script_data.json"""
-    with open(narration_timing_path, 'r', encoding='utf-8') as f:
-        timing = json.load(f)
+BPM_DEFAULT = 135
+SEC_PER_BAR = 60.0 / BPM_DEFAULT * 4  # 135 BPM 기준 4/4박자 1마디 = 1.777...초
+
+def extract_script_data(input_path):
+    """script.txt(.txt) 또는 기존 narration_timing.json 모두 지원"""
+    
+    is_json = input_path.endswith('.json')
+    segments_raw = []
+    
+    if is_json:
+        with open(input_path, 'r', encoding='utf-8') as f:
+            timing = json.load(f)
+            for seg in timing.get("segments", []):
+                segments_raw.append({
+                    "text": seg["text"],
+                    "start_sec": seg["start_sec"],
+                    "end_sec": seg["end_sec"],
+                    "duration_sec": seg["duration_sec"]
+                })
+    else:
+        # Txt 모드: 1줄 = 1마디(Bar)
+        with open(input_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            
+        current_time = 0.0
+        for line in lines:
+            text = line.strip()
+            # 빈 줄(Empty line)도 하나의 마디(Drop 구간)로 취급하여 시간은 전진시킴
+            if not text:
+                current_time += SEC_PER_BAR
+                continue
+                
+            segments_raw.append({
+                "text": text,
+                "start_sec": round(current_time, 3),
+                "end_sec": round(current_time + SEC_PER_BAR, 3),
+                "duration_sec": round(SEC_PER_BAR, 3)
+            })
+            current_time += SEC_PER_BAR
 
     segments_out = []
     all_numbers = []
     all_chemicals = set()
     freq_map = {}
 
-    for seg in timing.get("segments", []):
+    for i, seg in enumerate(segments_raw):
         text = seg["text"]
+        
+        # 텍스트가 없는 경우(일어나지 않아야 하지만 방어코드)
+        if not text.strip():
+            continue
+            
         analysis = analyze_sentence(text)
         units = extract_units(text)
 
@@ -653,7 +694,7 @@ def extract_script_data(narration_timing_path):
                 freq_map[str(n)] = round(1.0 / n, 2)
 
         segment_data = {
-            "index": seg["index"],
+            "index": i,
             "text": text,
             "start_sec": seg["start_sec"],
             "end_sec": seg["end_sec"],
@@ -661,23 +702,27 @@ def extract_script_data(narration_timing_path):
             "analysis": analysis,
             "units": units,
             "chemicals": chemicals_found,
+            "is_drop": False  # 미래 확장을 위해
         }
         segments_out.append(segment_data)
 
     # 글로벌 데이터
+    total_dur = segments_raw[-1]["end_sec"] if segments_raw else 0.0
     global_data = {
         "all_numbers": sorted(set(all_numbers)),
         "all_chemicals": sorted(all_chemicals),
         "freq_map": freq_map,
         "total_segments": len(segments_out),
-        "total_duration_sec": timing.get("total_duration_sec", 0),
+        "total_duration_sec": total_dur,
+        "bpm": BPM_DEFAULT,
+        "sec_per_bar": SEC_PER_BAR
     }
 
     return {
         "metadata": {
-            "episode": os.path.basename(os.path.dirname(narration_timing_path)),
-            "source": os.path.basename(narration_timing_path),
-            "version": 1,
+            "episode": os.path.basename(os.path.dirname(input_path)),
+            "source": os.path.basename(input_path),
+            "version": 2, # v12 Music-First
         },
         "segments": segments_out,
         "global": global_data,
@@ -798,7 +843,7 @@ def interactive_dict_update(unregistered):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: py scripts/script_data_extractor.py <narration_timing.json> [output.json]")
+        print("Usage: py scripts/script_data_extractor.py <script.txt | narration_timing.json> [output.json]")
         print("  Options:")
         print("    --update-dict   Interactive mode to add unregistered words to custom dictionary")
         print("    --report-only   Show unregistered word report without extraction")
