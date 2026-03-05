@@ -79,6 +79,25 @@
         "waveform_circular:default",
         "waveform_spectrum:default"
       ]
+    },
+    "ep003": {
+      "used_combos": [
+        "color_shift:default",
+        "flow_field_calm:opposing",
+        "flow_field_calm:vortex",
+        "flow_field_turbulent:vortex",
+        "grid_morph:default",
+        "lissajous:default",
+        "loop_ring:default",
+        "particle_converge:collapse_line",
+        "particle_converge:default",
+        "particle_escape:explosion",
+        "pixel_grid_life:default",
+        "pixel_grid_rain:default",
+        "pixel_waveform_cascade:default",
+        "text_reveal:default",
+        "waveform:default"
+      ]
     }
   }
 }
