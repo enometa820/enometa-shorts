@@ -7,8 +7,6 @@
 | ENOMETA_SYSTEM_SNAPSHOT_{날짜}.md | 전체 시스템 설계도 | docs/ |
 | ENOMETA_ClaudeCode_Brief_{날짜}.md | CLI 실행 매뉴얼 | docs/ |
 | ENOMETA_Hybrid_Visual_Architecture_{날짜}.md | Python+Remotion 아키텍처 | docs/ |
-| ENOMETA_Music_Engine_Spec_{날짜}.md | 음악 엔진 상세 | docs/ |
-| ENOMETA_Visual_Differentiation_Spec_{날짜}.md | 비주얼 차별화 시스템 | docs/ |
 
 ## 네이밍 규칙
 
@@ -33,8 +31,6 @@
 □ SYSTEM_SNAPSHOT — 변경된 컴포넌트/아키텍처 섹션 업데이트 + 진화 로그
 □ ClaudeCode_Brief — 검증 체크리스트 + CLI 명령 + 기술 스택 테이블
 □ Hybrid_Visual_Architecture — Remotion 컴포넌트 섹션 + 레이어 조합
-□ Music_Engine_Spec — 합성 함수/악기/마스터링 + audio_mixer 연동
-□ Visual_Differentiation_Spec — EMOTION_VOCAB_POOL + 전략 + z-order
 ```
 
 추가 문서:
