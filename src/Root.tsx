@@ -233,7 +233,7 @@ export const Root: React.FC = () => {
           audioAnalysis: ep009AudioAnalysis,
           audioSrc: ep009AudioSrc,
           narrationSegments: ep009NarrationSegments,
-          highlightWords: ["전전두엽", "메타인지", "감시", "투자"],
+          highlightWords: ["뇌", "누구"],
         }}
       />
 

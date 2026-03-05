@@ -98,6 +98,35 @@
         "text_reveal:default",
         "waveform:default"
       ]
+    },
+    "ep009": {
+      "used_combos": [
+        "flow_field_calm:opposing",
+        "flow_field_calm:vortex",
+        "flow_field_turbulent:vortex",
+        "grid_morph:pixel_dissolve",
+        "grid_morph:wave_propagation",
+        "lissajous:default",
+        "particle_birth:dots_grid",
+        "particle_birth:triangles_rise",
+        "particle_chain_awaken:default",
+        "particle_orbit:default",
+        "pixel_grid_life:default",
+        "pixel_grid_rain:default",
+        "pixel_waveform_cascade:default",
+        "text_reveal:default",
+        "waveform:default",
+        "waveform_circular:default"
+      ]
+    },
+    "test_debug": {
+      "used_combos": [
+        "flow_field_calm:default",
+        "grid_morph:default",
+        "lissajous:default",
+        "pixel_grid_life:default",
+        "text_reveal:default"
+      ]
     }
   }
 }

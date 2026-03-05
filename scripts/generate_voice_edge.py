@@ -118,7 +118,8 @@ async def main():
         script_data = json.load(f)
 
     segments = script_data.get("segments", [])
-    total_dur = script_data.get("global", {}).get("total_duration_sec", 60.0)
+    # 최상위 또는 global 하위 모두 지원
+    total_dur = script_data.get("total_duration_sec") or script_data.get("global", {}).get("total_duration_sec", 60.0)
     
     print(f"Voice: {voice} ({rate})")
     print(f"Segments: {len(segments)}")

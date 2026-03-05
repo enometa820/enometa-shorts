@@ -763,21 +763,100 @@ def snare_drum(freq=200, sr=SAMPLE_RATE):
     return n
 
 
-def transition_impact(sr=SAMPLE_RATE):
-    """v12: 섹션 전환 임팩트 — 디지털 노이즈 크래시.
-    전통적 심벌이 아닌 enometa 스타일: 날카로운 노이즈 버스트 + 빠른 감쇠.
-    섹션 경계 첫 비트에서 킥 대신 배치.
+def downbeat_crash(sr=SAMPLE_RATE):
+    """v16: 신스 크래시 심벌 — 노이즈 → 레조네이터 뱅크 + 스틱 어택.
+    Sound on Sound / mcld.co.uk cymbal synthesis 기법 기반.
+    매 4~8마디 첫박 배치용 (0.8초).
+    """
+    duration = 0.8
+    samples = int(sr * duration)
+    t = np.linspace(0, duration, samples, endpoint=False)
+
+    # 드라이버 1: LP 필터드 노이즈 (메인 바디)
+    n = noise(duration, sr)
+    # LP 엔벨로프: 빠른 어택 → 느린 감쇠
+    lp_env = np.exp(-t / 0.4) * 0.8
+    body = n * lp_env
+
+    # 드라이버 2: HP 필터드 노이즈 (심벌 쉬머)
+    shimmer = n.copy()
+    # 간단한 1차 HP: 차분 반복 2회
+    for _ in range(2):
+        shimmer[1:] = shimmer[1:] - shimmer[:-1] * 0.7
+    shimmer *= np.exp(-t / 0.3) * 0.4
+
+    # 드라이버 3: 스틱 임팩트 (1ms 클릭)
+    thwack = np.zeros(samples)
+    click_len = max(1, int(sr * 0.001))
+    thwack[:click_len] = noise(0.001, sr)[:click_len] * 1.5
+
+    # 레조네이터 뱅크: 지수 분포 300~16kHz, 16개 (가벼운 버전)
+    n_res = 16
+    freqs = np.exp(np.linspace(np.log(300), np.log(16000), n_res))
+    driver = body + shimmer + thwack
+    resonated = np.zeros(samples)
+    for freq in freqs:
+        # 고주파일수록 빠른 감쇠
+        decay = 0.5 / (1 + freq / 3000)
+        damping = np.exp(-t / decay)
+        resonated += np.sin(2 * np.pi * freq * t) * damping
+
+    # 레조네이터 * 드라이버 (링 모듈레이션 효과)
+    out = resonated / n_res * driver + body * 0.5 + thwack
+    # 노멀라이즈
+    peak = np.max(np.abs(out))
+    if peak > 0:
+        out = out / peak * 0.6
+    return out
+
+
+def downbeat_noise_hit(sr=SAMPLE_RATE):
+    """v16: 디지털 노이즈 임팩트 — enometa 시그니처.
+    날카로운 노이즈 버스트 + 중역대 레조넌스 + 빠른 감쇠.
+    매 마디 첫박 배치용 (0.15초).
     """
     duration = 0.15
-    t = np.linspace(0, duration, int(sr * duration), endpoint=False)
-    # 밝은 노이즈 버스트 — 빠른 감쇠
-    n = noise(duration, sr) * np.exp(-t * 25) * 0.5
-    # 고주파 강조 (간단한 1차 하이패스: 차분)
-    n[1:] = n[1:] - n[:-1] * 0.3
-    # 어택 클릭
-    click_samples = int(sr * 0.001)
-    n[:click_samples] += noise(0.001, sr) * 0.4
-    return n
+    samples = int(sr * duration)
+    t = np.linspace(0, duration, samples, endpoint=False)
+
+    # 날카로운 노이즈 버스트
+    n = noise(duration, sr) * np.exp(-t * 30) * 0.7
+    # 중역대 강조 (밴드패스 근사: HP + LP)
+    n[1:] = n[1:] - n[:-1] * 0.4  # HP
+    # 사인 레이어: 임팩트감을 위한 짧은 톤
+    tone = np.sin(2 * np.pi * 800 * t) * np.exp(-t * 50) * 0.3
+    # 스틱 클릭
+    click_len = max(1, int(sr * 0.0005))
+    click = np.zeros(samples)
+    click[:click_len] = noise(0.0005, sr)[:click_len] * 0.5
+
+    out = n + tone + click
+    peak = np.max(np.abs(out))
+    if peak > 0:
+        out = out / peak * 0.5
+    return out
+
+
+def downbeat_reverse_crash(sr=SAMPLE_RATE):
+    """v16: 리버스 크래시 → 포워드 히트.
+    크래시를 뒤집어서 당김 효과 + 끝에 정방향 노이즈 히트.
+    매 8~16마디 첫박 0.5초 전에 시작, 첫박에서 피크.
+    """
+    # 포워드 크래시 생성 후 뒤집기
+    fwd = downbeat_crash(sr)
+    rev = fwd[::-1].copy()
+    # 뒤집힌 크래시: 점점 커지는 효과 (0.8초)
+    # 끝부분 살짝 자르고 페이드
+    rev_len = len(rev)
+    fade = np.linspace(0.0, 1.0, rev_len) ** 2  # 제곱 커브로 후반부 강조
+    rev *= fade * 0.7
+    return rev
+
+
+# 하위 호환: 기존 코드에서 transition_impact 호출하는 곳
+def transition_impact(sr=SAMPLE_RATE):
+    """v16: downbeat_noise_hit으로 리다이렉트"""
+    return downbeat_noise_hit(sr)
 
 
 def synth_lead(freq, duration, sr=SAMPLE_RATE, wt=None, vibrato_depth=0.003, cutoff_hz=0):
@@ -1286,9 +1365,7 @@ class EnometaMusicEngine:
             len(drone), sections, "bass_drone", "volume",
             default=0.0, morph_sec=1.0, sr=self.sr
         )
-        drone *= vol_env * self._si_gate[:len(drone)] * 1.2  # v7-P8: si gate
-        # 전체 시작/끝 페이드
-        drone = fade_in(fade_out(drone, 3.0), 2.0)
+        drone *= vol_env * 1.2  # v16: si_gate 제거, 페이드 제거
         self._add_mono(drone, 0, 1.0)
 
     def _render_continuous_fm_bass(self, sections):
@@ -1301,8 +1378,7 @@ class EnometaMusicEngine:
             len(fm), sections, "fm_bass", "volume",
             default=0.0, morph_sec=1.0, sr=self.sr
         )
-        fm *= vol_env * self._si_gate[:len(fm)] * 1.0  # v7-P8: si gate
-        fm = fade_in(fade_out(fm, 2.0), 1.5)
+        fm *= vol_env * 1.0  # v16: si_gate 제거, 페이드 제거
         self._add_mono(fm, 0, 1.0)
 
     def _render_continuous_rhythm(self, sections):
@@ -1487,18 +1563,68 @@ class EnometaMusicEngine:
         # 스네어는 킥 볼륨 엔벨로프를 공유 (별도 악기 키 없으면)
         snare_vol_env = kick_vol_env
 
-        si_g = self._si_gate[:self.total_samples]
+        # v16: si_gate 제거 — 드럼은 ARRANGEMENT_TABLE 볼륨으로만 제어
         # F-7: 콜앤리스폰스 드럼 엔벨로프
         cr_d = self._cr_drum_env[:self.total_samples] if hasattr(self, '_cr_drum_env') else 1.0
-        self.master_L += kick_full * kick_vol_env * si_g * cr_d * 2.5
-        self.master_R += kick_full * kick_vol_env * si_g * cr_d * 2.5
-        self.master_L += snare_full * snare_vol_env * si_g * cr_d * 1.2
-        self.master_R += snare_full * snare_vol_env * si_g * cr_d * 1.2
-        self.master_L += hihat_full_L * hihat_vol_env * si_g * cr_d * 2.2
-        self.master_R += hihat_full_R * hihat_vol_env * si_g * cr_d * 2.2
-        # v12: 전환 임팩트 — 킥 볼륨 엔벨로프 공유, 약간 더 크게
-        self.master_L += impact_full * kick_vol_env * si_g * 3.0
-        self.master_R += impact_full * kick_vol_env * si_g * 3.0
+        self.master_L += kick_full * kick_vol_env * cr_d * 2.5
+        self.master_R += kick_full * kick_vol_env * cr_d * 2.5
+        self.master_L += snare_full * snare_vol_env * cr_d * 1.2
+        self.master_R += snare_full * snare_vol_env * cr_d * 1.2
+        self.master_L += hihat_full_L * hihat_vol_env * cr_d * 2.2
+        self.master_R += hihat_full_R * hihat_vol_env * cr_d * 2.2
+        # v12: 전환 임팩트
+        self.master_L += impact_full * kick_vol_env * 3.0
+        self.master_R += impact_full * kick_vol_env * 3.0
+
+        # v16: 마디 첫박 다운비트 사운드 — 3종 계층 배치
+        # 댄스 뮤직 관용: 마디 경계에 임팩트/크래시로 구조 표현 (페이드 대신)
+        # - 매 마디: noise hit (짧은 디지털 임팩트)
+        # - 매 4마디: crash cymbal (신스 크래시)
+        # - 매 16마디: reverse crash → crash (당김 + 히트)
+        d_noise = downbeat_noise_hit(self.sr)
+        d_crash = downbeat_crash(self.sr)
+        d_rev = downbeat_reverse_crash(self.sr)
+
+        downbeat_L = np.zeros(self.total_samples)
+        downbeat_R = np.zeros(self.total_samples)
+        bar_dur = 60.0 / self.bpm * 4
+        bar_count = 0
+        t_bar = 0.0
+        crash_count = 0
+        rev_count = 0
+        while t_bar < self.duration:
+            pos = int(t_bar * self.sr)
+            if pos >= self.total_samples:
+                break
+
+            # 매 마디: noise hit (L/R 약간 다른 볼륨으로 스테레오감)
+            end_n = min(pos + len(d_noise), self.total_samples)
+            downbeat_L[pos:end_n] += d_noise[:end_n - pos] * 0.8
+            downbeat_R[pos:end_n] += d_noise[:end_n - pos] * 0.7
+
+            # 매 4마디: crash cymbal
+            if bar_count % 4 == 0:
+                end_c = min(pos + len(d_crash), self.total_samples)
+                downbeat_L[pos:end_c] += d_crash[:end_c - pos] * 1.2
+                downbeat_R[pos:end_c] += d_crash[:end_c - pos] * 1.0
+                crash_count += 1
+
+            # 매 16마디: reverse crash (첫박 0.8초 전에 시작)
+            if bar_count % 16 == 0 and bar_count > 0:
+                rev_start = max(0, pos - len(d_rev))
+                rev_end = min(rev_start + len(d_rev), self.total_samples)
+                actual_len = rev_end - rev_start
+                if actual_len > 0:
+                    downbeat_L[rev_start:rev_end] += d_rev[:actual_len] * 0.9
+                    downbeat_R[rev_start:rev_end] += d_rev[:actual_len] * 0.8
+                    rev_count += 1
+
+            bar_count += 1
+            t_bar += bar_dur
+
+        self.master_L += downbeat_L * kick_vol_env
+        self.master_R += downbeat_R * kick_vol_env
+        print(f"    -> {bar_count} bars: {bar_count} noise hits, {crash_count} crashes, {rev_count} reverse crashes", flush=True)
 
     def _render_continuous_sub_pulse(self, sections):
         """전체 길이 서브 펄스"""
@@ -1508,7 +1634,7 @@ class EnometaMusicEngine:
             len(sub), sections, "sub_pulse", "volume",
             default=0.0, morph_sec=0.8, sr=self.sr
         )
-        sub *= vol_env * self._si_gate[:len(sub)] * 0.7  # v7-P8: si gate
+        sub *= vol_env * 0.7  # v16: si_gate 제거
         self._add_mono(sub, 0, 1.0)
 
     def _render_continuous_arpeggio(self, sections):
@@ -1531,7 +1657,7 @@ class EnometaMusicEngine:
             len(arp), sections, "arpeggio", "volume",
             default=0.0, morph_sec=1.0, sr=self.sr
         )
-        arp *= vol_env * self._si_gate[:len(arp)] * 1.2  # v7-P8: si gate
+        arp *= vol_env * 1.2  # v16: si_gate 제거
 
         # 디튠 스테레오 쌍
         arp2 = arpeggio_sequence(
@@ -1539,7 +1665,7 @@ class EnometaMusicEngine:
             [p * 1.01 for p in self.arp_pattern],
             speed=avg_speed * 1.02, sr=self.sr
         )
-        arp2 *= vol_env * self._si_gate[:len(arp2)] * 0.7  # v7-P8: si gate
+        arp2 *= vol_env * 0.7  # v16: si_gate 제거
 
         self._add_stereo(arp, -0.3, 0, 1.0)
         self._add_stereo(arp2, 0.3, 0.05, 1.0)
@@ -1619,7 +1745,7 @@ class EnometaMusicEngine:
             self.total_samples, sections, "sine_interference", "volume",
             default=0.3, morph_sec=1.5, sr=self.sr
         )
-        total *= vol_env * self._si_gate[:len(total)]  # v7-P8: si gate
+        total *= vol_env  # v16: si_gate 제거
 
         # 비주얼 데이터 수집
         self._sine_interference_raw[:len(total)] = total
@@ -1630,9 +1756,7 @@ class EnometaMusicEngine:
         detune = np.sin(2 * np.pi * 220.5 * t) * 0.05
         total_R += detune[:self.total_samples]
 
-        total = fade_in(fade_out(total, 3.0), 2.0)
-        total_L = fade_in(fade_out(total_L, 3.0), 2.0)
-        total_R = fade_in(fade_out(total_R, 3.0), 2.0)
+        # v16: 페이드 제거
         self.master_L += total_L
         self.master_R += total_R
 
@@ -1644,8 +1768,7 @@ class EnometaMusicEngine:
             len(texture), sections, "ultrahigh_texture", "volume",
             default=0.05, morph_sec=2.0, sr=self.sr
         )
-        texture *= vol_env * self._si_gate[:len(texture)]  # v7-P8: si gate
-        texture = fade_in(fade_out(texture, 2.0), 1.0)
+        texture *= vol_env  # v16: si_gate 제거, 페이드 제거
         self._add_mono(texture, 0, 1.0)
 
     def _render_continuous_pulse_train(self, sections):
@@ -1692,7 +1815,7 @@ class EnometaMusicEngine:
                 gc *= vol_env * 0.15  # 서브 레이어
                 pt += gc
 
-        pt = fade_in(fade_out(pt, 2.0), 1.0)
+        # v16: 페이드 제거
         # 좌우 약간 다른 위치에 배치 (스테레오 width)
         self._add_stereo(pt, random.uniform(-0.3, 0.3), 0, 1.0)
 
@@ -1764,7 +1887,7 @@ class EnometaMusicEngine:
             # v14: SI 기반 drive 동적 조절
             t_mid = t + this_chunk_dur / 2
             _si_idx = max(0, min(int(t_mid * self.sr), self.total_samples - 1))
-            _si_val = float(self._si_gate[_si_idx]) if self._si_gate is not None else 0.5
+            _si_val = float(self._si_env[_si_idx]) if self._si_env is not None else 0.5
             _drive = _drive_base + _si_val * 3.0  # 1.5 ~ 4.5
 
             chunk_L = saw_sequence(self.bass_freq, this_chunk_dur, pattern,
@@ -1801,16 +1924,14 @@ class EnometaMusicEngine:
         )
         # F-7: 콜앤리스폰스 멜로디 엔벨로프
         cr_m = self._cr_melody_env[:self.total_samples] if hasattr(self, '_cr_melody_env') else 1.0
-        saw_L *= vol_env * self._si_gate[:self.total_samples] * cr_m
-        saw_R *= vol_env * self._si_gate[:self.total_samples] * cr_m
+        saw_L *= vol_env * cr_m  # v16: si_gate 제거
+        saw_R *= vol_env * cr_m
 
         # v14: 코러스로 스테레오 풍부함 추가
         saw_L = chorus(saw_L, sr=self.sr, depth_ms=self.seq_config.chorus_depth_ms)
         saw_R = chorus(saw_R, sr=self.sr, depth_ms=self.seq_config.chorus_depth_ms, lfo_rate=1.7)
 
-        saw_L = fade_in(fade_out(saw_L, 2.0), 0.5)
-        saw_R = fade_in(fade_out(saw_R, 2.0), 0.5)
-
+        # v16: 페이드 제거
         self.master_L += saw_L
         self.master_R += saw_R
 
@@ -1924,12 +2045,10 @@ class EnometaMusicEngine:
             self.total_samples, sections, "gate_stutter", "volume",
             default=0.35, morph_sec=0.5, sr=self.sr
         )
-        gate_L *= vol_env * self._si_gate[:self.total_samples]
-        gate_R *= vol_env * self._si_gate[:self.total_samples]
+        gate_L *= vol_env  # v16: si_gate 제거
+        gate_R *= vol_env
 
-        gate_L = fade_in(fade_out(gate_L, 2.0), 0.3)
-        gate_R = fade_in(fade_out(gate_R, 2.0), 0.3)
-
+        # v16: 페이드 제거
         self.master_L += gate_L
         self.master_R += gate_R
 
@@ -2577,7 +2696,7 @@ class EnometaMusicEngine:
 
         # semantic_intensity 엔벨로프 사전 빌드 (adaptive arc가 참조하므로 arc 전에 빌드)
         self._si_env = self._build_si_envelope()
-        self._si_modulation = 0.85 + self._si_env * 0.15  # v15: ±15% 이내 — 레이어 ON/OFF가 에너지 주도
+        self._si_modulation = 0.95 + self._si_env * 0.05  # v16: ±5% 이내 — 음악 연속성 최우선, ARRANGEMENT_TABLE이 에너지 주도
         self._si_gate = self._build_si_gate()  # v7-P8: 연속 악기 si 게이트
         self._tempo_curve = self._compute_tempo_curve()  # v7-P6: 가변 BPM 곡선
         if self._script_data:
@@ -2592,25 +2711,9 @@ class EnometaMusicEngine:
         # v7-P3: script_data로 섹션별 악기 파라미터 풍부화 (전장르)
         self._script_data_enrichment(sections)
 
-        # v9: si 기반 레이어 밀도 동적 제어
-        # 상위 레이어는 si 낮은 섹션에서 볼륨 감소 → 미니멀 구간 실현
-        # scale = si^1.5 (비선형: 낮을수록 급격히 감소, si=0.25→0.09, si=0.5→0.35, si=1.0→1.0)
-        if self._script_data and is_enometa:
-            sd_segs = self._script_data.get("segments", [])
-            density_layers = ["saw_sequence", "arpeggio", "pulse_train", "ultrahigh",
-                               "sine_interference", "gate_stutter"]
-            for sec in sections:
-                idx = sec.get("_segment_index")
-                if idx is not None and idx < len(sd_segs):
-                    si_val = sd_segs[idx].get("analysis", {}).get("semantic_intensity", 0.5)
-                else:
-                    si_val = sec.get("energy", 0.5)
-                density_scale = max(0.6, si_val)  # v10: 상위 레이어 항상 60% 이상 활성 (이전: si^1.5 최소 5%)
-                instr = sec.get("instruments", {})
-                for layer in density_layers:
-                    if layer in instr and instr[layer].get("active"):
-                        instr[layer]["volume"] = instr[layer].get("volume", 0.3) * density_scale
-            print(f"  [v9] Layer density: si-driven (upper layers scale si^1.5)", flush=True)
+        # v16: SI 기반 레이어 밀도 제어 제거 — ARRANGEMENT_TABLE 볼륨이 유일한 소스
+        # 음악 연속성을 위해 섹션별 볼륨 변조 최소화
+        print(f"  [v16] Layer density: ARRANGEMENT_TABLE only (SI modulation at master level)", flush=True)
 
         # Song Arc 사전 계산 (adaptive arc는 위의 si_env를 사용)
         self._song_arc_env = self._compute_song_arc(arc_name)
@@ -2666,23 +2769,9 @@ class EnometaMusicEngine:
             print(f"  [{i+1}/{total}] textures: {sid} ({emotion})", flush=True)
             self._render_section_textures(section)
 
-        # Song Arc 적용: 매크로 에너지 엔벨로프를 마스터 버퍼에 곱하기
-        if arc_name != "flat":
-            print(f"  Applying song arc envelope ({arc_name})...", flush=True)
-            self.master_L *= self._song_arc_env
-            self.master_R *= self._song_arc_env
-
-        # SI 변조 적용 (Problem 1): semantic_intensity로 마스터 버퍼 에너지 변조
-        if self._script_data:
-            print(f"  Applying SI modulation...", flush=True)
-            self.master_L *= self._si_modulation
-            self.master_R *= self._si_modulation
-
-        # F-5: 호흡 시스템 — 8~16바 주기 미시적 에너지 딥
-        breath_env = self._compute_breath_envelope()
-        print(f"  Applying breath envelope (min={breath_env.min():.2f})...", flush=True)
-        self.master_L *= breath_env
-        self.master_R *= breath_env
+        # v16: 볼륨 고정 — song_arc, SI modulation, breath envelope 모두 비활성
+        # 음악은 ARRANGEMENT_TABLE 구조 + smooth_envelope만으로 에너지 표현
+        print(f"  [v16] Volume: FIXED (no song_arc, no SI modulation, no breath)", flush=True)
 
         return self._master()
 
@@ -2740,12 +2829,13 @@ class EnometaMusicEngine:
             start = bar * bar_samples
             end = min(start + bar_samples, self.total_samples)
 
-            # 매 16바의 15번째: 더 깊은 호흡 (0.70)
+            # v16: 호흡 깊이 완화 (음악 연속성 보호)
+            # 매 16바의 15번째: 가벼운 호흡 (0.90)
             if bar % 16 == 14:
-                breath[start:end] = 0.70
-            # 매 8바의 7번째: 가벼운 호흡 (0.85)
+                breath[start:end] = 0.90
+            # 매 8바의 7번째: 미세 호흡 (0.95)
             elif bar % 8 == 6:
-                breath[start:end] = 0.85
+                breath[start:end] = 0.95
 
         # 0.3초 cumsum 스무딩 (계단 → 부드러운 곡선)
         window = int(0.3 * self.sr)
@@ -2877,8 +2967,8 @@ class EnometaMusicEngine:
                 # 높은 에너지 유지
                 e_range = (arc_high, arc_high)
             elif role == "outro":
-                # 점진적 하강
-                e_range = (arc_low, 0.15)
+                # v16: 점진적 하강 — 최저 0.5 (음악이 계속 살아있어야 함)
+                e_range = (arc_low, 0.5)
             else:
                 # intro/breakdown 등: 완만한 변화
                 e_range = (arc_low, arc_high)
@@ -3796,56 +3886,23 @@ GENRE_PRESETS = {
 # smooth_envelope과 호환: instruments[key]["active"]=bool, instruments[key]["volume"]=float
 # ============================================================
 
+# v16: 볼륨 완전 고정 — 모든 role이 동일한 악기 편성/볼륨
+# smooth_envelope이 모핑할 차이가 없으므로 볼륨 변화 0
+_FLAT_INSTRUMENTS = {
+    "kick": 1.0, "hi_hat": 0.6, "snare": 0.2,
+    "saw_sequence": 1.0, "arpeggio": 0.7, "bass_drone": 0.8, "fm_bass": 0.2,
+    "sub_pulse": 0.4, "sine_interference": 0.8, "pulse_train": 0.7,
+    "ultrahigh_texture": 0.5, "gate_stutter": 0.4,
+    "data_click": 0.8, "clicks": 0.6,
+    "feedback": 0.15, "bytebeat": 0.15, "synth_lead": 0.15, "acid_bass": 0.4,
+}
 ARRANGEMENT_TABLE = {
-    # role: 각 악기의 볼륨 (0이면 inactive)
-    "intro": {
-        "kick": 0.6, "hi_hat": 0.4, "snare": 0.0,
-        "saw_sequence": 0.3, "arpeggio": 0.0, "bass_drone": 0.4, "fm_bass": 0.1,
-        "sub_pulse": 0.2, "sine_interference": 0.3, "pulse_train": 0.2,
-        "ultrahigh_texture": 0.0, "gate_stutter": 0.0,
-        "data_click": 0.3, "clicks": 0.2,
-        "feedback": 0.0, "bytebeat": 0.0, "synth_lead": 0.0, "acid_bass": 0.0,
-    },
-    "buildup": {
-        "kick": 0.7, "hi_hat": 0.5, "snare": 0.0,
-        "saw_sequence": 0.6, "arpeggio": 0.3, "bass_drone": 0.6, "fm_bass": 0.15,
-        "sub_pulse": 0.3, "sine_interference": 0.5, "pulse_train": 0.4,
-        "ultrahigh_texture": 0.2, "gate_stutter": 0.2,
-        "data_click": 0.5, "clicks": 0.4,
-        "feedback": 0.1, "bytebeat": 0.1, "synth_lead": 0.1, "acid_bass": 0.2,
-    },
-    "drop": {
-        "kick": 1.0, "hi_hat": 0.6, "snare": 0.2,
-        "saw_sequence": 1.0, "arpeggio": 0.7, "bass_drone": 0.8, "fm_bass": 0.2,
-        "sub_pulse": 0.4, "sine_interference": 0.8, "pulse_train": 0.7,
-        "ultrahigh_texture": 0.5, "gate_stutter": 0.4,
-        "data_click": 0.8, "clicks": 0.6,
-        "feedback": 0.15, "bytebeat": 0.15, "synth_lead": 0.15, "acid_bass": 0.4,
-    },
-    "breakdown": {
-        "kick": 0.0, "hi_hat": 0.3, "snare": 0.0,
-        "saw_sequence": 0.2, "arpeggio": 0.4, "bass_drone": 0.3, "fm_bass": 0.1,
-        "sub_pulse": 0.15, "sine_interference": 0.4, "pulse_train": 0.2,
-        "ultrahigh_texture": 0.1, "gate_stutter": 0.1,
-        "data_click": 0.3, "clicks": 0.2,
-        "feedback": 0.05, "bytebeat": 0.0, "synth_lead": 0.0, "acid_bass": 0.1,
-    },
-    "drop2": {
-        "kick": 1.0, "hi_hat": 0.6, "snare": 0.25,
-        "saw_sequence": 1.0, "arpeggio": 0.8, "bass_drone": 1.0, "fm_bass": 0.2,
-        "sub_pulse": 0.4, "sine_interference": 0.8, "pulse_train": 0.7,
-        "ultrahigh_texture": 0.6, "gate_stutter": 0.5,
-        "data_click": 0.9, "clicks": 0.6,
-        "feedback": 0.2, "bytebeat": 0.15, "synth_lead": 0.15, "acid_bass": 0.4,
-    },
-    "outro": {
-        "kick": 0.4, "hi_hat": 0.3, "snare": 0.0,
-        "saw_sequence": 0.15, "arpeggio": 0.0, "bass_drone": 0.3, "fm_bass": 0.1,
-        "sub_pulse": 0.1, "sine_interference": 0.2, "pulse_train": 0.1,
-        "ultrahigh_texture": 0.0, "gate_stutter": 0.0,
-        "data_click": 0.2, "clicks": 0.1,
-        "feedback": 0.0, "bytebeat": 0.0, "synth_lead": 0.0, "acid_bass": 0.0,
-    },
+    "intro": dict(_FLAT_INSTRUMENTS),
+    "buildup": dict(_FLAT_INSTRUMENTS),
+    "drop": dict(_FLAT_INSTRUMENTS),
+    "breakdown": dict(_FLAT_INSTRUMENTS),
+    "drop2": dict(_FLAT_INSTRUMENTS),
+    "outro": dict(_FLAT_INSTRUMENTS),
 }
 
 # role별 에너지 (song_arc에 사용)
@@ -4163,56 +4220,41 @@ def generate_music_script(script_data_path: str, visual_script_path: str = None)
     base_freq = 60.0
     sections = []
 
-    for seg in segments:
-        s_start = seg.get("start_sec", 0.0)
-        s_end = seg.get("end_sec", 0.0)
-        analysis = seg.get("analysis", {})
-        si = analysis.get("semantic_intensity", 0.5)
+    # v16: 음악은 TTS 문장 경계와 무관하게 하나의 연속 트랙으로 생성
+    # ARRANGEMENT_TABLE 기반 음악적 구조 사용 (intro→buildup→drop→breakdown→drop2→outro)
+    # SI 리액티브는 마스터 레벨의 si_modulation 하나로만 처리
+    si_peak_time = None
+    if segments:
+        peak_seg = max(segments, key=lambda s: s.get("analysis", {}).get("semantic_intensity", 0))
+        si_peak_time = (peak_seg.get("start_sec", 0) + peak_seg.get("end_sec", 0)) / 2
 
-        energy = 0.3 + (si * 0.7)
-        emotion = "neutral"
-        if si > 0.8:
-            emotion = "tension"
-        elif si > 0.6:
-            emotion = "awakening"
-        elif si < 0.2:
-            emotion = "empty"
+    sections, actual_dur = _plan_song_structure(
+        total_dur, bpm, climax_time=si_peak_time
+    )
+    # v16: 음악 구조가 TTS보다 길 수 있음 — 음악 길이를 실제 구조 길이로 확장
+    total_dur = max(total_dur, actual_dur)
 
-        section = {
-            "id": f"sec_{seg.get('index', 0)}",
-            "start_sec": s_start,
-            "end_sec": s_end,
-            "bpm": bpm,
-            "energy": energy,
-            "emotion": emotion,
-            "_segment_index": seg.get("index", 0),
-            "instruments": {
-                "bass_drone": {"active": True, "volume": 0.4 + si * 0.3, "freq": base_freq},
-                "fm_bass": {"active": energy > 0.6, "volume": 0.3, "freq": base_freq * 2},
-                "arpeggio": {"active": energy > 0.4, "volume": 0.3, "speed": 0.15 + si * 0.2, "freq": base_freq * 4},
-                "synth_lead": {"active": energy > 0.7, "volume": 0.35, "pattern": [1, 1.25, 1.5, 2]},
-                "sine_interference": {"active": True, "volume": 0.2 + energy * 0.2},
-                "ultrahigh_texture": {"active": True, "volume": 0.05 + energy * 0.1},
-                "pulse_train": {"active": True, "volume": 0.1 + energy * 0.3},
-                "saw_sequence": {"active": True, "volume": 0.4 + energy * 0.4},
-                "gate_stutter": {"active": energy > 0.5, "volume": 0.3 + energy * 0.2},
-                "sub_pulse": {"active": True, "volume": 0.6},
-                "glitch": {"active": energy > 0.7, "density": si * 1.5},
-                "data_click": {"active": True, "volume": 0.5, "density": si * 1.5},
-                "clicks": {"active": True, "density": si * 0.5},
-            },
-            "effects": {
-                "stereo_width": 0.5 + si * 0.5
-            }
-        }
-        sections.append(section)
+    # 세그먼트 인덱스 매핑 (script_data_enrichment 호환)
+    for sec in sections:
+        t_mid = (sec["start_sec"] + sec["end_sec"]) / 2
+        best_idx = 0
+        best_dist = float("inf")
+        for seg in segments:
+            seg_mid = (seg.get("start_sec", 0) + seg.get("end_sec", 0)) / 2
+            dist = abs(t_mid - seg_mid)
+            if dist < best_dist:
+                best_dist = dist
+                best_idx = seg.get("index", 0)
+        sec["_segment_index"] = best_idx
 
     return {
         "metadata": {
             "duration": total_dur,
             "base_bpm": bpm,
             "episode": episode_id,
-            "genre": "enometa"
+            "genre": "enometa",
+            "song_arc": "song_structure",  # v16: ARRANGEMENT_TABLE role energy 기반 arc
+            "synthesis_overrides": {"enometa_mode": True},
         },
         "palette": {
             "bass_freq": base_freq,

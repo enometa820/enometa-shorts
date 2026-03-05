@@ -737,6 +737,7 @@ def build_scene(
     strategy: dict = None,
     recent_combos: set = None,
     si: float = 0.5,
+    sd_keywords: Optional[List[str]] = None,
 ) -> dict:
     """단일 씬의 비주얼 스크립트 생성 (v5: 장르+전략+variant+SI)"""
     pool = EMOTION_VOCAB_POOL.get(emotion, EMOTION_VOCAB_POOL["neutral_curious"])
@@ -806,36 +807,28 @@ def build_scene(
             secondary_entry["variant"] = secondary_variant
         semantic.append(secondary_entry)
 
-    # 텍스트 비주얼 추가 (전략의 text_chance 반영)
-    # 단어/구/문장 단위 다양화: 키워드 1개 외에도 구절이나 짧은 문장 표시
+    # 텍스트 비주얼 추가 (전략의 text_chance 반영) — 키워드(명사) 단위만
     text_chance = strategy.get("text_chance", 0.5)
     force_text_mode = strategy.get("force_text_mode")
-    keyword = extract_highlight_word(sentence)
+    # v16: script_data keywords 우선, 폴백으로 regex 추출
+    _text_stopwords = {"우리", "그것", "이것", "자기", "자신", "모든", "하나",
+                       "지금", "여기", "거기", "어디", "누구", "무엇",
+                       "때문", "사이", "안에", "밖에", "위에", "아래",
+                       "그게", "이게", "저게", "그건", "이건", "저건",
+                       "있는", "없는", "되는", "하는", "있다", "없다"}
+    keyword = None
+    if sd_keywords:
+        filtered_kws = [w for w in sd_keywords if w not in _text_stopwords and len(w) >= 2]
+        if filtered_kws:
+            keyword = rng.choice(filtered_kws)
+        text_chance = max(text_chance, 0.9)  # v16: 정확한 키워드가 있으면 거의 항상 노출
+    if not keyword:
+        keyword = extract_highlight_word(sentence)
     if keyword and rng.random() < text_chance:
         text_mode = force_text_mode or pool.get("text_mode", "wave")
         text_params = generate_vocab_params("text_reveal", palette, rng)
         text_params["mode"] = text_mode
-
-        # 텍스트 범위 다양화: 단어(60%), 구절(25%), 짧은 문장(15%)
-        text_roll = rng.random()
-        if text_roll < 0.6:
-            # 단어 (기존)
-            text_params["text"] = keyword
-        elif text_roll < 0.85:
-            # 구절: 쉼표나 마침표 기준으로 짧은 구 추출
-            parts = [p.strip() for p in re.split(r'[.,]', sentence) if p.strip()]
-            # 키워드를 포함하는 구절 우선 선택
-            phrase = next((p for p in parts if keyword in p), parts[0] if parts else keyword)
-            # 너무 길면 공백 기준 앞 4단어까지
-            words = phrase.split()
-            if len(words) > 4:
-                phrase = " ".join(words[:4])
-            text_params["text"] = phrase
-        else:
-            # 짧은 문장: 마침표 기준 첫 문장 (20자 이내)
-            sentences_list = [s.strip() for s in sentence.split('.') if s.strip()]
-            short = next((s for s in sentences_list if len(s) <= 20), None)
-            text_params["text"] = (short + ".") if short else keyword
+        text_params["text"] = keyword
 
         semantic.append({"vocab": "text_reveal", "params": text_params})
         if keyword not in highlight_words:
@@ -908,6 +901,24 @@ def generate_visual_script(
 
     segments = timing_data["segments"]
 
+    # v16: script_data.json에서 정확한 키워드 로드 (같은 디렉토리에서 자동 탐색)
+    script_data_keywords: Dict[int, List[str]] = {}  # segment_index → [keyword_text, ...]
+    script_data_path = os.path.join(os.path.dirname(narration_timing_path), "script_data.json")
+    if os.path.exists(script_data_path):
+        try:
+            with open(script_data_path, 'r', encoding='utf-8') as f:
+                sd = json.load(f)
+            for seg in sd.get("segments", []):
+                idx = seg.get("index", 0)
+                kws = [k["text"] for k in seg.get("analysis", {}).get("keywords", [])
+                       if k.get("type") in ("noun", "body", "brain", "concept", "compound",
+                                             "discipline", "tech", "science", "philosophy")]
+                if kws:
+                    script_data_keywords[idx] = kws
+            print(f"  Script data keywords loaded: {sum(len(v) for v in script_data_keywords.values())} keywords from {len(script_data_keywords)} segments")
+        except Exception as e:
+            print(f"  Warning: Could not load script_data.json keywords: {e}")
+
     # B-9: script_path에서 tagline 추출 (없으면 기본값)
     tagline = "존재와 사유, 그 경계를 초월하다"
     if script_path:
@@ -933,13 +944,15 @@ def generate_visual_script(
         analysis = seg.get("analysis", {})
         return analysis.get("semantic_intensity", seg.get("semantic_intensity", 0.5))
 
-    for seg in segments:
+    buffer_seg_indices = []
+    for seg_i, seg in enumerate(segments):
         if not buffer_text:
             buffer_text = seg["text"]
             buffer_start = seg["start_sec"]
             buffer_end = seg["end_sec"]
             buffer_si_sum = _seg_si(seg)
             buffer_count = 1
+            buffer_seg_indices = [seg_i]
         else:
             # 현재 버퍼 길이가 최소 씬 길이 미만이면 합침
             if buffer_end - buffer_start < MIN_SCENE_DURATION:
@@ -947,18 +960,21 @@ def generate_visual_script(
                 buffer_end = seg["end_sec"]
                 buffer_si_sum += _seg_si(seg)
                 buffer_count += 1
+                buffer_seg_indices.append(seg_i)
             else:
                 merged_scenes.append({
                     "text": buffer_text,
                     "start": buffer_start,
                     "end": buffer_end,
                     "si": buffer_si_sum / buffer_count,
+                    "_seg_indices": buffer_seg_indices,
                 })
                 buffer_text = seg["text"]
                 buffer_start = seg["start_sec"]
                 buffer_end = seg["end_sec"]
                 buffer_si_sum = _seg_si(seg)
                 buffer_count = 1
+                buffer_seg_indices = [seg_i]
 
     # 마지막 버퍼
     if buffer_text:
@@ -967,6 +983,7 @@ def generate_visual_script(
             "start": buffer_start,
             "end": buffer_end,
             "si": buffer_si_sum / buffer_count if buffer_count else 0.5,
+            "_seg_indices": buffer_seg_indices,
         })
 
     print(f"  Segments: {len(segments)} → Scenes: {len(merged_scenes)}")
@@ -1029,6 +1046,11 @@ def generate_visual_script(
             if rng.random() > 0.5:
                 emotion = rng.choice(["transcendent_open", "hopeful"])
 
+        # v16: script_data keywords 수집 (해당 씬의 세그먼트들에서)
+        scene_sd_keywords = []
+        for seg_idx in scene_data.get("_seg_indices", []):
+            scene_sd_keywords.extend(script_data_keywords.get(seg_idx, []))
+
         scene = build_scene(
             i, scene_data["text"],
             scene_data["start"], scene_data["end"],
@@ -1038,6 +1060,7 @@ def generate_visual_script(
             strategy=strategy,
             recent_combos=recent_combos,
             si=scene_data.get("si", 0.5),
+            sd_keywords=scene_sd_keywords if scene_sd_keywords else None,
         )
         scenes.append(scene)
         prev_emotion = emotion
