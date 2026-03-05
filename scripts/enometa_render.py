@@ -65,8 +65,9 @@ def save_status(episode_dir: str, status: dict):
 
 
 def step_gen_timing(episode_dir: str, bpm: float = 135, music_mood: str = "raw",
-                    visual_mood: str | None = None, drum: bool | None = None):
-    """[1] 마디 기반 타이밍 생성 (script.txt → narration_timing.json)
+                    visual_mood: str | None = None, drum: bool | None = None,
+                    gap: float = 0.3, paragraph_gap: float = 0.8):
+    """[1] TTS 실측 기반 타이밍 생성 (script.txt -> narration_timing.json)
     조건: script.txt 있고 narration_timing.json 없을 때만 실행
     """
     script_txt = os.path.join(episode_dir, "script.txt")
@@ -79,9 +80,10 @@ def step_gen_timing(episode_dir: str, bpm: float = 135, music_mood: str = "raw",
         print("  [skip] narration_timing.json 이미 존재")
         return
 
-    print(f"  script.txt → narration_timing.json (BPM={bpm}, mood={music_mood})")
+    print(f"  script.txt -> narration_timing.json (BPM={bpm}, mood={music_mood}, gap={gap}s)")
     cmd = [PYTHON, os.path.join(SCRIPTS_DIR, "gen_timing.py"),
-           script_txt, "--bpm", str(bpm), "--music-mood", music_mood]
+           script_txt, "--bpm", str(bpm), "--music-mood", music_mood,
+           "--gap", str(gap), "--paragraph-gap", str(paragraph_gap)]
     if visual_mood:
         cmd += ["--visual-mood", visual_mood]
     if drum is True:
@@ -278,6 +280,8 @@ def run_pipeline(
     music_mood: str = "raw",
     visual_mood: str | None = None,
     drum: bool | None = None,
+    gap: float = 0.3,
+    paragraph_gap: float = 0.8,
 ):
     os.makedirs(episode_dir, exist_ok=True)
     status = load_status(episode_dir)
@@ -311,7 +315,7 @@ def run_pipeline(
         completed.append(name)
 
     try:
-        do("gen_timing",   lambda: step_gen_timing(episode_dir, bpm, music_mood, visual_mood, drum))
+        do("gen_timing",   lambda: step_gen_timing(episode_dir, bpm, music_mood, visual_mood, drum, gap, paragraph_gap))
         do("tts",          lambda: step_tts(episode_dir, force))
         do("script_data",  lambda: step_script_data(episode_dir, force))
         do("visual_script",lambda: step_visual_script(episode_dir, title, episode_id, palette, force, visual_mood or ""))
@@ -364,6 +368,10 @@ def main():
                         help="드럼 강제 ON")
     parser.add_argument("--no-drum", action="store_true",
                         help="드럼 강제 OFF")
+    parser.add_argument("--gap", type=float, default=0.3,
+                        help="문장 간 갭 (초, 기본: 0.3)")
+    parser.add_argument("--paragraph-gap", type=float, default=0.8,
+                        help="문단 간 갭 (초, 기본: 0.8)")
 
     args = parser.parse_args()
 
@@ -383,6 +391,8 @@ def main():
         music_mood=args.music_mood,
         visual_mood=args.visual_mood,
         drum=drum,
+        gap=args.gap,
+        paragraph_gap=args.paragraph_gap,
     )
 
 
