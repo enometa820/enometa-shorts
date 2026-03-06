@@ -256,8 +256,9 @@ def step_render(episode_dir: str, force: bool = False):
         return output
 
     print("  Remotion 렌더링 중...")
+    ep_num = os.path.basename(episode_dir).upper()  # ep010 → EP010
     cmd = ["npx", "remotion", "render",
-           "src/index.tsx", "EnometaShorts",
+           "src/index.tsx", ep_num,
            output,
            "--concurrency=2"]
     run(cmd, "Remotion render", shell=True)
