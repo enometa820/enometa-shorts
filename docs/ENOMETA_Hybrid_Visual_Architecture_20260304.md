@@ -1,6 +1,6 @@
 # ENOMETA Hybrid Visual Architecture — Claude Code 구현 명세서
 
-Python이 데이터 비주얼을 그리고, Remotion이 자막/제목/오버레이를 합성한다. 음악과 영상이 같은 numpy 배열을 공유하는 퓨어 컴퓨팅 아트 아키텍처. 의존 문서: ENOMETA_SYSTEM_SNAPSHOT_20260304.md, ENOMETA_Visual_Differentiation_Spec_20260304.md 프로젝트 경로: C:\옵시디언\enometa\enometa-shorts\
+Python이 데이터 비주얼을 그리고, Remotion이 자막/제목/오버레이를 합성한다. 음악과 영상이 같은 numpy 배열을 공유하는 퓨어 컴퓨팅 아트 아키텍처. 의존 문서: ENOMETA_SYSTEM_SNAPSHOT_20260306.md 프로젝트 경로: C:\옵시디언\enometa\enometa-shorts\
 > v8 업데이트: **Legacy 모드 제거** + **Hybrid 전용화**
 > v9 업데이트: **SI_INTENSITY_SCALE** (레이어 강도 동적 조절) + **visual_script SI 연동** (reactivity/max_layers 동적 결정)
 > v11 업데이트: **ikeda→enometa 리네이밍** (장르명/변수명/팔레트)

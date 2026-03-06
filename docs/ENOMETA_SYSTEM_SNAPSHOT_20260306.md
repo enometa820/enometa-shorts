@@ -1,8 +1,8 @@
-# ENOMETA System Snapshot (2026-03-04)
+# ENOMETA System Snapshot (2026-03-06)
 > **역할**: SNAPSHOT=설계도 (아키텍처, 히스토리). 실전 매뉴얼은 ClaudeCode_Brief 참조.
-> 최종 업데이트: 2026-03-04
-> 상태: v11 음악 패턴 엔진 + 창작 자유도 감사 전체 완료 (A~F + D섹션)
-> **last_updated**: 2026-03-04 — D섹션: 글쓰기 3종 구조(A/B/C) + 도메인 5+5 + SI 커브 7종 + SONG_ARC_PRESETS 7종(wave/shockwave/staircase) + audio_mixer 동적 믹싱(--dynamic-mix)
+> 최종 업데이트: 2026-03-06
+> 상태: v16 TTS 실측 타이밍 + kiwipiepy 형태소 분석 + 음악 엔진 볼륨 고정
+> **last_updated**: 2026-03-06 — kiwipiepy 형태소 분석, 콜앤리스폰스 비활성, calcMeta 엔드카드 기준, 다운비트 7종, 마스터 페이드 제거
 
 ---
 
@@ -52,6 +52,9 @@
 
 ### 3-0. 대본 데이터 추출 (v6 신규)
 - `scripts/script_data_extractor.py` — narration_timing.json → script_data.json
+- **v16: kiwipiepy 형태소 분석** — 정규식 간이 토크나이저 → kiwipiepy 기반
+  - 동사/명사 오분류 근본 해결, kiwi 사용자 사전에 ENOMETA 전문용어 등록
+  - ENOMETA 도메인 사전(CHEMICALS/BODY_PARTS/SCIENCE_TERMS) 오버라이드 유지
 - 대본 텍스트에서 숫자/화학물질/키워드 추출 + UTF-8 바이트 인코딩 + 한글 분해
 - **음악과 비주얼 양쪽에 데이터 공급** (대본 → 사운드 파라미터 + 비주얼 패턴 결정)
 - v6 **구현 완료**: `semantic_intensity` (0-1) 추출 — 단어/문장의 의미 강도가 움직임 세기 결정
@@ -78,8 +81,9 @@
 - **합성법 10종**: 기존 6 + sine_interference, data_click, ultrahigh_texture + **snare_drum** (v11)
 - **악기 26종**: 기존 23 + sine_interference, data_click, ultrahigh_texture
 - **장르 1종**: enometa (구 ikeda) — v11 단일 장르
-- **v11 패턴 엔진**: DRUM_PATTERNS 10종(16-step) + 바 카운팅 + 필/드롭 + SAW_PATTERNS 로테이션 + 호흡 시스템 + highlight_words 악센트 + call&response
-- **enometa 마스터링**: tanh(3.0) 강한 새츄레이션, RMS -6dB, 3중 에너지(Song Arc × SI × Breath)
+- **v11 패턴 엔진**: DRUM_PATTERNS 10종(16-step) + 바 카운팅 + 필/드롭 + SAW_PATTERNS 로테이션 + 호흡 시스템 + highlight_words 악센트
+- **v16**: 콜앤리스폰스 비활성 (볼륨 고정 원칙), 다운비트 7종 계층 배치, 마스터 페이드 → 5ms anti-click
+- **enometa 마스터링**: tanh(1.5) 새츄레이션, RMS -6dB, 볼륨 고정 (song_arc/SI modulation/breath 비활성)
 - **최적화**: smooth_envelope O(n) cumsum, 패턴 타일링
 - **음량 가이드라인**: 순수 노이즈 금지, enometa는 리듬/멜로디 구조 필수
 - **`--export-raw`**: raw_visual_data.npz 동시 출력 (sine_interference_values, data_click_positions 포함)

@@ -5,6 +5,31 @@
 
 ---
 
+## 2026-03-06 — v16: kiwipiepy 형태소 분석 + TTS 실측 타이밍 + 음악 엔진 개선
+
+### Added
+- `kiwipiepy` 형태소 분석 도입: `tokenize_korean()` 정규식 간이 토크나이저 → kiwipiepy 기반
+  - 동사/명사 오분류 근본 해결 ("저랬을까" → verb, "전전두엽" → 단일 명사)
+  - kiwi 사용자 사전에 ENOMETA 전문용어 등록 (전전두엽, 메타인지 등)
+  - ENOMETA 도메인 사전(CHEMICALS/BODY_PARTS/SCIENCE_TERMS) 오버라이드 유지
+- 다운비트 사운드 7종: noise_hit, ping_pong, sine_pop, sub_boom, open_hat, crash, reverse_crash
+  - 마디 계층 배치: 매 마디(noise/ping교대) → 2마디(sine_pop) → 4마디(crash+boom+ohat) → 16마디(reverse_crash)
+- `gen_timing.py`: TTS 실측 기반 연속 배치 (마디 snap 제거), paragraph_breaks[] 필드
+- 음악 무드 9종: techno 추가 (4-on-the-floor + TB-303 arp + FM bass)
+- `visual_script_generator.py`: TextReveal 동사 어미 필터(`_verb_suffixes`)
+
+### Changed
+- 콜앤리스폰스 비활성: 2바 주기 75%↔100% 볼륨 교대 제거 (v16 볼륨 고정 원칙)
+- 마스터 페이드 제거: 2s fade-in + 3s fade-out → 5ms anti-click만
+- `Root.tsx` calcMeta: `audioAnalysis.duration_sec` → `lastScene.end_sec + endcard` 기준
+  (BGM이 엔드카드보다 길어도 영상이 정확히 엔드카드에서 종료)
+- BGM 길이 제한: `_plan_song_structure` strict bar count + `total_dur` 캡핑
+
+### Dependencies
+- `kiwipiepy` 0.22.2 추가 (pip install kiwipiepy)
+
+---
+
 ## 2026-03-05 — v15: 마디 동기화 + 음악 무드 8종 + visual_mood 4종 + 시스템 다이어트
 
 ### Added

@@ -2,9 +2,9 @@
 
 > **역할**: Brief=실전 매뉴얼 (CLI 명령, 검증 체크리스트). 설계도는 SNAPSHOT 참조.
 > 이 문서를 Claude Code에 전달하면 에피소드 제작을 시작할 수 있다.
-> 상세 시스템 문서: ENOMETA_SYSTEM_SNAPSHOT_20260304.md 참조
-> 음악 엔진 상세: ENOMETA_Music_Engine_Spec_20260304.md 참조
-> **last_updated**: 2026-03-04 — D섹션: SONG_ARC_PRESETS 7종(+wave/shockwave/staircase), audio_mixer --dynamic-mix, 글쓰기 3종 구조+도메인 5+5+SI 커브 7종
+> 상세 시스템 문서: ENOMETA_SYSTEM_SNAPSHOT_20260306.md 참조
+> 음악 엔진 상세: 코드가 진실의 소스 (enometa_music_engine.py)
+> **last_updated**: 2026-03-06 — v16: kiwipiepy 형태소 분석, 콜앤리스폰스 비활성, calcMeta 엔드카드 기준
 
 ---
 
@@ -27,7 +27,7 @@
 | 비주얼 엔진 | Canvas 2D + SVG (Remotion) + Python (numpy+Pillow) | Hybrid: Python 배경 + Remotion 오버레이 |
 | 오디오 분석 | numpy FFT | 프레임별 bass/mid/high/rms/onset |
 | 오디오 믹싱 | ffmpeg | narration 90% + BGM 100%, output=max(nar,bgm), loudnorm -14 LUFS, 엔드카드 BGM 자동 연장 |
-| 대본 데이터 | script_data_extractor.py | 숫자/화학물질/바이트 인코딩 + **semantic_intensity** (v11.1: VERB 101개+EMOTION 68개+SCIENCE 85개+CHEM 19개+BODY 30개) + custom_dictionary.json 자동 로드 + 미등록 단어 감지 |
+| 대본 데이터 | script_data_extractor.py | **v16: kiwipiepy 형태소 분석** + semantic_intensity (VERB 101개+EMOTION 68개+SCIENCE 85개+CHEM 19개+BODY 30개) + custom_dictionary.json + 미등록 단어 감지 |
 | 비주얼 스크립트 | visual_script_generator.py | 대본+장르 → 씬 → 감정 → vocab 자동 매핑 |
 | 대본 분석 | Claude Code 자체 | Claude Max 포함, API 비용 없음 |
 
