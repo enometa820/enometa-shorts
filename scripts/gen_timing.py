@@ -63,9 +63,9 @@ async def generate(
     bpm: float = DEFAULT_BPM,
     voice: str = DEFAULT_VOICE,
     rate: str = DEFAULT_RATE,
-    music_mood: str = "raw",
+    music_mood: str = "acid",
     visual_mood: str | None = None,
-    drum: bool | None = None,
+    drum_mode: str = "default",
     gap_sec: float = DEFAULT_GAP,
     paragraph_gap_sec: float = DEFAULT_PARAGRAPH_GAP,
 ):
@@ -149,8 +149,13 @@ async def generate(
     if visual_mood is not None:
         output["visual_mood"] = visual_mood
 
-    if drum is not None:
-        output["drum"] = drum
+    if drum_mode != "default":
+        output["drum_mode"] = drum_mode
+    # 하위호환: bool 필드도 병행 저장
+    if drum_mode == "on":
+        output["drum"] = True
+    elif drum_mode == "off":
+        output["drum"] = False
 
     return output
 
@@ -162,14 +167,18 @@ def main():
     parser.add_argument("--bpm", type=float, default=DEFAULT_BPM, help=f"BPM (기본: {DEFAULT_BPM})")
     parser.add_argument("--voice", default=DEFAULT_VOICE)
     parser.add_argument("--rate", default=DEFAULT_RATE)
-    parser.add_argument("--music-mood", default="raw",
-                        choices=["ambient", "ikeda", "experimental", "minimal", "chill", "glitch", "raw", "intense", "techno"])
+    parser.add_argument("--music-mood", default="acid",
+                        choices=["ambient", "microsound", "IDM", "minimal", "dub", "glitch", "acid", "industrial", "techno"])
     parser.add_argument("--visual-mood", default=None,
                         choices=["ikeda", "cooper", "abstract", "data"])
-    parser.add_argument("--drum", action="store_true", default=None,
-                        help="드럼 강제 ON")
+    parser.add_argument("--drum-mode", default="default",
+                        choices=["default", "on", "off", "simple", "dynamic"],
+                        help="드럼 모드 (기본: default=무드 기본값)")
+    # deprecated alias (하위호환)
+    parser.add_argument("--drum", action="store_true", default=False,
+                        help="[deprecated] --drum-mode on 과 동일")
     parser.add_argument("--no-drum", action="store_true",
-                        help="드럼 강제 OFF")
+                        help="[deprecated] --drum-mode off 와 동일")
     parser.add_argument("--gap", type=float, default=DEFAULT_GAP,
                         help=f"문장 간 갭 (초, 기본: {DEFAULT_GAP})")
     parser.add_argument("--paragraph-gap", type=float, default=DEFAULT_PARAGRAPH_GAP,
@@ -181,13 +190,13 @@ def main():
         print(f"오류: script 파일 없음: {script_path}")
         sys.exit(1)
 
-    # drum 처리: --drum / --no-drum / 미지정(None)
+    # drum_mode 처리: --drum-mode 우선, deprecated --drum/--no-drum 하위호환
     if args.no_drum:
-        drum = False
+        drum_mode = "off"
     elif args.drum:
-        drum = True
+        drum_mode = "on"
     else:
-        drum = None
+        drum_mode = args.drum_mode
 
     output_path = args.output or os.path.join(os.path.dirname(script_path), "narration_timing.json")
 
@@ -198,7 +207,7 @@ def main():
         rate=args.rate,
         music_mood=args.music_mood,
         visual_mood=args.visual_mood,
-        drum=drum,
+        drum_mode=drum_mode,
         gap_sec=args.gap,
         paragraph_gap_sec=args.paragraph_gap,
     ))

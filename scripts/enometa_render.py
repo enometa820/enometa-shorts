@@ -64,8 +64,8 @@ def save_status(episode_dir: str, status: dict):
 # ── 단계별 함수 ────────────────────────────────────────────────
 
 
-def step_gen_timing(episode_dir: str, bpm: float = 135, music_mood: str = "raw",
-                    visual_mood: str | None = None, drum: bool | None = None,
+def step_gen_timing(episode_dir: str, bpm: float = 135, music_mood: str = "acid",
+                    visual_mood: str | None = None, drum_mode: str = "default",
                     gap: float = 0.3, paragraph_gap: float = 0.8):
     """[1] TTS 실측 기반 타이밍 생성 (script.txt -> narration_timing.json)
     조건: script.txt 있고 narration_timing.json 없을 때만 실행
@@ -86,10 +86,8 @@ def step_gen_timing(episode_dir: str, bpm: float = 135, music_mood: str = "raw",
            "--gap", str(gap), "--paragraph-gap", str(paragraph_gap)]
     if visual_mood:
         cmd += ["--visual-mood", visual_mood]
-    if drum is True:
-        cmd += ["--drum"]
-    elif drum is False:
-        cmd += ["--no-drum"]
+    if drum_mode != "default":
+        cmd += ["--drum-mode", drum_mode]
     run(cmd, "gen_timing")
 
 
@@ -277,11 +275,12 @@ def run_pipeline(
     step: str | None = None,
     force: bool = False,
     bpm: float = 135,
-    music_mood: str = "raw",
+    music_mood: str = "acid",
     visual_mood: str | None = None,
-    drum: bool | None = None,
+    drum_mode: str = "default",
     gap: float = 0.3,
     paragraph_gap: float = 0.8,
+    stop_after: str | None = None,
 ):
     os.makedirs(episode_dir, exist_ok=True)
     status = load_status(episode_dir)
@@ -294,7 +293,11 @@ def run_pipeline(
     print(f"  Dir:     {episode_dir}")
     print(f"{'='*60}\n")
 
+    _stop_requested = [False]
+
     def do(name: str, fn):
+        if _stop_requested[0]:
+            return
         if step is not None and step != name:
             return
         label_map = {
@@ -313,9 +316,21 @@ def run_pipeline(
         status[name] = "done"
         save_status(episode_dir, status)
         completed.append(name)
+        if stop_after and name == stop_after:
+            _stop_requested[0] = True
+            STEP_ORDER = ["gen_timing", "tts", "script_data", "visual_script",
+                          "bgm", "mix", "audio_analysis", "python_frames", "render"]
+            idx = STEP_ORDER.index(stop_after)
+            next_step = STEP_ORDER[idx + 1] if idx + 1 < len(STEP_ORDER) else None
+            print(f"\n{'='*60}")
+            print(f"  [PAUSE] --stop-after {stop_after}: 파이프라인 중단됨")
+            if next_step:
+                print(f"  확인 후 다음 단계 실행:")
+                print(f"  py scripts/enometa_render.py {episode_dir} --title \"{title}\" --step {next_step}")
+            print(f"{'='*60}\n")
 
     try:
-        do("gen_timing",   lambda: step_gen_timing(episode_dir, bpm, music_mood, visual_mood, drum, gap, paragraph_gap))
+        do("gen_timing",   lambda: step_gen_timing(episode_dir, bpm, music_mood, visual_mood, drum_mode, gap, paragraph_gap))
         do("tts",          lambda: step_tts(episode_dir, force))
         do("script_data",  lambda: step_script_data(episode_dir, force))
         do("visual_script",lambda: step_visual_script(episode_dir, title, episode_id, palette, force, visual_mood or ""))
@@ -352,17 +367,17 @@ PALETTE_DESC = {
     "enometa":    "흑백 모노크롬",
 }
 
-MUSIC_MOOD_CHOICES = ["raw", "ambient", "ikeda", "experimental", "minimal", "chill", "glitch", "intense", "techno"]
+MUSIC_MOOD_CHOICES = ["acid", "ambient", "microsound", "IDM", "minimal", "dub", "glitch", "industrial", "techno"]
 MUSIC_MOOD_DESC = {
-    "raw":          "거친 전자음 (기본)",
+    "acid":         "TB-303 애시드 (기본)",
     "ambient":      "잔잔한 배경",
-    "ikeda":        "Ryoji Ikeda 스타일",
-    "experimental": "실험적",
+    "microsound":   "Ikeda/Alva Noto 마이크로사운드",
+    "IDM":          "Aphex/Autechre 복잡 비트",
     "minimal":      "미니멀",
-    "chill":        "부드러운",
+    "dub":          "Basic Channel 딥 코드+딜레이",
     "glitch":       "글리치/노이즈",
-    "intense":      "풀 에너지",
-    "techno":       "4-on-the-floor 킥 + TB-303",
+    "industrial":   "Perc/Ansome 디스토션 킥",
+    "techno":       "4-on-the-floor 킥 + FM베이스",
 }
 
 VISUAL_MOOD_CHOICES = [None, "ikeda", "cooper", "abstract", "data"]
@@ -409,20 +424,18 @@ def run_interactive(args):
     print("\n[3] 비주얼 무드:")
     args.visual_mood = _pick("", VISUAL_MOOD_CHOICES, VISUAL_MOOD_DESC)
 
-    # 4. 드럼
-    print("\n[4] 드럼:")
-    drum_choices = ["default", "on", "off"]
-    drum_desc = ["무드 기본값", "강제 ON", "강제 OFF"]
+    # 4. 드럼 모드
+    print("\n[4] 드럼 모드:")
+    drum_choices = ["default", "on", "off", "simple", "dynamic"]
+    drum_desc = [
+        "무드 기본값",
+        "풀 드럼 강제 ON",
+        "드럼 강제 OFF",
+        "킥+하이햇만, 필인 최소 (영상 전체 2회)",
+        "풀 드럼+SI 최대+필인 2배",
+    ]
     drum_sel = _pick("", drum_choices, drum_desc)
-    if drum_sel == "on":
-        args.drum = True
-        args.no_drum = False
-    elif drum_sel == "off":
-        args.drum = False
-        args.no_drum = True
-    else:
-        args.drum = None
-        args.no_drum = False
+    args.drum_mode = drum_sel
 
     # 5. 제목
     print("\n[5] 제목:")
@@ -453,7 +466,7 @@ def run_interactive(args):
                  f'--title "{args.title}"']
     if args.palette != "phantom":
         cmd_parts.append(f"--palette {args.palette}")
-    if args.music_mood != "raw":
+    if args.music_mood != "acid":
         cmd_parts.append(f"--music-mood {args.music_mood}")
     if args.visual_mood:
         cmd_parts.append(f"--visual-mood {args.visual_mood}")
@@ -497,16 +510,24 @@ def main():
     parser.add_argument("--force", action="store_true", help="기존 파일 덮어쓰기")
     parser.add_argument("--bpm", type=float, default=135,
                         help="gen_timing BPM (기본: 135)")
-    parser.add_argument("--music-mood", default="raw",
-                        choices=["ambient", "ikeda", "experimental", "minimal", "chill", "glitch", "raw", "intense", "techno"],
-                        help="음악 무드 (기본: raw)")
+    parser.add_argument("--music-mood", default="acid",
+                        choices=["ambient", "microsound", "IDM", "minimal", "dub", "glitch", "acid", "industrial", "techno"],
+                        help="음악 장르 (기본: acid)")
     parser.add_argument("--visual-mood", default=None,
                         choices=["ikeda", "cooper", "abstract", "data"],
                         help="비주얼 무드 (선택)")
-    parser.add_argument("--drum", action="store_true", default=None,
-                        help="드럼 강제 ON")
+    parser.add_argument("--drum-mode", default="default",
+                        choices=["default", "on", "off", "simple", "dynamic"],
+                        help="드럼 모드 (기본: default=무드 기본값)")
+    # deprecated alias (하위호환)
+    parser.add_argument("--drum", action="store_true", default=False,
+                        help="[deprecated] --drum-mode on 과 동일")
     parser.add_argument("--no-drum", action="store_true",
-                        help="드럼 강제 OFF")
+                        help="[deprecated] --drum-mode off 와 동일")
+    parser.add_argument("--stop-after", default=None,
+                        choices=["gen_timing", "tts", "script_data", "visual_script",
+                                 "bgm", "mix", "audio_analysis", "python_frames"],
+                        help="지정 단계 완료 후 파이프라인 중단 (사용자 확인용)")
     parser.add_argument("--gap", type=float, default=0.3,
                         help="문장 간 갭 (초, 기본: 0.3)")
     parser.add_argument("--paragraph-gap", type=float, default=0.8,
@@ -522,7 +543,13 @@ def main():
     episode_dir = os.path.abspath(args.episode_dir)
     episode_id = args.episode or os.path.basename(episode_dir)
 
-    drum = False if args.no_drum else (True if args.drum else None)
+    # drum_mode 결정: --drum-mode 우선, deprecated --drum/--no-drum 하위호환
+    if args.no_drum:
+        drum_mode = "off"
+    elif args.drum:
+        drum_mode = "on"
+    else:
+        drum_mode = args.drum_mode
 
     run_pipeline(
         episode_dir=episode_dir,
@@ -534,9 +561,10 @@ def main():
         bpm=args.bpm,
         music_mood=args.music_mood,
         visual_mood=args.visual_mood,
-        drum=drum,
+        drum_mode=drum_mode,
         gap=args.gap,
         paragraph_gap=args.paragraph_gap,
+        stop_after=args.stop_after,
     )
 
 

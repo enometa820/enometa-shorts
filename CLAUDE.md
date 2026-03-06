@@ -32,7 +32,7 @@ npx remotion studio --port 3000
 npx remotion render src/index.tsx EP009 episodes/ep009/output.mp4
 
 # 전체 파이프라인 — Claude가 대화로 옵션 수집 후 아래 형태로 실행
-py scripts/enometa_render.py <episode_dir> --title "제목" --palette phantom --music-mood raw
+py scripts/enometa_render.py <episode_dir> --title "제목" --palette phantom --music-mood acid
 
 # 전체 파이프라인 — 사용자가 터미널에서 직접 실행할 때만 (input() 때문에 Claude 실행 불가)
 py scripts/enometa_render.py <episode_dir> --interactive
@@ -91,8 +91,8 @@ script.txt → gen_timing.py → narration_timing.json
 ### 팔레트
 `phantom` / `neon_noir` / `cold_steel` / `ember` / `synapse` / `gameboy` / `c64` / `enometa`
 
-### 음악 무드
-`raw` / `ambient` / `ikeda` / `experimental` / `minimal` / `chill` / `glitch` / `intense` / `techno`
+### 음악 장르 (v18)
+`acid` / `ambient` / `microsound` / `IDM` / `minimal` / `dub` / `glitch` / `industrial` / `techno`
 
 ### ⚠️ 오디오 경로 주의
 Remotion은 `public/epXXX/mixed.wav`를 참조. `episodes/epXXX/mixed.wav`와 **별개**.

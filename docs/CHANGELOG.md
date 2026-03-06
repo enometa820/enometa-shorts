@@ -5,6 +5,23 @@
 
 ---
 
+## 2026-03-07 — v18 장르 시스템 오버하울 + 파이프라인 버그 수정
+
+### Added
+- `scripts/enometa_music_engine.py`: 3개 신규 합성 함수 — `tape_delay()` (dub), `distorted_kick()` (industrial), `chord_stab()` (dub)
+- `scripts/script_data_extractor.py`: `music_mood`, `drum_mode` 필드를 narration_timing → script_data로 전달 (이전 누락 버그 수정)
+- `scripts/visual_script_generator.py`: `mood_override` 파라미터 추가 (visual_mood가 씬 레벨까지 전달)
+
+### Changed
+- **장르 리네이밍**: raw→acid, ikeda→microsound, experimental→IDM, chill→dub, intense→industrial (하위호환 자동 변환)
+- `scripts/enometa_music_engine.py`: 9개 `_MOOD_LAYERS` 전면 재설계 — 장르별 고유 악기+리듬+BPM 정체성 확보
+- `scripts/enometa_music_engine.py`: `generate()` 전 렌더러 게이팅 확장 — bass_drone/sine/pulse_train/ultrahigh/gate_stutter/gap_burst 장르별 ON/OFF
+- `scripts/enometa_music_engine.py`: 장르별 BPM 범위 (ambient 72~90 ~ industrial 138~155)
+- `scripts/enometa_render.py`, `scripts/gen_timing.py`: CLI choices 9장르 반영
+- `CLAUDE.md`, `.claude/skills/enometa-produce.md`: 장르 목록 최신화
+
+---
+
 ## 2026-03-06 — EP009 피드백 반영: 엔드카드 버그 수정 + 비주얼 개선
 
 ### Fixed

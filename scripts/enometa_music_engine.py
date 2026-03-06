@@ -974,6 +974,100 @@ def synth_lead(freq, duration, sr=SAMPLE_RATE, wt=None, vibrato_depth=0.003, cut
     return wave
 
 
+def tape_delay(signal, delay_ms=300, feedback=0.6, sr=SAMPLE_RATE):
+    """테이프 딜레이 — dub techno 핵심 이펙트.
+    Basic Channel / Rhythm & Sound 스타일: 반복될수록 LP 필터로 고주파 손실,
+    아날로그 테이프 특유의 따뜻한 감쇠.
+    feedback: 0.0~0.95 (0.7 이상 = 긴 꼬리, dub 특유의 공간감)
+    """
+    delay_samples = int(sr * delay_ms / 1000)
+    if delay_samples <= 0 or len(signal) == 0:
+        return signal.copy()
+    out = signal.copy().astype(np.float64)
+    buf = np.zeros(delay_samples, dtype=np.float64)
+    write_idx = 0
+    # LP 필터 상태 (1차 IIR: 테이프 헤드 고주파 손실)
+    lp_state = 0.0
+    lp_coeff = 0.7  # 높을수록 더 어두운 반복
+    for i in range(len(out)):
+        delayed = buf[write_idx]
+        # 1차 LP 필터: 반복마다 고주파 잘림
+        lp_state = lp_coeff * lp_state + (1 - lp_coeff) * delayed
+        out[i] += lp_state
+        buf[write_idx] = out[i] * feedback
+        write_idx = (write_idx + 1) % delay_samples
+    # 노멀라이즈 (피크 초과 방지)
+    peak = np.max(np.abs(out))
+    if peak > 1.0:
+        out /= peak
+    return out
+
+
+def distorted_kick(freq=50, sr=SAMPLE_RATE, drive=3.0):
+    """디스토션 킥 — industrial techno 킥.
+    Perc / Ansome / Surgeon 레퍼런스: punchy 킥 + np.tanh waveshaping + 비트크러시.
+    drive: 2.0~6.0 (높을수록 더 거친 디스토션)
+    """
+    # punchy 킥 기반
+    base = kick_drum(freq, sr, character=2)
+    # 웨이브쉐이핑 디스토션 (tanh 다단계)
+    driven = np.tanh(base * drive)
+    # 비트크러시: 8bit → 거친 디지털 텍스처
+    bit_depth = 8
+    levels = 2 ** bit_depth
+    driven = np.round(driven * levels) / levels
+    # 추가 드라이브로 펌핑감
+    driven = np.tanh(driven * 1.5)
+    # 클릭 어택 강화
+    click_len = int(sr * 0.003)
+    if click_len < len(driven):
+        click = noise(0.003, sr)[:click_len] * 0.3
+        driven[:click_len] += click
+    # 노멀라이즈
+    peak = np.max(np.abs(driven))
+    if peak > 0:
+        driven = driven / peak * 0.9
+    return driven
+
+
+def chord_stab(root_freq=130.8, duration=2.0, sr=SAMPLE_RATE):
+    """코드 스탭 — dub techno 딥 코드.
+    Basic Channel 스타일: 마이너 코드(root + m3 + 5th) + LP 필터 + 느린 감쇠.
+    tape_delay()와 조합하면 dub techno 특유의 공간감 형성.
+    """
+    total_samples = int(sr * duration)
+    t = np.linspace(0, duration, total_samples, endpoint=False)
+    # 마이너 코드: root, minor 3rd (1.189), perfect 5th (1.498)
+    ratios = [1.0, 1.189, 1.498]
+    chord = np.zeros(total_samples)
+    for ratio in ratios:
+        freq = root_freq * ratio
+        # 쏘우파 기반 (풍부한 하모닉)
+        phase = (np.arange(total_samples) * freq / sr) % 1.0
+        chord += (2.0 * phase - 1.0)
+    chord /= len(ratios)
+    # ADSR: 빠른 어택, 긴 릴리스 (패드 느낌)
+    attack_s = int(sr * 0.01)
+    decay_s = int(sr * 0.1)
+    sustain_level = 0.6
+    release_s = int(sr * max(0, duration - 0.5))
+    env = np.ones(total_samples) * sustain_level
+    # 어택
+    if attack_s > 0:
+        env[:attack_s] = np.linspace(0, 1, attack_s)
+    # 디케이
+    if decay_s > 0 and attack_s + decay_s < total_samples:
+        env[attack_s:attack_s + decay_s] = np.linspace(1, sustain_level, decay_s)
+    # 릴리스: 후반 50%에서 페이드아웃
+    fade_start = total_samples // 2
+    env[fade_start:] *= np.linspace(1, 0, total_samples - fade_start) ** 1.5
+    chord *= env * 0.35
+    # LP 필터: 따뜻한 톤 (dub 특유의 머핀 사운드)
+    if len(chord) > 20:
+        chord = resonant_lowpass(chord, 800, sr=sr, order=4)
+    return chord
+
+
 def soft_clip(signal, drive=2.0):
     """소프트 클리핑 디스토션"""
     driven = signal * drive
@@ -1430,9 +1524,11 @@ class EnometaMusicEngine:
     def _compute_tempo_curve(self) -> np.ndarray:
         """v12: 에피소드 전체 고정 BPM — 한 곡으로 들리게.
         가변 BPM은 섹션 경계에서 리듬이 끊기는 원인이었으므로 제거.
-        최소 BPM 120 보장.
+        최소 BPM: 무드별 하한 (ambient/ikeda/chill=70, 나머지=95)
         """
-        fixed_bpm = max(float(self.bpm), 120.0)
+        music_mood = self.script.get("metadata", {}).get("music_mood", "acid")
+        min_bpm = 70 if music_mood in ("ambient", "microsound", "dub") else 95
+        fixed_bpm = max(float(self.bpm), min_bpm)
         return np.full(self.total_samples, fixed_bpm)
 
     def _section_bpm(self, section) -> float:
@@ -1512,6 +1608,8 @@ class EnometaMusicEngine:
         from sequence_generators import generate_drum_pattern, generate_fill_pattern
         section_si = {}
         section_drum_pat = {}  # v13: dict{"kick","snare","hihat"} per section
+        drum_mode = getattr(self, '_drum_mode', 'default')
+        music_mood = self.script.get("metadata", {}).get("music_mood", "acid")
         for sec in sections:
             sid = sec.get("id", "?")
             s_start = int(sec["start_sec"] * self.sr)
@@ -1522,7 +1620,28 @@ class EnometaMusicEngine:
                 si_avg = sec.get("energy", 0.5)
             section_si[sid] = si_avg
             role = sec.get("_role", sec.get("emotion", "drop"))
-            section_drum_pat[sid] = generate_drum_pattern(self.seq_config, role, si_avg)
+            # drum_mode별 effective_si: simple=희소, dynamic=조밀
+            if drum_mode == "simple":
+                effective_si = 0.0   # si_mult=0.7 고정 → 최소 밀도
+            elif drum_mode == "dynamic":
+                effective_si = 1.0   # si_mult=1.3 고정 → 최대 밀도
+            else:
+                effective_si = si_avg
+            base_pat = generate_drum_pattern(self.seq_config, role, effective_si)
+
+            # v17: 무드별 유클리드 패턴 오버라이드 (MOOD_RHYTHM_PRESETS)
+            rhythm_preset = self.MOOD_RHYTHM_PRESETS.get(music_mood)
+            if rhythm_preset is not None:
+                for part in ("kick", "snare", "hihat"):
+                    euclid_spec = rhythm_preset.get(part)
+                    if euclid_spec is not None:
+                        pulses, steps = euclid_spec
+                        raw_pat = list(euclidean_rhythm(steps, pulses))
+                        # 렌더러는 16-step 고정 → cycling으로 정규화
+                        base_pat[part] = [raw_pat[i % len(raw_pat)] for i in range(16)]
+                    # None → seq_config 기본값 유지 (base_pat 그대로)
+
+            section_drum_pat[sid] = base_pat
 
         # v12: 드롭 감지 — role 기반 (drop/drop2 섹션의 시작 시점)
         drop_boundaries = set()
@@ -1571,8 +1690,14 @@ class EnometaMusicEngine:
                     is_near_drop = True
                     break
 
-            # v13: 패턴 결정 — 시퀀스 기반 or 필인
-            if drop_state == 1:
+            # v16: 패턴 결정 — drum_mode별 필인 빈도 차별화
+            if drum_mode == "simple":
+                # simple: 32바마다만 fill_buildup (영상 전체 약 2회)
+                if bar_idx % 32 == 31:
+                    pat = generate_fill_pattern(self.seq_config, "fill_buildup")
+                else:
+                    pat = section_drum_pat.get(sid, generate_drum_pattern(self.seq_config, cur_role, 0.5))
+            elif drop_state == 1:
                 pat = generate_fill_pattern(self.seq_config, "drop_impact")
                 drop_state = 0
             elif is_near_drop and drop_state == 0:
@@ -1580,6 +1705,14 @@ class EnometaMusicEngine:
                 drop_state = 1
             elif cur_role == "buildup" and is_near_drop:
                 pat = generate_fill_pattern(self.seq_config, "fill_snare_roll")
+            elif drum_mode == "dynamic":
+                # dynamic: 필인 빈도 2배 (8바→4바, 16바→8바)
+                if bar_idx % 8 == 7:
+                    pat = generate_fill_pattern(self.seq_config, "fill_snare_roll")
+                elif bar_idx % 4 == 3:
+                    pat = generate_fill_pattern(self.seq_config, "fill_buildup")
+                else:
+                    pat = section_drum_pat.get(sid, generate_drum_pattern(self.seq_config, cur_role, 0.5))
             elif bar_idx % 16 == 15:
                 pat = generate_fill_pattern(self.seq_config, "fill_snare_roll")
             elif bar_idx % 8 == 7:
@@ -2711,45 +2844,129 @@ class EnometaMusicEngine:
 
         return si_env
 
-    # ── v15 무드 시스템 ──────────────────────────────────────────────────
+    # ── v18 장르 시스템 ──────────────────────────────────────────────────
+    # 9개 실존 언더그라운드 전자음악 장르
+    # acid(TB-303), microsound(Ikeda/Noto), IDM(Aphex/Autechre),
+    # dub(Basic Channel), industrial(Perc/Ansome)
+    # + ambient, minimal, glitch, techno (유지)
     _MOOD_DRUM_DEFAULT = {
-        "ambient": False, "ikeda": False, "experimental": True,
-        "minimal": True,  "chill": True,  "glitch": True,
-        "raw": True,      "intense": True, "techno": True,
+        "ambient": False, "microsound": False, "IDM": True,
+        "minimal": True,  "dub": True,         "glitch": True,
+        "acid": True,     "industrial": True,  "techno": True,
     }
     _MOOD_LAYERS = {
-        "ambient":      {"bass_drone": {"active": True, "volume": 0.8}, "sine_interference": {"active": True, "volume": 0.9}, "pulse_train": {"active": True, "volume": 0.6}, "saw_sequence": {"active": False}, "arpeggio": {"active": False}, "kick": {"active": False}, "snare": {"active": False}},
-        "ikeda":        {"sine_interference": {"active": True, "volume": 1.0}, "data_click": {"active": True, "volume": 0.7}, "pulse_train": {"active": True, "volume": 0.8}, "ultrahigh_texture": {"active": True, "volume": 0.5}, "saw_sequence": {"active": False}, "arpeggio": {"active": False}, "kick": {"active": False}, "snare": {"active": False}},
-        "experimental": {"bytebeat": {"active": True, "volume": 0.8}, "feedback_loop": {"active": True, "volume": 0.6}, "stutter_gate": {"active": True, "volume": 0.7}, "glitch": {"active": True, "volume": 0.9}, "kick": {"active": True, "volume": 0.7}, "snare": {"active": True, "volume": 0.5}},
-        "minimal":      {"fm_bass": {"active": True, "volume": 0.9}, "bass_drone": {"active": True, "volume": 0.7}, "arpeggio": {"active": True, "volume": 0.6}, "kick": {"active": True, "volume": 0.5}, "saw_sequence": {"active": False}, "snare": {"active": False}},
-        "chill":        {"kick": {"active": True, "volume": 0.5}, "arpeggio": {"active": True, "volume": 0.9}, "bass_drone": {"active": True, "volume": 0.7}, "saw_sequence": {"active": True, "volume": 0.4}, "snare": {"active": False}},
-        "glitch":       {"kick": {"active": True, "volume": 0.8, "pattern": "irregular"}, "stutter_gate": {"active": True, "volume": 0.9}, "gap_burst": {"active": True, "volume": 1.0}, "data_click": {"active": True, "volume": 0.8}, "snare": {"active": True, "volume": 0.6}},
-        "raw":          {"kick": {"active": True, "volume": 0.9}, "snare": {"active": True, "volume": 0.8}, "saw_sequence": {"active": True, "volume": 1.0}, "arpeggio": {"active": True, "volume": 0.7}},
-        "intense":      {"kick": {"active": True, "volume": 1.0}, "snare": {"active": True, "volume": 1.0}, "saw_sequence": {"active": True, "volume": 1.0}, "arpeggio": {"active": True, "volume": 0.9}, "ultrahigh_texture": {"active": True, "volume": 0.8}, "feedback_loop": {"active": True, "volume": 0.6}},
-        "techno":       {"kick": {"active": True, "volume": 1.0}, "snare": {"active": True, "volume": 0.7}, "saw_sequence": {"active": True, "volume": 0.9}, "arpeggio": {"active": True, "volume": 0.9}, "fm_bass": {"active": True, "volume": 0.7}, "ultrahigh_texture": {"active": True, "volume": 0.6}},
+        "ambient":      {"bass_drone": {"active": True, "volume": 0.8}, "sine_interference": {"active": True, "volume": 0.9}, "pulse_train": {"active": True, "volume": 0.6},
+                         "saw_sequence": {"active": False}, "arpeggio": {"active": False}, "kick": {"active": False}, "snare": {"active": False}},
+        "microsound":   {"sine_interference": {"active": True, "volume": 1.0}, "data_click": {"active": True, "volume": 0.9}, "pulse_train": {"active": True, "volume": 0.8},
+                         "ultrahigh_texture": {"active": True, "volume": 0.6}, "saw_sequence": {"active": False}, "arpeggio": {"active": False}, "kick": {"active": False}, "snare": {"active": False}},
+        "IDM":          {"kick": {"active": True, "volume": 0.7}, "snare": {"active": True, "volume": 0.5},
+                         "saw_sequence": {"active": True, "volume": 0.5}, "arpeggio": {"active": True, "volume": 0.7},
+                         "glitch": {"active": True, "volume": 0.6}, "stutter_gate": {"active": True, "volume": 0.7}, "bytebeat": {"active": True, "volume": 0.5}},
+        "minimal":      {"fm_bass": {"active": True, "volume": 0.9}, "bass_drone": {"active": True, "volume": 0.7}, "arpeggio": {"active": True, "volume": 0.6},
+                         "kick": {"active": True, "volume": 0.5}, "saw_sequence": {"active": False}, "snare": {"active": False}},
+        "dub":          {"kick": {"active": True, "volume": 0.7}, "snare": {"active": True, "volume": 0.4},
+                         "bass_drone": {"active": True, "volume": 0.9}, "chord_stab": {"active": True, "volume": 0.7},
+                         "saw_sequence": {"active": False}, "arpeggio": {"active": False},
+                         "tape_delay": {"active": True, "feedback": 0.65}, "sine_interference": {"active": True, "volume": 0.5}},
+        "glitch":       {"kick": {"active": True, "volume": 0.8}, "snare": {"active": True, "volume": 0.6},
+                         "saw_sequence": {"active": False}, "arpeggio": {"active": False},
+                         "glitch": {"active": True, "volume": 1.0, "density": 0.7},
+                         "bytebeat": {"active": True, "volume": 0.6, "formula": "glitch"},
+                         "stutter_gate": {"active": True, "volume": 1.0}, "gap_burst": {"active": True, "volume": 1.0}, "data_click": {"active": True, "volume": 0.9}},
+        "acid":         {"kick": {"active": True, "volume": 0.9}, "snare": {"active": True, "volume": 0.8},
+                         "saw_sequence": {"active": True, "volume": 1.0}, "arpeggio": {"active": True, "volume": 0.7},
+                         "acid_bass": {"active": True, "volume": 0.9}},
+        "industrial":   {"kick": {"active": True, "volume": 1.0}, "snare": {"active": True, "volume": 1.0},
+                         "saw_sequence": {"active": True, "volume": 1.0}, "arpeggio": {"active": False},
+                         "distorted_kick": {"active": True, "volume": 0.8}, "ultrahigh_texture": {"active": True, "volume": 0.8},
+                         "feedback_loop": {"active": True, "volume": 0.7}, "gap_burst": {"active": True, "volume": 0.9}},
+        "techno":       {"kick": {"active": True, "volume": 1.0}, "snare": {"active": True, "volume": 0.7},
+                         "saw_sequence": {"active": True, "volume": 0.9}, "arpeggio": {"active": True, "volume": 0.9},
+                         "fm_bass": {"active": True, "volume": 0.7}, "ultrahigh_texture": {"active": True, "volume": 0.6}},
     }
     _GAP_FILL_INTENSITY = {
-        "ambient": 0.0, "ikeda": 0.3, "experimental": 1.0,
-        "minimal": 0.2, "chill": 0.3, "glitch": 0.8,
-        "raw": 0.6,     "intense": 0.9, "techno": 0.7,
+        "ambient": 0.0, "microsound": 0.3, "IDM": 1.0,
+        "minimal": 0.2, "dub": 0.3,        "glitch": 0.8,
+        "acid": 0.6,    "industrial": 0.9, "techno": 0.7,
     }
 
-    def apply_mood_to_sections(self, sections: list, mood: str, drum_override=None):
-        """v15: 무드 프리셋에 따라 섹션별 instrument active/volume 적용."""
-        mood_layers = self._MOOD_LAYERS.get(mood, self._MOOD_LAYERS["raw"])
-        drum_on = self._MOOD_DRUM_DEFAULT.get(mood, True) if drum_override is None else drum_override
+    # ── 장르별 BPM 범위 ──────────────────────────────────────────────────────
+    # ep_seed로 범위 내에서 결정론적 선택 → 장르별 템포 캐릭터 확보
+    MOOD_BPM_RANGES = {
+        "ambient":      (72,  90),   # slow, meditative
+        "microsound":   (80,  96),   # slow, data-driven (Ikeda/Alva Noto)
+        "minimal":      (118, 126),  # steady, hypnotic
+        "dub":          (110, 125),  # deep, spacious (Basic Channel)
+        "IDM":          (100, 155),  # wide range, unpredictable (Aphex/Autechre)
+        "glitch":       (95,  155),  # intentionally wide = instability
+        "acid":         (126, 138),  # TB-303 sweet spot
+        "industrial":   (138, 155),  # fast, aggressive (Perc/Ansome)
+        "techno":       (128, 138),  # 4-on-the-floor sweet spot
+    }
+
+    # ── 장르별 유클리드 드럼 패턴 ─────────────────────────────────────────────
+    # (pulses, steps): euclidean_rhythm(steps, pulses) → 장르 DNA
+    # None = 해당 파트 seq_config 기본값 유지
+    MOOD_RHYTHM_PRESETS = {
+        "techno":       {"kick": (4, 16), "snare": (2, 16), "hihat": (8, 16)},
+        "glitch":       {"kick": (5, 16), "snare": (3, 11), "hihat": (11, 16)},
+        "minimal":      {"kick": (3, 16), "snare": None,    "hihat": (5, 12)},
+        "dub":          {"kick": (3, 16), "snare": (2, 16), "hihat": (4, 16)},
+        "industrial":   {"kick": (4, 12), "snare": (3, 16), "hihat": (7,  8)},
+        "IDM":          {"kick": (5, 12), "snare": (3,  8), "hihat": (9, 16)},
+        "acid":         None,   # seq_config 기본값 — 클래식 808/909 패턴
+        "ambient":      {"kick": None,    "snare": None,    "hihat": None},
+        "microsound":   {"kick": None,    "snare": None,    "hihat": (3, 16)},
+    }
+
+    # ── 장르별 킥 캐릭터 ─────────────────────────────────────────────────────
+    # 0=tight(단단), 1=boomy(울림), 2=punchy(어택)
+    MOOD_KICK_CHARACTER = {
+        "techno":       2,   # punchy — 믹스 관통
+        "glitch":       0,   # tight — 짧고 클릭
+        "minimal":      0,   # tight
+        "dub":          1,   # boomy — 둥글고 깊은
+        "industrial":   2,   # punchy — distorted_kick과 레이어링
+        "IDM":          0,   # tight — 복잡 패턴에 어울리는 짧은 킥
+        "acid":         2,   # punchy — 909 킥
+        "ambient":      1,   # boomy
+        "microsound":   0,   # tight — 데이터 클릭과 혼합
+    }
+
+    def apply_mood_to_sections(self, sections: list, mood: str, drum_mode: str = "default"):
+        """v16: 무드 프리셋 + drum_mode 4종(on/off/simple/dynamic)으로 섹션별 instrument 적용."""
+        mood_layers = self._MOOD_LAYERS.get(mood, self._MOOD_LAYERS["acid"])
         drum_layers = {"kick", "snare", "hi_hat"}
-        print(f"  [mood] {mood}: drum={'ON' if drum_on else 'OFF'}", flush=True)
+
+        # drum_mode별 활성화 결정
+        if drum_mode == "off":
+            drum_on, snare_on = False, False
+        elif drum_mode == "on":
+            drum_on, snare_on = True, True
+        elif drum_mode == "simple":
+            drum_on, snare_on = True, False   # 킥+하이햇만, 스네어 OFF
+        elif drum_mode == "dynamic":
+            drum_on, snare_on = True, True
+        else:  # "default"
+            drum_on = self._MOOD_DRUM_DEFAULT.get(mood, True)
+            snare_on = drum_on
+
+        print(f"  [mood] {mood}+{drum_mode}: drum={'ON' if drum_on else 'OFF'}, snare={'ON' if snare_on else 'OFF'}", flush=True)
+
         for section in sections:
             instruments = section.setdefault("instruments", {})
             for layer_name, config in mood_layers.items():
-                if layer_name in drum_layers:
+                if layer_name == "snare":
+                    instruments[layer_name] = dict(config, active=snare_on and config.get("active", True))
+                elif layer_name in drum_layers:  # kick, hi_hat
                     instruments[layer_name] = dict(config, active=drum_on and config.get("active", True))
                 else:
                     instruments[layer_name] = dict(config)
+            section["_drum_mode"] = drum_mode  # 렌더러 참조용
+
         return sections
 
-    def _insert_gap_events(self, drops: list, mood: str = "raw"):
+    def _insert_gap_events(self, drops: list, mood: str = "acid"):
         """v15: drops[] 구간에 무드별 강도로 gap_burst/stutter/impact 삽입."""
         intensity = self._GAP_FILL_INTENSITY.get(mood, 0.5)
         if not drops or intensity == 0:
@@ -2841,35 +3058,80 @@ class EnometaMusicEngine:
         self._cr_drum_env = np.ones(self.total_samples, dtype=np.float64)
         self._cr_melody_env = np.ones(self.total_samples, dtype=np.float64)
 
-        # v15: 무드 기반 레이어 ON/OFF 적용
-        music_mood = self.script.get("metadata", {}).get("music_mood", "raw")
-        drum_override = self.script.get("metadata", {}).get("drum_override", None)
-        if music_mood and music_mood != "raw":
-            self.apply_mood_to_sections(sections, music_mood, drum_override)
-        elif drum_override is not None:
-            # raw 무드에서도 drum_override 적용
-            self.apply_mood_to_sections(sections, "raw", drum_override)
+        # v18: 장르 기반 레이어 ON/OFF 적용 (drum_mode 4종)
+        music_mood = self.script.get("metadata", {}).get("music_mood", "acid")
+        # 하위호환: 이전 무드 이름 → 새 장르 이름 자동 변환
+        _LEGACY_MOOD_MAP = {"raw": "acid", "ikeda": "microsound", "experimental": "IDM", "chill": "dub", "intense": "industrial"}
+        music_mood = _LEGACY_MOOD_MAP.get(music_mood, music_mood)
+        drum_mode = self.script.get("metadata", {}).get("drum_mode", "default")
+        # 하위호환: 기존 drum_override bool → drum_mode 자동 변환
+        if drum_mode == "default":
+            drum_override = self.script.get("metadata", {}).get("drum_override", None)
+            if drum_override is True:
+                drum_mode = "on"
+            elif drum_override is False:
+                drum_mode = "off"
+        self._drum_mode = drum_mode  # 렌더러에서 참조용
+
+        # v17: 무드별 킥 캐릭터 오버라이드 (seq_config 기본값 덮어쓰기)
+        kick_char = self.MOOD_KICK_CHARACTER.get(music_mood)
+        if kick_char is not None:
+            self.seq_config.kick_character = kick_char
+            print(f"  [mood] kick_character → {kick_char} ({['tight','boomy','punchy'][kick_char]})", flush=True)
+
+        if music_mood and music_mood != "acid":
+            self.apply_mood_to_sections(sections, music_mood, drum_mode)
+        elif drum_mode != "default":
+            # acid 장르에서도 drum_mode 적용
+            self.apply_mood_to_sections(sections, "acid", drum_mode)
 
         if is_enometa:
-            # v9 Ikeda 확장: 쏘우파 시퀀서 + 리듬 + 아르페지오 + 펄스 트레인 + 드론
-            # 레이어 1: 리듬 뼈대 (킥 + 하이햇)
+            # v18: 장르별 레이어 게이팅 — _MOOD_LAYERS에서 active 여부 확인
+            _mood_cfg = self._MOOD_LAYERS.get(music_mood, {})
+            def _layer_on(name, default=True):
+                return _mood_cfg.get(name, {}).get("active", default)
+            # 레이어 1: 리듬 뼈대 (킥 + 하이햇) — 항상 실행 (drum_mode가 off면 내부에서 처리)
             self._render_continuous_rhythm(sections)
-            # 레이어 2: 쏘우파 게이트 시퀀서 (메인 멜로디/베이스 라인)
-            self._render_continuous_saw_sequence(sections)
-            # 레이어 3: 아르페지오 (고음역 움직임)
-            self._render_continuous_arpeggio(sections)
-            # 레이어 4: 서브 베이스 드론 (바닥 에너지)
-            self._render_continuous_bass(sections)
+            # 레이어 2: 쏘우파 게이트 시퀀서
+            if _layer_on("saw_sequence"):
+                self._render_continuous_saw_sequence(sections)
+            else:
+                print("  [saw_seq] SKIPPED (mood layer off)", flush=True)
+            # 레이어 3: 아르페지오
+            if _layer_on("arpeggio"):
+                self._render_continuous_arpeggio(sections)
+            else:
+                print("  [arp] SKIPPED (mood layer off)", flush=True)
+            # 레이어 4: 베이스 드론 + 서브
+            if _layer_on("bass_drone"):
+                self._render_continuous_bass(sections)
+            else:
+                print("  [bass] SKIPPED (mood layer off)", flush=True)
             self._render_continuous_sub_pulse(sections)
-            # 레이어 5: enometa 시그니처 텍스처 (사인파 간섭, 펄스, 초고주파)
-            self._render_continuous_sine_interference(sections)
-            self._render_continuous_pulse_train(sections)
-            self._render_continuous_ultrahigh(sections)
-            # 레이어 9: 게이트 + 유클리드 + 스터터 (대본 데이터 연동)
-            self._render_continuous_gate_stutter(sections)
-            # 레이어 10: 무음 갭 쏘우 스터터 버스트 (나레이션 없는 구간 임팩트)
-            self._render_gap_stutter_burst()
-            # v15: drops[] 기반 gap_events 삽입 (music_mood 강도 적용)
+            # 레이어 5: 텍스처 (사인파 간섭, 펄스, 초고주파)
+            if _layer_on("sine_interference"):
+                self._render_continuous_sine_interference(sections)
+            else:
+                print("  [sine_interference] SKIPPED (mood layer off)", flush=True)
+            if _layer_on("pulse_train", default=True):
+                self._render_continuous_pulse_train(sections)
+            else:
+                print("  [pulse_train] SKIPPED (mood layer off)", flush=True)
+            if _layer_on("ultrahigh_texture"):
+                self._render_continuous_ultrahigh(sections)
+            else:
+                print("  [ultrahigh] SKIPPED (mood layer off)", flush=True)
+            # 레이어 9: 게이트 + 스터터
+            if _layer_on("stutter_gate", default=True):
+                self._render_continuous_gate_stutter(sections)
+            else:
+                print("  [gate_stutter] SKIPPED (mood layer off)", flush=True)
+            # 레이어 10: 무음 갭 버스트
+            if _layer_on("gap_burst", default=True):
+                self._render_gap_stutter_burst()
+            else:
+                print("  [gap_burst] SKIPPED (mood layer off)", flush=True)
+            # v15: drops[] 기반 gap_events 삽입 (장르 강도 적용)
             drops = self.script.get("metadata", {}).get("drops", [])
             if drops:
                 self._insert_gap_events(drops, music_mood)
@@ -4334,7 +4596,25 @@ def generate_music_script(script_data_path: str, visual_script_path: str = None)
 
     segments = script_data.get("segments", [])
     total_dur = script_data.get("global", {}).get("total_duration_sec", 60.0)
-    bpm = script_data.get("global", {}).get("bpm", 120)
+
+    # v18: 장르 기반 BPM 선택 (ep_seed 결정론적)
+    music_mood = meta.get("music_mood", "acid")
+    _LEGACY_MOOD_MAP = {"raw": "acid", "ikeda": "microsound", "experimental": "IDM", "chill": "dub", "intense": "industrial"}
+    music_mood = _LEGACY_MOOD_MAP.get(music_mood, music_mood)
+    _MOOD_BPM_RANGES = {
+        "ambient":      (72,  90),
+        "microsound":   (80,  96),
+        "minimal":      (118, 126),
+        "dub":          (110, 125),
+        "IDM":          (100, 155),
+        "glitch":       (95,  155),
+        "acid":         (126, 138),
+        "industrial":   (138, 155),
+        "techno":       (128, 138),
+    }
+    bpm_min, bpm_max = _MOOD_BPM_RANGES.get(music_mood, (124, 138))
+    bpm = bpm_min + (seed_val % max(1, bpm_max - bpm_min + 1))
+    print(f"  [v17] mood={music_mood} → BPM {bpm} (range {bpm_min}~{bpm_max})")
 
     base_freq = 60.0
     sections = []
@@ -4368,6 +4648,10 @@ def generate_music_script(script_data_path: str, visual_script_path: str = None)
                 best_idx = seg.get("index", 0)
         sec["_segment_index"] = best_idx
 
+    # script_data.json metadata에서 music_mood, drum_mode 전달
+    music_mood_out = meta.get("music_mood", "acid")
+    drum_mode_out = meta.get("drum_mode", "default")
+
     return {
         "metadata": {
             "duration": total_dur,
@@ -4376,6 +4660,8 @@ def generate_music_script(script_data_path: str, visual_script_path: str = None)
             "genre": "enometa",
             "song_arc": "song_structure",  # v16: ARRANGEMENT_TABLE role energy 기반 arc
             "synthesis_overrides": {"enometa_mode": True},
+            "music_mood": music_mood_out,
+            "drum_mode": drum_mode_out,
         },
         "palette": {
             "bass_freq": base_freq,

@@ -744,11 +744,21 @@ def extract_script_data(input_path):
         "sec_per_bar": SEC_PER_BAR
     }
 
+    # narration_timing.json에서 music_mood, drum_mode 추출해서 전달
+    timing_meta = {}
+    if is_json:
+        timing_meta["music_mood"] = timing.get("music_mood", "acid")
+        if "drum_mode" in timing:
+            timing_meta["drum_mode"] = timing["drum_mode"]
+        elif "drum" in timing:  # 하위호환: bool → drum_mode 변환
+            timing_meta["drum_mode"] = "on" if timing["drum"] else "off"
+
     return {
         "metadata": {
             "episode": os.path.basename(os.path.dirname(input_path)),
             "source": os.path.basename(input_path),
             "version": 2, # v12 Music-First
+            **timing_meta,
         },
         "segments": segments_out,
         "global": global_data,

@@ -738,10 +738,14 @@ def build_scene(
     recent_combos: set = None,
     si: float = 0.5,
     sd_keywords: Optional[List[str]] = None,
+    mood_override: dict = None,
 ) -> dict:
     """단일 씬의 비주얼 스크립트 생성 (v5: 장르+전략+variant+SI)"""
     pool = EMOTION_VOCAB_POOL.get(emotion, EMOTION_VOCAB_POOL["neutral_curious"])
     genre_override = GENRE_VISUAL_OVERRIDES.get(genre, {})
+    # visual_mood 오버라이드 병합 (mood_override가 genre_override보다 우선)
+    if mood_override:
+        genre_override = {**genre_override, **mood_override}
     if strategy is None:
         strategy = get_strategy("dense")
 
@@ -1018,6 +1022,7 @@ def generate_visual_script(
         palette_name = genre_override["palette"]
 
     # v15: visual_mood 오버라이드 — genre_override보다 우선 적용
+    mood_override = None
     if visual_mood and visual_mood in VISUAL_MOOD_OVERRIDES:
         mood_override = VISUAL_MOOD_OVERRIDES[visual_mood]
         genre_override = {**genre_override, **mood_override}
@@ -1068,6 +1073,7 @@ def generate_visual_script(
             recent_combos=recent_combos,
             si=scene_data.get("si", 0.5),
             sd_keywords=scene_sd_keywords if scene_sd_keywords else None,
+            mood_override=mood_override,
         )
         scenes.append(scene)
         prev_emotion = emotion

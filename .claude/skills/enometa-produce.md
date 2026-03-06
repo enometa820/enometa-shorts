@@ -19,20 +19,34 @@ description: >
 Claude가 아래 순서로 물어본 뒤 명령을 조합해서 실행한다.
 
 1. **팔레트** — `phantom` / `neon_noir` / `cold_steel` / `ember` / `synapse` / `gameboy` / `c64` / `enometa`
-2. **음악 무드** — `raw` / `ambient` / `ikeda` / `experimental` / `minimal` / `chill` / `glitch` / `intense` / `techno`
+2. **음악 장르** — `acid` / `ambient` / `microsound` / `IDM` / `minimal` / `dub` / `glitch` / `industrial` / `techno`
 3. **비주얼 무드** — 자동(생략 가능) / `ikeda` / `cooper` / `abstract` / `data`
-4. **드럼** — 무드 기본값(생략) / `--drum` 강제 ON / `--no-drum` 강제 OFF
+4. **드럼 모드** (필수 선택) — 반드시 5가지 중 하나를 명시할 것:
+   - `default` — 무드 기본값 따름 (생략 시 기본)
+   - `--drum-mode on` — 풀 드럼 강제 ON
+   - `--drum-mode off` — 드럼 강제 OFF
+   - `--drum-mode simple` — 킥+하이햇만, 필인 최소 (32바마다 1회, 영상 전체 약 2회)
+   - `--drum-mode dynamic` — 풀 드럼+SI 최대+필인 2배 (4/8바 주기)
 5. **제목** — 입력받으면 kiwipiepy가 키워드 자동 추출
 
-수집 완료 후 실행:
+수집 완료 후 **BGM 확인 게이트 포함**해서 실행:
 
 ```bash
+# 1단계: BGM까지 실행 후 중단 (확인용)
 py scripts/enometa_render.py episodes/epXXX \
   --title "제목" \
   --palette phantom \
   --music-mood techno \
-  --visual-mood ikeda \
-  --drum
+  --drum-mode default \
+  --stop-after bgm
+```
+
+BGM 확인 후 OK → 믹스까지:
+```bash
+# 2단계: mix까지 실행 후 중단
+py scripts/enometa_render.py episodes/epXXX --title "제목" --step mix
+# 믹스 확인 후 OK → 나머지 전체
+py scripts/enometa_render.py episodes/epXXX --title "제목" --step visual_script
 ```
 
 ## 특정 단계만 재실행
@@ -44,6 +58,8 @@ py scripts/enometa_render.py episodes/epXXX --title "제목" --step render --for
 ```
 
 `--step` 선택지: `gen_timing` / `tts` / `script_data` / `visual_script` / `bgm` / `mix` / `audio_analysis` / `python_frames` / `render`
+
+`--stop-after` 선택지: `gen_timing` / `tts` / `script_data` / `visual_script` / `bgm` / `mix` / `audio_analysis` / `python_frames`
 
 ## 검증
 
