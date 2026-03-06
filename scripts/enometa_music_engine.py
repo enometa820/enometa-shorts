@@ -2916,8 +2916,8 @@ class EnometaMusicEngine:
             stereo *= 0.95 / peak2
 
         # v16: 마스터 페이드 제거 — 음악은 즉시 시작, 즉시 끝남
-        # 클릭 방지용 극초단 anti-click만 적용 (1ms)
-        anti_click = min(int(self.sr * 0.001), len(stereo) // 4)
+        # 클릭 방지용 anti-click (5ms — 앨리어싱 방지)
+        anti_click = min(int(self.sr * 0.005), len(stereo) // 4)
         if anti_click > 1:
             for ch in range(2):
                 stereo[:anti_click, ch] *= np.linspace(0, 1, anti_click)
@@ -4094,13 +4094,12 @@ def _plan_song_structure(total_duration: float, bpm: float,
         else:
             print(f"  [v12] climax at {climax_pct:.0%} — outside 20~70% range, using default ratio")
 
-    # 총 바 수가 target 대비 ±20% 이내가 되도록 재조정
+    # v16: 총 바 수가 target을 초과하지 않도록 강제 축소
     final_total = sum(b for _, b in roles_bars)
-    max_bars = int(total_bars * 1.2)
-    if final_total > max_bars:
-        # 가장 큰 섹션부터 축소
+    if final_total > total_bars:
         excess = final_total - total_bars
-        for shrink_target in ("drop2", "drop", "intro"):
+        # 큰 섹션부터 축소 (drop2 → intro → drop → buildup 순)
+        for shrink_target in ("drop2", "intro", "drop", "buildup", "breakdown", "outro"):
             for i, (name, bars) in enumerate(roles_bars):
                 if name == shrink_target and bars > 4:
                     reduction = min(excess, bars - 4)
@@ -4338,9 +4337,11 @@ def generate_music_script(script_data_path: str, visual_script_path: str = None)
     base_freq = 60.0
     sections = []
 
+    # v16: BGM = TTS 길이 + 엔드카드(6초) + 버퍼(2초)
+    total_dur += 8  # 엔드카드 커버
+
     # v16: 음악은 TTS 문장 경계와 무관하게 하나의 연속 트랙으로 생성
     # ARRANGEMENT_TABLE 기반 음악적 구조 사용 (intro→buildup→drop→breakdown→drop2→outro)
-    # SI 리액티브는 마스터 레벨의 si_modulation 하나로만 처리
     si_peak_time = None
     if segments:
         peak_seg = max(segments, key=lambda s: s.get("analysis", {}).get("semantic_intensity", 0))
@@ -4349,8 +4350,8 @@ def generate_music_script(script_data_path: str, visual_script_path: str = None)
     sections, actual_dur = _plan_song_structure(
         total_dur, bpm, climax_time=si_peak_time
     )
-    # v16: 음악 구조가 TTS보다 길 수 있음 — 음악 길이를 실제 구조 길이로 확장
-    total_dur = max(total_dur, actual_dur)
+    # v16: BGM 길이는 요청 길이(TTS+엔드카드)로 고정 — 초과 확장 금지
+    total_dur = min(total_dur, actual_dur)
 
     # 세그먼트 인덱스 매핑 (script_data_enrichment 호환)
     for sec in sections:

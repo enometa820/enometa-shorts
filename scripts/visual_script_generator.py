@@ -815,10 +815,17 @@ def build_scene(
                        "지금", "여기", "거기", "어디", "누구", "무엇",
                        "때문", "사이", "안에", "밖에", "위에", "아래",
                        "그게", "이게", "저게", "그건", "이건", "저건",
-                       "있는", "없는", "되는", "하는", "있다", "없다"}
+                       "있는", "없는", "되는", "하는", "있다", "없다",
+                       "같은", "같다", "왜", "저", "내", "그",
+                       "않는", "않다", "않은", "쓰"}
+    # v16: 활용형/용언 어미 패턴 필터 (NLP 오분류 방지)
+    _verb_suffixes = ("했", "랬", "됐", "겠", "까", "는다", "한다")
     keyword = None
     if sd_keywords:
-        filtered_kws = [w for w in sd_keywords if w not in _text_stopwords and len(w) >= 2]
+        filtered_kws = [w for w in sd_keywords
+                        if w not in _text_stopwords
+                        and len(w) >= 2
+                        and not any(w.endswith(s) for s in _verb_suffixes)]
         if filtered_kws:
             keyword = rng.choice(filtered_kws)
         text_chance = max(text_chance, 0.9)  # v16: 정확한 키워드가 있으면 거의 항상 노출
