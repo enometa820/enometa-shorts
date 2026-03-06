@@ -1,0 +1,49 @@
+{
+  "episode": "ep005",
+  "title": "공포와 각성의 화학식은 같다",
+  "style": "ikeda",
+  "date": "2026-03-02",
+  "overall_rating": 5,
+  "issues": [
+    {
+      "category": "music",
+      "severity": "major",
+      "description": "ikeda 음악이 너무 난해해서 음악처럼 들리지 않음. sine interference + data click + ultrahigh texture 조합이 불쾌한 노이즈에 가까움",
+      "action": "ikeda 장르 재설계 필요 - 최소한의 멜로디/리듬 구조 필요, 순수 실험음악은 Shorts에 부적합"
+    },
+    {
+      "category": "visual",
+      "severity": "major",
+      "description": "Python 비주얼 레이어(SineWave/Barcode/DataStream/TextData)가 반복 패턴이라 지루함. 무브먼트가 단조로움",
+      "action": "파티클, 다양한 패턴, 동적 움직임 추가 필요"
+    },
+    {
+      "category": "visual",
+      "severity": "major",
+      "description": "Remotion 애니메이션이 hybrid 모드에서 전혀 사용되지 않음. vocab 컴포넌트(파티클, 모션그래픽 등)가 비활성",
+      "action": "hybrid 모드에서도 Remotion vocab 컴포넌트를 Python 배경 위에 오버레이해야 함"
+    },
+    {
+      "category": "visual",
+      "severity": "major",
+      "description": "Remotion 텍스트 모션그래픽, 그래프 등이 전혀 활용되지 않음",
+      "action": "Remotion의 강점(모션그래픽, 텍스트 애니메이션, 데이터 시각화)을 적극 활용해야 함"
+    }
+  ],
+  "good_points": [
+    "비주얼 스타일(ikeda/데이터아트) 자체는 마음에 들었음",
+    "hybrid 아키텍처(Python+Remotion) 구조는 유효"
+  ],
+  "bad_points": [
+    "음악이 음악이 아닌 노이즈",
+    "비주얼 패턴 반복, 무브먼트 단조",
+    "Remotion 미활용 - 파티클, 모션그래픽, 텍스트 애니메이션 부재",
+    "hybrid 모드에서 Python 배경만 있고 Remotion 오버레이 없음"
+  ],
+  "lessons": [
+    "ikeda 장르라도 최소한의 리듬/멜로디 구조 필요",
+    "hybrid 모드 = Python 배경 + Remotion 오버레이(vocab + 텍스트) 동시 사용",
+    "비주얼 다양성: 파티클, 그래프, 텍스트 모션 등 여러 패턴 혼합",
+    "단조로운 반복 금지 - 씬마다 다른 비주얼 전략"
+  ]
+}

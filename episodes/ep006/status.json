@@ -1,0 +1,8 @@
+{
+  "tts": "done",
+  "script_data": "done",
+  "visual_script": "done",
+  "bgm": "done",
+  "mix": "done",
+  "error": "Command '['py', 'C:\\\\옵시디언\\\\enometa\\\\enometa-shorts\\\\scripts\\\\visual_renderer.py', 'C:\\\\옵시디언\\\\enometa\\\\enometa-shorts\\\\episodes\\\\ep006', '--genre', 'ikeda']' timed out after 900.0 seconds"
+}

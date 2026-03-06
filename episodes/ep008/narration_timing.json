@@ -1,0 +1,168 @@
+{
+  "voice": "ko-KR-SunHiNeural",
+  "rate": "+5%",
+  "total_duration_sec": 125.332,
+  "segments": [
+    {
+      "index": 0,
+      "text": "우주는 무너지고 있다.",
+      "start_sec": 0.0,
+      "end_sec": 2.424,
+      "duration_sec": 2.424
+    },
+    {
+      "index": 1,
+      "text": "물리학이 말한다. 닫힌 공간의 무질서는 반드시 증가한다. 질서는 소멸한다. 예외 없이.",
+      "start_sec": 2.674,
+      "end_sec": 12.346,
+      "duration_sec": 9.672
+    },
+    {
+      "index": 2,
+      "text": "우리는 이것이 두려워서 모든 것을 고정하려 한다. 흩어지지 않으려고.",
+      "start_sec": 12.596,
+      "end_sec": 18.884,
+      "duration_sec": 6.288
+    },
+    {
+      "index": 3,
+      "text": "얇은 층의 액체를 아래에서 천천히 데워보면 알 수 있다.",
+      "start_sec": 19.134,
+      "end_sec": 23.718,
+      "duration_sec": 4.584
+    },
+    {
+      "index": 4,
+      "text": "처음에는 아무 일도 일어나지 않는다. 분자들이 무작위로 흔들릴 뿐이다.",
+      "start_sec": 23.968,
+      "end_sec": 30.352,
+      "duration_sec": 6.384
+    },
+    {
+      "index": 5,
+      "text": "그런데 바닥과 수면의 온도 차이가 임계점을 넘는 순간",
+      "start_sec": 30.602,
+      "end_sec": 35.282,
+      "duration_sec": 4.68
+    },
+    {
+      "index": 6,
+      "text": "물 안에서 육각형 패턴이 나타난다.",
+      "start_sec": 35.532,
+      "end_sec": 38.892,
+      "duration_sec": 3.36
+    },
+    {
+      "index": 7,
+      "text": "뜨거운 물이 올라가고 차가운 물이 내려오며 그 흐름이 스스로 벌집 모양의 구조를 만든다.",
+      "start_sec": 39.142,
+      "end_sec": 45.574,
+      "duration_sec": 6.432
+    },
+    {
+      "index": 8,
+      "text": "아무도 설계하지 않았다. 혼돈이 기하학을 낳은 것이다.",
+      "start_sec": 45.824,
+      "end_sec": 51.104,
+      "duration_sec": 5.28
+    },
+    {
+      "index": 9,
+      "text": "1977년 프리고진은 노벨상을 받았다. 불안정한 시스템이 스스로 새로운 질서를 만든다는 이론.",
+      "start_sec": 51.354,
+      "end_sec": 59.946,
+      "duration_sec": 8.592
+    },
+    {
+      "index": 10,
+      "text": "이 육각형은 그 증거 중 하나였다.",
+      "start_sec": 60.196,
+      "end_sec": 63.508,
+      "duration_sec": 3.312
+    },
+    {
+      "index": 11,
+      "text": "질서는 안정에서 오지 않았다. 불안정이 질서를 창조했다.",
+      "start_sec": 63.758,
+      "end_sec": 69.566,
+      "duration_sec": 5.808
+    },
+    {
+      "index": 12,
+      "text": "이 원리는 자연에서 끝나지 않았다.",
+      "start_sec": 69.816,
+      "end_sec": 73.104,
+      "duration_sec": 3.288
+    },
+    {
+      "index": 13,
+      "text": "넷플릭스에는 카오스 몽키라는 프로그램이 있다. 하는 일은 단순하다.",
+      "start_sec": 73.354,
+      "end_sec": 79.618,
+      "duration_sec": 6.264
+    },
+    {
+      "index": 14,
+      "text": "2억 명이 접속하는 서버를 무작위로 죽인다. 예고 없이. 업무 시간 중에.",
+      "start_sec": 79.868,
+      "end_sec": 86.444,
+      "duration_sec": 6.576
+    },
+    {
+      "index": 15,
+      "text": "한 번도 무너져보지 않은 시스템이 가장 쉽게 무너진다. 어디가 약한지 아무도 모른다.",
+      "start_sec": 86.694,
+      "end_sec": 94.062,
+      "duration_sec": 7.368
+    },
+    {
+      "index": 16,
+      "text": "매일 작은 균열을 내기 때문에 진짜 위기 앞에서 무너지지 않는다.",
+      "start_sec": 94.312,
+      "end_sec": 99.424,
+      "duration_sec": 5.112
+    },
+    {
+      "index": 17,
+      "text": "부서져본 시스템만이 부서지지 않는다.",
+      "start_sec": 99.674,
+      "end_sec": 102.962,
+      "duration_sec": 3.288
+    },
+    {
+      "index": 18,
+      "text": "우리도 다르지 않다.",
+      "start_sec": 103.212,
+      "end_sec": 105.516,
+      "duration_sec": 2.304
+    },
+    {
+      "index": 19,
+      "text": "질서를 지키려 에너지를 쓰는 동안 혼돈은 이미 다음 구조를 설계하고 있었다.",
+      "start_sec": 105.766,
+      "end_sec": 111.766,
+      "duration_sec": 6.0
+    },
+    {
+      "index": 20,
+      "text": "엔트로피는 적이 아니었다. 연료였다.",
+      "start_sec": 112.016,
+      "end_sec": 116.312,
+      "duration_sec": 4.296
+    },
+    {
+      "index": 21,
+      "text": "혼돈을 견디는 것이 아니다. 혼돈 위에 서는 것이다.",
+      "start_sec": 116.562,
+      "end_sec": 121.578,
+      "duration_sec": 5.016
+    },
+    {
+      "index": 22,
+      "text": "우리는 처음부터 그렇게 진화해왔다.",
+      "start_sec": 121.828,
+      "end_sec": 125.332,
+      "duration_sec": 3.504
+    }
+  ]
+}

@@ -1,0 +1,1192 @@
+{
+  "title": "공포와 각성의 화학식은 같다",
+  "highlightWords": [
+    "시작하려",
+    "손바닥",
+    "동시"
+  ],
+  "meta": {
+    "strategy": "ikeda",
+    "strategy_description": "Ikeda data art - minimal+terminal+sine",
+    "genre": "ikeda",
+    "palette": "ikeda",
+    "seed": 2753981950,
+    "render_mode": "hybrid",
+    "frames_dir": "ep005/frames",
+    "total_frames": 3858
+  },
+  "global": {
+    "color_palette": [
+      "#8B5CF6",
+      "#C084FC",
+      "#06B6D4",
+      "#F43F5E"
+    ],
+    "background_color": "#06060A",
+    "particle_total": 2000,
+    "font": "Pretendard Variable",
+    "palette": "ikeda"
+  },
+  "scenes": [
+    {
+      "id": "scene_01",
+      "sentence": "새로운 걸 시작하려는 순간. 심박수가 오른다. 분당 70에서 120.",
+      "start_sec": 0.0,
+      "end_sec": 7.762,
+      "emotion": "awakening_spark",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_chain_awaken",
+            "params": {
+              "count": 600,
+              "color": "#8B5CF6",
+              "chain_speed": 1.043,
+              "glow_color": "#7C3AED"
+            }
+          },
+          {
+            "vocab": "waveform_circular",
+            "params": {
+              "mode": "circular",
+              "color": "#8B5CF6",
+              "lineWidth": 3,
+              "sensitivity": 1.765
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "시작하려",
+              "mode": "scatter",
+              "fontSize": 56,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0025,
+            "speed": 0.05,
+            "line_opacity": 0.069,
+            "line_color": "#8888AA"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_02",
+      "sentence": "손바닥에 땀이 맺힌다. 호흡이 얕아진다.",
+      "start_sec": 8.012,
+      "end_sec": 12.764,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {}
+          },
+          {
+            "vocab": "brightness_pulse",
+            "params": {
+              "intensity": 0.458,
+              "color": "#7C3AED"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "손바닥",
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0049,
+            "speed": 0.05,
+            "line_opacity": 0.064,
+            "line_color": "#8888AA"
+          },
+          "variant": "opposing"
+        }
+      }
+    },
+    {
+      "id": "scene_03",
+      "sentence": "편도체가 반응하는 데 걸리는 시간. 0.012초.",
+      "start_sec": 13.014,
+      "end_sec": 18.486,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 300,
+              "color": "#8B5CF6",
+              "rings": 4,
+              "speed": 0.659
+            }
+          },
+          {
+            "vocab": "waveform",
+            "params": {
+              "mode": "waveform",
+              "color": "#8B5CF6",
+              "lineWidth": 1.5,
+              "sensitivity": 1.021
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.003,
+            "speed": 0.05,
+            "line_opacity": 0.054,
+            "line_color": "#8888AA"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      }
+    },
+    {
+      "id": "scene_04",
+      "sentence": "의식보다 빠르다. 생각보다 먼저 몸이 반응한다.",
+      "start_sec": 18.736,
+      "end_sec": 24.016,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {},
+            "variant": "vortex"
+          },
+          {
+            "vocab": "brightness_pulse",
+            "params": {
+              "intensity": 0.726,
+              "color": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0027,
+            "speed": 0.05,
+            "line_opacity": 0.057,
+            "line_color": "#8888AA"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      }
+    },
+    {
+      "id": "scene_05",
+      "sentence": "코르티솔 분비. 아드레날린 급등. 심박수 상승.",
+      "start_sec": 24.266,
+      "end_sec": 30.89,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 500,
+              "color": "#8B5CF6",
+              "rings": 4,
+              "speed": 0.586
+            }
+          },
+          {
+            "vocab": "waveform",
+            "params": {
+              "mode": "waveform",
+              "color": "#8B5CF6",
+              "lineWidth": 1.5,
+              "sensitivity": 1.728
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0041,
+            "speed": 0.05,
+            "line_opacity": 0.082,
+            "line_color": "#8888AA"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      }
+    },
+    {
+      "id": "scene_06",
+      "sentence": "뇌가 동시에 보내는 세 가지 신호.",
+      "start_sec": 31.14,
+      "end_sec": 34.284,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "grid_morph",
+            "params": {
+              "cols": 25,
+              "rows": 20,
+              "mode": "wave",
+              "color": "#555577",
+              "accentColor": "#8B5CF6",
+              "morphIntensity": 0.885,
+              "showConnections": true
+            },
+            "variant": "wave_propagation"
+          },
+          {
+            "vocab": "grid_mesh",
+            "params": {
+              "cols": 25,
+              "rows": 20,
+              "mode": "mesh",
+              "color": "#FFFFFF",
+              "accentColor": "#8B5CF6",
+              "morphIntensity": 1.19,
+              "showConnections": false
+            },
+            "variant": "wave_propagation"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "동시",
+              "mode": "typewriter",
+              "fontSize": 72,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.003,
+            "speed": 0.05,
+            "line_opacity": 0.067,
+            "line_color": "#555577"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_07",
+      "sentence": "공포의 화학식이다. 그런데 정확히 같은 세 신호가 발생하는 순간이 하나 더 있다.",
+      "start_sec": 34.534,
+      "end_sec": 41.792,
+      "emotion": "awakening_spark",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_escape",
+            "params": {
+              "count": 800,
+              "color": "#8B5CF6",
+              "burst_speed": 2.647,
+              "glow": true
+            },
+            "variant": "chain_break"
+          },
+          {
+            "vocab": "brightness_pulse",
+            "params": {
+              "intensity": 0.476,
+              "color": "#7C3AED"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "공포",
+              "mode": "scatter",
+              "fontSize": 56,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0036,
+            "speed": 0.05,
+            "line_opacity": 0.069,
+            "line_color": "#8888AA"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      }
+    },
+    {
+      "id": "scene_08",
+      "sentence": "각성. 코르티솔. 아드레날린. 심박수.",
+      "start_sec": 42.042,
+      "end_sec": 49.228,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 300,
+              "color": "#8B5CF6",
+              "rings": 3,
+              "speed": 0.636
+            }
+          },
+          {
+            "vocab": "waveform",
+            "params": {
+              "mode": "waveform",
+              "color": "#8B5CF6",
+              "lineWidth": 2,
+              "sensitivity": 1.082
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0045,
+            "speed": 0.05,
+            "line_opacity": 0.056,
+            "line_color": "#8888AA"
+          },
+          "variant": "opposing"
+        }
+      }
+    },
+    {
+      "id": "scene_09",
+      "sentence": "수치가 같다. 패턴이 같다.",
+      "start_sec": 49.478,
+      "end_sec": 53.222,
+      "emotion": "somber_reflective",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {}
+          },
+          {
+            "vocab": "loop_ring",
+            "params": {
+              "rings": 6,
+              "color": "#8B5CF6",
+              "pulse_speed": 0.665
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "수치",
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0045,
+            "speed": 0.05,
+            "line_opacity": 0.083,
+            "line_color": "#555577"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      }
+    },
+    {
+      "id": "scene_10",
+      "sentence": "뇌는 공포와 각성을 화학적으로 구분하지 못한다.",
+      "start_sec": 53.472,
+      "end_sec": 57.72,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "grid_morph",
+            "params": {
+              "cols": 20,
+              "rows": 25,
+              "mode": "lines",
+              "color": "#AAAACC",
+              "accentColor": "#8B5CF6",
+              "morphIntensity": 0.824,
+              "showConnections": true
+            }
+          },
+          {
+            "vocab": "waveform_spectrum",
+            "params": {
+              "mode": "spectrum",
+              "color": "#8B5CF6",
+              "lineWidth": 2,
+              "sensitivity": 1.185
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "공포",
+              "mode": "typewriter",
+              "fontSize": 48,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0041,
+            "speed": 0.05,
+            "line_opacity": 0.043,
+            "line_color": "#8888AA"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_11",
+      "sentence": "차이는 단 하나. 해석. 같은 불안을 느끼는 두 그룹을 나눴다.",
+      "start_sec": 57.97,
+      "end_sec": 64.58,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 300,
+              "color": "#8B5CF6",
+              "rings": 5,
+              "speed": 0.472
+            }
+          },
+          {
+            "vocab": "waveform",
+            "params": {
+              "mode": "waveform",
+              "color": "#8B5CF6",
+              "lineWidth": 1.5,
+              "sensitivity": 1.381
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "차이",
+              "mode": "wave",
+              "fontSize": 48,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0049,
+            "speed": 0.05,
+            "line_opacity": 0.065,
+            "line_color": "#555577"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      }
+    },
+    {
+      "id": "scene_12",
+      "sentence": "한쪽에는 진정하라고 했다. 다른 쪽에는 이건 각성이다 라고 했다.",
+      "start_sec": 64.83,
+      "end_sec": 71.272,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {},
+            "variant": "opposing"
+          },
+          {
+            "vocab": "brightness_pulse",
+            "params": {
+              "intensity": 0.582,
+              "color": "#7C3AED"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "한쪽에",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0031,
+            "speed": 0.05,
+            "line_opacity": 0.072,
+            "line_color": "#555577"
+          },
+          "variant": "vortex"
+        }
+      }
+    },
+    {
+      "id": "scene_13",
+      "sentence": "각성으로 해석한 그룹. 수행 능력이 유의미하게 높았다.",
+      "start_sec": 71.522,
+      "end_sec": 76.994,
+      "emotion": "tension_redefine",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_split_ratio",
+            "params": {
+              "count": 500,
+              "ratio": 0.5,
+              "color_a": "#8B5CF6",
+              "color_b": "#C084FC"
+            }
+          },
+          {
+            "vocab": "loop_ring",
+            "params": {
+              "rings": 8,
+              "color": "#8B5CF6",
+              "pulse_speed": 1.378
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "각성으",
+              "mode": "glitch",
+              "fontSize": 56,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0079,
+            "speed": 0.263,
+            "line_opacity": 0.076,
+            "line_color": "#8888AA"
+          },
+          "variant": "vortex"
+        }
+      }
+    },
+    {
+      "id": "scene_14",
+      "sentence": "달라진 건 몸이 아니었다. 한 문장이었다.",
+      "start_sec": 77.244,
+      "end_sec": 82.222,
+      "emotion": "tension_transformative",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "grid_morph",
+            "params": {
+              "cols": 20,
+              "rows": 25,
+              "mode": "wave",
+              "color": "#555577",
+              "accentColor": "#8B5CF6",
+              "morphIntensity": 0.82,
+              "showConnections": false
+            },
+            "variant": "wave_propagation"
+          },
+          {
+            "vocab": "color_shift",
+            "params": {
+              "from_color": "#8B5CF6",
+              "to_color": "#F43F5E",
+              "rhythm": "breath"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "문장",
+              "mode": "glitch",
+              "fontSize": 64,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0074,
+            "speed": 0.283,
+            "line_opacity": 0.054,
+            "line_color": "#8888AA"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_15",
+      "sentence": "그리고 각성 너머에 한 단계가 더 있다.",
+      "start_sec": 82.472,
+      "end_sec": 85.976,
+      "emotion": "somber_reflective",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_converge",
+            "params": {
+              "count": 600,
+              "color": "#C084FC",
+              "target": "center",
+              "speed": 0.829
+            },
+            "variant": "multi_point"
+          },
+          {
+            "vocab": "loop_ring",
+            "params": {
+              "rings": 6,
+              "color": "#8B5CF6",
+              "pulse_speed": 0.92
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "너머",
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0047,
+            "speed": 0.05,
+            "line_opacity": 0.097,
+            "line_color": "#AAAACC"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_16",
+      "sentence": "몰입. 각성 상태에서 행동을 시작하면 뇌는 도파민과 노르에피네프린을 동시에 방출한다.",
+      "start_sec": 86.226,
+      "end_sec": 94.324,
+      "emotion": "hopeful",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_converge",
+            "params": {
+              "count": 800,
+              "color": "#06B6D4",
+              "target": "center",
+              "speed": 0.937
+            },
+            "variant": "multi_point"
+          },
+          {
+            "vocab": "waveform_circular",
+            "params": {
+              "mode": "circular",
+              "color": "#8B5CF6",
+              "lineWidth": 2,
+              "sensitivity": 1.631
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "상태",
+              "mode": "wave",
+              "fontSize": 72,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0048,
+            "speed": 0.05,
+            "line_opacity": 0.053,
+            "line_color": "#8888AA"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      }
+    },
+    {
+      "id": "scene_17",
+      "sentence": "전두엽의 잡음이 줄어든다. 자의식이 사라진다. 시간 감각이 왜곡된다.",
+      "start_sec": 94.574,
+      "end_sec": 102.062,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 300,
+              "color": "#8B5CF6",
+              "rings": 5,
+              "speed": 0.785
+            }
+          },
+          {
+            "vocab": "waveform",
+            "params": {
+              "mode": "waveform",
+              "color": "#8B5CF6",
+              "lineWidth": 2,
+              "sensitivity": 1.992
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "전두엽",
+              "mode": "wave",
+              "fontSize": 48,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0027,
+            "speed": 0.05,
+            "line_opacity": 0.099,
+            "line_color": "#555577"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      }
+    },
+    {
+      "id": "scene_18",
+      "sentence": "뇌가 가장 효율적으로 작동하는 상태.",
+      "start_sec": 102.312,
+      "end_sec": 105.72,
+      "emotion": "awakening_climax",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_escape",
+            "params": {
+              "count": 500,
+              "color": "#8B5CF6",
+              "burst_speed": 2.531,
+              "glow": true
+            },
+            "variant": "chain_break"
+          },
+          {
+            "vocab": "waveform_circular",
+            "params": {
+              "mode": "circular",
+              "color": "#8B5CF6",
+              "lineWidth": 2,
+              "sensitivity": 1.41
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "효율적으",
+              "mode": "scatter",
+              "fontSize": 48,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.95 + 0.05",
+          "particle_size": "bass * 7 + 1",
+          "glow_intensity": "bass * 7",
+          "displacement": "bass * 5",
+          "speed_mult": "onset ? 6 : 1",
+          "glitch_trigger": "onset ? 12 : 0"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0075,
+            "speed": 0.244,
+            "line_opacity": 0.084,
+            "line_color": "#8888AA"
+          },
+          "transition_to": "flow_field_calm"
+        }
+      }
+    },
+    {
+      "id": "scene_19",
+      "sentence": "공포에서 멈추면 아무 일도 일어나지 않는다.",
+      "start_sec": 105.97,
+      "end_sec": 109.858,
+      "emotion": "somber_warning",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "color_drain",
+            "params": {
+              "from_color": "#8B5CF6",
+              "to_color": "#F43F5E",
+              "rhythm": "pulse"
+            }
+          },
+          {
+            "vocab": "grid_morph",
+            "params": {
+              "cols": 15,
+              "rows": 25,
+              "mode": "lines",
+              "color": "#FFFFFF",
+              "accentColor": "#8B5CF6",
+              "morphIntensity": 0.648,
+              "showConnections": false
+            },
+            "variant": "wave_propagation"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "공포",
+              "mode": "glitch",
+              "fontSize": 48,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0056,
+            "speed": 0.258,
+            "line_opacity": 0.057,
+            "line_color": "#AAAACC"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_20",
+      "sentence": "각성으로 읽고 움직이면 몰입이 시작된다.",
+      "start_sec": 110.108,
+      "end_sec": 113.732,
+      "emotion": "hopeful",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_converge",
+            "params": {
+              "count": 600,
+              "color": "#06B6D4",
+              "target": "center",
+              "speed": 1.46
+            },
+            "variant": "multi_point"
+          },
+          {
+            "vocab": "waveform_circular",
+            "params": {
+              "mode": "circular",
+              "color": "#8B5CF6",
+              "lineWidth": 2,
+              "sensitivity": 1.775
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "각성으",
+              "mode": "wave",
+              "fontSize": 72,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0025,
+            "speed": 0.05,
+            "line_opacity": 0.084,
+            "line_color": "#8888AA"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_21",
+      "sentence": "화학식은 같다. 해석이 바뀌면 회로가 바뀐다.",
+      "start_sec": 113.982,
+      "end_sec": 119.344,
+      "emotion": "somber_reflective",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {}
+          },
+          {
+            "vocab": "brightness_pulse",
+            "params": {
+              "intensity": 0.701,
+              "color": "#7C3AED"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "화학식",
+              "mode": "wave",
+              "fontSize": 72,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0036,
+            "speed": 0.05,
+            "line_opacity": 0.047,
+            "line_color": "#AAAACC"
+          }
+        }
+      }
+    },
+    {
+      "id": "scene_22",
+      "sentence": "회로가 바뀌면 우리가 도달하는 곳이 달라진다.",
+      "start_sec": 119.594,
+      "end_sec": 123.602,
+      "emotion": "tension_transformative",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_split_ratio",
+            "params": {
+              "count": 700,
+              "ratio": 0.618,
+              "color_a": "#8B5CF6",
+              "color_b": "#C084FC"
+            }
+          },
+          {
+            "vocab": "color_shift",
+            "params": {
+              "from_color": "#8B5CF6",
+              "to_color": "#F43F5E",
+              "rhythm": "slow"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "회로",
+              "mode": "glitch",
+              "fontSize": 64,
+              "color": "#8B5CF6",
+              "position": "center",
+              "glowColor": "#7C3AED"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0053,
+            "speed": 0.216,
+            "line_opacity": 0.07,
+            "line_color": "#555577"
+          },
+          "transition_to": "flow_field_calm"
+        }
+      }
+    }
+  ]
+}

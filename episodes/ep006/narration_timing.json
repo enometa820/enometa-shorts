@@ -1,0 +1,266 @@
+{
+  "voice": "ko-KR-SunHiNeural",
+  "rate": "+5%",
+  "segments": [
+    {
+      "index": 0,
+      "text": "경사 하강법.",
+      "start_sec": 0.0,
+      "end_sec": 1.92,
+      "duration_sec": 1.92
+    },
+    {
+      "index": 1,
+      "text": "머신러닝이 최적해를 찾는 알고리즘이다.",
+      "start_sec": 2.17,
+      "end_sec": 5.674,
+      "duration_sec": 3.504
+    },
+    {
+      "index": 2,
+      "text": "알고리즘은 정답의 위치를 모른다.",
+      "start_sec": 5.924,
+      "end_sec": 9.212,
+      "duration_sec": 3.288
+    },
+    {
+      "index": 3,
+      "text": "전체 지형이 없다.",
+      "start_sec": 9.462,
+      "end_sec": 11.814,
+      "duration_sec": 2.352
+    },
+    {
+      "index": 4,
+      "text": "목적지 좌표가 없다.",
+      "start_sec": 12.064,
+      "end_sec": 14.584,
+      "duration_sec": 2.52
+    },
+    {
+      "index": 5,
+      "text": "하나만 한다.",
+      "start_sec": 14.834,
+      "end_sec": 16.85,
+      "duration_sec": 2.016
+    },
+    {
+      "index": 6,
+      "text": "지금 이 자리에서, 기울기를 계산한다.",
+      "start_sec": 17.1,
+      "end_sec": 20.988,
+      "duration_sec": 3.888
+    },
+    {
+      "index": 7,
+      "text": "가장 가파르게 낮아지는 방향을 읽는다.",
+      "start_sec": 21.238,
+      "end_sec": 24.67,
+      "duration_sec": 3.432
+    },
+    {
+      "index": 8,
+      "text": "그쪽으로 한 걸음.",
+      "start_sec": 24.92,
+      "end_sec": 27.08,
+      "duration_sec": 2.16
+    },
+    {
+      "index": 9,
+      "text": "다시 계산한다.",
+      "start_sec": 27.33,
+      "end_sec": 29.442,
+      "duration_sec": 2.112
+    },
+    {
+      "index": 10,
+      "text": "다시 한 걸음.",
+      "start_sec": 29.692,
+      "end_sec": 31.588,
+      "duration_sec": 1.896
+    },
+    {
+      "index": 11,
+      "text": "10만 번. 100만 번.",
+      "start_sec": 31.838,
+      "end_sec": 34.526,
+      "duration_sec": 2.688
+    },
+    {
+      "index": 12,
+      "text": "그 반복 끝에 알고리즘은 수렴한다.",
+      "start_sec": 34.776,
+      "end_sec": 37.968,
+      "duration_sec": 3.192
+    },
+    {
+      "index": 13,
+      "text": "완전한 최적해가 아닐 수도 있다.",
+      "start_sec": 38.218,
+      "end_sec": 41.242,
+      "duration_sec": 3.024
+    },
+    {
+      "index": 14,
+      "text": "하지만 충분히 좋은 지점에 닿는다.",
+      "start_sec": 41.492,
+      "end_sec": 44.828,
+      "duration_sec": 3.336
+    },
+    {
+      "index": 15,
+      "text": "우리는 달랐다.",
+      "start_sec": 45.078,
+      "end_sec": 47.166,
+      "duration_sec": 2.088
+    },
+    {
+      "index": 16,
+      "text": "완벽한 방향을 알아야 출발할 수 있다고 믿었다.",
+      "start_sec": 47.416,
+      "end_sec": 51.496,
+      "duration_sec": 4.08
+    },
+    {
+      "index": 17,
+      "text": "전체 지형이 보여야 첫 발을 뗄 수 있다고.",
+      "start_sec": 51.746,
+      "end_sec": 55.466,
+      "duration_sec": 3.72
+    },
+    {
+      "index": 18,
+      "text": "그래서 기다렸다.",
+      "start_sec": 55.716,
+      "end_sec": 57.828,
+      "duration_sec": 2.112
+    },
+    {
+      "index": 19,
+      "text": "준비가 더 되면.",
+      "start_sec": 58.078,
+      "end_sec": 60.166,
+      "duration_sec": 2.088
+    },
+    {
+      "index": 20,
+      "text": "확신이 생기면.",
+      "start_sec": 60.416,
+      "end_sec": 62.528,
+      "duration_sec": 2.112
+    },
+    {
+      "index": 21,
+      "text": "완벽한 타이밍이 오면.",
+      "start_sec": 62.778,
+      "end_sec": 65.298,
+      "duration_sec": 2.52
+    },
+    {
+      "index": 22,
+      "text": "그 조건은 알고리즘에게 없다.",
+      "start_sec": 65.548,
+      "end_sec": 68.452,
+      "duration_sec": 2.904
+    },
+    {
+      "index": 23,
+      "text": "알고리즘은 그냥 시작한다.",
+      "start_sec": 68.702,
+      "end_sec": 71.51,
+      "duration_sec": 2.808
+    },
+    {
+      "index": 24,
+      "text": "지금 이 자리의 기울기만 읽으면서.",
+      "start_sec": 71.76,
+      "end_sec": 75.216,
+      "duration_sec": 3.456
+    },
+    {
+      "index": 25,
+      "text": "미래를 알 수 없는 존재가 완벽한 방향을 찾아야 출발한다면,",
+      "start_sec": 75.466,
+      "end_sec": 80.314,
+      "duration_sec": 4.848
+    },
+    {
+      "index": 26,
+      "text": "그건 실행하지 않겠다는 선언이다.",
+      "start_sec": 80.564,
+      "end_sec": 83.708,
+      "duration_sec": 3.144
+    },
+    {
+      "index": 27,
+      "text": "지금 우리가 서 있는 자리.",
+      "start_sec": 83.958,
+      "end_sec": 86.502,
+      "duration_sec": 2.544
+    },
+    {
+      "index": 28,
+      "text": "기울기를 읽는다.",
+      "start_sec": 86.752,
+      "end_sec": 88.984,
+      "duration_sec": 2.232
+    },
+    {
+      "index": 29,
+      "text": "조금 더 나아지는 방향이 어딘지.",
+      "start_sec": 89.234,
+      "end_sec": 92.33,
+      "duration_sec": 3.096
+    },
+    {
+      "index": 30,
+      "text": "그것만 읽으면 된다.",
+      "start_sec": 92.58,
+      "end_sec": 94.98,
+      "duration_sec": 2.4
+    },
+    {
+      "index": 31,
+      "text": "한 걸음.",
+      "start_sec": 95.23,
+      "end_sec": 96.838,
+      "duration_sec": 1.608
+    },
+    {
+      "index": 32,
+      "text": "다음 자리에서 다시 읽으면 된다.",
+      "start_sec": 97.088,
+      "end_sec": 100.208,
+      "duration_sec": 3.12
+    },
+    {
+      "index": 33,
+      "text": "100만 번 틀리면서 수렴하듯,",
+      "start_sec": 100.458,
+      "end_sec": 103.266,
+      "duration_sec": 2.808
+    },
+    {
+      "index": 34,
+      "text": "우리도 틀리면서 닿는다.",
+      "start_sec": 103.516,
+      "end_sec": 106.156,
+      "duration_sec": 2.64
+    },
+    {
+      "index": 35,
+      "text": "그게 최적화다.",
+      "start_sec": 106.406,
+      "end_sec": 108.518,
+      "duration_sec": 2.112
+    },
+    {
+      "index": 36,
+      "text": "그게, 살아있는 것이다.",
+      "start_sec": 108.768,
+      "end_sec": 111.456,
+      "duration_sec": 2.688
+    }
+  ],
+  "total_duration_sec": 111.456
+}

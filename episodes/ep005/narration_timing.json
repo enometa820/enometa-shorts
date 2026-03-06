@@ -1,0 +1,217 @@
+{
+  "voice": "ko-KR-SunHiNeural",
+  "rate": "+5%",
+  "segments": [
+    {
+      "index": 0,
+      "text": "새로운 걸 시작하려는 순간.",
+      "start_sec": 0.0,
+      "end_sec": 2.808,
+      "duration_sec": 2.808
+    },
+    {
+      "index": 1,
+      "text": "심박수가 오른다. 분당 70에서 120.",
+      "start_sec": 3.058,
+      "end_sec": 7.762,
+      "duration_sec": 4.704
+    },
+    {
+      "index": 2,
+      "text": "손바닥에 땀이 맺힌다. 호흡이 얕아진다.",
+      "start_sec": 8.012,
+      "end_sec": 12.764,
+      "duration_sec": 4.752
+    },
+    {
+      "index": 3,
+      "text": "편도체가 반응하는 데 걸리는 시간. 0.012초.",
+      "start_sec": 13.014,
+      "end_sec": 18.486,
+      "duration_sec": 5.472
+    },
+    {
+      "index": 4,
+      "text": "의식보다 빠르다. 생각보다 먼저 몸이 반응한다.",
+      "start_sec": 18.736,
+      "end_sec": 24.016,
+      "duration_sec": 5.28
+    },
+    {
+      "index": 5,
+      "text": "코르티솔 분비. 아드레날린 급등. 심박수 상승.",
+      "start_sec": 24.266,
+      "end_sec": 30.89,
+      "duration_sec": 6.624
+    },
+    {
+      "index": 6,
+      "text": "뇌가 동시에 보내는 세 가지 신호.",
+      "start_sec": 31.14,
+      "end_sec": 34.284,
+      "duration_sec": 3.144
+    },
+    {
+      "index": 7,
+      "text": "공포의 화학식이다.",
+      "start_sec": 34.534,
+      "end_sec": 36.838,
+      "duration_sec": 2.304
+    },
+    {
+      "index": 8,
+      "text": "그런데 정확히 같은 세 신호가 발생하는 순간이 하나 더 있다.",
+      "start_sec": 37.088,
+      "end_sec": 41.792,
+      "duration_sec": 4.704
+    },
+    {
+      "index": 9,
+      "text": "각성.",
+      "start_sec": 42.042,
+      "end_sec": 43.746,
+      "duration_sec": 1.704
+    },
+    {
+      "index": 10,
+      "text": "코르티솔. 아드레날린. 심박수.",
+      "start_sec": 43.996,
+      "end_sec": 49.228,
+      "duration_sec": 5.232
+    },
+    {
+      "index": 11,
+      "text": "수치가 같다. 패턴이 같다.",
+      "start_sec": 49.478,
+      "end_sec": 53.222,
+      "duration_sec": 3.744
+    },
+    {
+      "index": 12,
+      "text": "뇌는 공포와 각성을 화학적으로 구분하지 못한다.",
+      "start_sec": 53.472,
+      "end_sec": 57.72,
+      "duration_sec": 4.248
+    },
+    {
+      "index": 13,
+      "text": "차이는 단 하나. 해석.",
+      "start_sec": 57.97,
+      "end_sec": 60.778,
+      "duration_sec": 2.808
+    },
+    {
+      "index": 14,
+      "text": "같은 불안을 느끼는 두 그룹을 나눴다.",
+      "start_sec": 61.028,
+      "end_sec": 64.58,
+      "duration_sec": 3.552
+    },
+    {
+      "index": 15,
+      "text": "한쪽에는 진정하라고 했다.",
+      "start_sec": 64.83,
+      "end_sec": 67.542,
+      "duration_sec": 2.712
+    },
+    {
+      "index": 16,
+      "text": "다른 쪽에는 이건 각성이다 라고 했다.",
+      "start_sec": 67.792,
+      "end_sec": 71.272,
+      "duration_sec": 3.48
+    },
+    {
+      "index": 17,
+      "text": "각성으로 해석한 그룹. 수행 능력이 유의미하게 높았다.",
+      "start_sec": 71.522,
+      "end_sec": 76.994,
+      "duration_sec": 5.472
+    },
+    {
+      "index": 18,
+      "text": "달라진 건 몸이 아니었다.",
+      "start_sec": 77.244,
+      "end_sec": 79.956,
+      "duration_sec": 2.712
+    },
+    {
+      "index": 19,
+      "text": "한 문장이었다.",
+      "start_sec": 80.206,
+      "end_sec": 82.222,
+      "duration_sec": 2.016
+    },
+    {
+      "index": 20,
+      "text": "그리고 각성 너머에 한 단계가 더 있다.",
+      "start_sec": 82.472,
+      "end_sec": 85.976,
+      "duration_sec": 3.504
+    },
+    {
+      "index": 21,
+      "text": "몰입.",
+      "start_sec": 86.226,
+      "end_sec": 87.666,
+      "duration_sec": 1.44
+    },
+    {
+      "index": 22,
+      "text": "각성 상태에서 행동을 시작하면 뇌는 도파민과 노르에피네프린을 동시에 방출한다.",
+      "start_sec": 87.916,
+      "end_sec": 94.324,
+      "duration_sec": 6.408
+    },
+    {
+      "index": 23,
+      "text": "전두엽의 잡음이 줄어든다. 자의식이 사라진다. 시간 감각이 왜곡된다.",
+      "start_sec": 94.574,
+      "end_sec": 102.062,
+      "duration_sec": 7.488
+    },
+    {
+      "index": 24,
+      "text": "뇌가 가장 효율적으로 작동하는 상태.",
+      "start_sec": 102.312,
+      "end_sec": 105.72,
+      "duration_sec": 3.408
+    },
+    {
+      "index": 25,
+      "text": "공포에서 멈추면 아무 일도 일어나지 않는다.",
+      "start_sec": 105.97,
+      "end_sec": 109.858,
+      "duration_sec": 3.888
+    },
+    {
+      "index": 26,
+      "text": "각성으로 읽고 움직이면 몰입이 시작된다.",
+      "start_sec": 110.108,
+      "end_sec": 113.732,
+      "duration_sec": 3.624
+    },
+    {
+      "index": 27,
+      "text": "화학식은 같다.",
+      "start_sec": 113.982,
+      "end_sec": 116.118,
+      "duration_sec": 2.136
+    },
+    {
+      "index": 28,
+      "text": "해석이 바뀌면 회로가 바뀐다.",
+      "start_sec": 116.368,
+      "end_sec": 119.344,
+      "duration_sec": 2.976
+    },
+    {
+      "index": 29,
+      "text": "회로가 바뀌면 우리가 도달하는 곳이 달라진다.",
+      "start_sec": 119.594,
+      "end_sec": 123.602,
+      "duration_sec": 4.008
+    }
+  ],
+  "total_duration_sec": 123.602
+}

@@ -1,0 +1,53 @@
+{
+  "episode": "ep008",
+  "title": "질서는 안정에서 오지 않았다",
+  "score": "4/10",
+  "date": "2026-03-05",
+  "feedback": [
+    {
+      "id": "FB-EP008-01",
+      "category": "visual",
+      "severity": "major",
+      "description": "자막 레이어가 비주얼 레이어에 가려짐 — 자막은 최상위여야 함",
+      "fix": "SubtitleSection.tsx에 zIndex: 50 추가 (PostProcess=10 위, LogoEndcard=100 아래)",
+      "status": "resolved",
+      "file": "src/components/SubtitleSection.tsx"
+    },
+    {
+      "id": "FB-EP008-02",
+      "category": "music",
+      "severity": "critical",
+      "description": "음악이 섹션별로 따로 논다. BPM이 섹션마다 변해서 정신없음. 최소 BPM 120 요청",
+      "root_cause": "_compute_tempo_curve()에서 SI 기반 가변 BPM — 섹션별 10~15 BPM 변동이 리듬 끊김 유발",
+      "fix": "v12: 에피소드 전체 고정 BPM으로 변경. max(base_bpm, 120) 보장. 가변 BPM 제거",
+      "status": "resolved",
+      "file": "scripts/enometa_music_engine.py"
+    },
+    {
+      "id": "FB-EP008-03",
+      "category": "music",
+      "severity": "major",
+      "description": "필인이 너무 많이 반복되어 지침. 4바마다 fill이라 그루브가 안정될 틈이 없음",
+      "root_cause": "4바마다 fill_buildup + 8바마다 fill_snare_roll = 36%의 바가 필인",
+      "fix": "v12: 8바마다 fill_buildup + 16바마다 fill_snare_roll = 12.5%로 감소",
+      "status": "resolved",
+      "file": "scripts/enometa_music_engine.py"
+    },
+    {
+      "id": "FB-EP008-04",
+      "category": "music",
+      "severity": "critical",
+      "description": "대본 전체 흐름을 음악 문법으로 해석하는 구조 필요. 한 곡으로 들려야 함",
+      "root_cause": "saw_sequence가 섹션마다 다른 pat_key(음정비율+리듬밀도) 선택 → 멜로디 라인이 섹션 경계에서 완전히 바뀜",
+      "fix": "v12: saw_sequence 에피소드 전체에서 1개 pat_key 고정. 전체 길이를 연속 렌더링(섹션 경계 무시). 에너지 차이는 볼륨(smooth_envelope)과 si_gate로만 표현",
+      "status": "resolved",
+      "file": "scripts/enometa_music_engine.py"
+    }
+  ],
+  "system_changes": [
+    "SubtitleSection.tsx: zIndex: 50 추가",
+    "enometa_music_engine.py: _compute_tempo_curve() → 에피소드 전체 고정 BPM (min 120)",
+    "enometa_music_engine.py: 필인 빈도 36% → 12.5% (8바/16바 단위)",
+    "enometa_music_engine.py: _render_continuous_saw_sequence() → 에피소드 전체 고정 패턴 키"
+  ]
+}

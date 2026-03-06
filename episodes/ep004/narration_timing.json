@@ -1,0 +1,189 @@
+{
+  "voice": "ko-KR-SunHiNeural",
+  "rate": "+5%",
+  "total_duration_sec": 93.37,
+  "segments": [
+    {
+      "index": 0,
+      "text": "하루에 우리가 내리는 결정의 수.",
+      "start_sec": 0.0,
+      "end_sec": 3.072,
+      "duration_sec": 3.072
+    },
+    {
+      "index": 1,
+      "text": "3만 5천 개.",
+      "start_sec": 3.322,
+      "end_sec": 5.362,
+      "duration_sec": 2.04
+    },
+    {
+      "index": 2,
+      "text": "그 중 대부분을 우리는 의식하지 못한다.",
+      "start_sec": 5.612,
+      "end_sec": 9.26,
+      "duration_sec": 3.648
+    },
+    {
+      "index": 3,
+      "text": "이건 망각이 아니다.",
+      "start_sec": 9.51,
+      "end_sec": 11.814,
+      "duration_sec": 2.304
+    },
+    {
+      "index": 4,
+      "text": "소진이다.",
+      "start_sec": 12.064,
+      "end_sec": 14.104,
+      "duration_sec": 2.04
+    },
+    {
+      "index": 5,
+      "text": "이스라엘 연구팀이 판사 1,100건의 판결을 분석했다.",
+      "start_sec": 14.354,
+      "end_sec": 18.818,
+      "duration_sec": 4.464
+    },
+    {
+      "index": 6,
+      "text": "오전의 가석방 승인율. 65퍼센트.",
+      "start_sec": 19.068,
+      "end_sec": 23.772,
+      "duration_sec": 4.704
+    },
+    {
+      "index": 7,
+      "text": "오후 늦게의 가석방 승인율. 7퍼센트.",
+      "start_sec": 24.022,
+      "end_sec": 28.822,
+      "duration_sec": 4.8
+    },
+    {
+      "index": 8,
+      "text": "달라진 건 죄수가 아니었다.",
+      "start_sec": 29.072,
+      "end_sec": 31.88,
+      "duration_sec": 2.808
+    },
+    {
+      "index": 9,
+      "text": "판사의 에너지가 떨어진 것이다.",
+      "start_sec": 32.13,
+      "end_sec": 35.106,
+      "duration_sec": 2.976
+    },
+    {
+      "index": 10,
+      "text": "뇌는 불확실성을 처리할 때마다 포도당을 소모한다.",
+      "start_sec": 35.356,
+      "end_sec": 39.58,
+      "duration_sec": 4.224
+    },
+    {
+      "index": 11,
+      "text": "연료가 떨어진 뇌는 가장 안전한 선택을 고른다.",
+      "start_sec": 39.83,
+      "end_sec": 44.15,
+      "duration_sec": 4.32
+    },
+    {
+      "index": 12,
+      "text": "현상 유지. 거부. 포기.",
+      "start_sec": 44.4,
+      "end_sec": 49.248,
+      "duration_sec": 4.848
+    },
+    {
+      "index": 13,
+      "text": "마크 저커버그는 매일 같은 옷을 입는다.",
+      "start_sec": 49.498,
+      "end_sec": 53.122,
+      "duration_sec": 3.624
+    },
+    {
+      "index": 14,
+      "text": "버락 오바마는 의상을 두 가지로만 줄였다.",
+      "start_sec": 53.372,
+      "end_sec": 56.924,
+      "duration_sec": 3.552
+    },
+    {
+      "index": 15,
+      "text": "이건 패션 철학이 아니다.",
+      "start_sec": 57.174,
+      "end_sec": 59.766,
+      "duration_sec": 2.592
+    },
+    {
+      "index": 16,
+      "text": "결정 에너지를 아끼는 전략이다.",
+      "start_sec": 60.016,
+      "end_sec": 62.968,
+      "duration_sec": 2.952
+    },
+    {
+      "index": 17,
+      "text": "우리는 의지력이 부족한 게 아니다.",
+      "start_sec": 63.218,
+      "end_sec": 66.458,
+      "duration_sec": 3.24
+    },
+    {
+      "index": 18,
+      "text": "결정의 총량이 너무 많은 것이다.",
+      "start_sec": 66.708,
+      "end_sec": 69.828,
+      "duration_sec": 3.12
+    },
+    {
+      "index": 19,
+      "text": "3만 5천 번의 선택 중,",
+      "start_sec": 70.078,
+      "end_sec": 72.838,
+      "duration_sec": 2.76
+    },
+    {
+      "index": 20,
+      "text": "얼마나 많은 것들이 진짜 우리의 선택이었을까.",
+      "start_sec": 73.088,
+      "end_sec": 77.24,
+      "duration_sec": 4.152
+    },
+    {
+      "index": 21,
+      "text": "소진된 뇌가 고른 기본값이 아닌,",
+      "start_sec": 77.49,
+      "end_sec": 80.73,
+      "duration_sec": 3.24
+    },
+    {
+      "index": 22,
+      "text": "깨어있는 우리가 진심으로 고른 것이 몇 번이나 될까.",
+      "start_sec": 80.98,
+      "end_sec": 85.036,
+      "duration_sec": 4.056
+    },
+    {
+      "index": 23,
+      "text": "선택은 의지가 아니다.",
+      "start_sec": 85.286,
+      "end_sec": 87.83,
+      "duration_sec": 2.544
+    },
+    {
+      "index": 24,
+      "text": "에너지다.",
+      "start_sec": 88.08,
+      "end_sec": 90.096,
+      "duration_sec": 2.016
+    },
+    {
+      "index": 25,
+      "text": "그리고 에너지는 설계할 수 있다.",
+      "start_sec": 90.346,
+      "end_sec": 93.37,
+      "duration_sec": 3.024
+    }
+  ]
+}

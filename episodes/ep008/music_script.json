@@ -1,0 +1,610 @@
+{
+  "metadata": {
+    "title": "질서는 안정에서 오지 않았다",
+    "duration": 132.17391304347825,
+    "sample_rate": 44100,
+    "key": "E_minor",
+    "base_bpm": 138,
+    "genre": "enometa",
+    "song_arc": "song_structure",
+    "synthesis_overrides": {
+      "enometa_mode": true
+    },
+    "highlight_words": [
+      "우주",
+      "액체",
+      "처음에",
+      "바닥",
+      "패턴"
+    ],
+    "seq_config": {
+      "drum_seq_type": 0,
+      "drum_rotation": 12,
+      "pitch_rotation": 1,
+      "pitch_length": 5,
+      "saw_harmonics": {
+        "1": 1.0,
+        "6": 0.67,
+        "8": 0.79
+      },
+      "filter_cutoff_base": 7000,
+      "chorus_depth_ms": 2.5,
+      "fm_mod_ratio": 3.08,
+      "bass_detune": 0.007,
+      "kick_character": 1
+    },
+    "texture_modules": [
+      "rhythm_backbone",
+      "bytebeat_texture",
+      "euclidean_rhythm",
+      "melodic_sequence"
+    ]
+  },
+  "palette": {
+    "bass_freq": 82.4,
+    "pad_root": 329.6,
+    "pad_fifth": 493.9,
+    "arp_root": 220.0,
+    "arp_pattern": [
+      1.25,
+      0.75,
+      1.5,
+      1.25,
+      1.0
+    ]
+  },
+  "sections": [
+    {
+      "id": "music_intro",
+      "text": "",
+      "start_sec": 0.0,
+      "end_sec": 13.913,
+      "emotion": "intro",
+      "energy": 0.5,
+      "instruments": {
+        "kick": {
+          "active": true,
+          "volume": 0.48
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.32000000000000006
+        },
+        "snare": {
+          "active": false,
+          "volume": 0.0
+        },
+        "saw_sequence": {
+          "active": true,
+          "volume": 0.3
+        },
+        "arpeggio": {
+          "active": false,
+          "volume": 0.0
+        },
+        "bass_drone": {
+          "active": true,
+          "volume": 0.16000000000000003
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.015
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.06999999999999999
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.24
+        },
+        "pulse_train": {
+          "active": true,
+          "volume": 0.13999999999999999
+        },
+        "ultrahigh_texture": {
+          "active": false,
+          "volume": 0.0
+        },
+        "gate_stutter": {
+          "active": false,
+          "volume": 0.0
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.27
+        },
+        "clicks": {
+          "active": true,
+          "volume": 0.12
+        },
+        "feedback": {
+          "active": false,
+          "volume": 0.0
+        },
+        "bytebeat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "synth_lead": {
+          "active": false,
+          "volume": 0.0
+        },
+        "acid_bass": {
+          "active": false,
+          "volume": 0.0
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.44999999999999996,
+        "filter_cutoff": 1700,
+        "stereo_width": 0.55
+      },
+      "transition_in": {
+        "type": "fade_in",
+        "duration_sec": 1.0
+      },
+      "_role": "intro"
+    },
+    {
+      "id": "music_buildup",
+      "text": "",
+      "start_sec": 13.913,
+      "end_sec": 41.739,
+      "emotion": "buildup",
+      "energy": 0.8,
+      "instruments": {
+        "kick": {
+          "active": true,
+          "volume": 0.5599999999999999
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.4
+        },
+        "snare": {
+          "active": false,
+          "volume": 0.0
+        },
+        "saw_sequence": {
+          "active": true,
+          "volume": 0.6
+        },
+        "arpeggio": {
+          "active": true,
+          "volume": 0.15
+        },
+        "bass_drone": {
+          "active": true,
+          "volume": 0.24
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.0225
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.105
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.4
+        },
+        "pulse_train": {
+          "active": true,
+          "volume": 0.27999999999999997
+        },
+        "ultrahigh_texture": {
+          "active": true,
+          "volume": 0.12
+        },
+        "gate_stutter": {
+          "active": true,
+          "volume": 0.2
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.45
+        },
+        "clicks": {
+          "active": true,
+          "volume": 0.24
+        },
+        "feedback": {
+          "active": true,
+          "volume": 0.020000000000000004
+        },
+        "bytebeat": {
+          "active": true,
+          "volume": 0.015
+        },
+        "synth_lead": {
+          "active": true,
+          "volume": 0.015
+        },
+        "acid_bass": {
+          "active": true,
+          "volume": 0.08000000000000002
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.54,
+        "filter_cutoff": 2600,
+        "stereo_width": 0.7
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      },
+      "_role": "buildup"
+    },
+    {
+      "id": "music_drop",
+      "text": "",
+      "start_sec": 41.739,
+      "end_sec": 69.565,
+      "emotion": "drop",
+      "energy": 1.0,
+      "instruments": {
+        "kick": {
+          "active": true,
+          "volume": 0.8
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.48
+        },
+        "snare": {
+          "active": true,
+          "volume": 0.2
+        },
+        "saw_sequence": {
+          "active": true,
+          "volume": 1.0
+        },
+        "arpeggio": {
+          "active": true,
+          "volume": 0.35
+        },
+        "bass_drone": {
+          "active": true,
+          "volume": 0.32000000000000006
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.03
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.13999999999999999
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.6400000000000001
+        },
+        "pulse_train": {
+          "active": true,
+          "volume": 0.48999999999999994
+        },
+        "ultrahigh_texture": {
+          "active": true,
+          "volume": 0.3
+        },
+        "gate_stutter": {
+          "active": true,
+          "volume": 0.4
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.7200000000000001
+        },
+        "clicks": {
+          "active": true,
+          "volume": 0.36
+        },
+        "feedback": {
+          "active": true,
+          "volume": 0.03
+        },
+        "bytebeat": {
+          "active": true,
+          "volume": 0.0225
+        },
+        "synth_lead": {
+          "active": true,
+          "volume": 0.0225
+        },
+        "acid_bass": {
+          "active": true,
+          "volume": 0.16000000000000003
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.6,
+        "filter_cutoff": 3200,
+        "stereo_width": 0.8
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      },
+      "_role": "drop"
+    },
+    {
+      "id": "music_breakdown",
+      "text": "",
+      "start_sec": 69.565,
+      "end_sec": 83.478,
+      "emotion": "breakdown",
+      "energy": 0.4,
+      "instruments": {
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.24
+        },
+        "snare": {
+          "active": false,
+          "volume": 0.0
+        },
+        "saw_sequence": {
+          "active": true,
+          "volume": 0.2
+        },
+        "arpeggio": {
+          "active": true,
+          "volume": 0.2
+        },
+        "bass_drone": {
+          "active": true,
+          "volume": 0.12
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.015
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.0525
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.32000000000000006
+        },
+        "pulse_train": {
+          "active": true,
+          "volume": 0.13999999999999999
+        },
+        "ultrahigh_texture": {
+          "active": true,
+          "volume": 0.06
+        },
+        "gate_stutter": {
+          "active": true,
+          "volume": 0.1
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.27
+        },
+        "clicks": {
+          "active": true,
+          "volume": 0.12
+        },
+        "feedback": {
+          "active": true,
+          "volume": 0.010000000000000002
+        },
+        "bytebeat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "synth_lead": {
+          "active": false,
+          "volume": 0.0
+        },
+        "acid_bass": {
+          "active": true,
+          "volume": 0.04000000000000001
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.42,
+        "filter_cutoff": 1400,
+        "stereo_width": 0.5
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      },
+      "_role": "breakdown"
+    },
+    {
+      "id": "music_drop2",
+      "text": "",
+      "start_sec": 83.478,
+      "end_sec": 118.261,
+      "emotion": "drop2",
+      "energy": 1.0,
+      "instruments": {
+        "kick": {
+          "active": true,
+          "volume": 0.8
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.48
+        },
+        "snare": {
+          "active": true,
+          "volume": 0.25
+        },
+        "saw_sequence": {
+          "active": true,
+          "volume": 1.0
+        },
+        "arpeggio": {
+          "active": true,
+          "volume": 0.4
+        },
+        "bass_drone": {
+          "active": true,
+          "volume": 0.4
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.03
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.13999999999999999
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.6400000000000001
+        },
+        "pulse_train": {
+          "active": true,
+          "volume": 0.48999999999999994
+        },
+        "ultrahigh_texture": {
+          "active": true,
+          "volume": 0.36
+        },
+        "gate_stutter": {
+          "active": true,
+          "volume": 0.5
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.81
+        },
+        "clicks": {
+          "active": true,
+          "volume": 0.36
+        },
+        "feedback": {
+          "active": true,
+          "volume": 0.04000000000000001
+        },
+        "bytebeat": {
+          "active": true,
+          "volume": 0.0225
+        },
+        "synth_lead": {
+          "active": true,
+          "volume": 0.0225
+        },
+        "acid_bass": {
+          "active": true,
+          "volume": 0.16000000000000003
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.6,
+        "filter_cutoff": 3200,
+        "stereo_width": 0.8
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      },
+      "_role": "drop2"
+    },
+    {
+      "id": "music_outro",
+      "text": "",
+      "start_sec": 118.261,
+      "end_sec": 132.174,
+      "emotion": "outro",
+      "energy": 0.3,
+      "instruments": {
+        "kick": {
+          "active": true,
+          "volume": 0.32000000000000006
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.24
+        },
+        "snare": {
+          "active": false,
+          "volume": 0.0
+        },
+        "saw_sequence": {
+          "active": true,
+          "volume": 0.15
+        },
+        "arpeggio": {
+          "active": false,
+          "volume": 0.0
+        },
+        "bass_drone": {
+          "active": true,
+          "volume": 0.12
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.015
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.034999999999999996
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.16000000000000003
+        },
+        "pulse_train": {
+          "active": true,
+          "volume": 0.06999999999999999
+        },
+        "ultrahigh_texture": {
+          "active": false,
+          "volume": 0.0
+        },
+        "gate_stutter": {
+          "active": false,
+          "volume": 0.0
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.18000000000000002
+        },
+        "clicks": {
+          "active": true,
+          "volume": 0.06
+        },
+        "feedback": {
+          "active": false,
+          "volume": 0.0
+        },
+        "bytebeat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "synth_lead": {
+          "active": false,
+          "volume": 0.0
+        },
+        "acid_bass": {
+          "active": false,
+          "volume": 0.0
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.39,
+        "filter_cutoff": 1100,
+        "stereo_width": 0.44999999999999996
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      },
+      "_role": "outro"
+    }
+  ]
+}

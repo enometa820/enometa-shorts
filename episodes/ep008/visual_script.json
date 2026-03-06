@@ -1,0 +1,1136 @@
+{
+  "title": "질서는 안정에서 오지 않았다",
+  "tagline": "존재와 사유, 그 경계를 초월하다",
+  "highlightWords": [
+    "우주",
+    "액체",
+    "처음에",
+    "바닥",
+    "패턴"
+  ],
+  "meta": {
+    "strategy": "enometa",
+    "strategy_description": "ENOMETA data art - minimal+terminal+sine",
+    "genre": "enometa",
+    "palette": "enometa",
+    "seed": 35165784,
+    "render_mode": "hybrid",
+    "frames_dir": "ep008/frames",
+    "total_frames": 3939
+  },
+  "global": {
+    "color_palette": [
+      "#FFFFFF",
+      "#AAAAAA",
+      "#555555",
+      "#222222"
+    ],
+    "background_color": "#000000",
+    "particle_total": 2000,
+    "font": "Pretendard Variable",
+    "palette": "enometa"
+  },
+  "scenes": [
+    {
+      "id": "scene_01",
+      "sentence": "우주는 무너지고 있다. 물리학이 말한다. 닫힌 공간의 무질서는 반드시 증가한다. 질서는 소멸한다. 예외 없이.",
+      "start_sec": 0.0,
+      "end_sec": 12.346,
+      "emotion": "transcendent_open",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {},
+            "variant": "vortex"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "우주는 무너지고 있다",
+              "mode": "wave",
+              "fontSize": 80,
+              "color": "#FFD700",
+              "position": "upper",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 80
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0029,
+            "speed": 0.034,
+            "line_opacity": 0.048,
+            "line_color": "#222222"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_02",
+      "sentence": "우리는 이것이 두려워서 모든 것을 고정하려 한다. 흩어지지 않으려고.",
+      "start_sec": 12.596,
+      "end_sec": 18.884,
+      "emotion": "somber_warning",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "color_drain",
+            "params": {
+              "from_color": "#FFFFFF",
+              "to_color": "#222222",
+              "rhythm": "pulse"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0069,
+            "speed": 0.283,
+            "line_opacity": 0.096,
+            "line_color": "#888888"
+          },
+          "variant": "vortex",
+          "transition_to": "flow_field_calm"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_03",
+      "sentence": "얇은 층의 액체를 아래에서 천천히 데워보면 알 수 있다.",
+      "start_sec": 19.134,
+      "end_sec": 23.718,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 3,
+              "ratioB": 3,
+              "phaseOffset": 0.94,
+              "color": "#00FFFF",
+              "glowColor": "#CCCCCC",
+              "lineWidth": 1.5,
+              "trailLength": 1000
+            }
+          },
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 5,
+              "ratioB": 5,
+              "phaseOffset": 1.81,
+              "color": "#00FFFF",
+              "glowColor": "#CCCCCC",
+              "lineWidth": 3,
+              "trailLength": 1000
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "얇은 층의 액체를 아래에서",
+              "mode": "wave",
+              "fontSize": 80,
+              "color": "#FFD700",
+              "position": "center",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0014,
+            "speed": 0.03,
+            "line_opacity": 0.063,
+            "line_color": "#444444"
+          },
+          "variant": "opposing"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_04",
+      "sentence": "처음에는 아무 일도 일어나지 않는다. 분자들이 무작위로 흔들릴 뿐이다.",
+      "start_sec": 23.968,
+      "end_sec": 30.352,
+      "emotion": "awakening_spark",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_chain_awaken",
+            "params": {
+              "count": 600,
+              "color": "#FFFFFF",
+              "chain_speed": 1.441,
+              "glow_color": "#CCCCCC"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "처음에",
+              "mode": "scatter",
+              "fontSize": 80,
+              "color": "#FFFFFF",
+              "position": "top",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 80
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0032,
+            "speed": 0.05,
+            "line_opacity": 0.087,
+            "line_color": "#888888"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_05",
+      "sentence": "그런데 바닥과 수면의 온도 차이가 임계점을 넘는 순간",
+      "start_sec": 30.602,
+      "end_sec": 35.282,
+      "emotion": "awakening_spark",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 1,
+              "ratioB": 3,
+              "phaseOffset": 5.87,
+              "color": "#FFFFFF",
+              "glowColor": "#CCCCCC",
+              "lineWidth": 2,
+              "trailLength": 600
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "바닥",
+              "mode": "scatter",
+              "fontSize": 72,
+              "color": "#CCCCCC",
+              "position": "bottom",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0041,
+            "speed": 0.05,
+            "line_opacity": 0.055,
+            "line_color": "#222222"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_06",
+      "sentence": "물 안에서 육각형 패턴이 나타난다.",
+      "start_sec": 35.532,
+      "end_sec": 38.892,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {},
+            "variant": "vortex"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "물 안에서 육각형 패턴이 나타난다.",
+              "mode": "wave",
+              "fontSize": 72,
+              "color": "#FFFFFF",
+              "position": "center",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0029,
+            "speed": 0.026,
+            "line_opacity": 0.059,
+            "line_color": "#222222"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_07",
+      "sentence": "뜨거운 물이 올라가고 차가운 물이 내려오며 그 흐름이 스스로 벌집 모양의 구조를 만든다.",
+      "start_sec": 39.142,
+      "end_sec": 45.574,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 2,
+              "ratioB": 3,
+              "phaseOffset": 2.68,
+              "color": "#FFFFFF",
+              "glowColor": "#CCCCCC",
+              "lineWidth": 3,
+              "trailLength": 600
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "뜨거운 물이 올라가고 차가운",
+              "mode": "typewriter",
+              "fontSize": 72,
+              "color": "#FFFFFF",
+              "position": "upper",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0049,
+            "speed": 0.05,
+            "line_opacity": 0.075,
+            "line_color": "#888888"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_08",
+      "sentence": "아무도 설계하지 않았다. 혼돈이 기하학을 낳은 것이다.",
+      "start_sec": 45.824,
+      "end_sec": 51.104,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "waveform",
+            "params": {
+              "mode": "waveform",
+              "color": "#FFFFFF",
+              "lineWidth": 2,
+              "sensitivity": 1.843
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "아무",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#CCCCCC",
+              "position": "bottom",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 80
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0019,
+            "speed": 0.021,
+            "line_opacity": 0.057,
+            "line_color": "#222222"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_09",
+      "sentence": "1977년 프리고진은 노벨상을 받았다. 불안정한 시스템이 스스로 새로운 질서를 만든다는 이론.",
+      "start_sec": 51.354,
+      "end_sec": 59.946,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 1,
+              "ratioB": 3,
+              "phaseOffset": 5.62,
+              "color": "#00FFFF",
+              "glowColor": "#CCCCCC",
+              "lineWidth": 3,
+              "trailLength": 800
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "1977년 프리고진은 노벨상을 받았다",
+              "mode": "typewriter",
+              "fontSize": 80,
+              "color": "#00FFFF",
+              "position": "upper",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.004,
+            "speed": 0.05,
+            "line_opacity": 0.092,
+            "line_color": "#444444"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_10",
+      "sentence": "이 육각형은 그 증거 중 하나였다.",
+      "start_sec": 60.196,
+      "end_sec": 63.508,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "waveform",
+            "params": {
+              "mode": "waveform",
+              "color": "#FFFFFF",
+              "lineWidth": 2,
+              "sensitivity": 1.938
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "이 육각형은 그 증거 중 하나였다.",
+              "mode": "wave",
+              "fontSize": 72,
+              "color": "#FFD700",
+              "position": "top",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 80
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0021,
+            "speed": 0.035,
+            "line_opacity": 0.064,
+            "line_color": "#222222"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_11",
+      "sentence": "질서는 안정에서 오지 않았다. 불안정이 질서를 창조했다.",
+      "start_sec": 63.758,
+      "end_sec": 69.566,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {},
+            "variant": "vortex"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "질서는 안정에서 오지 않았다.",
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#FFFFFF",
+              "position": "top",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0013,
+            "speed": 0.04,
+            "line_opacity": 0.062,
+            "line_color": "#444444"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_12",
+      "sentence": "이 원리는 자연에서 끝나지 않았다.",
+      "start_sec": 69.816,
+      "end_sec": 73.104,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "pixel_waveform_cascade",
+            "params": {
+              "bars": 24,
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "mode": "cascade",
+              "quantize": 8,
+              "mirror": false,
+              "position": "bottom"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "원리",
+              "mode": "typewriter",
+              "fontSize": 72,
+              "color": "#FFFFFF",
+              "position": "bottom",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.004,
+            "speed": 0.05,
+            "line_opacity": 0.09,
+            "line_color": "#444444"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_13",
+      "sentence": "넷플릭스에는 카오스 몽키라는 프로그램이 있다. 하는 일은 단순하다.",
+      "start_sec": 73.354,
+      "end_sec": 79.618,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 3,
+              "ratioB": 1,
+              "phaseOffset": 0.93,
+              "color": "#FFFFFF",
+              "glowColor": "#CCCCCC",
+              "lineWidth": 2,
+              "trailLength": 800
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0029,
+            "speed": 0.034,
+            "line_opacity": 0.062,
+            "line_color": "#888888"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_14",
+      "sentence": "2억 명이 접속하는 서버를 무작위로 죽인다. 예고 없이. 업무 시간 중에.",
+      "start_sec": 79.868,
+      "end_sec": 86.444,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 2,
+              "ratioB": 4,
+              "phaseOffset": 2.2,
+              "color": "#FFFFFF",
+              "glowColor": "#CCCCCC",
+              "lineWidth": 2,
+              "trailLength": 600
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0027,
+            "speed": 0.035,
+            "line_opacity": 0.044,
+            "line_color": "#222222"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_15",
+      "sentence": "한 번도 무너져보지 않은 시스템이 가장 쉽게 무너진다. 어디가 약한지 아무도 모른다.",
+      "start_sec": 86.694,
+      "end_sec": 94.062,
+      "emotion": "somber_warning",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "pixel_grid_life",
+            "params": {
+              "cols": 40,
+              "rows": 40,
+              "mode": "life",
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "pixelGap": 1,
+              "reactivity": 1.0
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "시스템",
+              "mode": "glitch",
+              "fontSize": 72,
+              "color": "#FFFFFF",
+              "position": "center",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.007,
+            "speed": 0.197,
+            "line_opacity": 0.119,
+            "line_color": "#444444"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_16",
+      "sentence": "매일 작은 균열을 내기 때문에 진짜 위기 앞에서 무너지지 않는다.",
+      "start_sec": 94.312,
+      "end_sec": 99.424,
+      "emotion": "tension_reveal",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "waveform_spectrum",
+            "params": {
+              "mode": "spectrum",
+              "color": "#FFFFFF",
+              "lineWidth": 1.5,
+              "sensitivity": 1.572
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "매일 작은 균열을 내기",
+              "mode": "glitch",
+              "fontSize": 56,
+              "color": "#FFFFFF",
+              "position": "upper",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0064,
+            "speed": 0.169,
+            "line_opacity": 0.072,
+            "line_color": "#888888"
+          },
+          "variant": "opposing"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_17",
+      "sentence": "부서져본 시스템만이 부서지지 않는다.",
+      "start_sec": 99.674,
+      "end_sec": 102.962,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 4,
+              "ratioB": 5,
+              "phaseOffset": 2.12,
+              "color": "#FFFFFF",
+              "glowColor": "#CCCCCC",
+              "lineWidth": 2,
+              "trailLength": 800
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "부서져본 시스템만이 부서지지 않는다.",
+              "mode": "typewriter",
+              "fontSize": 72,
+              "color": "#FFFFFF",
+              "position": "bottom",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0023,
+            "speed": 0.05,
+            "line_opacity": 0.049,
+            "line_color": "#888888"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_18",
+      "sentence": "우리도 다르지 않다. 질서를 지키려 에너지를 쓰는 동안 혼돈은 이미 다음 구조를 설계하고 있었다.",
+      "start_sec": 103.212,
+      "end_sec": 111.766,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "grid_morph",
+            "params": {
+              "cols": 20,
+              "rows": 20,
+              "mode": "lines",
+              "color": "#888888",
+              "accentColor": "#FFFFFF",
+              "morphIntensity": 0.69,
+              "showConnections": true
+            },
+            "variant": "wave_propagation"
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0045,
+            "speed": 0.05,
+            "line_opacity": 0.047,
+            "line_color": "#222222"
+          },
+          "variant": "vortex",
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_19",
+      "sentence": "엔트로피는 적이 아니었다. 연료였다.",
+      "start_sec": 112.016,
+      "end_sec": 116.312,
+      "emotion": "hopeful",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "waveform_circular",
+            "params": {
+              "mode": "circular",
+              "color": "#FFFFFF",
+              "lineWidth": 2,
+              "sensitivity": 1.416
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "엔트로피",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#FFFFFF",
+              "position": "top",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.002,
+            "speed": 0.05,
+            "line_opacity": 0.047,
+            "line_color": "#222222"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_20",
+      "sentence": "혼돈을 견디는 것이 아니다. 혼돈 위에 서는 것이다.",
+      "start_sec": 116.562,
+      "end_sec": 121.578,
+      "emotion": "tension_reveal",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 5,
+              "ratioB": 5,
+              "phaseOffset": 1.19,
+              "color": "#00FFFF",
+              "glowColor": "#CCCCCC",
+              "lineWidth": 2.5,
+              "trailLength": 600
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "혼돈",
+              "mode": "glitch",
+              "fontSize": 56,
+              "color": "#FFFFFF",
+              "position": "center",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0067,
+            "speed": 0.248,
+            "line_opacity": 0.119,
+            "line_color": "#444444"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_21",
+      "sentence": "우리는 처음부터 그렇게 진화해왔다.",
+      "start_sec": 121.828,
+      "end_sec": 125.332,
+      "emotion": "awakening_spark",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_escape",
+            "params": {
+              "count": 800,
+              "color": "#FFFFFF",
+              "burst_speed": 3.802,
+              "glow": true
+            }
+          },
+          {
+            "vocab": "pixel_grid_life",
+            "params": {
+              "cols": 40,
+              "rows": 32,
+              "mode": "life",
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "pixelGap": 2,
+              "reactivity": 1.25
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0024,
+            "speed": 0.05,
+            "line_opacity": 0.084,
+            "line_color": "#888888"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    }
+  ]
+}

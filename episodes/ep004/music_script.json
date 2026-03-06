@@ -1,0 +1,801 @@
+{
+  "metadata": {
+    "title": "우리의 선택은 몇 번이나 우리의 것이었을까",
+    "duration": 105.0,
+    "sample_rate": 44100,
+    "key": "D_minor",
+    "base_bpm": 128,
+    "genre": "techno",
+    "synthesis_overrides": {}
+  },
+  "palette": {
+    "bass_freq": 73.4,
+    "pad_root": 293.7,
+    "pad_fifth": 440.0,
+    "arp_root": 220,
+    "arp_pattern": [
+      1,
+      1.5,
+      1.25,
+      2,
+      1.5,
+      1.125
+    ]
+  },
+  "sections": [
+    {
+      "id": "scene_01",
+      "text": "하루에 우리가 내리는 결정의 수. 3만 5천 개.",
+      "start_sec": 0.0,
+      "end_sec": 5.0,
+      "emotion": "neutral_curious",
+      "energy": 0.35,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.18
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.3,
+          "pan_spread": 0.4
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.12
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.4,
+          "volume": 0.3
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.1
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.09
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.05
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.41,
+        "filter_cutoff": 1250,
+        "stereo_width": 0.5
+      },
+      "transition_in": {
+        "type": "fade_in",
+        "duration_sec": 1.0
+      }
+    },
+    {
+      "id": "scene_02",
+      "text": "그 중 대부분을 우리는 의식하지 못한다. 이건 망각이 아니다. 소진이다.",
+      "start_sec": 5.1,
+      "end_sec": 14.5,
+      "emotion": "tension_reveal",
+      "energy": 0.65,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.28
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.9,
+          "pan_spread": 0.7
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.2
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.2,
+          "volume": 0.75
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.45
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.22
+        },
+        "noise_burst": {
+          "active": false
+        },
+        "metallic_hit": {
+          "active": true,
+          "volume": 0.22,
+          "density": 0.2
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.13
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.08
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.5,
+        "filter_cutoff": 2200,
+        "stereo_width": 0.65
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.5
+      }
+    },
+    {
+      "id": "scene_03",
+      "text": "이스라엘 연구팀이 판사 1,100건의 판결을 분석했다. 오전의 가석방 승인율. 65퍼센트. 오후 늦게의 가석방 승인율. 7퍼센트.",
+      "start_sec": 14.6,
+      "end_sec": 28.0,
+      "emotion": "neutral_analytical",
+      "energy": 0.55,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.22
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.6,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.16
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.3,
+          "volume": 0.5
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.2
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.16
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.1
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.06
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "stutter_gate": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.47,
+        "filter_cutoff": 1850,
+        "stereo_width": 0.55
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_04",
+      "text": "달라진 건 죄수가 아니었다. 판사의 에너지가 떨어진 것이다.",
+      "start_sec": 28.1,
+      "end_sec": 34.5,
+      "emotion": "tension_redefine",
+      "energy": 0.72,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.36
+        },
+        "clicks": {
+          "active": true,
+          "density": 1.1,
+          "pan_spread": 0.8
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.28
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.16,
+          "volume": 0.92
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.65
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.28
+        },
+        "noise_burst": {
+          "active": false
+        },
+        "metallic_hit": {
+          "active": true,
+          "volume": 0.28,
+          "density": 0.3
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.17
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.1
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "stutter_gate": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.55,
+        "filter_cutoff": 2700,
+        "stereo_width": 0.72
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      }
+    },
+    {
+      "id": "scene_05",
+      "text": "뇌는 불확실성을 처리할 때마다 포도당을 소모한다. 연료가 떨어진 뇌는 가장 안전한 선택을 고른다. 현상 유지. 거부. 포기.",
+      "start_sec": 34.6,
+      "end_sec": 48.0,
+      "emotion": "tension_transformative",
+      "energy": 0.72,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.32
+        },
+        "clicks": {
+          "active": true,
+          "density": 1.0,
+          "pan_spread": 0.75
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.24
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.18,
+          "volume": 0.86
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.55
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.26
+        },
+        "noise_burst": {
+          "active": false
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.16
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.09
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "stutter_gate": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.53,
+        "filter_cutoff": 2500,
+        "stereo_width": 0.7
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.5
+      }
+    },
+    {
+      "id": "scene_06",
+      "text": "마크 저커버그는 매일 같은 옷을 입는다. 버락 오바마는 의상을 두 가지로만 줄였다.",
+      "start_sec": 48.1,
+      "end_sec": 57.0,
+      "emotion": "neutral_analytical",
+      "energy": 0.5,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.22
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.5,
+          "pan_spread": 0.45
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.16
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.28,
+          "volume": 0.48
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.15
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.1
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.06
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.44,
+        "filter_cutoff": 1700,
+        "stereo_width": 0.52
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_07",
+      "text": "이건 패션 철학이 아니다. 결정 에너지를 아끼는 전략이다.",
+      "start_sec": 57.1,
+      "end_sec": 64.0,
+      "emotion": "awakening_spark",
+      "energy": 0.72,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.38
+        },
+        "clicks": {
+          "active": true,
+          "density": 1.3,
+          "pan_spread": 0.9
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.32
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.14,
+          "volume": 1.1
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.8
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.32
+        },
+        "noise_burst": {
+          "active": false
+        },
+        "metallic_hit": {
+          "active": true,
+          "volume": 0.3,
+          "density": 0.35
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.19
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.11
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "stutter_gate": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.58,
+        "filter_cutoff": 3000,
+        "stereo_width": 0.78
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      }
+    },
+    {
+      "id": "scene_08",
+      "text": "우리는 의지력이 부족한 게 아니다. 결정의 총량이 너무 많은 것이다.",
+      "start_sec": 64.1,
+      "end_sec": 71.5,
+      "emotion": "hopeful",
+      "energy": 0.7,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.3
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.4,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.22
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.28,
+          "volume": 0.65
+        },
+        "glitch": {
+          "active": false
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.2
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.13
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.07
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.51,
+        "filter_cutoff": 2300,
+        "stereo_width": 0.62
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_09",
+      "text": "3만 5천 번의 선택 중, 얼마나 많은 것들이 진짜 우리의 선택이었을까.",
+      "start_sec": 71.6,
+      "end_sec": 80.5,
+      "emotion": "somber_reflective",
+      "energy": 0.55,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.26
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.2,
+          "pan_spread": 0.35
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.18
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.32,
+          "volume": 0.52
+        },
+        "glitch": {
+          "active": false
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.16
+        },
+        "kick": {
+          "active": false
+        },
+        "hi_hat": {
+          "active": false
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.47,
+        "filter_cutoff": 1900,
+        "stereo_width": 0.55
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "scene_10",
+      "text": "소진된 뇌가 고른 기본값이 아닌, 깨어있는 우리가 진심으로 고른 것이 몇 번이나 될까.",
+      "start_sec": 80.6,
+      "end_sec": 91.0,
+      "emotion": "tension_peak",
+      "energy": 0.72,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.35
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.85,
+          "pan_spread": 0.7
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.25
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.2,
+          "volume": 0.82
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.5
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.25
+        },
+        "noise_burst": {
+          "active": false
+        },
+        "metallic_hit": {
+          "active": true,
+          "volume": 0.22,
+          "density": 0.2
+        },
+        "kick": {
+          "active": true,
+          "volume": 0.15
+        },
+        "hi_hat": {
+          "active": true,
+          "volume": 0.09
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.53,
+        "filter_cutoff": 2450,
+        "stereo_width": 0.68
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.5
+      }
+    },
+    {
+      "id": "scene_11",
+      "text": "선택은 의지가 아니다. 에너지다. 그리고 에너지는 설계할 수 있다.",
+      "start_sec": 91.1,
+      "end_sec": 100.0,
+      "emotion": "transcendent_open",
+      "energy": 0.65,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.28
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.12,
+          "pan_spread": 0.3
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.22
+        },
+        "arpeggio": {
+          "active": true,
+          "speed": 0.38,
+          "volume": 0.42
+        },
+        "glitch": {
+          "active": false
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.18
+        },
+        "kick": {
+          "active": false
+        },
+        "hi_hat": {
+          "active": false
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.52,
+        "filter_cutoff": 2100,
+        "stereo_width": 0.62
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      }
+    },
+    {
+      "id": "outro",
+      "text": "",
+      "start_sec": 100.0,
+      "end_sec": 105.0,
+      "emotion": "fade",
+      "energy": 0.1,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.22
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.12
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.72,
+        "filter_cutoff": 450,
+        "stereo_width": 0.3
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 3.0
+      }
+    }
+  ]
+}

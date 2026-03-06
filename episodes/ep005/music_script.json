@@ -1,0 +1,1840 @@
+{
+  "metadata": {
+    "title": "ENOMETA",
+    "duration": 128.602,
+    "sample_rate": 44100,
+    "key": "E_minor",
+    "base_bpm": 60,
+    "genre": "ikeda",
+    "synthesis_overrides": {
+      "ikeda_mode": true
+    }
+  },
+  "palette": {
+    "bass_freq": 82.4,
+    "pad_root": 329.6,
+    "pad_fifth": 493.9,
+    "arp_root": 220,
+    "arp_pattern": [
+      1,
+      1.25,
+      1.5,
+      2,
+      1.5,
+      1.25
+    ]
+  },
+  "sections": [
+    {
+      "id": "scene_01",
+      "text": "새로운 걸 시작하려는 순간. 심박수가 오른다. 분당 70에서 120.",
+      "start_sec": 0.0,
+      "end_sec": 7.762,
+      "emotion": "awakening_spark",
+      "energy": 0.8,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.285
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.4,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.25,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.15
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.12
+        },
+        "metallic_hit": {
+          "active": true,
+          "volume": 0.25,
+          "density": 0.2
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "synth_lead": {
+          "active": false,
+          "volume": 0.0,
+          "note_duration": 0.6
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false,
+          "volume": 0.0,
+          "duty": 0.125
+        },
+        "chiptune_drum": {
+          "active": false,
+          "volume": 0.0
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.54,
+        "filter_cutoff": 2600,
+        "stereo_width": 0.7
+      },
+      "transition_in": {
+        "type": "fade_in",
+        "duration_sec": 1.0
+      },
+      "_segment_index": 0
+    },
+    {
+      "id": "scene_02",
+      "text": "손바닥에 땀이 맺힌다. 호흡이 얕아진다.",
+      "start_sec": 8.012,
+      "end_sec": 12.764,
+      "emotion": "neutral_curious",
+      "energy": 0.4,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.195
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.5,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.35,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.15
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.08000000000000002
+        },
+        "noise_burst": {
+          "active": true,
+          "density": 0.15
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false,
+          "volume": 0.0,
+          "duty": 0.25
+        },
+        "chiptune_drum": {
+          "active": false
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.42,
+        "filter_cutoff": 1400,
+        "stereo_width": 0.5
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      },
+      "_segment_index": 1
+    },
+    {
+      "id": "scene_03",
+      "text": "편도체가 반응하는 데 걸리는 시간. 0.012초.",
+      "start_sec": 13.014,
+      "end_sec": 18.486,
+      "emotion": "neutral_curious",
+      "energy": 0.4,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.195
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.5,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.35,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.15
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.08000000000000002
+        },
+        "noise_burst": {
+          "active": true,
+          "density": 0.15
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false,
+          "volume": 0.0,
+          "duty": 0.25
+        },
+        "chiptune_drum": {
+          "active": false
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.42,
+        "filter_cutoff": 1400,
+        "stereo_width": 0.5
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      },
+      "_segment_index": 2
+    },
+    {
+      "id": "scene_04",
+      "text": "의식보다 빠르다. 생각보다 먼저 몸이 반응한다.",
+      "start_sec": 18.736,
+      "end_sec": 24.016,
+      "emotion": "neutral_curious",
+      "energy": 0.4,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.195
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.5,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.35,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.15
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.08000000000000002
+        },
+        "noise_burst": {
+          "active": true,
+          "density": 0.15
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false,
+          "volume": 0.0,
+          "duty": 0.25
+        },
+        "chiptune_drum": {
+          "active": false
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.42,
+        "filter_cutoff": 1400,
+        "stereo_width": 0.5
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      },
+      "_segment_index": 3
+    },
+    {
+      "id": "scene_05",
+      "text": "코르티솔 분비. 아드레날린 급등. 심박수 상승.",
+      "start_sec": 24.266,
+      "end_sec": 30.89,
+      "emotion": "neutral_curious",
+      "energy": 0.4,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.195
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.5,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.35,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.15
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.08000000000000002
+        },
+        "noise_burst": {
+          "active": true,
+          "density": 0.15
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false,
+          "volume": 0.0,
+          "duty": 0.25
+        },
+        "chiptune_drum": {
+          "active": false
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.42,
+        "filter_cutoff": 1400,
+        "stereo_width": 0.5
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      },
+      "_segment_index": 4
+    },
+    {
+      "id": "scene_06",
+      "text": "뇌가 동시에 보내는 세 가지 신호.",
+      "start_sec": 31.14,
+      "end_sec": 34.284,
+      "emotion": "neutral_analytical",
+      "energy": 0.45,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.21
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.6,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.25,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.25
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.09000000000000001
+        },
+        "metallic_hit": {
+          "active": true,
+          "volume": 0.2,
+          "density": 0.2
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false,
+          "volume": 0.0
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.435,
+        "filter_cutoff": 1550,
+        "stereo_width": 0.525
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      },
+      "_segment_index": 5
+    },
+    {
+      "id": "scene_07",
+      "text": "공포의 화학식이다. 그런데 정확히 같은 세 신호가 발생하는 순간이 하나 더 있다.",
+      "start_sec": 34.534,
+      "end_sec": 41.792,
+      "emotion": "awakening_spark",
+      "energy": 0.8,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.285
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.4,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.25,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.15
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.12
+        },
+        "metallic_hit": {
+          "active": true,
+          "volume": 0.25,
+          "density": 0.2
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "synth_lead": {
+          "active": false,
+          "volume": 0.0,
+          "note_duration": 0.6
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false,
+          "volume": 0.0,
+          "duty": 0.125
+        },
+        "chiptune_drum": {
+          "active": false,
+          "volume": 0.0
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.54,
+        "filter_cutoff": 2600,
+        "stereo_width": 0.7
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      },
+      "_segment_index": 6
+    },
+    {
+      "id": "scene_08",
+      "text": "각성. 코르티솔. 아드레날린. 심박수.",
+      "start_sec": 42.042,
+      "end_sec": 49.228,
+      "emotion": "neutral_curious",
+      "energy": 0.4,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.195
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.5,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.35,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.15
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.08000000000000002
+        },
+        "noise_burst": {
+          "active": true,
+          "density": 0.15
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false,
+          "volume": 0.0,
+          "duty": 0.25
+        },
+        "chiptune_drum": {
+          "active": false
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.42,
+        "filter_cutoff": 1400,
+        "stereo_width": 0.5
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      },
+      "_segment_index": 7
+    },
+    {
+      "id": "scene_09",
+      "text": "수치가 같다. 패턴이 같다.",
+      "start_sec": 49.478,
+      "end_sec": 53.222,
+      "emotion": "somber_reflective",
+      "energy": 0.5,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.24
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.15,
+          "pan_spread": 0.3
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.3,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": false
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.09000000000000001
+        },
+        "kick": {
+          "active": false
+        },
+        "hi_hat": {
+          "active": false
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.44999999999999996,
+        "filter_cutoff": 1700,
+        "stereo_width": 0.55
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      },
+      "_segment_index": 8
+    },
+    {
+      "id": "scene_10",
+      "text": "뇌는 공포와 각성을 화학적으로 구분하지 못한다.",
+      "start_sec": 53.472,
+      "end_sec": 57.72,
+      "emotion": "neutral_analytical",
+      "energy": 0.45,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.21
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.6,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.25,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.25
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.09000000000000001
+        },
+        "metallic_hit": {
+          "active": true,
+          "volume": 0.2,
+          "density": 0.2
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false,
+          "volume": 0.0
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.435,
+        "filter_cutoff": 1550,
+        "stereo_width": 0.525
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      },
+      "_segment_index": 9
+    },
+    {
+      "id": "scene_11",
+      "text": "차이는 단 하나. 해석. 같은 불안을 느끼는 두 그룹을 나눴다.",
+      "start_sec": 57.97,
+      "end_sec": 64.58,
+      "emotion": "neutral_curious",
+      "energy": 0.4,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.195
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.5,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.35,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.15
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.08000000000000002
+        },
+        "noise_burst": {
+          "active": true,
+          "density": 0.15
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false,
+          "volume": 0.0,
+          "duty": 0.25
+        },
+        "chiptune_drum": {
+          "active": false
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.42,
+        "filter_cutoff": 1400,
+        "stereo_width": 0.5
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      },
+      "_segment_index": 10
+    },
+    {
+      "id": "scene_12",
+      "text": "한쪽에는 진정하라고 했다. 다른 쪽에는 이건 각성이다 라고 했다.",
+      "start_sec": 64.83,
+      "end_sec": 71.272,
+      "emotion": "neutral_curious",
+      "energy": 0.4,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.195
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.5,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.35,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.15
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.08000000000000002
+        },
+        "noise_burst": {
+          "active": true,
+          "density": 0.15
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false,
+          "volume": 0.0,
+          "duty": 0.25
+        },
+        "chiptune_drum": {
+          "active": false
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.42,
+        "filter_cutoff": 1400,
+        "stereo_width": 0.5
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      },
+      "_segment_index": 11
+    },
+    {
+      "id": "scene_13",
+      "text": "각성으로 해석한 그룹. 수행 능력이 유의미하게 높았다.",
+      "start_sec": 71.522,
+      "end_sec": 76.994,
+      "emotion": "tension_redefine",
+      "energy": 0.78,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.3
+        },
+        "clicks": {
+          "active": true,
+          "density": 1.0,
+          "pan_spread": 0.75
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.14,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.6
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.15000000000000002
+        },
+        "noise_burst": {
+          "active": true,
+          "density": 0.35
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "synth_lead": {
+          "active": false,
+          "volume": 0.0,
+          "note_duration": 1.0
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false,
+          "volume": 0.15,
+          "iterations": 3
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false,
+          "volume": 0.0
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.534,
+        "filter_cutoff": 2540,
+        "stereo_width": 0.69
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      },
+      "_segment_index": 12
+    },
+    {
+      "id": "scene_14",
+      "text": "달라진 건 몸이 아니었다. 한 문장이었다.",
+      "start_sec": 77.244,
+      "end_sec": 82.222,
+      "emotion": "tension_transformative",
+      "energy": 0.8,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.3
+        },
+        "clicks": {
+          "active": true,
+          "density": 1.1,
+          "pan_spread": 0.8
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.12,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.7
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.16000000000000003
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "acid_bass": {
+          "active": false,
+          "volume": 0.0,
+          "sweep_dir": "up"
+        },
+        "stutter_gate": {
+          "active": false,
+          "divisions": 8,
+          "blend": 0.3
+        },
+        "bytebeat": {
+          "active": false,
+          "volume": 0.0,
+          "formula": "chaos"
+        },
+        "feedback": {
+          "active": false,
+          "volume": 0.2,
+          "iterations": 4
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.54,
+        "filter_cutoff": 2600,
+        "stereo_width": 0.7
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 1.0
+      },
+      "_segment_index": 13
+    },
+    {
+      "id": "scene_15",
+      "text": "그리고 각성 너머에 한 단계가 더 있다.",
+      "start_sec": 82.472,
+      "end_sec": 85.976,
+      "emotion": "somber_reflective",
+      "energy": 0.5,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.24
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.15,
+          "pan_spread": 0.3
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.3,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": false
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.09000000000000001
+        },
+        "kick": {
+          "active": false
+        },
+        "hi_hat": {
+          "active": false
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.44999999999999996,
+        "filter_cutoff": 1700,
+        "stereo_width": 0.55
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      },
+      "_segment_index": 14
+    },
+    {
+      "id": "scene_16",
+      "text": "몰입. 각성 상태에서 행동을 시작하면 뇌는 도파민과 노르에피네프린을 동시에 방출한다.",
+      "start_sec": 86.226,
+      "end_sec": 94.324,
+      "emotion": "hopeful",
+      "energy": 0.7,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.255
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.2,
+          "pan_spread": 0.3
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.3,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": false
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.09000000000000001
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "synth_lead": {
+          "active": false,
+          "volume": 0.0,
+          "note_duration": 0.9
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false,
+          "volume": 0.0,
+          "duty": 0.5
+        },
+        "chiptune_drum": {
+          "active": false
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.51,
+        "filter_cutoff": 2300,
+        "stereo_width": 0.6499999999999999
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      },
+      "_segment_index": 15
+    },
+    {
+      "id": "scene_17",
+      "text": "전두엽의 잡음이 줄어든다. 자의식이 사라진다. 시간 감각이 왜곡된다.",
+      "start_sec": 94.574,
+      "end_sec": 102.062,
+      "emotion": "neutral_curious",
+      "energy": 0.4,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.195
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.5,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.35,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.15
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.08000000000000002
+        },
+        "noise_burst": {
+          "active": true,
+          "density": 0.15
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false,
+          "volume": 0.0,
+          "duty": 0.25
+        },
+        "chiptune_drum": {
+          "active": false
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.42,
+        "filter_cutoff": 1400,
+        "stereo_width": 0.5
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      },
+      "_segment_index": 16
+    },
+    {
+      "id": "scene_18",
+      "text": "뇌가 가장 효율적으로 작동하는 상태.",
+      "start_sec": 102.312,
+      "end_sec": 105.72,
+      "emotion": "awakening_climax",
+      "energy": 1.0,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.36
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.5,
+          "pan_spread": 0.6
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.18,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.25
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.13999999999999999
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "synth_lead": {
+          "active": false,
+          "volume": 0.0,
+          "note_duration": 0.5
+        },
+        "acid_bass": {
+          "active": false,
+          "volume": 0.0,
+          "sweep_dir": "up"
+        },
+        "stutter_gate": {
+          "active": false,
+          "divisions": 8,
+          "blend": 0.25
+        },
+        "bytebeat": {
+          "active": false,
+          "volume": 0.0,
+          "formula": "cascade"
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false,
+          "volume": 0.0,
+          "duty": 0.25
+        },
+        "chiptune_drum": {
+          "active": false,
+          "volume": 0.0
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.6,
+        "filter_cutoff": 3200,
+        "stereo_width": 0.8
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      },
+      "_segment_index": 17
+    },
+    {
+      "id": "scene_19",
+      "text": "공포에서 멈추면 아무 일도 일어나지 않는다.",
+      "start_sec": 105.97,
+      "end_sec": 109.858,
+      "emotion": "somber_warning",
+      "energy": 0.6,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.27
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.4,
+          "pan_spread": 0.5
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.2,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.25
+        },
+        "noise_sweep": {
+          "active": false,
+          "direction": "down",
+          "speed": 0.3
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.12
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "bytebeat": {
+          "active": false,
+          "volume": 0.0,
+          "formula": "drone"
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.48,
+        "filter_cutoff": 2000,
+        "stereo_width": 0.6
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      },
+      "_segment_index": 18
+    },
+    {
+      "id": "scene_20",
+      "text": "각성으로 읽고 움직이면 몰입이 시작된다.",
+      "start_sec": 110.108,
+      "end_sec": 113.732,
+      "emotion": "hopeful",
+      "energy": 0.7,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.255
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.2,
+          "pan_spread": 0.3
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.3,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": false
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.09000000000000001
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "synth_lead": {
+          "active": false,
+          "volume": 0.0,
+          "note_duration": 0.9
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false,
+          "volume": 0.0,
+          "duty": 0.5
+        },
+        "chiptune_drum": {
+          "active": false
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.51,
+        "filter_cutoff": 2300,
+        "stereo_width": 0.6499999999999999
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      },
+      "_segment_index": 19
+    },
+    {
+      "id": "scene_21",
+      "text": "화학식은 같다. 해석이 바뀌면 회로가 바뀐다.",
+      "start_sec": 113.982,
+      "end_sec": 119.344,
+      "emotion": "somber_reflective",
+      "energy": 0.5,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.24
+        },
+        "clicks": {
+          "active": true,
+          "density": 0.15,
+          "pan_spread": 0.3
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.3,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": false
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.09000000000000001
+        },
+        "kick": {
+          "active": false
+        },
+        "hi_hat": {
+          "active": false
+        },
+        "bytebeat": {
+          "active": false
+        },
+        "feedback": {
+          "active": false
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.44999999999999996,
+        "filter_cutoff": 1700,
+        "stereo_width": 0.55
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      },
+      "_segment_index": 20
+    },
+    {
+      "id": "scene_22",
+      "text": "회로가 바뀌면 우리가 도달하는 곳이 달라진다.",
+      "start_sec": 119.594,
+      "end_sec": 123.602,
+      "emotion": "tension_transformative",
+      "energy": 0.8,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.3
+        },
+        "clicks": {
+          "active": true,
+          "density": 1.1,
+          "pan_spread": 0.8
+        },
+        "fm_bass": {
+          "active": false,
+          "volume": 0.0
+        },
+        "arpeggio": {
+          "active": false,
+          "speed": 0.12,
+          "volume": 0.0
+        },
+        "glitch": {
+          "active": true,
+          "density": 0.7
+        },
+        "sub_pulse": {
+          "active": true,
+          "volume": 0.16000000000000003
+        },
+        "kick": {
+          "active": false,
+          "volume": 0.0
+        },
+        "hi_hat": {
+          "active": false,
+          "volume": 0.0
+        },
+        "acid_bass": {
+          "active": false,
+          "volume": 0.0,
+          "sweep_dir": "up"
+        },
+        "stutter_gate": {
+          "active": false,
+          "divisions": 8,
+          "blend": 0.3
+        },
+        "bytebeat": {
+          "active": false,
+          "volume": 0.0,
+          "formula": "chaos"
+        },
+        "feedback": {
+          "active": false,
+          "volume": 0.2,
+          "iterations": 4
+        },
+        "chiptune_lead": {
+          "active": false
+        },
+        "chiptune_drum": {
+          "active": false
+        },
+        "sine_interference": {
+          "active": true,
+          "volume": 0.3
+        },
+        "data_click": {
+          "active": true,
+          "volume": 0.3
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.54,
+        "filter_cutoff": 2600,
+        "stereo_width": 0.7
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 2.0
+      },
+      "_segment_index": 21
+    },
+    {
+      "id": "outro",
+      "text": "",
+      "start_sec": 123.602,
+      "end_sec": 128.602,
+      "emotion": "fade",
+      "energy": 0.1,
+      "instruments": {
+        "bass_drone": {
+          "active": true,
+          "volume": 0.25
+        },
+        "fm_bass": {
+          "active": true,
+          "volume": 0.15
+        }
+      },
+      "effects": {
+        "reverb_decay": 0.7,
+        "filter_cutoff": 500,
+        "stereo_width": 0.3
+      },
+      "transition_in": {
+        "type": "crossfade",
+        "duration_sec": 3.0
+      }
+    }
+  ]
+}
