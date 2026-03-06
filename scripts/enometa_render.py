@@ -340,6 +340,143 @@ def run_pipeline(
         print(f"{'='*60}\n")
 
 
+PALETTE_CHOICES = ["phantom", "neon_noir", "cold_steel", "ember", "synapse", "gameboy", "c64", "enometa"]
+PALETTE_DESC = {
+    "phantom":    "어두운 보라/청색 (기본)",
+    "neon_noir":  "핑크/붉은 네온",
+    "cold_steel": "차가운 청록",
+    "ember":      "붉은/주황",
+    "synapse":    "파란/신경망",
+    "gameboy":    "8비트 초록",
+    "c64":        "레트로 보라",
+    "enometa":    "흑백 모노크롬",
+}
+
+MUSIC_MOOD_CHOICES = ["raw", "ambient", "ikeda", "experimental", "minimal", "chill", "glitch", "intense", "techno"]
+MUSIC_MOOD_DESC = {
+    "raw":          "거친 전자음 (기본)",
+    "ambient":      "잔잔한 배경",
+    "ikeda":        "Ryoji Ikeda 스타일",
+    "experimental": "실험적",
+    "minimal":      "미니멀",
+    "chill":        "부드러운",
+    "glitch":       "글리치/노이즈",
+    "intense":      "풀 에너지",
+    "techno":       "4-on-the-floor 킥 + TB-303",
+}
+
+VISUAL_MOOD_CHOICES = [None, "ikeda", "cooper", "abstract", "data"]
+VISUAL_MOOD_DESC = {
+    None:       "무드 자동 (기본)",
+    "ikeda":    "디지털 라인",
+    "cooper":   "기하학적",
+    "abstract": "추상",
+    "data":     "데이터 시각화",
+}
+
+
+def _pick(prompt, choices, descriptions, default_idx=0):
+    """번호 선택 헬퍼. 빈 입력 = 기본값(default_idx)."""
+    for i, c in enumerate(choices, 1):
+        marker = "  ← 기본" if i - 1 == default_idx else ""
+        label = descriptions.get(c, c) if isinstance(descriptions, dict) else descriptions[i - 1]
+        name = c if c is not None else "(자동)"
+        print(f"  {i}. {str(name):<14} {label}{marker}")
+    while True:
+        raw = input("→ ").strip()
+        if raw == "":
+            return choices[default_idx]
+        if raw.isdigit() and 1 <= int(raw) <= len(choices):
+            return choices[int(raw) - 1]
+        print(f"  1~{len(choices)} 사이 번호를 입력하세요.")
+
+
+def run_interactive(args):
+    """--interactive 모드: 터미널에서 번호 선택으로 옵션 설정"""
+    print("\n" + "=" * 48)
+    print("  ENOMETA 에피소드 제작 설정")
+    print("=" * 48)
+
+    # 1. 팔레트
+    print("\n[1] 팔레트:")
+    args.palette = _pick("", PALETTE_CHOICES, PALETTE_DESC)
+
+    # 2. 음악 무드
+    print("\n[2] 음악 무드:")
+    args.music_mood = _pick("", MUSIC_MOOD_CHOICES, MUSIC_MOOD_DESC)
+
+    # 3. 비주얼 무드
+    print("\n[3] 비주얼 무드:")
+    args.visual_mood = _pick("", VISUAL_MOOD_CHOICES, VISUAL_MOOD_DESC)
+
+    # 4. 드럼
+    print("\n[4] 드럼:")
+    drum_choices = ["default", "on", "off"]
+    drum_desc = ["무드 기본값", "강제 ON", "강제 OFF"]
+    drum_sel = _pick("", drum_choices, drum_desc)
+    if drum_sel == "on":
+        args.drum = True
+        args.no_drum = False
+    elif drum_sel == "off":
+        args.drum = False
+        args.no_drum = True
+    else:
+        args.drum = None
+        args.no_drum = False
+
+    # 5. 제목
+    print("\n[5] 제목:")
+    while True:
+        title = input("→ ").strip()
+        if title:
+            break
+        print("  제목을 입력해주세요.")
+    args.title = title
+
+    # 제목 키워드 추출 (kiwipiepy)
+    try:
+        from kiwipiepy import Kiwi
+        kiwi = Kiwi()
+        tokens = kiwi.tokenize(title)
+        candidates = [t.form for t in tokens if t.tag in ("NNG", "NNP", "VV", "VA")][:3]
+        if candidates:
+            print(f"\n  키워드 후보: {candidates}")
+            print("  확인 (엔터) 또는 직접 입력 (쉼표 구분):")
+            kw_raw = input("→ ").strip()
+            if kw_raw:
+                candidates = [k.strip() for k in kw_raw.split(",") if k.strip()]
+    except Exception:
+        candidates = []
+
+    # 최종 명령어 출력
+    cmd_parts = [f'py scripts/enometa_render.py "{args.episode_dir}"',
+                 f'--title "{args.title}"']
+    if args.palette != "phantom":
+        cmd_parts.append(f"--palette {args.palette}")
+    if args.music_mood != "raw":
+        cmd_parts.append(f"--music-mood {args.music_mood}")
+    if args.visual_mood:
+        cmd_parts.append(f"--visual-mood {args.visual_mood}")
+    if args.drum is True:
+        cmd_parts.append("--drum")
+    elif getattr(args, "no_drum", False):
+        cmd_parts.append("--no-drum")
+
+    print("\n" + "-" * 48)
+    print("실행 명령:")
+    print("  " + " \\\n  ".join(cmd_parts))
+    if candidates:
+        print(f"  (하이라이트 키워드: {candidates})")
+    print("-" * 48)
+
+    confirm = input("\n실행할까요? (y/n) → ").strip().lower()
+    if confirm != "y":
+        print("취소됨.")
+        sys.exit(0)
+
+    return args
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="ENOMETA Shorts Pipeline v2",
@@ -347,11 +484,13 @@ def main():
     )
     parser.add_argument("episode_dir",
                         help="에피소드 디렉토리 (narration_timing.json 있어야 함)\n예: episodes/ep006")
-    parser.add_argument("--title", required=True, help="쇼츠 제목")
+    parser.add_argument("--title", default=None, help="쇼츠 제목 (--interactive 시 생략 가능)")
+    parser.add_argument("--interactive", "-i", action="store_true",
+                        help="인터랙티브 옵션 선택 모드 (번호로 선택)")
     parser.add_argument("--episode", default=None,
                         help="에피소드 ID (기본: 디렉토리 이름)")
     parser.add_argument("--palette", default="phantom",
-                        choices=["phantom", "neon_noir", "cold_steel", "ember", "synapse", "gameboy", "c64"],
+                        choices=PALETTE_CHOICES,
                         help="비주얼 팔레트 (기본: phantom)")
     parser.add_argument("--step", default=None, choices=STEPS,
                         help="특정 단계만 실행")
@@ -374,6 +513,11 @@ def main():
                         help="문단 간 갭 (초, 기본: 0.8)")
 
     args = parser.parse_args()
+
+    if args.interactive:
+        args = run_interactive(args)
+    elif not args.title:
+        parser.error("--title 은 필수입니다 (또는 --interactive/-i 사용)")
 
     episode_dir = os.path.abspath(args.episode_dir)
     episode_id = args.episode or os.path.basename(episode_dir)

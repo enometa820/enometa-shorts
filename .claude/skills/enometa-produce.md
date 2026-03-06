@@ -2,8 +2,7 @@
 name: enometa-produce
 description: >
   ENOMETA 에피소드 제작 파이프라인 실행 스킬.
-  대본 컨펌 후 TTS → script_data → visual_script → BGM → 렌더링 → 믹싱 → FFT → Remotion 합성.
-  8단계 CLI 명령 순차 실행 + 각 단계별 검증 체크리스트 포함.
+  대본 컨펌 후 인터랙티브 모드로 옵션 선택 → enometa_render.py 단일 명령 실행.
   트리거 키워드 - 제작 시작, 파이프라인, 영상 만들자, produce, 에피소드 제작
 ---
 
@@ -15,141 +14,50 @@ description: >
 - 에피소드 폴더 준비: `episodes/epXXX/`
 - 필수 입력 파일: `episodes/epXXX/script.txt` (대본 원문)
 
-## 파이프라인 실행 전 옵션 안내 규칙
+## 표준 실행 — 인터랙티브 모드
 
-**반드시 `enometa_render.py`의 `choices=` 값을 코드에서 직접 확인한 후 출력한다. 기억으로 나열 금지.**
-
-사용자에게 아래 형식으로 번호를 붙여 안내한다 (타이핑 편의):
-
-```
-팔레트 선택:
-1. phantom  — 기본값, 어두운 보라/청색
-2. neon_noir
-3. cold_steel
-4. ember    — 붉은/주황
-5. synapse
-6. gameboy  — 8비트
-7. c64      — 레트로
-
-음악 무드:
-1. raw         — 기본값, 거친 전자음
-2. ambient
-3. ikeda       — Ryoji Ikeda 스타일
-4. experimental
-5. minimal
-6. chill
-7. glitch
-8. intense     — 풀 에너지
-9. techno      — 4-on-the-floor 킥 + TB-303 arpeggio + FM bass, 기계적 드라이빙 그루브
-
-비주얼 무드:
-1. ikeda    — 기본값
-2. cooper
-3. abstract
-4. data
-
-드럼:
-1. 무드 기본값 (--drum/--no-drum 미지정)
-2. 강제 ON  (--drum)
-3. 강제 OFF (--no-drum)
-```
-
-제목 하이라이트 키워드:
-- 제목에서 빨간색으로 강조할 단어를 선택한다
-- 반드시 **제목 안에 존재하는 단어**여야 함
-- 1~3개 추천 후 사용자가 확인/수정
-- 예: 제목 "우리의 뇌는 지금 누구를 위해 일하는가" → 추천: ["뇌", "누구"]
-```
-
-사용자가 번호로 답하면 해당 옵션으로 매핑하여 실행한다.
-옵션은 한 번에 묻지 않고 **팔레트 → 음악 무드 → 비주얼 무드 → 드럼 → 제목 하이라이트 키워드 순서로 하나씩 질문한다.**
-
-## 실행 순서
-
-사용자에게 현재 에피소드 번호(epXXX)와 제목을 확인한 후 아래 순서대로 실행한다.
-**각 단계 완료 후 검증을 반드시 수행하고, 실패 시 다음 단계로 넘어가지 않는다.**
-
-### [1] TTS 생성
 ```bash
-py scripts/generate_voice_edge.py \
-  episodes/epXXX/narration_timing.json \
-  episodes/epXXX/narration.wav
-```
-- Edge-TTS 전용 (ko-KR-SunHiNeural)
-- **generate_voice.py(Chatterbox) 절대 사용 금지**
-- 검증: narration.wav 생성 확인 + narration_timing.json 실측 타이밍 업데이트 확인
-
-### [2] 대본 데이터 추출
-```bash
-py scripts/script_data_extractor.py \
-  episodes/epXXX/narration_timing.json
-```
-- 검증: script_data.json 내 `semantic_intensity` 값이 0.1~0.9 범위에 분포
-- 검증: `keywords[].intensity` 필드 존재 (0-1)
-- 검증: 미등록 단어 리포트 확인 → 필요 시 `--update-dict`
-
-### [3] 비주얼 스크립트 생성
-```bash
-py scripts/visual_script_generator.py \
-  episodes/epXXX/narration_timing.json \
-  --strategy ikeda --episode epXXX --title "에피소드 실제 제목"
-```
-- ⚠ `--title` 필수! 미지정 시 "제목 미지정"이 영상에 표시됨
-- 검증: visual_script.json 내 `meta.render_mode` = `"hybrid"` 확인
-- 검증: 씬마다 다른 vocab 조합인지 확인 (단조 반복 금지)
-
-### [4] BGM 생성
-```bash
-py scripts/enometa_music_engine.py \
-  --from-visual episodes/epXXX/visual_script.json \
-  --export-raw --arc narrative \
-  --script-data episodes/epXXX/script_data.json \
-  --episode epXXX \
-  episodes/epXXX/narration_timing.json \
-  episodes/epXXX/bgm.wav
-```
-- v8: 항상 ikeda 단일 장르 (--genre 옵션 없음)
-- `--arc` 옵션: narrative(기본) | crescendo | flat | adaptive
-- 검증: bgm.wav + raw_visual_data.npz 생성 확인
-
-### [5] Python 비주얼 렌더링
-```bash
-py scripts/visual_renderer.py \
-  episodes/epXXX/visual_script.json \
-  episodes/epXXX/raw_visual_data.npz \
-  episodes/epXXX/script_data.json \
-  episodes/epXXX/frames/
-```
-- 렌더 완료 후: `frames/`를 `public/epXXX/frames/`에 복사 (Remotion staticFile용)
-- 검증: 조용한 대사(si≈0.1) vs 극적 대사(si≈0.9) 프레임 비교 → 시각 차이 확인
-
-### [6] 오디오 믹싱
-```bash
-py scripts/audio_mixer.py \
-  episodes/epXXX/narration.wav \
-  episodes/epXXX/bgm.wav \
-  public/epXXX/mixed.wav \
-  --sidechain episodes/epXXX/narration_timing.json
-```
-- TTS:BGM = 4:6 (narration_volume=0.67, bgm_volume=1.0)
-- 사이드체인 덕킹: 나레이션 구간 BGM -3dB
-
-### [7] FFT 분석
-```bash
-py scripts/audio_analyzer.py \
-  public/epXXX/mixed.wav \
-  episodes/epXXX/audio_analysis.json 30
+py scripts/enometa_render.py episodes/epXXX --interactive
 ```
 
-### [8] Remotion 합성
+실행하면 터미널에서 번호로 선택:
+1. **팔레트** — phantom/neon_noir/cold_steel/ember/synapse/gameboy/c64/enometa
+2. **음악 무드** — raw/ambient/ikeda/experimental/minimal/chill/glitch/intense/techno
+3. **비주얼 무드** — 자동/ikeda/cooper/abstract/data
+4. **드럼** — 무드 기본값/강제 ON/강제 OFF
+5. **제목** 입력 → kiwipiepy 키워드 자동 추출 → 확인
+
+최종 명령어 출력 후 `y` 입력 시 파이프라인 실행.
+
+## 옵션 직접 지정 (비인터랙티브)
+
 ```bash
-# Root.tsx durationInFrames 업데이트 필요
-npx remotion render EP00X episodes/epXXX/output.mp4 --concurrency=4
+py scripts/enometa_render.py episodes/epXXX \
+  --title "제목" \
+  --palette phantom \
+  --music-mood techno \
+  --visual-mood ikeda \
+  --drum
 ```
-- hybrid: Python 배경 + vocab 오버레이 + 제목 + 자막 + PostProcess
-- 검증: output.mp4 재생 확인
+
+## 특정 단계만 재실행
+
+```bash
+py scripts/enometa_render.py episodes/epXXX --title "제목" --step bgm --force
+py scripts/enometa_render.py episodes/epXXX --title "제목" --step mix --force
+py scripts/enometa_render.py episodes/epXXX --title "제목" --step render --force
+```
+
+`--step` 선택지: `gen_timing` / `tts` / `script_data` / `visual_script` / `bgm` / `mix` / `audio_analysis` / `python_frames` / `render`
+
+## 검증
+
+- `episodes/epXXX/output.mp4` 생성 확인
+- 음악 이상 시: `--step bgm --force` 재실행
+- 자막 오류 시: `--step render --force` 재실행
 
 ## 완료 후
+
 1. 사용자에게 최종 영상 확인 요청
 2. `enometa-publish` 스킬로 업로드 메타데이터 생성
 3. `enometa-feedback` 스킬로 피드백 수집
