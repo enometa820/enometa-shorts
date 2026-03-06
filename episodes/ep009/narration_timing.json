@@ -1,0 +1,330 @@
+{
+  "voice": "ko-KR-SunHiNeural",
+  "rate": "+5%",
+  "bpm": 135.0,
+  "sec_per_bar": 1.777778,
+  "total_duration_sec": 98.88,
+  "music_mood": "techno",
+  "gap_sec": 0.3,
+  "paragraph_gap_sec": 0.8,
+  "segments": [
+    {
+      "index": 0,
+      "text": "우리의 뇌는 지금 누구를 위해 일하고 있는가.",
+      "start_sec": 0.0,
+      "end_sec": 3.912,
+      "duration_sec": 3.912,
+      "actual_tts_sec": 3.912
+    },
+    {
+      "index": 1,
+      "text": "타인을 감시하는 뇌.",
+      "start_sec": 4.712,
+      "end_sec": 7.016,
+      "duration_sec": 2.304,
+      "actual_tts_sec": 2.304
+    },
+    {
+      "index": 2,
+      "text": "전전두엽이 쉬지 못한다.",
+      "start_sec": 7.316,
+      "end_sec": 10.028,
+      "duration_sec": 2.712,
+      "actual_tts_sec": 2.712
+    },
+    {
+      "index": 3,
+      "text": "그가 왜 저랬을까.",
+      "start_sec": 10.828,
+      "end_sec": 13.108,
+      "duration_sec": 2.28,
+      "actual_tts_sec": 2.28
+    },
+    {
+      "index": 4,
+      "text": "저 사람은 왜 저럴까.",
+      "start_sec": 13.408,
+      "end_sec": 15.808,
+      "duration_sec": 2.4,
+      "actual_tts_sec": 2.4
+    },
+    {
+      "index": 5,
+      "text": "반추가 시작되면",
+      "start_sec": 16.608,
+      "end_sec": 18.816,
+      "duration_sec": 2.208,
+      "actual_tts_sec": 2.208
+    },
+    {
+      "index": 6,
+      "text": "전전두엽은 과부하 상태다.",
+      "start_sec": 19.116,
+      "end_sec": 22.02,
+      "duration_sec": 2.904,
+      "actual_tts_sec": 2.904
+    },
+    {
+      "index": 7,
+      "text": "CPU가 타인의 데이터를 처리한다.",
+      "start_sec": 22.82,
+      "end_sec": 26.18,
+      "duration_sec": 3.36,
+      "actual_tts_sec": 3.36
+    },
+    {
+      "index": 8,
+      "text": "내 연산은 멈춘다.",
+      "start_sec": 26.48,
+      "end_sec": 28.928,
+      "duration_sec": 2.448,
+      "actual_tts_sec": 2.448
+    },
+    {
+      "index": 9,
+      "text": "이것이 손실이다.",
+      "start_sec": 29.728,
+      "end_sec": 31.912,
+      "duration_sec": 2.184,
+      "actual_tts_sec": 2.184
+    },
+    {
+      "index": 10,
+      "text": "돌아오지 않는 시간과 에너지.",
+      "start_sec": 32.212,
+      "end_sec": 35.02,
+      "duration_sec": 2.808,
+      "actual_tts_sec": 2.808
+    },
+    {
+      "index": 11,
+      "text": "같은 시간.",
+      "start_sec": 35.82,
+      "end_sec": 37.668,
+      "duration_sec": 1.848,
+      "actual_tts_sec": 1.848
+    },
+    {
+      "index": 12,
+      "text": "같은 뇌.",
+      "start_sec": 37.968,
+      "end_sec": 39.672,
+      "duration_sec": 1.704,
+      "actual_tts_sec": 1.704
+    },
+    {
+      "index": 13,
+      "text": "메타인지를 쓰는 뇌는 다르다.",
+      "start_sec": 40.472,
+      "end_sec": 43.328,
+      "duration_sec": 2.856,
+      "actual_tts_sec": 2.856
+    },
+    {
+      "index": 14,
+      "text": "나는 지금 무엇을 모르는가.",
+      "start_sec": 44.128,
+      "end_sec": 47.032,
+      "duration_sec": 2.904,
+      "actual_tts_sec": 2.904
+    },
+    {
+      "index": 15,
+      "text": "어디서 틀렸는가.",
+      "start_sec": 47.332,
+      "end_sec": 49.492,
+      "duration_sec": 2.16,
+      "actual_tts_sec": 2.16
+    },
+    {
+      "index": 16,
+      "text": "전전두엽이 자기 자신을 디버깅한다.",
+      "start_sec": 50.292,
+      "end_sec": 53.724,
+      "duration_sec": 3.432,
+      "actual_tts_sec": 3.432
+    },
+    {
+      "index": 17,
+      "text": "이 연산이 성장을 만든다.",
+      "start_sec": 54.024,
+      "end_sec": 56.832,
+      "duration_sec": 2.808,
+      "actual_tts_sec": 2.808
+    },
+    {
+      "index": 18,
+      "text": "부족함을 보는 눈.",
+      "start_sec": 57.632,
+      "end_sec": 59.96,
+      "duration_sec": 2.328,
+      "actual_tts_sec": 2.328
+    },
+    {
+      "index": 19,
+      "text": "그것이 다음 방향이다.",
+      "start_sec": 60.26,
+      "end_sec": 62.78,
+      "duration_sec": 2.52,
+      "actual_tts_sec": 2.52
+    },
+    {
+      "index": 20,
+      "text": "타인의 결함을 세는 동안",
+      "start_sec": 63.58,
+      "end_sec": 66.244,
+      "duration_sec": 2.664,
+      "actual_tts_sec": 2.664
+    },
+    {
+      "index": 21,
+      "text": "우리는 자신의 좌표를 잃는다.",
+      "start_sec": 66.544,
+      "end_sec": 69.448,
+      "duration_sec": 2.904,
+      "actual_tts_sec": 2.904
+    },
+    {
+      "index": 22,
+      "text": "자신의 결함을 보는 순간",
+      "start_sec": 70.248,
+      "end_sec": 72.912,
+      "duration_sec": 2.664,
+      "actual_tts_sec": 2.664
+    },
+    {
+      "index": 23,
+      "text": "우리는 다음 좌표를 얻는다.",
+      "start_sec": 73.212,
+      "end_sec": 76.044,
+      "duration_sec": 2.832,
+      "actual_tts_sec": 2.832
+    },
+    {
+      "index": 24,
+      "text": "같은 에너지다.",
+      "start_sec": 76.844,
+      "end_sec": 78.812,
+      "duration_sec": 1.968,
+      "actual_tts_sec": 1.968
+    },
+    {
+      "index": 25,
+      "text": "방향이 다를 뿐이다.",
+      "start_sec": 79.112,
+      "end_sec": 81.512,
+      "duration_sec": 2.4,
+      "actual_tts_sec": 2.4
+    },
+    {
+      "index": 26,
+      "text": "감시는 소비다.",
+      "start_sec": 82.312,
+      "end_sec": 84.424,
+      "duration_sec": 2.112,
+      "actual_tts_sec": 2.112
+    },
+    {
+      "index": 27,
+      "text": "메타인지는 투자다.",
+      "start_sec": 84.724,
+      "end_sec": 87.028,
+      "duration_sec": 2.304,
+      "actual_tts_sec": 2.304
+    },
+    {
+      "index": 28,
+      "text": "이득과 손해.",
+      "start_sec": 87.828,
+      "end_sec": 89.844,
+      "duration_sec": 2.016,
+      "actual_tts_sec": 2.016
+    },
+    {
+      "index": 29,
+      "text": "가장 단순한 연산.",
+      "start_sec": 90.144,
+      "end_sec": 92.688,
+      "duration_sec": 2.544,
+      "actual_tts_sec": 2.544
+    },
+    {
+      "index": 30,
+      "text": "틀리는 사람이 가장 많이 잃는다.",
+      "start_sec": 92.988,
+      "end_sec": 96.132,
+      "duration_sec": 3.144,
+      "actual_tts_sec": 3.144
+    },
+    {
+      "index": 31,
+      "text": "이건 지능의 문제다.",
+      "start_sec": 96.432,
+      "end_sec": 98.88,
+      "duration_sec": 2.448,
+      "actual_tts_sec": 2.448
+    }
+  ],
+  "paragraph_breaks": [
+    {
+      "start_sec": 3.912,
+      "end_sec": 4.712
+    },
+    {
+      "start_sec": 10.028,
+      "end_sec": 10.828
+    },
+    {
+      "start_sec": 15.808,
+      "end_sec": 16.608
+    },
+    {
+      "start_sec": 22.02,
+      "end_sec": 22.82
+    },
+    {
+      "start_sec": 28.928,
+      "end_sec": 29.728
+    },
+    {
+      "start_sec": 35.02,
+      "end_sec": 35.82
+    },
+    {
+      "start_sec": 39.672,
+      "end_sec": 40.472
+    },
+    {
+      "start_sec": 43.328,
+      "end_sec": 44.128
+    },
+    {
+      "start_sec": 49.492,
+      "end_sec": 50.292
+    },
+    {
+      "start_sec": 56.832,
+      "end_sec": 57.632
+    },
+    {
+      "start_sec": 62.78,
+      "end_sec": 63.58
+    },
+    {
+      "start_sec": 69.448,
+      "end_sec": 70.248
+    },
+    {
+      "start_sec": 76.044,
+      "end_sec": 76.844
+    },
+    {
+      "start_sec": 81.512,
+      "end_sec": 82.312
+    },
+    {
+      "start_sec": 87.028,
+      "end_sec": 87.828
+    }
+  ]
+}

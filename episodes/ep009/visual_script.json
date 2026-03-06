@@ -1,0 +1,981 @@
+{
+  "title": "우리의 뇌는 지금 누구를 위해 일하는가",
+  "tagline": "존재와 사유, 그 경계를 초월하다",
+  "highlightWords": [
+    "타인",
+    "저랬",
+    "전전두엽",
+    "연산",
+    "좌표"
+  ],
+  "meta": {
+    "strategy": "ikeda",
+    "strategy_description": "빽빽한 입자+레이어 — 압도적 시각 밀도",
+    "genre": "enometa",
+    "palette": "enometa",
+    "seed": 2376610802,
+    "render_mode": "hybrid",
+    "frames_dir": "ep009/frames",
+    "total_frames": 3146
+  },
+  "global": {
+    "color_palette": [
+      "#FFFFFF",
+      "#AAAAAA",
+      "#555555",
+      "#222222"
+    ],
+    "background_color": "#000000",
+    "particle_total": 2000,
+    "font": "Pretendard Variable",
+    "palette": "enometa"
+  },
+  "scenes": [
+    {
+      "id": "scene_01",
+      "sentence": "우리의 뇌는 지금 누구를 위해 일하고 있는가.",
+      "start_sec": 0.0,
+      "end_sec": 3.912,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "grid_morph",
+            "params": {
+              "cols": 25,
+              "rows": 25,
+              "mode": "dots",
+              "color": "#CCCCCC",
+              "accentColor": "#FFFFFF",
+              "morphIntensity": 0.92,
+              "showConnections": false
+            },
+            "variant": "wave_propagation"
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0024,
+            "speed": 0.05,
+            "line_opacity": 0.095,
+            "line_color": "#222222"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_02",
+      "sentence": "타인을 감시하는 뇌. 전전두엽이 쉬지 못한다.",
+      "start_sec": 4.712,
+      "end_sec": 10.028,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 4,
+              "ratioB": 5,
+              "phaseOffset": 1.55,
+              "color": "#FFFFFF",
+              "glowColor": "#CCCCCC",
+              "lineWidth": 2.5,
+              "trailLength": 800
+            }
+          },
+          {
+            "vocab": "pixel_grid_rain",
+            "params": {
+              "cols": 32,
+              "rows": 32,
+              "mode": "rain",
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "pixelGap": 1,
+              "reactivity": 1.12
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "타인",
+              "mode": "typewriter",
+              "fontSize": 56,
+              "color": "#FFD700",
+              "position": "bottom",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 80
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0027,
+            "speed": 0.05,
+            "line_opacity": 0.092,
+            "line_color": "#888888"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_03",
+      "sentence": "그가 왜 저랬을까. 저 사람은 왜 저럴까.",
+      "start_sec": 10.828,
+      "end_sec": 15.808,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "pixel_grid_rain",
+            "params": {
+              "cols": 24,
+              "rows": 24,
+              "mode": "rain",
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "pixelGap": 2,
+              "reactivity": 0.96
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "저랬",
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#FFD700",
+              "position": "center",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0027,
+            "speed": 0.022,
+            "line_opacity": 0.051,
+            "line_color": "#888888"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_04",
+      "sentence": "반추가 시작되면 전전두엽은 과부하 상태다.",
+      "start_sec": 16.608,
+      "end_sec": 22.02,
+      "emotion": "hopeful",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "waveform_circular",
+            "params": {
+              "mode": "circular",
+              "color": "#FFFFFF",
+              "lineWidth": 3,
+              "sensitivity": 1.426
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0032,
+            "speed": 0.05,
+            "line_opacity": 0.08,
+            "line_color": "#222222"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_05",
+      "sentence": "CPU가 타인의 데이터를 처리한다.",
+      "start_sec": 22.82,
+      "end_sec": 26.18,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "pixel_grid_life",
+            "params": {
+              "cols": 32,
+              "rows": 40,
+              "mode": "life",
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "pixelGap": 1,
+              "reactivity": 1.08
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0033,
+            "speed": 0.05,
+            "line_opacity": 0.063,
+            "line_color": "#888888"
+          },
+          "variant": "opposing",
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_06",
+      "sentence": "내 연산은 멈춘다. 이것이 손실이다.",
+      "start_sec": 26.48,
+      "end_sec": 31.912,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_birth",
+            "params": {
+              "count": 1200,
+              "spawn_duration_sec": 3.236,
+              "spawn_pattern": "center_burst",
+              "initial_color": "#222222",
+              "size_range": [
+                1,
+                4
+              ]
+            },
+            "variant": "triangles_rise"
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0013,
+            "speed": 0.023,
+            "line_opacity": 0.069,
+            "line_color": "#444444"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_07",
+      "sentence": "돌아오지 않는 시간과 에너지. 같은 시간.",
+      "start_sec": 32.212,
+      "end_sec": 37.668,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "waveform",
+            "params": {
+              "mode": "waveform",
+              "color": "#FFFFFF",
+              "lineWidth": 3,
+              "sensitivity": 1.6
+            }
+          },
+          {
+            "vocab": "pixel_waveform_cascade",
+            "params": {
+              "bars": 20,
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "mode": "cascade",
+              "quantize": 10,
+              "mirror": true,
+              "position": "bottom"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0019,
+            "speed": 0.033,
+            "line_opacity": 0.063,
+            "line_color": "#222222"
+          },
+          "variant": "opposing",
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_08",
+      "sentence": "같은 뇌. 메타인지를 쓰는 뇌는 다르다.",
+      "start_sec": 37.968,
+      "end_sec": 43.328,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "grid_morph",
+            "params": {
+              "cols": 20,
+              "rows": 15,
+              "mode": "dots",
+              "color": "#FFFFFF",
+              "accentColor": "#FFFFFF",
+              "morphIntensity": 1.097,
+              "showConnections": true
+            },
+            "variant": "pixel_dissolve"
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0021,
+            "speed": 0.05,
+            "line_opacity": 0.087,
+            "line_color": "#888888"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_09",
+      "sentence": "나는 지금 무엇을 모르는가. 어디서 틀렸는가.",
+      "start_sec": 44.128,
+      "end_sec": 49.492,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_birth",
+            "params": {
+              "count": 600,
+              "spawn_duration_sec": 3.206,
+              "spawn_pattern": "random",
+              "initial_color": "#FFFFFF",
+              "size_range": [
+                1,
+                5
+              ]
+            },
+            "variant": "triangles_rise"
+          },
+          {
+            "vocab": "pixel_grid_rain",
+            "params": {
+              "cols": 32,
+              "rows": 40,
+              "mode": "rain",
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "pixelGap": 2,
+              "reactivity": 1.15
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0013,
+            "speed": 0.032,
+            "line_opacity": 0.058,
+            "line_color": "#888888"
+          },
+          "variant": "opposing"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_10",
+      "sentence": "전전두엽이 자기 자신을 디버깅한다.",
+      "start_sec": 50.292,
+      "end_sec": 53.724,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "pixel_grid_rain",
+            "params": {
+              "cols": 32,
+              "rows": 40,
+              "mode": "rain",
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "pixelGap": 1,
+              "reactivity": 0.89
+            }
+          },
+          {
+            "vocab": "pixel_waveform_cascade",
+            "params": {
+              "bars": 24,
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "mode": "cascade",
+              "quantize": 6,
+              "mirror": true,
+              "position": "bottom"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "전전두엽",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#FFFFFF",
+              "position": "upper",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0018,
+            "speed": 0.04,
+            "line_opacity": 0.054,
+            "line_color": "#888888"
+          },
+          "variant": "opposing"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_11",
+      "sentence": "이 연산이 성장을 만든다. 부족함을 보는 눈.",
+      "start_sec": 54.024,
+      "end_sec": 59.96,
+      "emotion": "tension_transformative",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "grid_morph",
+            "params": {
+              "cols": 20,
+              "rows": 20,
+              "mode": "wave",
+              "color": "#222222",
+              "accentColor": "#FFFFFF",
+              "morphIntensity": 0.685,
+              "showConnections": true
+            },
+            "variant": "pixel_dissolve"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "연산",
+              "mode": "glitch",
+              "fontSize": 64,
+              "color": "#FFFFFF",
+              "position": "center",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0066,
+            "speed": 0.479,
+            "line_opacity": 0.142,
+            "line_color": "#888888"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_12",
+      "sentence": "그것이 다음 방향이다. 타인의 결함을 세는 동안",
+      "start_sec": 60.26,
+      "end_sec": 66.244,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_birth",
+            "params": {
+              "count": 800,
+              "spawn_duration_sec": 2.758,
+              "spawn_pattern": "edges",
+              "initial_color": "#555555",
+              "size_range": [
+                1,
+                5
+              ]
+            },
+            "variant": "dots_grid"
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0023,
+            "speed": 0.027,
+            "line_opacity": 0.046,
+            "line_color": "#888888"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_13",
+      "sentence": "우리는 자신의 좌표를 잃는다. 자신의 결함을 보는 순간",
+      "start_sec": 66.544,
+      "end_sec": 72.912,
+      "emotion": "awakening_spark",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_chain_awaken",
+            "params": {
+              "count": 600,
+              "color": "#FFFFFF",
+              "chain_speed": 1.91,
+              "glow_color": "#CCCCCC"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "좌표",
+              "mode": "scatter",
+              "fontSize": 80,
+              "color": "#00FFFF",
+              "position": "center",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 100
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0041,
+            "speed": 0.05,
+            "line_opacity": 0.087,
+            "line_color": "#222222"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_14",
+      "sentence": "우리는 다음 좌표를 얻는다. 같은 에너지다.",
+      "start_sec": 73.212,
+      "end_sec": 78.812,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_birth",
+            "params": {
+              "count": 1200,
+              "spawn_duration_sec": 2.023,
+              "spawn_pattern": "center_burst",
+              "initial_color": "#AAAAAA",
+              "size_range": [
+                1,
+                5
+              ]
+            },
+            "variant": "dots_grid"
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0013,
+            "speed": 0.021,
+            "line_opacity": 0.048,
+            "line_color": "#888888"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_15",
+      "sentence": "방향이 다를 뿐이다. 감시는 소비다.",
+      "start_sec": 79.112,
+      "end_sec": 84.424,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {},
+            "variant": "vortex"
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0012,
+            "speed": 0.036,
+            "line_opacity": 0.043,
+            "line_color": "#222222"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_16",
+      "sentence": "메타인지는 투자다. 이득과 손해.",
+      "start_sec": 84.724,
+      "end_sec": 89.844,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_birth",
+            "params": {
+              "count": 600,
+              "spawn_duration_sec": 3.591,
+              "spawn_pattern": "random",
+              "initial_color": "#222222",
+              "size_range": [
+                1,
+                4
+              ]
+            },
+            "variant": "triangles_rise"
+          },
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 1,
+              "ratioB": 5,
+              "phaseOffset": 6.18,
+              "color": "#CCCCCC",
+              "glowColor": "#CCCCCC",
+              "lineWidth": 1.5,
+              "trailLength": 600
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0028,
+            "speed": 0.027,
+            "line_opacity": 0.049,
+            "line_color": "#888888"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_17",
+      "sentence": "가장 단순한 연산. 틀리는 사람이 가장 많이 잃는다.",
+      "start_sec": 90.144,
+      "end_sec": 96.132,
+      "emotion": "awakening_climax",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "waveform_circular",
+            "params": {
+              "mode": "circular",
+              "color": "#FFFFFF",
+              "lineWidth": 1.5,
+              "sensitivity": 1.694
+            }
+          },
+          {
+            "vocab": "pixel_grid_rain",
+            "params": {
+              "cols": 40,
+              "rows": 32,
+              "mode": "rain",
+              "colors": [
+                "#FFFFFF",
+                "#AAAAAA",
+                "#555555",
+                "#222222"
+              ],
+              "pixelGap": 1,
+              "reactivity": 1.0
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.95 + 0.05",
+          "particle_size": "bass * 7 + 1",
+          "glow_intensity": "bass * 7",
+          "displacement": "bass * 5",
+          "speed_mult": "onset ? 6 : 1",
+          "glitch_trigger": "onset ? 12 : 0"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0114,
+            "speed": 0.356,
+            "line_opacity": 0.093,
+            "line_color": "#888888"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_18",
+      "sentence": "이건 지능의 문제다.",
+      "start_sec": 96.432,
+      "end_sec": 98.88,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 500,
+              "color": "#FFFFFF",
+              "rings": 5,
+              "speed": 0.614
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "지능",
+              "mode": "wave",
+              "fontSize": 72,
+              "color": "#FFD700",
+              "position": "top",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 100
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.001,
+            "speed": 0.023,
+            "line_opacity": 0.059,
+            "line_color": "#888888"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    }
+  ]
+}

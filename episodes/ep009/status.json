@@ -1,0 +1,12 @@
+{
+  "error": "BGM 실패 (exit 2)",
+  "gen_timing": "done",
+  "tts": "done",
+  "script_data": "done",
+  "visual_script": "done",
+  "bgm": "done",
+  "mix": "done",
+  "audio_analysis": "done",
+  "python_frames": "done",
+  "render": "done"
+}
