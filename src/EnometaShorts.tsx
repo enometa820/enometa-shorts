@@ -13,9 +13,6 @@ import { LogoEndcard } from "./components/LogoEndcard";
 import { getPalette } from "./utils/palettes";
 import { VisualScript, NarrationSegment } from "./types";
 
-// 테스트용 비주얼 스크립트 (Phase 0 프로토타입)
-import { testVisualScript } from "./testScript";
-
 interface EnometaShortsProps {
   visualScript?: VisualScript;
   audioSrc?: string;
@@ -37,7 +34,7 @@ export const EnometaShorts: React.FC<EnometaShortsProps> = ({
   endcardDurationSec = 6,
   tagline,
 }) => {
-  const script = visualScript || testVisualScript;
+  const script = visualScript;
   const palette = getPalette(script.global.palette || "phantom");
   const simulatedAudio = useSimulatedAudio();
   const realAudio = useAudioData(audioAnalysis);
