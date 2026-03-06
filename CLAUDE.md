@@ -18,7 +18,7 @@ Claude는:
 - **TTS**: `scripts/generate_voice_edge.py` 전용. `generate_voice.py`(Chatterbox) **절대 금지**
 - **글쓰기**: 대본 컨펌 전 제목/음악/비주얼 등 후속 단계 진행 **금지** (글 컨펌 게이트)
 - **비주얼**: render_mode 항상 `"hybrid"` (legacy 모드 제거됨)
-- **음악**: enometa 장르 (구 ikeda). 대본 리액티브 댄스 뮤직. 패턴 엔진 v11: 드럼 패턴(킥/스네어/하이햇) + 필/드롭 + 호흡 시스템
+- **음악**: v18 실존 언더그라운드 장르 9종 (acid/ambient/microsound/IDM/minimal/dub/glitch/industrial/techno). 대본 리액티브 댄스 뮤직. 패턴 엔진 v18: Euclidean 리듬 + 장르별 레이어 스택 + 전용 합성 함수
 - **오디오**: narration_volume=0.90, bgm_volume=1.0, 사이드체인 없음, loudnorm -14 LUFS, 엔드카드 BGM 자동 연장
 - **태그**: 주제 기반 5개만. 고정 제외 태그(`#쇼츠` `#shorts` `#ENOMETA` `#이노메타` `#데이터아트`) 포함 금지
 
@@ -71,7 +71,7 @@ script.txt → gen_timing.py → narration_timing.json
 ### Python 핵심 파일 (scripts/)
 | 파일 | 역할 |
 |------|------|
-| `enometa_music_engine.py` | BGM 합성 (numpy, ~5000줄). 10레이어, 9무드, 패턴 엔진 |
+| `enometa_music_engine.py` | BGM 합성 (numpy, ~5000줄). 10레이어, 9장르(v18), Euclidean 패턴 엔진 |
 | `script_data_extractor.py` | 대본 분석 — kiwipiepy 형태소 분석 + semantic_intensity + 도메인 사전 |
 | `visual_script_generator.py` | 대본 → 씬/감정/vocab 매핑 → visual_script.json |
 | `visual_renderer.py` | numpy+Pillow 프레임 렌더링 (1080x1080) |
@@ -126,6 +126,7 @@ TTS / 비주얼 / BGM이 하나의 통합 유기체로 움직여야 한다.
 
 - 에피소드 상세 교훈은 `episodes/epXXX/feedback.json` 저장
 - MEMORY.md: 시스템 규칙 + 최신 교훈만 (200줄 이내)
+- 주요 아키텍처 결정은 `docs/decisions/NNN-*.md` (ADR) 저장 — "왜" 이 결정을 했는지 기록
 - 코드와 CLAUDE.md가 진실의 소스
 
 ## 시니어 개발자 관점 — 지적 & 제안 프로토콜

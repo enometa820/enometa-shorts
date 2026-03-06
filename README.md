@@ -17,7 +17,7 @@ script.txt
   ├─ gen_timing.py          → narration_timing.json  (TTS 실측 기반 연속 배치)
   ├─ generate_voice_edge.py → narration.wav           (Edge-TTS ko-KR-SunHiNeural)
   ├─ script_data_extractor  → script_data.json        (kiwipiepy 형태소 분석 + SI 커브)
-  ├─ enometa_music_engine   → bgm.wav                 (numpy 직접 합성, 9무드, 10레이어)
+  ├─ enometa_music_engine   → bgm.wav                 (numpy 직접 합성, 9장르(v18), 10레이어)
   ├─ audio_mixer.py         → mixed.wav               (narration 0.90 + bgm 1.0, -14 LUFS)
   ├─ visual_script_gen      → visual_script.json      (씬/감정/vocab 매핑)
   ├─ visual_renderer.py     → frames/000000.png~      (1080×1080, numpy+Pillow)
@@ -54,7 +54,7 @@ episodes/
 ### 3. 전체 파이프라인 실행
 
 ```bash
-py scripts/enometa_render.py episodes/ep010 --title "제목" --palette phantom --music-mood raw
+py scripts/enometa_render.py episodes/ep010 --title "제목" --palette phantom --music-mood acid
 ```
 
 ### 4. Remotion 프리뷰
@@ -80,19 +80,19 @@ npx remotion studio --port 3000
 | `c64` | Commodore 64 |
 | `enometa` | 흑백 모노크롬 |
 
-### 음악 무드 (`--music-mood`)
+### 음악 장르 (`--music-mood`) — v18
 
-| 값 | 특성 |
-|----|------|
-| `raw` | 거친 전자음, 하이패스 노이즈 (기본) |
-| `ambient` | 공간감, 리버브 중심 |
-| `ikeda` | 정밀 펄스, Ryoji Ikeda 레퍼런스 |
-| `experimental` | 비정형 리듬, 글리치 |
-| `minimal` | 극도로 절제된 텍스처 |
-| `chill` | 느린 템포, 부드러운 패드 |
-| `glitch` | 비트 크러시, 노이즈 버스트 |
-| `intense` | 고에너지, 빠른 BPM |
-| `techno` | 4-on-the-floor, TB-303 arp |
+| 값 | 레퍼런스 | 특성 |
+|----|----------|------|
+| `acid` | Phuture, DJ Pierre | TB-303 acid bass, BPM 126–138 (기본) |
+| `ambient` | Brian Eno | 공간감, 리버브 중심, BPM 72–88 |
+| `microsound` | Ryoji Ikeda, Alva Noto | 정밀 펄스, 초단파 클릭, BPM 80–96 |
+| `IDM` | Aphex Twin, Autechre | 비정형 리듬, 폴리리듬, BPM 100–155 |
+| `minimal` | Robert Hood, Richie Hawtin | 극도로 절제된 텍스처, BPM 124–132 |
+| `dub` | Basic Channel, Rhythm & Sound | tape delay, 보이드 킥, BPM 110–125 |
+| `glitch` | Oval, Farmers Manual | Euclidean E(5,16) 패턴, 비트크러시, BPM 92–108 |
+| `industrial` | Perc, Ansome, Surgeon | 왜곡 킥, 고에너지, BPM 138–155 |
+| `techno` | Jeff Mills, Underground Resistance | 4-on-the-floor, TB-303 arp, BPM 128–138 |
 
 ### 비주얼 무드 (`--visual-mood`)
 
@@ -148,7 +148,7 @@ py scripts/enometa_render.py episodes/ep010 --title "제목" --step bgm --force
 enometa-shorts/
 ├── scripts/
 │   ├── enometa_render.py          # 전체 파이프라인 진입점
-│   ├── enometa_music_engine.py    # BGM 합성 (9무드, 10레이어, ~5000줄)
+│   ├── enometa_music_engine.py    # BGM 합성 (9장르(v18), 10레이어, ~5000줄)
 │   ├── visual_script_generator.py # 대본 → 씬/감정/vocab 매핑
 │   ├── visual_renderer.py         # numpy+Pillow 프레임 렌더링
 │   ├── gen_timing.py              # TTS 실측 기반 타이밍 생성
@@ -180,7 +180,8 @@ enometa-shorts/
 │       ├── 002-edge-tts-vs-chatterbox.md
 │       ├── 003-hybrid-render.md
 │       ├── 004-fixed-volume-no-cr.md
-│       └── 005-music-engine-monolith.md
+│       ├── 005-music-engine-monolith.md
+│       └── 006-genre-rename-v18.md
 └── CLAUDE.md                      # AI 협업 가이드 (파이프라인 전체 규칙)
 ```
 
@@ -197,6 +198,7 @@ enometa-shorts/
 | [003](docs/decisions/003-hybrid-render.md) | 비주얼: 하이브리드 렌더 |
 | [004](docs/decisions/004-fixed-volume-no-cr.md) | 볼륨 고정 + 콜앤리스폰스 제거 |
 | [005](docs/decisions/005-music-engine-monolith.md) | 음악 엔진 모놀리스 유지 |
+| [006](docs/decisions/006-genre-rename-v18.md) | 프로토타입 무드 → 실존 언더그라운드 장르 리네이밍 |
 
 ---
 
