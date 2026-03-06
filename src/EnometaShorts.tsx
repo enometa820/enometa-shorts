@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Audio, staticFile } from "remotion";
+import { AbsoluteFill, Audio, interpolate, staticFile } from "remotion";
 import {
   useSimulatedAudio,
   useAudioData,
@@ -50,8 +50,20 @@ export const EnometaShorts: React.FC<EnometaShortsProps> = ({
 
   return (
     <AbsoluteFill style={{ backgroundColor: palette.bg }}>
-      {/* 오디오 트랙 (있을 경우) */}
-      {audioSrc && <Audio src={staticFile(audioSrc)} />}
+      {/* 오디오 트랙 — 엔드카드 구간 BGM 페이드 아웃 (여운) */}
+      {audioSrc && (
+        <Audio
+          src={staticFile(audioSrc)}
+          volume={(f) =>
+            interpolate(
+              f,
+              [endcardStartFrame, endcardStartFrame + endcardDurationFrames],
+              [1, 0],
+              { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+            )
+          }
+        />
+      )}
 
       {/* 9:16 레이아웃: 1080 × 1920 (YouTube Shorts UI 세이프존 반영) */}
       {/*

@@ -5,6 +5,20 @@
 
 ---
 
+## 2026-03-06 — EP009 피드백 반영: 엔드카드 버그 수정 + 비주얼 개선
+
+### Fixed
+- `src/Root.tsx`: calcMeta `Math.ceil` → `Math.round` 기반 계산 (엔드카드 이후 1프레임 flash 제거)
+- `src/components/LogoEndcard.tsx`: 태그라인 `right: 120` (YouTube Shorts 우측 UI 안전 영역 확보)
+
+### Changed
+- `src/components/LogoEndcard.tsx`: fadeIn 0.1s → 1.5s (엔드카드 진입 여운)
+- `src/EnometaShorts.tsx`: Audio volume 콜백 추가 — 엔드카드 구간에만 BGM 1→0 페이드 아웃
+- `scripts/visual_script_generator.py`: text_reveal 색상 풀 개선 (어두운 glow/colors[0] 제거 → 가시성 보장)
+- `.claude/skills/enometa-feedback.md`: 음악 세부 항목 + 시스템 이슈 질문 추가
+
+---
+
 ## 2026-03-06 — Claude 워크플로우: pre-commit hook + produce 스킬 개선
 
 ### Added

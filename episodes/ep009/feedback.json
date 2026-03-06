@@ -1,0 +1,78 @@
+{
+  "episode": "ep009",
+  "title": "우리의 뇌는 지금 누구를 위해 일하는가",
+  "settings": {
+    "music_mood": "techno",
+    "palette": "c64",
+    "visual_mood": "default"
+  },
+  "date": "2026-03-06",
+  "overall_rating": 9,
+  "music": {
+    "rating": 5,
+    "liked": ["지금까지 모든 에피소드 중 최고", "techno 무드 첫 적용 성공"],
+    "disliked": ["엔드카드 진입 시 페이드가 없어 여운이 부족함"]
+  },
+  "visual": {
+    "rating": 4,
+    "liked": ["c64 팔레트 + 전체 비주얼 조화 매우 좋음"],
+    "disliked": ["text_reveal(텍스트 코드화) 비주얼이 영상에서 보이지 않음 — 데이터는 6/18 씬에 존재하나 enometa 팔레트 흑백 배경에 묻혀 가시성 없음"]
+  },
+  "narration": {
+    "rating": 5,
+    "liked": ["전반적으로 좋음"],
+    "disliked": []
+  },
+  "script": {
+    "rating": 5,
+    "liked": ["전반적으로 좋음"],
+    "disliked": []
+  },
+  "issues": [
+    {
+      "id": "FB-EP009-01",
+      "category": "pipeline",
+      "severity": "major",
+      "description": "엔드카드 이후 주 영상이 아주 잠깐 노출됨 (flash)",
+      "root_cause": "calcMeta의 composition duration이 endcard 종료 시점보다 길거나, LogoEndcard Sequence가 composition 끝까지 덮지 못함",
+      "fix": "Root.tsx calcMeta 또는 LogoEndcard Sequence durationInFrames 재확인. endcard 이후 여분 프레임 제거.",
+      "status": "open",
+      "file": "src/Root.tsx / src/components/LogoEndcard.tsx"
+    },
+    {
+      "id": "FB-EP009-02",
+      "category": "visual",
+      "severity": "minor",
+      "description": "엔드카드 하단 태그라인 오른쪽 끝이 YouTube Shorts UI(좋아요/댓글 버튼)에 가려짐",
+      "root_cause": "YouTube Shorts는 오른쪽 약 80-100px에 UI 버튼 오버레이. 안전 영역(safe area) 미적용",
+      "fix": "LogoEndcard.tsx 태그라인 maxWidth 또는 paddingRight 조정. 우측 100px 여백 확보.",
+      "status": "open",
+      "file": "src/components/LogoEndcard.tsx"
+    },
+    {
+      "id": "FB-EP009-03",
+      "category": "music",
+      "severity": "minor",
+      "description": "엔드카드 진입 시 페이드 없음 — 여운이 남지 않음",
+      "root_cause": "v16 마스터 페이드 제거 원칙 적용 중. 엔드카드 구간 한정 fade는 미구현",
+      "fix": "LogoEndcard.tsx에 fadeIn 애니메이션 추가 (1-2초). BGM은 현행 유지 (5ms anti-click만).",
+      "status": "open",
+      "file": "src/components/LogoEndcard.tsx"
+    },
+    {
+      "id": "FB-EP009-04",
+      "category": "visual",
+      "severity": "major",
+      "description": "text_reveal(텍스트 코드화) 비주얼 가시성 없음 — 시스템의 핵심 아이덴티티 요소",
+      "root_cause": "visual_script.json에 text_reveal 6개 존재하나 enometa 팔레트(#000000 배경 + #FFFFFF 텍스트)에서 대비 부족 또는 blend mode 문제로 묻힘",
+      "fix": "text_reveal 렌더링 시 배경 대비 보장: 반투명 배경 블록 추가 또는 텍스트 color/glow 강화. c64 팔레트 시 bright green(#00FF41) 강제 적용 검토.",
+      "status": "open",
+      "file": "src/components/vocab/TextReveal.tsx"
+    }
+  ],
+  "system_suggestions": [
+    "엔드카드 전용 페이드인 애니메이션 (LogoEndcard 한정, v16 마스터 페이드와 별개)",
+    "YouTube Shorts 안전 영역(safe area) 가이드라인 적용 — 우측 100px, 하단 200px",
+    "text_reveal 가시성: 팔레트별 텍스트 색상 보장 (어두운 팔레트 → 밝은 글리치 컬러)"
+  ]
+}

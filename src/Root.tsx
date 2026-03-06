@@ -75,8 +75,11 @@ const calcMeta: CalculateMetadataFunction<any> = async ({ props }) => {
   const lastSceneEnd = scenes.length > 0
     ? scenes[scenes.length - 1].end_sec
     : (props.audioAnalysis?.duration_sec ?? 120);
+  // EnometaShorts.tsx와 동일한 Math.round 기반 계산 → 엔드카드 이후 flash 방지
+  const endcardStartFrame = Math.round(lastSceneEnd * 30);
+  const endcardFrames = Math.round(endcardSec * 30);
   return {
-    durationInFrames: Math.ceil((lastSceneEnd + endcardSec) * 30),
+    durationInFrames: endcardStartFrame + endcardFrames,
   };
 };
 

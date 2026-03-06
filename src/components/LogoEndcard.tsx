@@ -313,8 +313,8 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
   // 엔드카드 영역 밖이면 렌더링하지 않음
   if (localFrame < 0 || localFrame >= durationFrames) return null;
 
-  // 전체 페이드인/아웃 (v2: 빠른 fade-in)
-  const fadeIn = interpolate(localFrame, [0, fps * 0.1], [0, 1], {
+  // 전체 페이드인/아웃 (v3: 1.5초 여운 fade-in)
+  const fadeIn = interpolate(localFrame, [0, fps * 1.5], [0, 1], {
     extrapolateRight: "clamp",
   });
   const fadeOut = interpolate(
@@ -376,8 +376,8 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
         style={{
           position: "absolute",
           bottom: 580,
-          left: 0,
-          width: W,
+          left: 60,
+          right: 120,  // YouTube Shorts 우측 UI 버튼 안전 영역
           textAlign: "center",
           pointerEvents: "none",
         }}

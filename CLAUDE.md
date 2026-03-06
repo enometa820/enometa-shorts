@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 학습 목표 — 개발 개념 체득
+
+이 프로젝트를 진행하면서 개발 용어/개념/작업 방식을 학습하고 싶어한다.
+
+Claude는:
+- 새로운 기술 개념이 등장하면 **이름과 용어를 1~2줄로 설명**한다
+- 작업 완료 후 **"오늘 사용한 개념"** 을 요청하면 표로 정리해 준다
+- 처음 등장하는 개발 용어는 괄호 안에 간단 설명을 붙인다
+- 왜 이렇게 설계했는지 이유(trade-off)를 짧게 곁들인다
+
 ## 절대 규칙
 
 - **환경**: `py` 명령 사용 (`python`은 Windows Store alias 문제). entry point: `src/index.tsx`
@@ -21,11 +31,11 @@ npx remotion studio --port 3000
 # 영상 렌더링 (단일 에피소드)
 npx remotion render src/index.tsx EP009 episodes/ep009/output.mp4
 
-# 전체 파이프라인 — 인터랙티브 모드 (권장)
-py scripts/enometa_render.py <episode_dir> --interactive
-
-# 전체 파이프라인 — 직접 지정
+# 전체 파이프라인 — Claude가 대화로 옵션 수집 후 아래 형태로 실행
 py scripts/enometa_render.py <episode_dir> --title "제목" --palette phantom --music-mood raw
+
+# 전체 파이프라인 — 사용자가 터미널에서 직접 실행할 때만 (input() 때문에 Claude 실행 불가)
+py scripts/enometa_render.py <episode_dir> --interactive
 
 # 특정 단계만 재실행
 py scripts/enometa_render.py <episode_dir> --title "제목" --step bgm --force

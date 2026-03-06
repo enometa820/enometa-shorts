@@ -618,8 +618,8 @@ def generate_vocab_params(vocab: str, palette: dict, rng: random.Random) -> dict
     elif vocab == "text_reveal":
         # 모드 다양화: 4가지 모드 랜덤 선택
         mode = rng.choice(["typewriter", "wave", "glitch", "scatter"])
-        # 색상 다양화: accent, glow, 또는 팔레트 컬러에서 선택
-        text_color = rng.choice([accent, glow, colors[0], "#FFFFFF", "#FFD700", "#00FFFF"])
+        # 색상: 배경 불문 가시성 보장 — glow/colors[0] 제거 (어두운 팔레트에서 대비 부족)
+        text_color = rng.choice([accent, "#FFFFFF", "#FFD700", "#00FFFF"])
         return {
             "text": "",
             "mode": mode,
