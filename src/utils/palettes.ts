@@ -56,6 +56,13 @@ export const PALETTES: Record<string, Palette> = {
     accent: "#A59ADE",
     glow: "#7869C4",
   },
+  enometa: {
+    name: "Enometa",
+    bg: "#000000",
+    accent: "#FFFFFF",
+    glow: "#CCCCCC",
+    particles: ["#FFFFFF", "#CCCCCC", "#888888", "#444444", "#222222"],
+  },
 };
 
 export const getPalette = (name: string): Palette => {
