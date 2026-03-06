@@ -21,8 +21,14 @@ npx remotion studio --port 3000
 # 영상 렌더링 (단일 에피소드)
 npx remotion render src/index.tsx EP009 episodes/ep009/output.mp4
 
-# 전체 파이프라인 (TTS → BGM → mix → 비주얼 → Remotion)
-py scripts/enometa_render.py <episode_dir> --title "제목" --palette phantom
+# 전체 파이프라인 — 인터랙티브 모드 (권장)
+py scripts/enometa_render.py <episode_dir> --interactive
+
+# 전체 파이프라인 — 직접 지정
+py scripts/enometa_render.py <episode_dir> --title "제목" --palette phantom --music-mood raw
+
+# 특정 단계만 재실행
+py scripts/enometa_render.py <episode_dir> --title "제목" --step bgm --force
 
 # 개별 스텝
 py scripts/generate_voice_edge.py episodes/epXXX/narration_timing.json episodes/epXXX/narration.wav
@@ -71,6 +77,17 @@ script.txt → gen_timing.py → narration_timing.json
 | `components/VisualSection.tsx` | Python 프레임 배경 + Remotion vocab 오버레이 |
 | `components/SubtitleSection.tsx` | 나레이션 싱크 자막 (EP005 레퍼런스 유지) |
 | `components/TextReveal.tsx` | 4모드 타이포그래피 모션그래픽 |
+
+### 팔레트
+`phantom` / `neon_noir` / `cold_steel` / `ember` / `synapse` / `gameboy` / `c64` / `enometa`
+
+### 음악 무드
+`raw` / `ambient` / `ikeda` / `experimental` / `minimal` / `chill` / `glitch` / `intense` / `techno`
+
+### ⚠️ 오디오 경로 주의
+Remotion은 `public/epXXX/mixed.wav`를 참조. `episodes/epXXX/mixed.wav`와 **별개**.
+mix 단계 후 `public/epXXX/mixed.wav`도 반드시 동기화 필요.
+(`enometa_render.py`가 자동 처리하나, 수동 재믹스 시 직접 복사해야 함)
 
 ### 의존성
 - **Python**: numpy, scipy, Pillow, edge-tts, kiwipiepy
