@@ -1,4 +1,6 @@
-# ENOMETA 프로젝트 지침
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## 절대 규칙
 
@@ -10,25 +12,90 @@
 - **오디오**: narration_volume=0.90, bgm_volume=1.0, 사이드체인 없음, loudnorm -14 LUFS, 엔드카드 BGM 자동 연장
 - **태그**: 주제 기반 5개만. 고정 제외 태그(`#쇼츠` `#shorts` `#ENOMETA` `#이노메타` `#데이터아트`) 포함 금지
 
+## 빌드 & 실행 명령
+
+```bash
+# Remotion Studio (프리뷰)
+npx remotion studio --port 3000
+
+# 영상 렌더링 (단일 에피소드)
+npx remotion render src/index.tsx EP009 episodes/ep009/output.mp4
+
+# 전체 파이프라인 (TTS → BGM → mix → 비주얼 → Remotion)
+py scripts/enometa_render.py <episode_dir> --title "제목" --palette phantom
+
+# 개별 스텝
+py scripts/generate_voice_edge.py episodes/epXXX/narration_timing.json episodes/epXXX/narration.wav
+py scripts/gen_timing.py episodes/epXXX/script.txt episodes/epXXX/narration_timing.json
+py scripts/script_data_extractor.py episodes/epXXX/narration_timing.json
+py scripts/enometa_music_engine.py --script-data episodes/epXXX/script_data.json episodes/epXXX/bgm.wav
+py scripts/audio_mixer.py episodes/epXXX/narration.wav episodes/epXXX/bgm.wav episodes/epXXX/mixed.wav
+py scripts/audio_analyzer.py episodes/epXXX/mixed.wav episodes/epXXX/audio_analysis.json 30
+py scripts/visual_script_generator.py episodes/epXXX/narration_timing.json --title "제목" --palette phantom
+py scripts/visual_renderer.py episodes/epXXX/visual_script.json episodes/epXXX/
+```
+
+## 아키텍처 개요
+
+YouTube Shorts 자동 생성 파이프라인. Python(음악/비주얼 데이터) + Remotion(React 영상 합성) 하이브리드.
+
+### 파이프라인 흐름
+```
+script.txt → gen_timing.py → narration_timing.json
+           → generate_voice_edge.py → narration.wav
+           → script_data_extractor.py → script_data.json (kiwipiepy 형태소 분석)
+           → enometa_music_engine.py → bgm.wav + music_script.json
+           → audio_mixer.py → mixed.wav
+           → visual_script_generator.py → visual_script.json
+           → visual_renderer.py → frames/000000.png~
+           → audio_analyzer.py → audio_analysis.json
+           → Remotion (src/Root.tsx) → output.mp4
+```
+
+### Python 핵심 파일 (scripts/)
+| 파일 | 역할 |
+|------|------|
+| `enometa_music_engine.py` | BGM 합성 (numpy, ~5000줄). 10레이어, 9무드, 패턴 엔진 |
+| `script_data_extractor.py` | 대본 분석 — kiwipiepy 형태소 분석 + semantic_intensity + 도메인 사전 |
+| `visual_script_generator.py` | 대본 → 씬/감정/vocab 매핑 → visual_script.json |
+| `visual_renderer.py` | numpy+Pillow 프레임 렌더링 (1080x1080) |
+| `gen_timing.py` | TTS 실측 기반 연속 배치 (v16: 마디 snap 제거) |
+| `sequence_generators.py` | Thue-Morse/Norgard/Rudin-Shapiro 수열 생성 |
+
+### Remotion 핵심 파일 (src/)
+| 파일 | 역할 |
+|------|------|
+| `Root.tsx` | Composition 정의 + calcMeta (lastScene.end_sec + endcard 기준) |
+| `EnometaShorts.tsx` | 메인 컴포넌트 — 레이아웃 (제목/비주얼/자막/엔드카드) |
+| `ep0XXScript.ts` | 에피소드별 데이터 import (visual_script, audio_analysis 등) |
+| `components/VisualSection.tsx` | Python 프레임 배경 + Remotion vocab 오버레이 |
+| `components/SubtitleSection.tsx` | 나레이션 싱크 자막 (EP005 레퍼런스 유지) |
+| `components/TextReveal.tsx` | 4모드 타이포그래피 모션그래픽 |
+
+### 의존성
+- **Python**: numpy, scipy, Pillow, edge-tts, kiwipiepy
+- **Node**: remotion, @remotion/cli, @remotion/layout-utils
+
 ## 문서 프로토콜
 
 시스템 변경 시 → `memory/protocols.md` 체크리스트 실행.
 SNAPSHOT(설계도) + Brief(실전 매뉴얼) 항상 쌍으로 업데이트.
 
-## v15 시스템 철학 — 음악적 완성도
+## v16 시스템 철학 — 음악적 완성도 + 볼륨 고정
 
 **최우선 목표**: 음악적 완성도. 처음부터 끝까지 따로 놀지 않는 음악.
 TTS / 비주얼 / BGM이 하나의 통합 유기체로 움직여야 한다.
 
 ### 3원칙
 
-1. **마디 동기화**: 모든 요소의 시간축은 `SEC_PER_BAR = 1.777s` 기준.
-   - `narration_timing.json` start_sec → 항상 SEC_PER_BAR의 배수
-   - TTS adelay → 마디 경계 배치 / 비주얼 씬 전환 → 마디 경계
-   - BGM 내부 패턴 → 0초 기준, 마디 경계 자동 일치
+1. **TTS 실측 기반 타이밍**: `gen_timing.py`가 TTS 실측 길이로 연속 배치.
+   - 문장 간 갭: `--gap 0.3` (같은 문단), `--paragraph-gap 0.8` (빈줄 구분)
+   - BGM은 TTS 총 길이 + 엔드카드(8초)로 별도 생성
+   - 영상 길이 = lastScene.end_sec + endcard (BGM 초과분 자동 잘림)
 
-2. **레이어 ON/OFF**: 에너지 표현은 볼륨 커브가 아닌 레이어 추가/제거.
-   - 볼륨 변조 범위: ±15% 이내. 무드별 레이어 조합이 진짜 차별화.
+2. **레이어 ON/OFF + 볼륨 고정**: 에너지 표현은 볼륨 커브가 아닌 레이어 추가/제거.
+   - 콜앤리스폰스 비활성. song_arc/SI modulation/breath 비활성.
+   - 마스터 페이드 없음 (5ms anti-click만).
 
 3. **모든 요소의 상호작용**: 음악이 비주얼을 이끌고, 비주얼이 자막을 감싸고,
    자막이 리듬에 맞춰 호흡한다. 하나라도 따로 놀면 실패.
