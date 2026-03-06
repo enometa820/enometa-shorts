@@ -853,6 +853,97 @@ def downbeat_reverse_crash(sr=SAMPLE_RATE):
     return rev
 
 
+def downbeat_sine_pop(sr=SAMPLE_RATE):
+    """v16: Ikeda 스타일 사인 팝 — 초단 사인 버스트 (1~3ms).
+    다양한 주파수의 극초단 사인파로 디지털 텍스처. 매 2마디 배치용.
+    """
+    duration = 0.005
+    samples = int(sr * duration)
+    t = np.linspace(0, duration, samples, endpoint=False)
+    # 랜덤하지 않은 결정론적 주파수: 2kHz (날카로운 클릭감)
+    freq = 2000.0
+    pop = np.sin(2 * np.pi * freq * t)
+    # 극초단 엔벨로프: 1ms 어택 → 즉시 감쇠
+    env = np.exp(-t * 800)
+    pop *= env * 0.7
+    # 비선형 클리핑으로 Ikeda 특유의 날카로움
+    pop = np.tanh(pop * 3.0) * 0.5
+    return pop
+
+
+def downbeat_sub_boom(sr=SAMPLE_RATE):
+    """v16: 서브 붐 — 저주파 사인 스윕 (80→40Hz) + 빠른 감쇠.
+    4마디 경계에서 무게감 추가. 킥과 레이어링.
+    """
+    duration = 0.25
+    samples = int(sr * duration)
+    t = np.linspace(0, duration, samples, endpoint=False)
+    # 피치 스윕: 80Hz → 40Hz (exponential)
+    freq = 80.0 * np.exp(-t * 3.0)  # 빠른 하강
+    phase = np.cumsum(2 * np.pi * freq / sr)
+    boom = np.sin(phase)
+    # 엔벨로프: 즉시 어택 → 0.2초 감쇠
+    env = np.exp(-t * 12) * 0.8
+    boom *= env
+    # 서브 강조: 약간의 하모닉 디스토션
+    boom = np.tanh(boom * 2.0) * 0.6
+    return boom
+
+
+def downbeat_open_hat(sr=SAMPLE_RATE):
+    """v16: 오픈 하이햇 — 긴 감쇠 노이즈 + 메탈릭 레조넌스.
+    2마디 또는 4마디 첫박에서 그루브 강조용 (0.3초).
+    """
+    duration = 0.3
+    samples = int(sr * duration)
+    t = np.linspace(0, duration, samples, endpoint=False)
+    # 메탈릭 노이즈 (HP 필터링)
+    n = noise(duration, sr)
+    # 2차 HP: 고주파 강조
+    for _ in range(3):
+        n[1:] = n[1:] - n[:-1] * 0.6
+    # 메탈릭 레조넌스: 6kHz + 10kHz
+    res1 = np.sin(2 * np.pi * 6200 * t) * np.exp(-t * 8)
+    res2 = np.sin(2 * np.pi * 10500 * t) * np.exp(-t * 10)
+    # 엔벨로프: 빠른 어택, 중간 감쇠
+    env = np.exp(-t * 6)
+    out = (n * 0.5 + res1 * 0.3 + res2 * 0.2) * env
+    peak = np.max(np.abs(out))
+    if peak > 0:
+        out = out / peak * 0.45
+    return out
+
+
+def downbeat_ping_pong(sr=SAMPLE_RATE):
+    """v16: Ikeda 스타일 핑퐁 트랜지언트 — L/R 교대 클릭.
+    2~5ms 딜레이로 스테레오 공간감. 반환: (L, R) 튜플.
+    매 마디 배치, noise_hit와 교대 사용.
+    """
+    duration = 0.02
+    samples = int(sr * duration)
+    # 극초단 클릭 (0.5ms)
+    click_len = max(1, int(sr * 0.0005))
+    click = noise(0.001, sr)[:click_len] * 0.6
+    # 딜레이: 3ms
+    delay_samples = int(sr * 0.003)
+    L = np.zeros(samples)
+    R = np.zeros(samples)
+    # L: 즉시
+    L[:click_len] = click
+    # R: 3ms 딜레이
+    r_start = delay_samples
+    r_end = min(r_start + click_len, samples)
+    actual = r_end - r_start
+    R[r_start:r_end] = click[:actual]
+    # 두 번째 바운스: L 6ms
+    l2_start = delay_samples * 2
+    l2_end = min(l2_start + click_len, samples)
+    actual2 = l2_end - l2_start
+    if actual2 > 0:
+        L[l2_start:l2_end] = click[:actual2] * 0.4  # 감쇠
+    return L, R
+
+
 # 하위 호환: 기존 코드에서 transition_impact 호출하는 곳
 def transition_impact(sr=SAMPLE_RATE):
     """v16: downbeat_noise_hit으로 리다이렉트"""
@@ -1576,14 +1667,20 @@ class EnometaMusicEngine:
         self.master_L += impact_full * kick_vol_env * 3.0
         self.master_R += impact_full * kick_vol_env * 3.0
 
-        # v16: 마디 첫박 다운비트 사운드 — 3종 계층 배치
+        # v16: 마디 첫박 다운비트 사운드 — 7종 계층 배치
         # 댄스 뮤직 관용: 마디 경계에 임팩트/크래시로 구조 표현 (페이드 대신)
-        # - 매 마디: noise hit (짧은 디지털 임팩트)
-        # - 매 4마디: crash cymbal (신스 크래시)
-        # - 매 16마디: reverse crash → crash (당김 + 히트)
+        # 계층 (작은 단위 → 큰 단위):
+        # - 매 마디(홀수): noise hit / 매 마디(짝수): ping pong
+        # - 매 2마디: sine pop (Ikeda 디지털 텍스처)
+        # - 매 4마디: crash + sub boom + open hat
+        # - 매 16마디: reverse crash (당김 → 히트)
         d_noise = downbeat_noise_hit(self.sr)
         d_crash = downbeat_crash(self.sr)
         d_rev = downbeat_reverse_crash(self.sr)
+        d_sine = downbeat_sine_pop(self.sr)
+        d_boom = downbeat_sub_boom(self.sr)
+        d_ohat = downbeat_open_hat(self.sr)
+        d_ping_L, d_ping_R = downbeat_ping_pong(self.sr)
 
         downbeat_L = np.zeros(self.total_samples)
         downbeat_R = np.zeros(self.total_samples)
@@ -1597,16 +1694,36 @@ class EnometaMusicEngine:
             if pos >= self.total_samples:
                 break
 
-            # 매 마디: noise hit (L/R 약간 다른 볼륨으로 스테레오감)
-            end_n = min(pos + len(d_noise), self.total_samples)
-            downbeat_L[pos:end_n] += d_noise[:end_n - pos] * 0.8
-            downbeat_R[pos:end_n] += d_noise[:end_n - pos] * 0.7
+            # 매 마디: noise hit(홀수) / ping pong(짝수) 교대
+            if bar_count % 2 == 0:
+                end_n = min(pos + len(d_noise), self.total_samples)
+                downbeat_L[pos:end_n] += d_noise[:end_n - pos] * 0.8
+                downbeat_R[pos:end_n] += d_noise[:end_n - pos] * 0.7
+            else:
+                end_pl = min(pos + len(d_ping_L), self.total_samples)
+                downbeat_L[pos:end_pl] += d_ping_L[:end_pl - pos] * 0.9
+                end_pr = min(pos + len(d_ping_R), self.total_samples)
+                downbeat_R[pos:end_pr] += d_ping_R[:end_pr - pos] * 0.9
 
-            # 매 4마디: crash cymbal
+            # 매 2마디: sine pop (날카로운 디지털 클릭)
+            if bar_count % 2 == 0:
+                end_s = min(pos + len(d_sine), self.total_samples)
+                downbeat_L[pos:end_s] += d_sine[:end_s - pos] * 0.6
+                downbeat_R[pos:end_s] += d_sine[:end_s - pos] * 0.6
+
+            # 매 4마디: crash + sub boom + open hat
             if bar_count % 4 == 0:
                 end_c = min(pos + len(d_crash), self.total_samples)
                 downbeat_L[pos:end_c] += d_crash[:end_c - pos] * 1.2
                 downbeat_R[pos:end_c] += d_crash[:end_c - pos] * 1.0
+                # sub boom: 무게감
+                end_b = min(pos + len(d_boom), self.total_samples)
+                downbeat_L[pos:end_b] += d_boom[:end_b - pos] * 0.7
+                downbeat_R[pos:end_b] += d_boom[:end_b - pos] * 0.7
+                # open hat: 그루브
+                end_oh = min(pos + len(d_ohat), self.total_samples)
+                downbeat_L[pos:end_oh] += d_ohat[:end_oh - pos] * 0.5
+                downbeat_R[pos:end_oh] += d_ohat[:end_oh - pos] * 0.5
                 crash_count += 1
 
             # 매 16마디: reverse crash (첫박 0.8초 전에 시작)
@@ -1624,7 +1741,7 @@ class EnometaMusicEngine:
 
         self.master_L += downbeat_L * kick_vol_env
         self.master_R += downbeat_R * kick_vol_env
-        print(f"    -> {bar_count} bars: {bar_count} noise hits, {crash_count} crashes, {rev_count} reverse crashes", flush=True)
+        print(f"    -> {bar_count} bars: noise/ping-pong hits, {crash_count} crash+boom+ohat, {rev_count} reverse crashes", flush=True)
 
     def _render_continuous_sub_pulse(self, sections):
         """전체 길이 서브 펄스"""
@@ -2798,12 +2915,13 @@ class EnometaMusicEngine:
         if peak2 > 0.95:
             stereo *= 0.95 / peak2
 
-        # 전체 페이드
-        fade_in_samples = int(self.sr * 2)
-        fade_out_samples = int(self.sr * 3)
-        for ch in range(2):
-            stereo[:fade_in_samples, ch] *= np.linspace(0, 1, fade_in_samples)
-            stereo[-fade_out_samples:, ch] *= np.linspace(1, 0, fade_out_samples)
+        # v16: 마스터 페이드 제거 — 음악은 즉시 시작, 즉시 끝남
+        # 클릭 방지용 극초단 anti-click만 적용 (1ms)
+        anti_click = min(int(self.sr * 0.001), len(stereo) // 4)
+        if anti_click > 1:
+            for ch in range(2):
+                stereo[:anti_click, ch] *= np.linspace(0, 1, anti_click)
+                stereo[-anti_click:, ch] *= np.linspace(1, 0, anti_click)
 
         # 4) 16bit WAV
         audio_16bit = (stereo * 32767).astype(np.int16)
