@@ -2,7 +2,7 @@
 name: enometa-produce
 description: >
   ENOMETA 에피소드 제작 파이프라인 실행 스킬.
-  대본 컨펌 후 인터랙티브 모드로 옵션 선택 → enometa_render.py 단일 명령 실행.
+  대본 컨펌 후 대화로 옵션 수집 → enometa_render.py 비인터랙티브 단일 명령 실행.
   트리거 키워드 - 제작 시작, 파이프라인, 영상 만들자, produce, 에피소드 제작
 ---
 
@@ -14,22 +14,17 @@ description: >
 - 에피소드 폴더 준비: `episodes/epXXX/`
 - 필수 입력 파일: `episodes/epXXX/script.txt` (대본 원문)
 
-## 표준 실행 — 인터랙티브 모드
+## 표준 실행 — 대화로 옵션 수집
 
-```bash
-py scripts/enometa_render.py episodes/epXXX --interactive
-```
+Claude가 아래 순서로 물어본 뒤 명령을 조합해서 실행한다.
 
-실행하면 터미널에서 번호로 선택:
-1. **팔레트** — phantom/neon_noir/cold_steel/ember/synapse/gameboy/c64/enometa
-2. **음악 무드** — raw/ambient/ikeda/experimental/minimal/chill/glitch/intense/techno
-3. **비주얼 무드** — 자동/ikeda/cooper/abstract/data
-4. **드럼** — 무드 기본값/강제 ON/강제 OFF
-5. **제목** 입력 → kiwipiepy 키워드 자동 추출 → 확인
+1. **팔레트** — `phantom` / `neon_noir` / `cold_steel` / `ember` / `synapse` / `gameboy` / `c64` / `enometa`
+2. **음악 무드** — `raw` / `ambient` / `ikeda` / `experimental` / `minimal` / `chill` / `glitch` / `intense` / `techno`
+3. **비주얼 무드** — 자동(생략 가능) / `ikeda` / `cooper` / `abstract` / `data`
+4. **드럼** — 무드 기본값(생략) / `--drum` 강제 ON / `--no-drum` 강제 OFF
+5. **제목** — 입력받으면 kiwipiepy가 키워드 자동 추출
 
-최종 명령어 출력 후 `y` 입력 시 파이프라인 실행.
-
-## 옵션 직접 지정 (비인터랙티브)
+수집 완료 후 실행:
 
 ```bash
 py scripts/enometa_render.py episodes/epXXX \

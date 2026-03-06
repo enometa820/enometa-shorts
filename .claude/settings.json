@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(py *)",
+      "Bash(PYTHONIOENCODING=utf-8 py *)",
+      "Bash(npx remotion *)",
+      "Bash(git *)"
+    ],
+    "additionalDirectories": [
+      "c:\\옵시디언\\enometa\\enometa-shorts\\episodes",
+      "C:\\옵시디언\\enometa\\enometa-shorts\\.git"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py \".claude/hooks/pre_commit_check.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

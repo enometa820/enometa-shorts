@@ -5,6 +5,17 @@
 
 ---
 
+## 2026-03-06 — Claude 워크플로우: pre-commit hook + produce 스킬 개선
+
+### Added
+- `.claude/hooks/pre_commit_check.py`: feat:/fix:/refactor: 커밋 전 CHANGELOG staged 확인 강제 + decisions remind
+- `.claude/settings.json`: PreToolUse hook 연결 (Bash 도구 → pre_commit_check.py)
+
+### Changed
+- `.claude/skills/enometa-produce.md`: 인터랙티브 모드(--interactive) → 대화로 옵션 수집 후 비인터랙티브 실행 방식으로 변경
+
+---
+
 ## 2026-03-06 — v16: kiwipiepy 형태소 분석 + TTS 실측 타이밍 + 음악 엔진 개선
 
 ### Added
