@@ -76,11 +76,6 @@ script.txt → gen_timing.py → narration_timing.json
 - **Python**: numpy, scipy, Pillow, edge-tts, kiwipiepy
 - **Node**: remotion, @remotion/cli, @remotion/layout-utils
 
-## 문서 프로토콜
-
-시스템 변경 시 → `memory/protocols.md` 체크리스트 실행.
-SNAPSHOT(설계도) + Brief(실전 매뉴얼) 항상 쌍으로 업데이트.
-
 ## v16 시스템 철학 — 음악적 완성도 + 볼륨 고정
 
 **최우선 목표**: 음악적 완성도. 처음부터 끝까지 따로 놀지 않는 음악.
