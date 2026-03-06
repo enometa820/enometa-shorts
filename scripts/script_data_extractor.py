@@ -17,6 +17,47 @@ from functools import reduce
 from operator import xor
 from pathlib import Path
 
+from kiwipiepy import Kiwi
+_kiwi = Kiwi()
+
+# ENOMETA 도메인 전문용어를 kiwi 사용자 사전에 등록
+_KIWI_USER_WORDS = [
+    # 뇌과학 복합어
+    "전전두엽", "대뇌피질", "수상돌기", "미주신경", "신경세포",
+    "노르에피네프린", "아세틸콜린", "바소프레신",
+    # 컴퓨팅/과학
+    "메타인지", "자유의지", "결정론", "정규분포", "표준편차",
+    "지연시간",
+]
+for _w in _KIWI_USER_WORDS:
+    _kiwi.add_user_word(_w, "NNG")
+
+# kiwipiepy POS → ENOMETA type 매핑
+_KIWI_POS_MAP = {
+    "NNG": "noun",    # 일반명사
+    "NNP": "noun",    # 고유명사
+    "NNB": "noun",    # 의존명사
+    "NR": "number",   # 수사
+    "SN": "number",   # 숫자
+    "VV": "verb",     # 동사
+    "VA": "verb",     # 형용사
+    "VX": "verb",     # 보조용언
+    "VCP": "verb",    # 긍정지정사 (이다)
+    "VCN": "verb",    # 부정지정사 (아니다)
+    "JKS": "particle", "JKC": "particle", "JKG": "particle",
+    "JKO": "particle", "JKB": "particle", "JKV": "particle",
+    "JKQ": "particle", "JX": "particle", "JC": "particle",
+    "SF": "punct", "SP": "punct", "SS": "punct", "SE": "punct",
+    "SO": "punct", "SW": "punct",
+    "MAG": "adverb",  # 일반부사
+    "MAJ": "adverb",  # 접속부사
+    "MM": "noun",     # 관형사 → noun으로 처리
+    "EC": "particle", "EF": "particle", "ETN": "particle", "ETM": "particle",
+    "EP": "particle",  # 선어말어미
+    "XPN": "particle", "XSN": "particle", "XSV": "particle", "XSA": "particle",
+    "XR": "noun",     # 어근 → noun
+}
+
 
 # ============================================================
 # 한글 분해 (Unicode Hangul Decomposition)
@@ -407,48 +448,33 @@ load_custom_dictionary()
 
 
 def tokenize_korean(text):
-    """간이 한국어 토큰화"""
-    # 숫자, 한글 단어, 문장부호 분리
-    pattern = r'(\d+\.?\d*|[가-힣]+|[.!?,;:])'
-    raw_tokens = re.findall(pattern, text)
+    """kiwipiepy 기반 한국어 형태소 분석 + ENOMETA 도메인 사전 오버라이드"""
+    kiwi_result = _kiwi.tokenize(text)
 
     tokens = []
-    for t in raw_tokens:
-        if re.match(r'^\d+\.?\d*$', t):
-            tokens.append({"text": t, "type": "number", "position": len(tokens)})
-        elif t in '.!?,;:':
-            tokens.append({"text": t, "type": "punct", "position": len(tokens)})
-        elif t in PARTICLES:
-            tokens.append({"text": t, "type": "particle", "position": len(tokens)})
-        elif t in CHEMICALS:
-            tokens.append({"text": t, "type": "chemical", "position": len(tokens)})
-        elif t in BODY_PARTS:
-            tokens.append({"text": t, "type": "body", "position": len(tokens)})
-        elif t in SCIENCE_TERMS:
-            tokens.append({"text": t, "type": "science", "position": len(tokens)})
-        else:
-            # 조사 분리 시도
-            separated = False
-            for p in sorted(PARTICLES, key=len, reverse=True):
-                if t.endswith(p) and len(t) > len(p):
-                    stem = t[:-len(p)]
-                    stem_type = "noun"
-                    if stem in CHEMICALS:
-                        stem_type = "chemical"
-                    elif stem in BODY_PARTS:
-                        stem_type = "body"
-                    elif stem in SCIENCE_TERMS:
-                        stem_type = "science"
-                    tokens.append({"text": stem, "type": stem_type, "position": len(tokens)})
-                    tokens.append({"text": p, "type": "particle", "position": len(tokens)})
-                    separated = True
-                    break
-            if not separated:
-                # 동사/형용사 어미 분리
-                if t.endswith(("다", "한다", "된다", "진다", "있다", "없다")):
-                    tokens.append({"text": t, "type": "verb", "position": len(tokens)})
-                else:
-                    tokens.append({"text": t, "type": "noun", "position": len(tokens)})
+    for token in kiwi_result:
+        form = token.form
+        pos = token.tag  # e.g. "NNG", "JKS", "VV", ...
+
+        # 숫자 (SN 태그 또는 숫자 패턴)
+        if pos == "SN" or re.match(r'^\d+\.?\d*$', form):
+            tokens.append({"text": form, "type": "number", "position": len(tokens)})
+            continue
+
+        # ENOMETA 도메인 사전 우선 (kiwipiepy POS보다 우선)
+        if form in CHEMICALS:
+            tokens.append({"text": form, "type": "chemical", "position": len(tokens)})
+            continue
+        if form in BODY_PARTS:
+            tokens.append({"text": form, "type": "body", "position": len(tokens)})
+            continue
+        if form in SCIENCE_TERMS:
+            tokens.append({"text": form, "type": "science", "position": len(tokens)})
+            continue
+
+        # kiwipiepy POS → ENOMETA type 매핑
+        enometa_type = _KIWI_POS_MAP.get(pos, "noun")
+        tokens.append({"text": form, "type": enometa_type, "position": len(tokens)})
 
     return tokens
 

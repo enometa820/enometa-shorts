@@ -69,10 +69,14 @@ import {
 // endcardDurationSec 기본 6초 포함
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const calcMeta: CalculateMetadataFunction<any> = async ({ props }) => {
-  const durationSec = props.audioAnalysis?.duration_sec ?? 120;
   const endcardSec = props.endcardDurationSec ?? 6;
+  // 영상 길이 = 마지막 씬 종료 + 엔드카드 (BGM이 더 길어도 잘라냄)
+  const scenes = props.visualScript?.scenes ?? [];
+  const lastSceneEnd = scenes.length > 0
+    ? scenes[scenes.length - 1].end_sec
+    : (props.audioAnalysis?.duration_sec ?? 120);
   return {
-    durationInFrames: Math.ceil((durationSec + endcardSec) * 30),
+    durationInFrames: Math.ceil((lastSceneEnd + endcardSec) * 30),
   };
 };
 

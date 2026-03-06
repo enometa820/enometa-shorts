@@ -2837,7 +2837,9 @@ class EnometaMusicEngine:
         self._song_arc_name = arc_name
 
         # F-7: 콜앤리스폰스 엔벨로프 사전 계산
-        self._cr_drum_env, self._cr_melody_env = self._compute_call_response_envelopes()
+        # v16: 콜앤리스폰스 비활성 — 볼륨 고정 원칙 (마디별 감쇠 제거)
+        self._cr_drum_env = np.ones(self.total_samples, dtype=np.float64)
+        self._cr_melody_env = np.ones(self.total_samples, dtype=np.float64)
 
         # v15: 무드 기반 레이어 ON/OFF 적용
         music_mood = self.script.get("metadata", {}).get("music_mood", "raw")
