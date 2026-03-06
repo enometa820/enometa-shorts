@@ -127,6 +127,22 @@
         "pixel_grid_life:default",
         "text_reveal:default"
       ]
+    },
+    "ep010": {
+      "used_combos": [
+        "flow_field_calm:opposing",
+        "flow_field_calm:vortex",
+        "flow_field_turbulent:vortex",
+        "grid_morph:wave_propagation",
+        "lissajous:default",
+        "particle_orbit:ellipse_drift",
+        "particle_orbit:figure_eight",
+        "pixel_grid_life:default",
+        "pixel_grid_rain:default",
+        "text_reveal:default",
+        "waveform:default",
+        "waveform_spectrum:default"
+      ]
     }
   }
 }

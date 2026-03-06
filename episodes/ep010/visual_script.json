@@ -1,0 +1,1005 @@
+{
+  "title": "우리의 믿음이 우리의 몸이 된다",
+  "tagline": "존재와 사유, 그 경계를 초월하다",
+  "highlightWords": [
+    "절반",
+    "명확",
+    "연구자",
+    "가짜",
+    "통증"
+  ],
+  "meta": {
+    "strategy": "enometa",
+    "strategy_description": "ENOMETA data art - minimal+terminal+sine",
+    "genre": "enometa",
+    "palette": "neon_noir",
+    "seed": 3016471557,
+    "render_mode": "hybrid",
+    "frames_dir": "ep010/frames",
+    "total_frames": 3230
+  },
+  "global": {
+    "color_palette": [
+      "#00F5D4",
+      "#FF006E",
+      "#3A86FF",
+      "#FFBE0B"
+    ],
+    "background_color": "#0A0A0F",
+    "particle_total": 2000,
+    "font": "Pretendard Variable",
+    "palette": "neon_noir"
+  },
+  "scenes": [
+    {
+      "id": "scene_01",
+      "sentence": "임상 실험. 절반의 참가자에게",
+      "start_sec": 0.0,
+      "end_sec": 4.524,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 3,
+              "ratioB": 3,
+              "phaseOffset": 3.06,
+              "color": "#00F5D4",
+              "glowColor": "#00D4B8",
+              "lineWidth": 2,
+              "trailLength": 800
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "절반",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#00FFFF",
+              "position": "bottom",
+              "glowColor": "#00D4B8",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0022,
+            "speed": 0.023,
+            "line_opacity": 0.055,
+            "line_color": "#AACCCC"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_02",
+      "sentence": "설탕으로 만든 알약을 줬다. 아무 성분도 없다.",
+      "start_sec": 4.824,
+      "end_sec": 10.64,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {},
+            "variant": "vortex"
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0028,
+            "speed": 0.038,
+            "line_opacity": 0.065,
+            "line_color": "#AACCCC"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_03",
+      "sentence": "그럼에도 결과는 명확했다. 통증이 30퍼센트 줄었다.",
+      "start_sec": 10.94,
+      "end_sec": 17.048,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "waveform",
+            "params": {
+              "mode": "waveform",
+              "color": "#00F5D4",
+              "lineWidth": 1.5,
+              "sensitivity": 1.489
+            }
+          },
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 1,
+              "ratioB": 5,
+              "phaseOffset": 3.55,
+              "color": "#FFFFFF",
+              "glowColor": "#00D4B8",
+              "lineWidth": 2.5,
+              "trailLength": 600
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "명확",
+              "mode": "wave",
+              "fontSize": 72,
+              "color": "#00F5D4",
+              "position": "top",
+              "glowColor": "#00D4B8",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0027,
+            "speed": 0.035,
+            "line_opacity": 0.046,
+            "line_color": "#AACCCC"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_04",
+      "sentence": "더 놀라운 실험. 연구자가 고백하며 건넸다.",
+      "start_sec": 17.848,
+      "end_sec": 23.212,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "grid_morph",
+            "params": {
+              "cols": 15,
+              "rows": 20,
+              "mode": "wave",
+              "color": "#88AAAA",
+              "accentColor": "#00F5D4",
+              "morphIntensity": 0.503,
+              "showConnections": true
+            },
+            "variant": "wave_propagation"
+          },
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 4,
+              "ratioB": 2,
+              "phaseOffset": 6.19,
+              "color": "#FFFFFF",
+              "glowColor": "#00D4B8",
+              "lineWidth": 1.5,
+              "trailLength": 800
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "연구자",
+              "mode": "typewriter",
+              "fontSize": 64,
+              "color": "#00FFFF",
+              "position": "center",
+              "glowColor": "#00D4B8",
+              "staggerMs": 80
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0041,
+            "speed": 0.05,
+            "line_opacity": 0.053,
+            "line_color": "#88AAAA"
+          },
+          "variant": "opposing"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_05",
+      "sentence": "이건 가짜 약입니다. 그래도 삼켰다.",
+      "start_sec": 23.512,
+      "end_sec": 28.3,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 1,
+              "ratioB": 2,
+              "phaseOffset": 3.93,
+              "color": "#00D4B8",
+              "glowColor": "#00D4B8",
+              "lineWidth": 2.5,
+              "trailLength": 800
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "가짜",
+              "mode": "wave",
+              "fontSize": 72,
+              "color": "#FFD700",
+              "position": "upper",
+              "glowColor": "#00D4B8",
+              "staggerMs": 100
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0023,
+            "speed": 0.035,
+            "line_opacity": 0.053,
+            "line_color": "#557777"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_06",
+      "sentence": "그래도 통증이 줄었다. 이건 착각이 아니다.",
+      "start_sec": 28.6,
+      "end_sec": 34.176,
+      "emotion": "tension_reveal",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "pixel_grid_life",
+            "params": {
+              "cols": 24,
+              "rows": 40,
+              "mode": "life",
+              "colors": [
+                "#00F5D4",
+                "#FF006E",
+                "#3A86FF",
+                "#FFBE0B"
+              ],
+              "pixelGap": 1,
+              "reactivity": 1.12
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "통증",
+              "mode": "glitch",
+              "fontSize": 80,
+              "color": "#FFD700",
+              "position": "bottom",
+              "glowColor": "#00D4B8",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0079,
+            "speed": 0.232,
+            "line_opacity": 0.115,
+            "line_color": "#88AAAA"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_07",
+      "sentence": "뇌가 실제로 반응한 것이다. 엔도르핀이 분비됐다.",
+      "start_sec": 34.476,
+      "end_sec": 40.056,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "grid_morph",
+            "params": {
+              "cols": 25,
+              "rows": 15,
+              "mode": "lines",
+              "color": "#AACCCC",
+              "accentColor": "#00F5D4",
+              "morphIntensity": 0.609,
+              "showConnections": true
+            },
+            "variant": "wave_propagation"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "반응",
+              "mode": "typewriter",
+              "fontSize": 56,
+              "color": "#00FFFF",
+              "position": "center",
+              "glowColor": "#00D4B8",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0027,
+            "speed": 0.05,
+            "line_opacity": 0.071,
+            "line_color": "#AACCCC"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_08",
+      "sentence": "뇌가 스스로 만든 것이다. 믿음이 화학을 만든다.",
+      "start_sec": 40.356,
+      "end_sec": 46.244,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 2,
+              "ratioB": 3,
+              "phaseOffset": 4.15,
+              "color": "#00F5D4",
+              "glowColor": "#00D4B8",
+              "lineWidth": 1.5,
+              "trailLength": 600
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "화학",
+              "mode": "typewriter",
+              "fontSize": 64,
+              "color": "#00FFFF",
+              "position": "upper",
+              "glowColor": "#00D4B8",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0036,
+            "speed": 0.05,
+            "line_opacity": 0.092,
+            "line_color": "#557777"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_09",
+      "sentence": "기대가 신경계를 움직인다. 플라시보가 가짜라는 생각.",
+      "start_sec": 46.544,
+      "end_sec": 52.84,
+      "emotion": "transcendent_open",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 500,
+              "color": "#00F5D4",
+              "rings": 3,
+              "speed": 0.598
+            },
+            "variant": "figure_eight"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "플라시보",
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#FFFFFF",
+              "position": "bottom",
+              "glowColor": "#00D4B8",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0019,
+            "speed": 0.03,
+            "line_opacity": 0.053,
+            "line_color": "#AACCCC"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_10",
+      "sentence": "그것이 오해였다. 우리는 세계를 직접 보지 않는다.",
+      "start_sec": 53.14,
+      "end_sec": 59.292,
+      "emotion": "tension_reveal",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "waveform_spectrum",
+            "params": {
+              "mode": "spectrum",
+              "color": "#00F5D4",
+              "lineWidth": 1.5,
+              "sensitivity": 1.949
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "오해",
+              "mode": "glitch",
+              "fontSize": 56,
+              "color": "#FFD700",
+              "position": "bottom",
+              "glowColor": "#00D4B8",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0055,
+            "speed": 0.215,
+            "line_opacity": 0.069,
+            "line_color": "#557777"
+          },
+          "variant": "vortex",
+          "transition_to": "flow_field_calm"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_11",
+      "sentence": "뇌가 재구성한 세계를 본다. 현실은 뇌 바깥에 없다.",
+      "start_sec": 59.592,
+      "end_sec": 65.412,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 1,
+              "ratioB": 1,
+              "phaseOffset": 5.09,
+              "color": "#00D4B8",
+              "glowColor": "#00D4B8",
+              "lineWidth": 3,
+              "trailLength": 600
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "현실",
+              "mode": "typewriter",
+              "fontSize": 80,
+              "color": "#FFFFFF",
+              "position": "top",
+              "glowColor": "#00D4B8",
+              "staggerMs": 80
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0047,
+            "speed": 0.05,
+            "line_opacity": 0.099,
+            "line_color": "#557777"
+          },
+          "variant": "opposing",
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_12",
+      "sentence": "뇌의 해석이 현실이다. 그 해석을 기대가 조각한다.",
+      "start_sec": 65.712,
+      "end_sec": 71.816,
+      "emotion": "neutral_analytical",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "grid_morph",
+            "params": {
+              "cols": 25,
+              "rows": 20,
+              "mode": "wave",
+              "color": "#FFFFFF",
+              "accentColor": "#00F5D4",
+              "morphIntensity": 0.559,
+              "showConnections": false
+            },
+            "variant": "wave_propagation"
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0036,
+            "speed": 0.05,
+            "line_opacity": 0.096,
+            "line_color": "#557777"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_13",
+      "sentence": "기대가 바뀌면 신호가 바뀐다. 신호가 바뀌면 몸이 응답한다.",
+      "start_sec": 72.116,
+      "end_sec": 78.464,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 500,
+              "color": "#00F5D4",
+              "rings": 4,
+              "speed": 0.361
+            },
+            "variant": "ellipse_drift"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "응답",
+              "mode": "wave",
+              "fontSize": 80,
+              "color": "#FFFFFF",
+              "position": "center",
+              "glowColor": "#00D4B8",
+              "staggerMs": 100
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0013,
+            "speed": 0.022,
+            "line_opacity": 0.061,
+            "line_color": "#AACCCC"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_14",
+      "sentence": "우리가 믿는 것이 우리의 몸이 된다.",
+      "start_sec": 79.264,
+      "end_sec": 83.812,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 3,
+              "ratioB": 5,
+              "phaseOffset": 2.14,
+              "color": "#00F5D4",
+              "glowColor": "#00D4B8",
+              "lineWidth": 1.5,
+              "trailLength": 600
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0019,
+            "speed": 0.022,
+            "line_opacity": 0.063,
+            "line_color": "#557777"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_15",
+      "sentence": "믿음을 바꾸는 것. 그것이 신호를 바꾸는 것이다.",
+      "start_sec": 84.612,
+      "end_sec": 89.688,
+      "emotion": "tension_transformative",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "pixel_grid_rain",
+            "params": {
+              "cols": 24,
+              "rows": 24,
+              "mode": "rain",
+              "colors": [
+                "#00F5D4",
+                "#FF006E",
+                "#3A86FF",
+                "#FFBE0B"
+              ],
+              "pixelGap": 1,
+              "reactivity": 0.89
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "신호",
+              "mode": "glitch",
+              "fontSize": 56,
+              "color": "#00FFFF",
+              "position": "bottom",
+              "glowColor": "#00D4B8",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0075,
+            "speed": 0.252,
+            "line_opacity": 0.088,
+            "line_color": "#557777"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_16",
+      "sentence": "신호가 바뀌면 화학이 바뀐다.",
+      "start_sec": 89.988,
+      "end_sec": 93.036,
+      "emotion": "transcendent_open",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {},
+            "variant": "opposing"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "화학",
+              "mode": "wave",
+              "fontSize": 80,
+              "color": "#FFFFFF",
+              "position": "center",
+              "glowColor": "#00D4B8",
+              "staggerMs": 100
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0022,
+            "speed": 0.021,
+            "line_opacity": 0.059,
+            "line_color": "#AACCCC"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_17",
+      "sentence": "화학이 바뀌면 몸이 달라진다.",
+      "start_sec": 93.336,
+      "end_sec": 96.36,
+      "emotion": "transcendent_open",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 2,
+              "ratioB": 1,
+              "phaseOffset": 2.22,
+              "color": "#FFFFFF",
+              "glowColor": "#00D4B8",
+              "lineWidth": 1.5,
+              "trailLength": 800
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "화학",
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#FFD700",
+              "position": "center",
+              "glowColor": "#00D4B8",
+              "staggerMs": 100
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0018,
+            "speed": 0.039,
+            "line_opacity": 0.066,
+            "line_color": "#88AAAA"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_18",
+      "sentence": "허상이 아니다. 우리의 뇌과학이다.",
+      "start_sec": 97.16,
+      "end_sec": 101.684,
+      "emotion": "transcendent_open",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 300,
+              "color": "#00F5D4",
+              "rings": 5,
+              "speed": 0.705
+            },
+            "variant": "figure_eight"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "과학",
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#00FFFF",
+              "position": "top",
+              "glowColor": "#00D4B8",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0026,
+            "speed": 0.027,
+            "line_opacity": 0.06,
+            "line_color": "#88AAAA"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    }
+  ]
+}

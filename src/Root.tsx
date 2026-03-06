@@ -64,6 +64,13 @@ import {
   ep009AudioSrc,
   ep009NarrationSegments,
 } from "./ep009Script";
+import {
+  ep010VisualScript,
+  ep010Title,
+  ep010AudioAnalysis,
+  ep010AudioSrc,
+  ep010NarrationSegments,
+} from "./ep010Script";
 
 // calculateMetadata: audioAnalysis.duration_sec 기반 durationInFrames 자동 계산
 // endcardDurationSec 기본 6초 포함
@@ -241,6 +248,25 @@ export const Root: React.FC = () => {
           audioSrc: ep009AudioSrc,
           narrationSegments: ep009NarrationSegments,
           highlightWords: ["뇌", "누구"],
+        }}
+      />
+
+      {/* EP010: 우리의 믿음이 우리의 몸이 된다 */}
+      <Composition
+        id="EP010"
+        component={EnometaShorts}
+        durationInFrames={30 * 30}
+        fps={30}
+        width={1080}
+        height={1920}
+        calculateMetadata={calcMeta}
+        defaultProps={{
+          visualScript: ep010VisualScript,
+          title: ep010Title,
+          audioAnalysis: ep010AudioAnalysis,
+          audioSrc: ep010AudioSrc,
+          narrationSegments: ep010NarrationSegments,
+          highlightWords: ["믿음", "플라시보", "뇌"],
         }}
       />
 

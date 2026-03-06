@@ -1,0 +1,326 @@
+{
+  "voice": "ko-KR-SunHiNeural",
+  "rate": "+5%",
+  "bpm": 135.0,
+  "sec_per_bar": 1.777778,
+  "total_duration_sec": 101.684,
+  "music_mood": "glitch",
+  "gap_sec": 0.3,
+  "paragraph_gap_sec": 0.8,
+  "segments": [
+    {
+      "index": 0,
+      "text": "임상 실험.",
+      "start_sec": 0.0,
+      "end_sec": 1.896,
+      "duration_sec": 1.896,
+      "actual_tts_sec": 1.896
+    },
+    {
+      "index": 1,
+      "text": "절반의 참가자에게",
+      "start_sec": 2.196,
+      "end_sec": 4.524,
+      "duration_sec": 2.328,
+      "actual_tts_sec": 2.328
+    },
+    {
+      "index": 2,
+      "text": "설탕으로 만든 알약을 줬다.",
+      "start_sec": 4.824,
+      "end_sec": 7.584,
+      "duration_sec": 2.76,
+      "actual_tts_sec": 2.76
+    },
+    {
+      "index": 3,
+      "text": "아무 성분도 없다.",
+      "start_sec": 8.384,
+      "end_sec": 10.64,
+      "duration_sec": 2.256,
+      "actual_tts_sec": 2.256
+    },
+    {
+      "index": 4,
+      "text": "그럼에도 결과는 명확했다.",
+      "start_sec": 10.94,
+      "end_sec": 13.796,
+      "duration_sec": 2.856,
+      "actual_tts_sec": 2.856
+    },
+    {
+      "index": 5,
+      "text": "통증이 30퍼센트 줄었다.",
+      "start_sec": 14.096,
+      "end_sec": 17.048,
+      "duration_sec": 2.952,
+      "actual_tts_sec": 2.952
+    },
+    {
+      "index": 6,
+      "text": "더 놀라운 실험.",
+      "start_sec": 17.848,
+      "end_sec": 20.056,
+      "duration_sec": 2.208,
+      "actual_tts_sec": 2.208
+    },
+    {
+      "index": 7,
+      "text": "연구자가 고백하며 건넸다.",
+      "start_sec": 20.356,
+      "end_sec": 23.212,
+      "duration_sec": 2.856,
+      "actual_tts_sec": 2.856
+    },
+    {
+      "index": 8,
+      "text": "이건 가짜 약입니다.",
+      "start_sec": 23.512,
+      "end_sec": 25.912,
+      "duration_sec": 2.4,
+      "actual_tts_sec": 2.4
+    },
+    {
+      "index": 9,
+      "text": "그래도 삼켰다.",
+      "start_sec": 26.212,
+      "end_sec": 28.3,
+      "duration_sec": 2.088,
+      "actual_tts_sec": 2.088
+    },
+    {
+      "index": 10,
+      "text": "그래도 통증이 줄었다.",
+      "start_sec": 28.6,
+      "end_sec": 31.096,
+      "duration_sec": 2.496,
+      "actual_tts_sec": 2.496
+    },
+    {
+      "index": 11,
+      "text": "이건 착각이 아니다.",
+      "start_sec": 31.896,
+      "end_sec": 34.176,
+      "duration_sec": 2.28,
+      "actual_tts_sec": 2.28
+    },
+    {
+      "index": 12,
+      "text": "뇌가 실제로 반응한 것이다.",
+      "start_sec": 34.476,
+      "end_sec": 37.236,
+      "duration_sec": 2.76,
+      "actual_tts_sec": 2.76
+    },
+    {
+      "index": 13,
+      "text": "엔도르핀이 분비됐다.",
+      "start_sec": 37.536,
+      "end_sec": 40.056,
+      "duration_sec": 2.52,
+      "actual_tts_sec": 2.52
+    },
+    {
+      "index": 14,
+      "text": "뇌가 스스로 만든 것이다.",
+      "start_sec": 40.356,
+      "end_sec": 42.948,
+      "duration_sec": 2.592,
+      "actual_tts_sec": 2.592
+    },
+    {
+      "index": 15,
+      "text": "믿음이 화학을 만든다.",
+      "start_sec": 43.748,
+      "end_sec": 46.244,
+      "duration_sec": 2.496,
+      "actual_tts_sec": 2.496
+    },
+    {
+      "index": 16,
+      "text": "기대가 신경계를 움직인다.",
+      "start_sec": 46.544,
+      "end_sec": 49.352,
+      "duration_sec": 2.808,
+      "actual_tts_sec": 2.808
+    },
+    {
+      "index": 17,
+      "text": "플라시보가 가짜라는 생각.",
+      "start_sec": 50.152,
+      "end_sec": 52.84,
+      "duration_sec": 2.688,
+      "actual_tts_sec": 2.688
+    },
+    {
+      "index": 18,
+      "text": "그것이 오해였다.",
+      "start_sec": 53.14,
+      "end_sec": 55.276,
+      "duration_sec": 2.136,
+      "actual_tts_sec": 2.136
+    },
+    {
+      "index": 19,
+      "text": "우리는 세계를 직접 보지 않는다.",
+      "start_sec": 56.076,
+      "end_sec": 59.292,
+      "duration_sec": 3.216,
+      "actual_tts_sec": 3.216
+    },
+    {
+      "index": 20,
+      "text": "뇌가 재구성한 세계를 본다.",
+      "start_sec": 59.592,
+      "end_sec": 62.4,
+      "duration_sec": 2.808,
+      "actual_tts_sec": 2.808
+    },
+    {
+      "index": 21,
+      "text": "현실은 뇌 바깥에 없다.",
+      "start_sec": 62.7,
+      "end_sec": 65.412,
+      "duration_sec": 2.712,
+      "actual_tts_sec": 2.712
+    },
+    {
+      "index": 22,
+      "text": "뇌의 해석이 현실이다.",
+      "start_sec": 65.712,
+      "end_sec": 68.208,
+      "duration_sec": 2.496,
+      "actual_tts_sec": 2.496
+    },
+    {
+      "index": 23,
+      "text": "그 해석을 기대가 조각한다.",
+      "start_sec": 69.008,
+      "end_sec": 71.816,
+      "duration_sec": 2.808,
+      "actual_tts_sec": 2.808
+    },
+    {
+      "index": 24,
+      "text": "기대가 바뀌면 신호가 바뀐다.",
+      "start_sec": 72.116,
+      "end_sec": 75.092,
+      "duration_sec": 2.976,
+      "actual_tts_sec": 2.976
+    },
+    {
+      "index": 25,
+      "text": "신호가 바뀌면 몸이 응답한다.",
+      "start_sec": 75.392,
+      "end_sec": 78.464,
+      "duration_sec": 3.072,
+      "actual_tts_sec": 3.072
+    },
+    {
+      "index": 26,
+      "text": "우리가 믿는 것이",
+      "start_sec": 79.264,
+      "end_sec": 81.376,
+      "duration_sec": 2.112,
+      "actual_tts_sec": 2.112
+    },
+    {
+      "index": 27,
+      "text": "우리의 몸이 된다.",
+      "start_sec": 81.676,
+      "end_sec": 83.812,
+      "duration_sec": 2.136,
+      "actual_tts_sec": 2.136
+    },
+    {
+      "index": 28,
+      "text": "믿음을 바꾸는 것.",
+      "start_sec": 84.612,
+      "end_sec": 86.7,
+      "duration_sec": 2.088,
+      "actual_tts_sec": 2.088
+    },
+    {
+      "index": 29,
+      "text": "그것이 신호를 바꾸는 것이다.",
+      "start_sec": 87.0,
+      "end_sec": 89.688,
+      "duration_sec": 2.688,
+      "actual_tts_sec": 2.688
+    },
+    {
+      "index": 30,
+      "text": "신호가 바뀌면 화학이 바뀐다.",
+      "start_sec": 89.988,
+      "end_sec": 93.036,
+      "duration_sec": 3.048,
+      "actual_tts_sec": 3.048
+    },
+    {
+      "index": 31,
+      "text": "화학이 바뀌면 몸이 달라진다.",
+      "start_sec": 93.336,
+      "end_sec": 96.36,
+      "duration_sec": 3.024,
+      "actual_tts_sec": 3.024
+    },
+    {
+      "index": 32,
+      "text": "허상이 아니다.",
+      "start_sec": 97.16,
+      "end_sec": 99.224,
+      "duration_sec": 2.064,
+      "actual_tts_sec": 2.064
+    },
+    {
+      "index": 33,
+      "text": "우리의 뇌과학이다.",
+      "start_sec": 99.524,
+      "end_sec": 101.684,
+      "duration_sec": 2.16,
+      "actual_tts_sec": 2.16
+    }
+  ],
+  "paragraph_breaks": [
+    {
+      "start_sec": 7.584,
+      "end_sec": 8.384
+    },
+    {
+      "start_sec": 17.048,
+      "end_sec": 17.848
+    },
+    {
+      "start_sec": 31.096,
+      "end_sec": 31.896
+    },
+    {
+      "start_sec": 42.948,
+      "end_sec": 43.748
+    },
+    {
+      "start_sec": 49.352,
+      "end_sec": 50.152
+    },
+    {
+      "start_sec": 55.276,
+      "end_sec": 56.076
+    },
+    {
+      "start_sec": 68.208,
+      "end_sec": 69.008
+    },
+    {
+      "start_sec": 78.464,
+      "end_sec": 79.264
+    },
+    {
+      "start_sec": 83.812,
+      "end_sec": 84.612
+    },
+    {
+      "start_sec": 96.36,
+      "end_sec": 97.16
+    }
+  ]
+}
