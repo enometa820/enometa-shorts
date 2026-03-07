@@ -19,7 +19,7 @@ Claude는:
 - **글쓰기**: 대본 컨펌 전 제목/음악/비주얼 등 후속 단계 진행 **금지** (글 컨펌 게이트)
 - **비주얼**: render_mode 항상 `"hybrid"` (legacy 모드 제거됨)
 - **음악**: v18 실존 언더그라운드 장르 9종 (acid/ambient/microsound/IDM/minimal/dub/glitch/industrial/techno). 대본 리액티브 댄스 뮤직. 패턴 엔진 v18: Euclidean 리듬 + 장르별 레이어 스택 + 전용 합성 함수
-- **오디오**: narration_volume=1.0, bgm_volume=1.0 (1:1 균형), 사이드체인 없음, loudnorm -14 LUFS, 엔드카드 BGM 자동 연장
+- **오디오**: narration_volume=0.90, bgm_volume=1.0 (기본), 사이드체인 없음, loudnorm -14 LUFS, 엔드카드 BGM 자동 연장
 - **태그**: 주제 기반 5개 + 고정 3개(`#데이터아트` `#전자음악` `#오디오비주얼`) = 해시태그 항상 8개. **완전 금지** (어디에도 사용 불가): `#쇼츠` `#shorts` `#ENOMETA` `#이노메타`
 
 ## 빌드 & 실행 명령
@@ -77,6 +77,7 @@ script.txt → gen_timing.py → narration_timing.json
 | `visual_renderer.py` | numpy+Pillow 프레임 렌더링 (1080x1080) |
 | `gen_timing.py` | TTS 실측 기반 연속 배치 (v16: 마디 snap 제거) |
 | `sequence_generators.py` | Thue-Morse/Norgard/Rudin-Shapiro 수열 생성 |
+| `visual_strategies.py` | 비주얼 전략 6종 프리셋 (dense/breathing/cinematic/data_viz/retro/abstract) — visual_script_generator.py `--strategy` 옵션에서 참조 |
 
 ### Remotion 핵심 파일 (src/)
 | 파일 | 역할 |
@@ -86,13 +87,31 @@ script.txt → gen_timing.py → narration_timing.json
 | `ep0XXScript.ts` | 에피소드별 데이터 import (visual_script, audio_analysis 등) |
 | `components/VisualSection.tsx` | Python 프레임 배경 + Remotion vocab 오버레이 |
 | `components/SubtitleSection.tsx` | 나레이션 싱크 자막 (EP005 레퍼런스 유지) |
-| `components/TextReveal.tsx` | 4모드 타이포그래피 모션그래픽 |
+| `components/TextReveal.tsx` | 4모드 타이포그래픽 모션그래픽 |
+| `types.ts` | 중앙 타입 정의 — `Scene`, `VisualScript`, `VocabEntry`, `VocabComponentProps` 등 |
+| `hooks/useAudioData.ts` | `AudioFrame`(bass/mid/high/rms/onset) + `useAudioData()` 훅 + `useSimulatedAudio()` |
 
 ### 팔레트
 `phantom` / `neon_noir` / `cold_steel` / `ember` / `synapse` / `gameboy` / `c64` / `enometa`
 
 ### 음악 장르 (v18)
 `acid` / `ambient` / `microsound` / `IDM` / `minimal` / `dub` / `glitch` / `industrial` / `techno`
+
+### 새 에피소드 추가 절차
+
+1. `episodes/epXXX/` 디렉토리 생성 후 파이프라인 실행
+2. `src/epXXXScript.ts` 생성 — ep010Script.ts 패턴 복사 (json import + export 5개)
+3. `src/Root.tsx` 상단 import 추가, `<Composition id="EPXXX" ... calcMeta>` 블록 추가
+4. `public/epXXX/mixed.wav` 동기화 (`episodes/epXXX/mixed.wav` 복사)
+
+### 사용 가능한 Vocab 문자열 (VisualSection.tsx VOCAB_MAP)
+
+**파티클**: `particle_birth` `particle_scatter` `particle_converge` `particle_orbit` `particle_escape` `particle_chain_awaken` `particle_split_ratio`
+**흐름/색**: `flow_field_calm` `flow_field_turbulent` `color_shift` `color_shift_warm` `color_shift_cold` `color_drain` `color_bloom` `brightness_pulse` `light_source`
+**데이터/수학**: `counter_up` `neural_network` `loop_ring` `fractal_crack` `data_bar` `data_ring` `grid_morph` `grid_mesh` `waveform` `waveform_spectrum` `waveform_circular` `lissajous` `lissajous_complex`
+**텍스트**: `text_reveal` `text_wave` `text_glitch` `text_scatter`
+**레트로**: `pixel_grid` `pixel_grid_outline` `pixel_grid_life` `pixel_grid_rain` `pixel_waveform` `pixel_waveform_steps` `pixel_waveform_cascade`
+**자동 적용**: `post_process` (VisualSection이 항상 렌더링, vocab에 추가 불필요)
 
 ### ⚠️ 오디오 경로 주의
 Remotion은 `public/epXXX/mixed.wav`를 참조. `episodes/epXXX/mixed.wav`와 **별개**.
