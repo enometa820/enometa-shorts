@@ -16,7 +16,7 @@ script.txt
   │
   ├─ gen_timing.py          → narration_timing.json  (TTS 실측 기반 연속 배치)
   ├─ generate_voice_edge.py → narration.wav           (Edge-TTS ko-KR-SunHiNeural)
-  ├─ script_data_extractor  → script_data.json        (kiwipiepy 형태소 분석 + SI 커브)
+  ├─ script_data_extractor  → script_data.json        (kiwipiepy 형태소 분석 + soynlp 전처리 + SI 커브)
   ├─ enometa_music_engine   → bgm.wav                 (numpy 직접 합성, 9장르(v18), 10레이어)
   ├─ audio_mixer.py         → mixed.wav               (narration 0.90 + bgm 1.0, -14 LUFS)
   ├─ visual_script_gen      → visual_script.json      (씬/감정/vocab 매핑)
@@ -33,7 +33,7 @@ script.txt
 
 ```bash
 # Python 의존성
-pip install numpy scipy Pillow edge-tts kiwipiepy
+pip install numpy scipy Pillow edge-tts kiwipiepy soynlp
 
 # Node 의존성
 npm install

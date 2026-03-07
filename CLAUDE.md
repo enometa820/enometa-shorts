@@ -72,7 +72,7 @@ script.txt → gen_timing.py → narration_timing.json
 | 파일 | 역할 |
 |------|------|
 | `enometa_music_engine.py` | BGM 합성 (numpy, ~5000줄). 10레이어, 9장르(v18), Euclidean 패턴 엔진 |
-| `script_data_extractor.py` | 대본 분석 — kiwipiepy 형태소 분석 + semantic_intensity + 도메인 사전 |
+| `script_data_extractor.py` | 대본 분석 — kiwipiepy 형태소 분석 + soynlp 전처리 + semantic_intensity + 도메인 사전 (50+용어) |
 | `visual_script_generator.py` | 대본 → 씬/감정/vocab 매핑 → visual_script.json |
 | `visual_renderer.py` | numpy+Pillow 프레임 렌더링 (1080x1080) |
 | `gen_timing.py` | TTS 실측 기반 연속 배치 (v16: 마디 snap 제거) |
@@ -100,7 +100,7 @@ mix 단계 후 `public/epXXX/mixed.wav`도 반드시 동기화 필요.
 (`enometa_render.py`가 자동 처리하나, 수동 재믹스 시 직접 복사해야 함)
 
 ### 의존성
-- **Python**: numpy, scipy, Pillow, edge-tts, kiwipiepy
+- **Python**: numpy, scipy, Pillow, edge-tts, kiwipiepy, soynlp
 - **Node**: remotion, @remotion/cli, @remotion/layout-utils
 
 ## v16 시스템 철학 — 음악적 완성도 + 볼륨 고정

@@ -5,6 +5,18 @@
 
 ---
 
+## 2026-03-07 — NLP 강화: soynlp 전처리 + kiwipiepy 사전 확장 + 품사별 색상
+
+### Added
+- `scripts/script_data_extractor.py`: soynlp `repeat_normalize` 전처리 — 텍스트 노이즈 정규화 (`pip install soynlp`)
+- `scripts/script_data_extractor.py`: `_KIWI_USER_WORDS` 50+ 도메인 용어 확장 (뇌과학 구조/신경전달물질, 철학 인식론/윤리, 데이터사이언스, 사회/인문학 — kiwipiepy 미등록 복합명사 사전 등록)
+- `scripts/visual_layers/text_data_layer.py`: 품사 타입별 카드 색상 분기 — noun/verb/science/chemical/body/number 각각 다른 hue 채널 (`_TYPE_HUE_SHIFT` 테이블, `type_color()` 함수)
+
+### Changed
+- `scripts/visual_layers/text_data_layer.py`: 카드 `kw_color` → `type_color(kw_type, kw_intensity)` 로 교체 (기존 accent 단색 → 품사별 hue 분기)
+
+---
+
 ## 2026-03-07 — TextDataLayer 강화 + 비주얼 다양성 + 엔드카드 개선
 
 ### Added
