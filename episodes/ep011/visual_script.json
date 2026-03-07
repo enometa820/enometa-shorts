@@ -1,0 +1,1083 @@
+{
+  "title": "자연은 우리보다 38억 년 먼저 코딩했다",
+  "tagline": "존재와 사유, 그 경계를 초월하다",
+  "highlightWords": [
+    "자연",
+    "C.",
+    "문자",
+    "실행",
+    "환산"
+  ],
+  "meta": {
+    "strategy": "enometa",
+    "strategy_description": "ENOMETA data art - minimal+terminal+sine",
+    "genre": "enometa",
+    "palette": "cold_steel",
+    "seed": 566390363,
+    "render_mode": "hybrid",
+    "frames_dir": "ep011/frames",
+    "total_frames": 3244
+  },
+  "global": {
+    "color_palette": [
+      "#64748B",
+      "#94A3B8",
+      "#CBD5E1",
+      "#E2E8F0"
+    ],
+    "background_color": "#080810",
+    "particle_total": 2000,
+    "font": "Pretendard Variable",
+    "palette": "cold_steel"
+  },
+  "scenes": [
+    {
+      "id": "scene_01",
+      "sentence": "자연은 코딩을 먼저 했다. 38억 년 먼저.",
+      "start_sec": 0.0,
+      "end_sec": 5.34,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "terra_globe",
+            "params": {
+              "dataPoints": 12,
+              "wireColor": "#CBD5E1",
+              "dotColor": "#E2E8F0",
+              "rotationSpeed": 0.013,
+              "detail": 3
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "자연",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#FFD700",
+              "position": "center",
+              "glowColor": "#475569",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0025,
+            "speed": 0.03,
+            "line_opacity": 0.061,
+            "line_color": "#64748B"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_02",
+      "sentence": "A, T, G, C.",
+      "start_sec": 6.14,
+      "end_sec": 9.5,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 500,
+              "color": "#64748B",
+              "rings": 4,
+              "speed": 0.309
+            },
+            "variant": "ellipse_drift"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "C.",
+              "mode": "wave",
+              "fontSize": 80,
+              "color": "#FFD700",
+              "position": "top",
+              "glowColor": "#475569",
+              "staggerMs": 100
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.002,
+            "speed": 0.034,
+            "line_opacity": 0.055,
+            "line_color": "#64748B"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_03",
+      "sentence": "단 네 개의 문자. 이 네 문자가",
+      "start_sec": 9.8,
+      "end_sec": 15.016,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "waveform",
+            "params": {
+              "mode": "waveform",
+              "color": "#64748B",
+              "lineWidth": 3,
+              "sensitivity": 1.08
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "문자",
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#FFFFFF",
+              "position": "bottom",
+              "glowColor": "#475569",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0014,
+            "speed": 0.032,
+            "line_opacity": 0.042,
+            "line_color": "#94A3B8"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_04",
+      "sentence": "지구의 모든 생명을 실행한다. 인간의 게놈.",
+      "start_sec": 15.316,
+      "end_sec": 21.012,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 500,
+              "color": "#64748B",
+              "rings": 3,
+              "speed": 0.366
+            },
+            "variant": "ellipse_drift"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "실행",
+              "mode": "wave",
+              "fontSize": 72,
+              "color": "#FFD700",
+              "position": "upper",
+              "glowColor": "#475569",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0028,
+            "speed": 0.024,
+            "line_opacity": 0.067,
+            "line_color": "#475569"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_05",
+      "sentence": "30억 개의 염기쌍. 용량으로 환산하면",
+      "start_sec": 21.312,
+      "end_sec": 26.984,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "terra_globe",
+            "params": {
+              "dataPoints": 16,
+              "wireColor": "#E2E8F0",
+              "dotColor": "#E2E8F0",
+              "rotationSpeed": 0.022,
+              "detail": 3
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "환산",
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#FFFFFF",
+              "position": "top",
+              "glowColor": "#475569",
+              "staggerMs": 100
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0021,
+            "speed": 0.029,
+            "line_opacity": 0.064,
+            "line_color": "#94A3B8"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_06",
+      "sentence": "고작 1.5기가바이트. 3개의 염기가 모이면",
+      "start_sec": 27.284,
+      "end_sec": 33.388,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {},
+            "variant": "vortex"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "기가바이트",
+              "mode": "wave",
+              "fontSize": 80,
+              "color": "#64748B",
+              "position": "center",
+              "glowColor": "#475569",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0017,
+            "speed": 0.025,
+            "line_opacity": 0.042,
+            "line_color": "#64748B"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_07",
+      "sentence": "하나의 명령이 된다. 아미노산 하나를 만드는 코드다.",
+      "start_sec": 33.688,
+      "end_sec": 40.008,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "waveform",
+            "params": {
+              "mode": "waveform",
+              "color": "#64748B",
+              "lineWidth": 2,
+              "sensitivity": 1.137
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "코드",
+              "mode": "wave",
+              "fontSize": 80,
+              "color": "#64748B",
+              "position": "top",
+              "glowColor": "#475569",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0022,
+            "speed": 0.028,
+            "line_opacity": 0.048,
+            "line_color": "#475569"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_08",
+      "sentence": "오류가 나면 고친다. DNA는 스스로 복구한다.",
+      "start_sec": 40.808,
+      "end_sec": 46.436,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "pixel_waveform_cascade",
+            "params": {
+              "bars": 12,
+              "colors": [
+                "#64748B",
+                "#94A3B8",
+                "#CBD5E1",
+                "#E2E8F0"
+              ],
+              "mode": "cascade",
+              "quantize": 8,
+              "mirror": true,
+              "position": "center"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "오류",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#FFFFFF",
+              "position": "bottom",
+              "glowColor": "#475569",
+              "staggerMs": 80
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0018,
+            "speed": 0.038,
+            "line_opacity": 0.049,
+            "line_color": "#94A3B8"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_09",
+      "sentence": "38억 년 된 자동 수정이다.",
+      "start_sec": 47.236,
+      "end_sec": 50.284,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "pixel_waveform_cascade",
+            "params": {
+              "bars": 20,
+              "colors": [
+                "#64748B",
+                "#94A3B8",
+                "#CBD5E1",
+                "#E2E8F0"
+              ],
+              "mode": "cascade",
+              "quantize": 8,
+              "mirror": false,
+              "position": "bottom"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "자동",
+              "mode": "wave",
+              "fontSize": 80,
+              "color": "#FFD700",
+              "position": "top",
+              "glowColor": "#475569",
+              "staggerMs": 100
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0029,
+            "speed": 0.038,
+            "line_opacity": 0.05,
+            "line_color": "#94A3B8"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_10",
+      "sentence": "우리는 코드를 발명했다고 믿었다.",
+      "start_sec": 51.084,
+      "end_sec": 54.348,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {},
+            "variant": "vortex"
+          },
+          {
+            "vocab": "pixel_waveform_cascade",
+            "params": {
+              "bars": 24,
+              "colors": [
+                "#64748B",
+                "#94A3B8",
+                "#CBD5E1",
+                "#E2E8F0"
+              ],
+              "mode": "cascade",
+              "quantize": 10,
+              "mirror": false,
+              "position": "bottom"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "코드",
+              "mode": "wave",
+              "fontSize": 72,
+              "color": "#FFFFFF",
+              "position": "upper",
+              "glowColor": "#475569",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0021,
+            "speed": 0.033,
+            "line_opacity": 0.044,
+            "line_color": "#64748B"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_11",
+      "sentence": "아니다. 발견했다.",
+      "start_sec": 55.148,
+      "end_sec": 59.168,
+      "emotion": "awakening_spark",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_chain_awaken",
+            "params": {
+              "count": 400,
+              "color": "#64748B",
+              "chain_speed": 1.845,
+              "glow_color": "#475569"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "발견",
+              "mode": "scatter",
+              "fontSize": 64,
+              "color": "#FFD700",
+              "position": "bottom",
+              "glowColor": "#475569",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0042,
+            "speed": 0.05,
+            "line_opacity": 0.041,
+            "line_color": "#94A3B8"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_12",
+      "sentence": "자연이 이미 짜놓은 것을. 우리가 이름을 붙인 것이다.",
+      "start_sec": 59.968,
+      "end_sec": 65.524,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "terra_globe",
+            "params": {
+              "dataPoints": 16,
+              "wireColor": "#CBD5E1",
+              "dotColor": "#CBD5E1",
+              "rotationSpeed": 0.022,
+              "detail": 2
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "자연",
+              "mode": "wave",
+              "fontSize": 72,
+              "color": "#64748B",
+              "position": "center",
+              "glowColor": "#475569",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0013,
+            "speed": 0.033,
+            "line_opacity": 0.046,
+            "line_color": "#64748B"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_13",
+      "sentence": "변수, 함수, 루프.",
+      "start_sec": 66.324,
+      "end_sec": 69.492,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "waveform",
+            "params": {
+              "mode": "waveform",
+              "color": "#64748B",
+              "lineWidth": 2,
+              "sensitivity": 1.238
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "변수",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#FFD700",
+              "position": "upper",
+              "glowColor": "#475569",
+              "staggerMs": 80
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0023,
+            "speed": 0.034,
+            "line_opacity": 0.042,
+            "line_color": "#64748B"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_14",
+      "sentence": "자연에 먼저 있었다. 진화는",
+      "start_sec": 69.792,
+      "end_sec": 74.624,
+      "emotion": "tension_transformative",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "waveform_spectrum",
+            "params": {
+              "mode": "spectrum",
+              "color": "#64748B",
+              "lineWidth": 3,
+              "sensitivity": 1.869
+            }
+          },
+          {
+            "vocab": "pixel_grid_rain",
+            "params": {
+              "cols": 32,
+              "rows": 32,
+              "mode": "rain",
+              "colors": [
+                "#64748B",
+                "#94A3B8",
+                "#CBD5E1",
+                "#E2E8F0"
+              ],
+              "pixelGap": 2,
+              "reactivity": 1.35
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "진화",
+              "mode": "glitch",
+              "fontSize": 64,
+              "color": "#00FFFF",
+              "position": "bottom",
+              "glowColor": "#475569",
+              "staggerMs": 80
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0073,
+            "speed": 0.413,
+            "line_opacity": 0.117,
+            "line_color": "#475569"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_15",
+      "sentence": "가장 긴 디버깅 세션이다. 38억 년째 실행 중인 프로그램.",
+      "start_sec": 74.924,
+      "end_sec": 81.772,
+      "emotion": "awakening_climax",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_escape",
+            "params": {
+              "count": 800,
+              "color": "#64748B",
+              "burst_speed": 3.603,
+              "glow": true
+            },
+            "variant": "chain_break"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "프로그램",
+              "mode": "scatter",
+              "fontSize": 64,
+              "color": "#FFFFFF",
+              "position": "center",
+              "glowColor": "#475569",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.95 + 0.05",
+          "particle_size": "bass * 7 + 1",
+          "glow_intensity": "bass * 7",
+          "displacement": "bass * 5",
+          "speed_mult": "onset ? 6 : 1",
+          "glitch_trigger": "onset ? 12 : 0"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0063,
+            "speed": 0.266,
+            "line_opacity": 0.108,
+            "line_color": "#475569"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_16",
+      "sentence": "우리는 그 코드 안에 있다. 작성자가 아니라.",
+      "start_sec": 82.572,
+      "end_sec": 87.768,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "pixel_grid_life",
+            "params": {
+              "cols": 40,
+              "rows": 24,
+              "mode": "life",
+              "colors": [
+                "#64748B",
+                "#94A3B8",
+                "#CBD5E1",
+                "#E2E8F0"
+              ],
+              "pixelGap": 2,
+              "reactivity": 1.1
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "코드",
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#64748B",
+              "position": "top",
+              "glowColor": "#475569",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0017,
+            "speed": 0.022,
+            "line_opacity": 0.045,
+            "line_color": "#94A3B8"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_17",
+      "sentence": "출력값으로. 코딩한다는 것.",
+      "start_sec": 88.068,
+      "end_sec": 92.708,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "pixel_grid_rain",
+            "params": {
+              "cols": 32,
+              "rows": 40,
+              "mode": "rain",
+              "colors": [
+                "#64748B",
+                "#94A3B8",
+                "#CBD5E1",
+                "#E2E8F0"
+              ],
+              "pixelGap": 1,
+              "reactivity": 0.89
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "출력",
+              "mode": "wave",
+              "fontSize": 72,
+              "color": "#64748B",
+              "position": "top",
+              "glowColor": "#475569",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.002,
+            "speed": 0.024,
+            "line_opacity": 0.063,
+            "line_color": "#94A3B8"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_18",
+      "sentence": "자연의 언어를 따라 쓰는 것이다.",
+      "start_sec": 93.008,
+      "end_sec": 96.008,
+      "emotion": "transcendent_open",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 500,
+              "color": "#64748B",
+              "rings": 5,
+              "speed": 0.75
+            },
+            "variant": "figure_eight"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "자연",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#64748B",
+              "position": "center",
+              "glowColor": "#475569",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.003,
+            "speed": 0.034,
+            "line_opacity": 0.056,
+            "line_color": "#94A3B8"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_19",
+      "sentence": "가장 오래된 언어를. 가장 늦게 배우는 중이다.",
+      "start_sec": 96.808,
+      "end_sec": 102.148,
+      "emotion": "awakening_climax",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "waveform_circular",
+            "params": {
+              "mode": "circular",
+              "color": "#64748B",
+              "lineWidth": 1.5,
+              "sensitivity": 1.607
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "언어",
+              "mode": "scatter",
+              "fontSize": 56,
+              "color": "#64748B",
+              "position": "center",
+              "glowColor": "#475569",
+              "staggerMs": 100
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.95 + 0.05",
+          "particle_size": "bass * 7 + 1",
+          "glow_intensity": "bass * 7",
+          "displacement": "bass * 5",
+          "speed_mult": "onset ? 6 : 1",
+          "glitch_trigger": "onset ? 12 : 0"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0066,
+            "speed": 0.381,
+            "line_opacity": 0.113,
+            "line_color": "#475569"
+          },
+          "variant": "opposing"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    }
+  ]
+}

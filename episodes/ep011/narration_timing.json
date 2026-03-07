@@ -1,0 +1,346 @@
+{
+  "voice": "ko-KR-SunHiNeural",
+  "rate": "+5%",
+  "bpm": 135.0,
+  "sec_per_bar": 1.777778,
+  "total_duration_sec": 102.148,
+  "music_mood": "ambient",
+  "gap_sec": 0.3,
+  "paragraph_gap_sec": 0.8,
+  "segments": [
+    {
+      "index": 0,
+      "text": "자연은 코딩을 먼저 했다.",
+      "start_sec": 0.0,
+      "end_sec": 2.712,
+      "duration_sec": 2.712,
+      "actual_tts_sec": 2.712
+    },
+    {
+      "index": 1,
+      "text": "38억 년 먼저.",
+      "start_sec": 3.012,
+      "end_sec": 5.34,
+      "duration_sec": 2.328,
+      "actual_tts_sec": 2.328
+    },
+    {
+      "index": 2,
+      "text": "A, T, G, C.",
+      "start_sec": 6.14,
+      "end_sec": 9.5,
+      "duration_sec": 3.36,
+      "actual_tts_sec": 3.36
+    },
+    {
+      "index": 3,
+      "text": "단 네 개의 문자.",
+      "start_sec": 9.8,
+      "end_sec": 12.152,
+      "duration_sec": 2.352,
+      "actual_tts_sec": 2.352
+    },
+    {
+      "index": 4,
+      "text": "이 네 문자가",
+      "start_sec": 12.952,
+      "end_sec": 15.016,
+      "duration_sec": 2.064,
+      "actual_tts_sec": 2.064
+    },
+    {
+      "index": 5,
+      "text": "지구의 모든 생명을 실행한다.",
+      "start_sec": 15.316,
+      "end_sec": 18.22,
+      "duration_sec": 2.904,
+      "actual_tts_sec": 2.904
+    },
+    {
+      "index": 6,
+      "text": "인간의 게놈.",
+      "start_sec": 19.02,
+      "end_sec": 21.012,
+      "duration_sec": 1.992,
+      "actual_tts_sec": 1.992
+    },
+    {
+      "index": 7,
+      "text": "30억 개의 염기쌍.",
+      "start_sec": 21.312,
+      "end_sec": 23.832,
+      "duration_sec": 2.52,
+      "actual_tts_sec": 2.52
+    },
+    {
+      "index": 8,
+      "text": "용량으로 환산하면",
+      "start_sec": 24.632,
+      "end_sec": 26.984,
+      "duration_sec": 2.352,
+      "actual_tts_sec": 2.352
+    },
+    {
+      "index": 9,
+      "text": "고작 1.5기가바이트.",
+      "start_sec": 27.284,
+      "end_sec": 30.14,
+      "duration_sec": 2.856,
+      "actual_tts_sec": 2.856
+    },
+    {
+      "index": 10,
+      "text": "3개의 염기가 모이면",
+      "start_sec": 30.94,
+      "end_sec": 33.388,
+      "duration_sec": 2.448,
+      "actual_tts_sec": 2.448
+    },
+    {
+      "index": 11,
+      "text": "하나의 명령이 된다.",
+      "start_sec": 33.688,
+      "end_sec": 36.136,
+      "duration_sec": 2.448,
+      "actual_tts_sec": 2.448
+    },
+    {
+      "index": 12,
+      "text": "아미노산 하나를 만드는 코드다.",
+      "start_sec": 36.936,
+      "end_sec": 40.008,
+      "duration_sec": 3.072,
+      "actual_tts_sec": 3.072
+    },
+    {
+      "index": 13,
+      "text": "오류가 나면 고친다.",
+      "start_sec": 40.808,
+      "end_sec": 43.208,
+      "duration_sec": 2.4,
+      "actual_tts_sec": 2.4
+    },
+    {
+      "index": 14,
+      "text": "DNA는 스스로 복구한다.",
+      "start_sec": 43.508,
+      "end_sec": 46.436,
+      "duration_sec": 2.928,
+      "actual_tts_sec": 2.928
+    },
+    {
+      "index": 15,
+      "text": "38억 년 된 자동 수정이다.",
+      "start_sec": 47.236,
+      "end_sec": 50.284,
+      "duration_sec": 3.048,
+      "actual_tts_sec": 3.048
+    },
+    {
+      "index": 16,
+      "text": "우리는 코드를 발명했다고 믿었다.",
+      "start_sec": 51.084,
+      "end_sec": 54.348,
+      "duration_sec": 3.264,
+      "actual_tts_sec": 3.264
+    },
+    {
+      "index": 17,
+      "text": "아니다.",
+      "start_sec": 55.148,
+      "end_sec": 57.068,
+      "duration_sec": 1.92,
+      "actual_tts_sec": 1.92
+    },
+    {
+      "index": 18,
+      "text": "발견했다.",
+      "start_sec": 57.368,
+      "end_sec": 59.168,
+      "duration_sec": 1.8,
+      "actual_tts_sec": 1.8
+    },
+    {
+      "index": 19,
+      "text": "자연이 이미 짜놓은 것을.",
+      "start_sec": 59.968,
+      "end_sec": 62.584,
+      "duration_sec": 2.616,
+      "actual_tts_sec": 2.616
+    },
+    {
+      "index": 20,
+      "text": "우리가 이름을 붙인 것이다.",
+      "start_sec": 62.884,
+      "end_sec": 65.524,
+      "duration_sec": 2.64,
+      "actual_tts_sec": 2.64
+    },
+    {
+      "index": 21,
+      "text": "변수, 함수, 루프.",
+      "start_sec": 66.324,
+      "end_sec": 69.492,
+      "duration_sec": 3.168,
+      "actual_tts_sec": 3.168
+    },
+    {
+      "index": 22,
+      "text": "자연에 먼저 있었다.",
+      "start_sec": 69.792,
+      "end_sec": 72.168,
+      "duration_sec": 2.376,
+      "actual_tts_sec": 2.376
+    },
+    {
+      "index": 23,
+      "text": "진화는",
+      "start_sec": 72.968,
+      "end_sec": 74.624,
+      "duration_sec": 1.656,
+      "actual_tts_sec": 1.656
+    },
+    {
+      "index": 24,
+      "text": "가장 긴 디버깅 세션이다.",
+      "start_sec": 74.924,
+      "end_sec": 77.708,
+      "duration_sec": 2.784,
+      "actual_tts_sec": 2.784
+    },
+    {
+      "index": 25,
+      "text": "38억 년째 실행 중인 프로그램.",
+      "start_sec": 78.508,
+      "end_sec": 81.772,
+      "duration_sec": 3.264,
+      "actual_tts_sec": 3.264
+    },
+    {
+      "index": 26,
+      "text": "우리는 그 코드 안에 있다.",
+      "start_sec": 82.572,
+      "end_sec": 85.332,
+      "duration_sec": 2.76,
+      "actual_tts_sec": 2.76
+    },
+    {
+      "index": 27,
+      "text": "작성자가 아니라.",
+      "start_sec": 85.632,
+      "end_sec": 87.768,
+      "duration_sec": 2.136,
+      "actual_tts_sec": 2.136
+    },
+    {
+      "index": 28,
+      "text": "출력값으로.",
+      "start_sec": 88.068,
+      "end_sec": 90.012,
+      "duration_sec": 1.944,
+      "actual_tts_sec": 1.944
+    },
+    {
+      "index": 29,
+      "text": "코딩한다는 것.",
+      "start_sec": 90.812,
+      "end_sec": 92.708,
+      "duration_sec": 1.896,
+      "actual_tts_sec": 1.896
+    },
+    {
+      "index": 30,
+      "text": "자연의 언어를 따라 쓰는 것이다.",
+      "start_sec": 93.008,
+      "end_sec": 96.008,
+      "duration_sec": 3.0,
+      "actual_tts_sec": 3.0
+    },
+    {
+      "index": 31,
+      "text": "가장 오래된 언어를.",
+      "start_sec": 96.808,
+      "end_sec": 99.256,
+      "duration_sec": 2.448,
+      "actual_tts_sec": 2.448
+    },
+    {
+      "index": 32,
+      "text": "가장 늦게 배우는 중이다.",
+      "start_sec": 99.556,
+      "end_sec": 102.148,
+      "duration_sec": 2.592,
+      "actual_tts_sec": 2.592
+    }
+  ],
+  "paragraph_breaks": [
+    {
+      "start_sec": 5.34,
+      "end_sec": 6.14
+    },
+    {
+      "start_sec": 12.152,
+      "end_sec": 12.952
+    },
+    {
+      "start_sec": 18.22,
+      "end_sec": 19.02
+    },
+    {
+      "start_sec": 23.832,
+      "end_sec": 24.632
+    },
+    {
+      "start_sec": 30.14,
+      "end_sec": 30.94
+    },
+    {
+      "start_sec": 36.136,
+      "end_sec": 36.936
+    },
+    {
+      "start_sec": 40.008,
+      "end_sec": 40.808
+    },
+    {
+      "start_sec": 46.436,
+      "end_sec": 47.236
+    },
+    {
+      "start_sec": 50.284,
+      "end_sec": 51.084
+    },
+    {
+      "start_sec": 54.348,
+      "end_sec": 55.148
+    },
+    {
+      "start_sec": 59.168,
+      "end_sec": 59.968
+    },
+    {
+      "start_sec": 65.524,
+      "end_sec": 66.324
+    },
+    {
+      "start_sec": 72.168,
+      "end_sec": 72.968
+    },
+    {
+      "start_sec": 77.708,
+      "end_sec": 78.508
+    },
+    {
+      "start_sec": 81.772,
+      "end_sec": 82.572
+    },
+    {
+      "start_sec": 90.012,
+      "end_sec": 90.812
+    },
+    {
+      "start_sec": 96.008,
+      "end_sec": 96.808
+    }
+  ]
+}
