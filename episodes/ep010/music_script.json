@@ -1,15 +1,15 @@
 {
   "metadata": {
     "duration": 109.684,
-    "base_bpm": 128,
+    "base_bpm": 85,
     "episode": "ep010",
     "genre": "enometa",
     "song_arc": "song_structure",
     "synthesis_overrides": {
       "enometa_mode": true
     },
-    "music_mood": "techno",
-    "drum_mode": "default"
+    "music_mood": "microsound",
+    "drum_mode": "on"
   },
   "palette": {
     "bass_freq": 60.0,
@@ -30,7 +30,7 @@
       "id": "music_intro",
       "text": "",
       "start_sec": 0.0,
-      "end_sec": 22.5,
+      "end_sec": 22.588,
       "emotion": "intro",
       "energy": 0.5,
       "instruments": {
@@ -122,8 +122,8 @@
     {
       "id": "music_buildup",
       "text": "",
-      "start_sec": 22.5,
-      "end_sec": 45.0,
+      "start_sec": 22.588,
+      "end_sec": 45.176,
       "emotion": "buildup",
       "energy": 0.8,
       "instruments": {
@@ -215,8 +215,8 @@
     {
       "id": "music_drop",
       "text": "",
-      "start_sec": 45.0,
-      "end_sec": 67.5,
+      "start_sec": 45.176,
+      "end_sec": 67.765,
       "emotion": "drop",
       "energy": 1.0,
       "instruments": {
@@ -308,8 +308,8 @@
     {
       "id": "music_breakdown",
       "text": "",
-      "start_sec": 67.5,
-      "end_sec": 82.5,
+      "start_sec": 67.765,
+      "end_sec": 79.059,
       "emotion": "breakdown",
       "energy": 0.4,
       "instruments": {
@@ -401,8 +401,8 @@
     {
       "id": "music_drop2",
       "text": "",
-      "start_sec": 82.5,
-      "end_sec": 97.5,
+      "start_sec": 79.059,
+      "end_sec": 101.647,
       "emotion": "drop2",
       "energy": 1.0,
       "instruments": {
@@ -494,8 +494,8 @@
     {
       "id": "music_outro",
       "text": "",
-      "start_sec": 97.5,
-      "end_sec": 112.5,
+      "start_sec": 101.647,
+      "end_sec": 112.941,
       "emotion": "outro",
       "energy": 0.3,
       "instruments": {
