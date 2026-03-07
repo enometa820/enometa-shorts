@@ -3,7 +3,8 @@
     "episode": "ep010",
     "source": "narration_timing.json",
     "version": 2,
-    "music_mood": "glitch"
+    "music_mood": "microsound",
+    "drum_mode": "on"
   },
   "segments": [
     {

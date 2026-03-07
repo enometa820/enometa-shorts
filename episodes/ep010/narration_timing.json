@@ -4,7 +4,7 @@
   "bpm": 135.0,
   "sec_per_bar": 1.777778,
   "total_duration_sec": 101.684,
-  "music_mood": "glitch",
+  "music_mood": "microsound",
   "gap_sec": 0.3,
   "paragraph_gap_sec": 0.8,
   "segments": [
@@ -322,5 +322,7 @@
       "start_sec": 96.36,
       "end_sec": 97.16
     }
-  ]
+  ],
+  "drum_mode": "on",
+  "drum": true
 }

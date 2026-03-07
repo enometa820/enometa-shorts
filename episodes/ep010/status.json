@@ -7,5 +7,5 @@
   "mix": "done",
   "audio_analysis": "done",
   "python_frames": "done",
-  "error": "BGM 실패 (exit 1)"
+  "error": "Remotion render 실패 (exit 1)"
 }
