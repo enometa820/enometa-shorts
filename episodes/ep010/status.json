@@ -7,5 +7,6 @@
   "mix": "done",
   "audio_analysis": "done",
   "python_frames": "done",
-  "error": "Remotion render 실패 (exit 1)"
+  "error": "Remotion render 실패 (exit 1)",
+  "render": "done"
 }
