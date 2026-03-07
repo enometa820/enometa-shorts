@@ -105,13 +105,18 @@ Python 배경 프레임과 Remotion vocab 레이어를 동시에 제어한다.
 | `abstract` | DataMatrix 단일 | 기하 추상 | synapse |
 | `data` | TextData + Barcode + DataStream + DataMatrix (최대) | 시각화 데이터 스트림 | cold_steel |
 
-### 드럼 (`--drum`)
+### 드럼 모드 (`--drum-mode`)
 
-드럼을 강제로 ON / OFF 할 수 있다. 기본값은 무드 자동 결정.
+| 값 | 동작 |
+|----|------|
+| `default` | 무드 기본값 따름 (기본) |
+| `on` | 풀 드럼 강제 ON |
+| `off` | 드럼 강제 OFF |
+| `simple` | 킥+하이햇만, 필인 최소 (32바마다 1회) |
+| `dynamic` | 풀 드럼+SI 최대+필인 2배 (4/8바 주기) |
 
 ```bash
-py scripts/enometa_render.py episodes/ep010 --title "제목" --drum on   # 강제 ON
-py scripts/enometa_render.py episodes/ep010 --title "제목" --drum off  # 강제 OFF
+py scripts/enometa_render.py episodes/ep010 --title "제목" --drum-mode simple
 ```
 
 ### 특정 단계만 재실행 (`--step --force`)

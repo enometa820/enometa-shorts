@@ -5,6 +5,17 @@
 
 ---
 
+## 2026-03-07 — 오디오 1:1 균형 + 고정 해시태그 정책 + 고정 댓글 개선
+
+### Changed
+- `scripts/audio_mixer.py`: narration_volume 0.90 → **1.0** (BGM과 1:1 균형, TTS 묻힘 현상 해소)
+- `.claude/skills/enometa-publish.md`: 태그 정책 개정
+  - **완전 금지**: `#쇼츠` `#shorts` `#ENOMETA` `#이노메타` (어디에도 사용 불가)
+  - **고정 해시태그** 신설: `#데이터아트` `#전자음악` `#오디오비주얼` → 해시태그 섹션 항상 8개
+- `episodes/ep010/publish.md`: 고정 댓글 1단/2단/3단 구조로 전면 개선 (인용→맥락→성찰 질문)
+
+---
+
 ## 2026-03-07 — NLP 강화: soynlp 전처리 + kiwipiepy 사전 확장 + 품사별 색상
 
 ### Added

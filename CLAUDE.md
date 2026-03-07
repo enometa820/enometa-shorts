@@ -19,8 +19,8 @@ Claude는:
 - **글쓰기**: 대본 컨펌 전 제목/음악/비주얼 등 후속 단계 진행 **금지** (글 컨펌 게이트)
 - **비주얼**: render_mode 항상 `"hybrid"` (legacy 모드 제거됨)
 - **음악**: v18 실존 언더그라운드 장르 9종 (acid/ambient/microsound/IDM/minimal/dub/glitch/industrial/techno). 대본 리액티브 댄스 뮤직. 패턴 엔진 v18: Euclidean 리듬 + 장르별 레이어 스택 + 전용 합성 함수
-- **오디오**: narration_volume=0.90, bgm_volume=1.0, 사이드체인 없음, loudnorm -14 LUFS, 엔드카드 BGM 자동 연장
-- **태그**: 주제 기반 5개만. 고정 제외 태그(`#쇼츠` `#shorts` `#ENOMETA` `#이노메타` `#데이터아트`) 포함 금지
+- **오디오**: narration_volume=1.0, bgm_volume=1.0 (1:1 균형), 사이드체인 없음, loudnorm -14 LUFS, 엔드카드 BGM 자동 연장
+- **태그**: 주제 기반 5개 + 고정 3개(`#데이터아트` `#전자음악` `#오디오비주얼`) = 해시태그 항상 8개. **완전 금지** (어디에도 사용 불가): `#쇼츠` `#shorts` `#ENOMETA` `#이노메타`
 
 ## 빌드 & 실행 명령
 

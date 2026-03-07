@@ -58,7 +58,7 @@ def mix_audio(
     narration_path: str,
     bgm_path: str,
     output_path: str,
-    narration_volume: float = 0.90,
+    narration_volume: float = 1.0,
     bgm_volume: float = 1.0,
     sidechain_path: str = None,
     dynamic_mix_path: str = None,
