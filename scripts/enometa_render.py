@@ -210,7 +210,7 @@ def step_audio_analysis(episode_dir: str, force: bool = False):
     return output
 
 
-def step_python_frames(episode_dir: str, force: bool = False):
+def step_python_frames(episode_dir: str, force: bool = False, visual_mood: str = ""):
     """[7] Python 비주얼 프레임 렌더링"""
     frames_dir = os.path.join(episode_dir, "frames")
 
@@ -218,9 +218,10 @@ def step_python_frames(episode_dir: str, force: bool = False):
         print("  [skip] frames/ 이미 존재")
         return frames_dir
 
-    print("  Python 비주얼 프레임 렌더링 중 (enometa)...")
+    genre = visual_mood if visual_mood in ("cooper", "abstract", "data") else "enometa"
+    print(f"  Python 비주얼 프레임 렌더링 중 (genre={genre})...")
     cmd = [PYTHON, os.path.join(SCRIPTS_DIR, "visual_renderer.py"),
-           episode_dir, "--genre", "enometa"]
+           episode_dir, "--genre", genre]
     run(cmd, "python_frames", timeout=3600)  # 최대 1시간 (120초 영상 기준 ~20분)
     return frames_dir
 
@@ -338,7 +339,7 @@ def run_pipeline(
         do("bgm",          lambda: step_bgm(episode_dir, episode_id, force))
         do("mix",            lambda: step_mix(episode_dir, force))
         do("audio_analysis", lambda: step_audio_analysis(episode_dir, force))
-        do("python_frames",  lambda: step_python_frames(episode_dir, force))
+        do("python_frames",  lambda: step_python_frames(episode_dir, force, visual_mood or ""))
         step_copy_public(episode_dir, episode_id)
         do("render",       lambda: step_render(episode_dir, force))
 

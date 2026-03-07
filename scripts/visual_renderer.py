@@ -41,10 +41,13 @@ PALETTES = {
     "enometa":    {"bg": (0, 0, 0),     "accent": (255, 255, 255), "mid": (80, 80, 80)},
 }
 
-# v8: enometa 단일 장르 — 팔레트 항상 enometa
+# v9: visual_mood별 팔레트 매핑
 GENRE_PALETTE = {
-    "enometa": "enometa",
-    "ikeda": "enometa",  # 하위호환
+    "enometa":  "enometa",
+    "ikeda":    "enometa",   # 하위호환
+    "cooper":   "phantom",   # 어두운 보라 (유기적 파티클)
+    "abstract": "synapse",   # 청록 (기하학)
+    "data":     "cold_steel", # 차가운 철색 (수치 분석)
 }
 
 # ============================================================
@@ -94,11 +97,9 @@ ENOMETA_EMOTION_COLORS = {
 #   TTS 레이어: 장르별 강약 조절 (0.3~0.7)
 # ============================================================
 
-# v8: enometa 단일 장르 — 모든 비주얼 레이어 프리셋
+# v9: visual_mood별 레이어 프리셋 — Python 배경도 mood마다 다른 구성
 GENRE_LAYER_PRESETS = {
-    # ── enometa (60bpm) ── ENOMETA v8 단일 장르: 데이터아트 + 확장 텍스처
-    # Music: SineWave (간섭 패턴) + Waveform (파형) + Particle (에너지)
-    # TTS: TextData (데이터 카드) + Barcode (바이트 스트라이프) + DataStream + DataMatrix
+    # ── enometa/ikeda ── 기본: 데이터아트 + 확장 텍스처 (TextData 중심)
     "enometa": {
         "music_layers": [
             {"layer": "SineWaveLayer",   "intensity": 0.7},
@@ -112,6 +113,45 @@ GENRE_LAYER_PRESETS = {
             {"layer": "DataMatrixLayer", "intensity": 0.65},
         ],
         "blend_ratio": 0.45,
+    },
+    # ── cooper ── 유기적: Particle 중심, SineWave 강화, DataMatrix 제거
+    "cooper": {
+        "music_layers": [
+            {"layer": "SineWaveLayer",   "intensity": 0.9},
+            {"layer": "WaveformLayer",   "intensity": 0.6},
+            {"layer": "ParticleLayer",   "intensity": 0.7},
+        ],
+        "tts_layers": [
+            {"layer": "TextDataLayer",   "intensity": 0.70},
+            {"layer": "DataStreamLayer", "intensity": 0.90},
+        ],
+        "blend_ratio": 0.55,
+    },
+    # ── abstract ── 기하학: SineWave 극대화, Barcode 제거, Waveform 강화
+    "abstract": {
+        "music_layers": [
+            {"layer": "SineWaveLayer",   "intensity": 1.0},
+            {"layer": "WaveformLayer",   "intensity": 0.8},
+        ],
+        "tts_layers": [
+            {"layer": "TextDataLayer",   "intensity": 0.60},
+            {"layer": "DataMatrixLayer", "intensity": 0.95},
+        ],
+        "blend_ratio": 0.50,
+    },
+    # ── data ── 수치 분석: TextData + Barcode 극대화, 파티클 없음
+    "data": {
+        "music_layers": [
+            {"layer": "WaveformLayer",   "intensity": 0.5},
+            {"layer": "SineWaveLayer",   "intensity": 0.4},
+        ],
+        "tts_layers": [
+            {"layer": "TextDataLayer",   "intensity": 1.0},
+            {"layer": "BarcodeLayer",    "intensity": 1.0},
+            {"layer": "DataStreamLayer", "intensity": 0.95},
+            {"layer": "DataMatrixLayer", "intensity": 0.90},
+        ],
+        "blend_ratio": 0.35,
     },
 }
 
@@ -136,7 +176,7 @@ SI_INTENSITY_SCALE = {
     "SineWaveLayer":   lambda si: max(0.35, 1.0 - si * 0.45),  # 배경→서브, si=0→1.0, si=1→0.55
     "WaveformLayer":   lambda si: 0.25 + si * 0.75,             # si=0→0.25, si=1→1.0
     "ParticleLayer":   lambda si: max(0.05, si ** 1.5),         # si=0→0.05, si=1→1.0 (민감)
-    "TextDataLayer":   lambda si: 0.70 + si * 0.30,             # si=0→0.70, si=1→1.0
+    "TextDataLayer":   lambda si: 0.88 + si * 0.12,             # si=0→0.88, si=1→1.0 (강화)
     "BarcodeLayer":    lambda si: 0.60 + si * 0.40,             # si=0→0.60, si=1→1.0
     "DataStreamLayer": lambda si: 0.50 + si * 0.50,             # si=0→0.50, si=1→1.0
     "DataMatrixLayer": lambda si: max(0.40, si ** 0.8),         # si=0→0.40, si=1→1.0

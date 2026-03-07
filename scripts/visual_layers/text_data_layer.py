@@ -62,6 +62,13 @@ class TextDataLayer:
         keywords = analysis.get("keywords", [])
         total_segs = len(script_data.get("segments", [])) if script_data else 0
 
+        # 씬 내 경과 시간 (타이핑 + 카운트업용)
+        seg_start = current_seg.get("start_sec", time_sec)
+        seg_end = current_seg.get("end_sec", time_sec + 1)
+        seg_duration = max(seg_end - seg_start, 0.1)
+        elapsed = max(0.0, time_sec - seg_start)
+        scene_progress = min(1.0, elapsed / seg_duration)
+
         img = Image.fromarray(canvas)
         draw = ImageDraw.Draw(img)
 
@@ -91,16 +98,29 @@ class TextDataLayer:
         card_body_font, _ = tts_effects.get_scaled_font(si, 14, 28, monospace=True)
         parse_font, _ = tts_effects.get_scaled_font(si, 14, 24, monospace=True)
 
-        # ===== 상단 (10%): 시스템 상태 헤더 =====
+        # ===== 상단 (10%): 시스템 상태 헤더 (타이핑 효과) =====
         header_y = 10
         time_str = f"{int(time_sec//60):02d}:{time_sec%60:06.3f}"
+        # 카운트업: si/tokens/bytes를 씬 초반 0.4초에 걸쳐 카운트업
+        count_progress = min(1.0, elapsed / 0.4)
+        tokens_display = int(analysis.get("token_count", 0) * count_progress)
+        bytes_display = int(analysis.get("byte_count", 0) * count_progress)
+        si_display = si * count_progress
         header = (
             f"[{time_str}] SEG_{seg_idx:02d}/{total_segs} | "
-            f"TOKENS:{analysis.get('token_count', 0)} "
-            f"BYTES:{analysis.get('byte_count', 0)} "
-            f"SI:{si:.2f}"
+            f"TOKENS:{tokens_display} "
+            f"BYTES:{bytes_display} "
+            f"SI:{si_display:.2f}"
         )
-        draw.text((10 + jitter_x, header_y + jitter_y), header,
+        # 타이핑: 씬 시작 후 0.6초에 걸쳐 글자 하나씩 등장 (30글자/초)
+        typed_len = int(elapsed * 30)
+        typed_header = header[:typed_len]
+        # 커서 블링크 (BPM 기반)
+        bpm_period = max(1, int(60.0 / bpm * 30))  # 30fps 기준 한 박자 프레임 수
+        cursor = "▌" if (frame_idx % bpm_period) < (bpm_period // 2) else " "
+        if typed_len < len(header):
+            typed_header += cursor
+        draw.text((10 + jitter_x, header_y + jitter_y), typed_header,
                   fill=accent_color, font=header_font)
 
         # 구분선 (BPM 맥동 두께)
@@ -158,25 +178,30 @@ class TextDataLayer:
             draw.text((cx + 6, cy + 4), f"{kw_text} [{kw_type}]",
                       fill=kw_color, font=title_font)
 
-            # UTF-8 hex
+            # 카드별 카운트업 딜레이 (카드마다 0.1초 차이)
+            card_elapsed = max(0.0, elapsed - i * 0.1)
+            card_progress = min(1.0, card_elapsed / 0.5)
+
+            # UTF-8 hex (카드 등장 후 타이핑)
             hex_str = word_data.get("hex", "")
             max_hex_len = (card_width - 20) // 8
             if len(hex_str) > max_hex_len:
                 hex_str = hex_str[:max_hex_len] + ".."
+            hex_typed = hex_str[:int(card_elapsed * 20)]
             y_off = cy + title_size + 8
-            draw.text((cx + 6, y_off), f"UTF8: {hex_str}",
+            draw.text((cx + 6, y_off), f"UTF8: {hex_typed}",
                       fill=dim_color, font=card_body_font)
 
-            # Hash + bytes
+            # Hash + bytes (카운트업)
             xor_hex = word_data.get("xor_hex", "?")
-            byte_count = word_data.get("byte_count", 0)
+            byte_count = int(word_data.get("byte_count", 0) * card_progress)
             y_off += 18 + int(si * 8)
             draw.text((cx + 6, y_off), f"HASH:{xor_hex} B:{byte_count}",
                       fill=dim_color, font=card_body_font)
 
-            # Freq + variance
-            freq = word_data.get("freq_hz", 0)
-            variance = word_data.get("byte_variance", 0)
+            # Freq + variance (카운트업)
+            freq = int(word_data.get("freq_hz", 0) * card_progress)
+            variance = word_data.get("byte_variance", 0) * card_progress
             y_off += 18 + int(si * 8)
             draw.text((cx + 6, y_off), f"FREQ:{freq}Hz VAR:{variance:.0f}",
                       fill=dim_color, font=card_body_font)
@@ -204,15 +229,19 @@ class TextDataLayer:
         max_parse_len = int(self.width / 10)
         if len(parse_str) > max_parse_len:
             parse_str = parse_str[:max_parse_len] + "..."
-        draw.text((10 + jitter_x, bottom_y + 5), f"PARSE: {parse_str}",
+        # 타이핑: 씬 0.8초 이후부터 하단 등장
+        parse_elapsed = max(0.0, elapsed - 0.8)
+        parse_typed = parse_str[:int(parse_elapsed * 25)]
+        draw.text((10 + jitter_x, bottom_y + 5), f"PARSE: {parse_typed}",
                   fill=dim_color, font=parse_font)
 
-        # Sentence metadata + semantic intensity bar
+        # Sentence metadata + semantic intensity bar (카운트업)
         stype = analysis.get("sentence_type", "?")
         char_count = analysis.get("char_count", 0)
         token_count = analysis.get("token_count", 0)
-        si_bar = "█" * int(si * 10) + "░" * (10 - int(si * 10))
-        meta_str = f"TYPE:{stype.upper()} | TOKENS:{token_count} | CHARS:{char_count} | SI:[{si_bar}]"
+        si_filled = int(si * count_progress * 10)
+        si_bar = "█" * si_filled + "░" * (10 - si_filled)
+        meta_str = f"TYPE:{stype.upper()} | TOKENS:{tokens_display} | CHARS:{char_count} | SI:[{si_bar}]"
         draw.text((10 + jitter_x, bottom_y + 24 + int(si * 6)), meta_str,
                   fill=very_dim, font=parse_font)
 

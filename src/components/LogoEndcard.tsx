@@ -39,7 +39,7 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
   startFrame,
   durationFrames,
   palette,
-  tagline = "존재와 사유, 그 경계를 초월하다",
+  tagline = "존재와 사유\n그 경계를 초월하다",
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -382,51 +382,68 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
           pointerEvents: "none",
         }}
       >
-        {/* 글자별 스태거 애니메이션 */}
+        {/* 글자별 스태거 애니메이션 — 줄바꿈 지원 */}
         <div
           style={{
             display: "flex",
-            justifyContent: "center",
+            flexDirection: "column",
             alignItems: "center",
+            gap: 8,
           }}
         >
-          {tagline.split("").map((char, i) => {
-            const charDelay = i * 2;
-            const charLocalFrame = localFrame - fps * 2.0 - charDelay;
-            const charOpacity = interpolate(
-              charLocalFrame,
-              [0, fps * 0.3],
-              [0, 1],
-              { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-            );
-            const charY = interpolate(
-              charLocalFrame,
-              [0, fps * 0.4],
-              [12, 0],
-              { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-            );
-            const breathe =
-              charLocalFrame > fps * 0.5
-                ? 1 + Math.sin(localFrame * 0.06 + i * 0.4) * 0.03
-                : 1;
+          {tagline.split("\n").map((line, lineIdx) => {
+            // 이전 줄 글자 수 합산 (스태거 인덱스 연속)
+            const prevCharCount = tagline
+              .split("\n")
+              .slice(0, lineIdx)
+              .reduce((sum, l) => sum + l.length, 0);
 
             return (
-              <span
-                key={i}
-                style={{
-                  fontFamily: "Pretendard Variable, sans-serif",
-                  fontSize: 48,
-                  fontWeight: 700,
-                  letterSpacing: "0.25em",
-                  color: p.accent,
-                  opacity: charOpacity * taglineOpacity,
-                  transform: `translateY(${charY}px) scale(${breathe})`,
-                  display: "inline-block",
-                  textShadow: `0 0 20px ${p.glow}60, 0 0 40px ${p.glow}30`,
-                }}
+              <div
+                key={lineIdx}
+                style={{ display: "flex", justifyContent: "center", alignItems: "center" }}
               >
-                {char === " " ? "\u00A0" : char}
-              </span>
+                {line.split("").map((char, j) => {
+                  const i = prevCharCount + j;
+                  const charDelay = i * 2;
+                  const charLocalFrame = localFrame - fps * 2.0 - charDelay;
+                  const charOpacity = interpolate(
+                    charLocalFrame,
+                    [0, fps * 0.3],
+                    [0, 1],
+                    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+                  );
+                  const charY = interpolate(
+                    charLocalFrame,
+                    [0, fps * 0.4],
+                    [12, 0],
+                    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+                  );
+                  const breathe =
+                    charLocalFrame > fps * 0.5
+                      ? 1 + Math.sin(localFrame * 0.06 + i * 0.4) * 0.03
+                      : 1;
+
+                  return (
+                    <span
+                      key={j}
+                      style={{
+                        fontFamily: "Pretendard Variable, sans-serif",
+                        fontSize: 48,
+                        fontWeight: 700,
+                        letterSpacing: "0.25em",
+                        color: p.accent,
+                        opacity: charOpacity * taglineOpacity,
+                        transform: `translateY(${charY}px) scale(${breathe})`,
+                        display: "inline-block",
+                        textShadow: `0 0 20px ${p.glow}60, 0 0 40px ${p.glow}30`,
+                      }}
+                    >
+                      {char === " " ? "\u00A0" : char}
+                    </span>
+                  );
+                })}
+              </div>
             );
           })}
         </div>
