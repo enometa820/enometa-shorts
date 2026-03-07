@@ -96,12 +96,14 @@ npx remotion studio --port 3000
 
 ### 비주얼 무드 (`--visual-mood`)
 
-| 값 | 특성 |
-|----|------|
-| `ikeda` | 데이터아트 격자 (기본) |
-| `cooper` | 유기적 파형 |
-| `abstract` | 기하 추상 |
-| `data` | 시각화 데이터 스트림 |
+Python 배경 프레임과 Remotion vocab 레이어를 동시에 제어한다.
+
+| 값 | Python 레이어 | Remotion vocab | 팔레트 |
+|----|--------------|----------------|--------|
+| `ikeda` (기본) | TextData + Barcode + DataStream + DataMatrix | 데이터아트 | 에피소드 선택 |
+| `cooper` | Particle + DataStream | 유기적 파형 | phantom |
+| `abstract` | DataMatrix 단일 | 기하 추상 | synapse |
+| `data` | TextData + Barcode + DataStream + DataMatrix (최대) | 시각화 데이터 스트림 | cold_steel |
 
 ### 드럼 (`--drum`)
 

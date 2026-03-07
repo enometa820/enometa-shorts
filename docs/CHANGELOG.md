@@ -5,6 +5,19 @@
 
 ---
 
+## 2026-03-07 — TextDataLayer 강화 + 비주얼 다양성 + 엔드카드 개선
+
+### Added
+- `scripts/visual_layers/text_data_layer.py`: 타이핑 애니메이션(30글자/초) + BPM 동기 커서(`▌`) + 카운트업 애니메이션(TOKENS/BYTES/SI/FREQ/VAR, 0.4s/0.5s)
+- `scripts/visual_renderer.py`: `GENRE_LAYER_PRESETS` v9 — visual_mood별 Python 레이어 프리셋 4종 (enometa/cooper/abstract/data) 독립 구성
+- `scripts/enometa_render.py`: `step_python_frames`에 `visual_mood` 파라미터 연동 → `--visual-mood` 옵션이 Python 배경 프레임에도 반영
+
+### Changed
+- `scripts/visual_layers/text_data_layer.py`: `SI_INTENSITY_SCALE["TextDataLayer"]` 0.70+si*0.30 → 0.88+si*0.12 (기본 불투명도 강화)
+- `src/components/LogoEndcard.tsx`: 태그라인 기본값 `"존재와 사유\n그 경계를 초월하다"` — `\n` 줄바꿈 지원, 멀티라인 스태거 애니메이션
+
+---
+
 ## 2026-03-07 — v18 장르 시스템 오버하울 + 파이프라인 버그 수정
 
 ### Added
