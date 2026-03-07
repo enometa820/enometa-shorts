@@ -593,7 +593,7 @@ def compute_keyword_intensity(kw_text, kw_type):
 def analyze_sentence(text):
     """문장 구조 분석"""
     tokens = tokenize_korean(text)
-    numbers = [float(t["text"]) for t in tokens if t["type"] == "number"]
+    numbers = [float(t["text"]) for t in tokens if t["type"] == "number" and re.match(r'^\d+\.?\d*$', t["text"])]
 
     # 문장 유형 판별
     text_stripped = text.strip()
@@ -618,7 +618,7 @@ def analyze_sentence(text):
     word_data = []
     for kw in keywords:
         kw_intensity = compute_keyword_intensity(kw["text"], kw["type"])
-        if kw["type"] == "number":
+        if kw["type"] == "number" and re.match(r'^\d+\.?\d*$', kw["text"]):
             word_data.append({
                 "text": kw["text"],
                 "type": "number",

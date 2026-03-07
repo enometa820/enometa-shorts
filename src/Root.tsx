@@ -71,6 +71,13 @@ import {
   ep010AudioSrc,
   ep010NarrationSegments,
 } from "./ep010Script";
+import {
+  ep011VisualScript,
+  ep011Title,
+  ep011AudioAnalysis,
+  ep011AudioSrc,
+  ep011NarrationSegments,
+} from "./ep011Script";
 
 // calculateMetadata: audioAnalysis.duration_sec 기반 durationInFrames 자동 계산
 // endcardDurationSec 기본 6초 포함
@@ -267,6 +274,25 @@ export const Root: React.FC = () => {
           audioSrc: ep010AudioSrc,
           narrationSegments: ep010NarrationSegments,
           highlightWords: ["믿음", "플라시보", "뇌"],
+        }}
+      />
+
+      {/* EP011: 자연은 우리보다 38억 년 먼저 코딩했다 */}
+      <Composition
+        id="EP011"
+        component={EnometaShorts}
+        durationInFrames={30 * 30}
+        fps={30}
+        width={1080}
+        height={1920}
+        calculateMetadata={calcMeta}
+        defaultProps={{
+          visualScript: ep011VisualScript,
+          title: ep011Title,
+          audioAnalysis: ep011AudioAnalysis,
+          audioSrc: ep011AudioSrc,
+          narrationSegments: ep011NarrationSegments,
+          highlightWords: ["자연", "DNA", "코딩", "진화"],
         }}
       />
 

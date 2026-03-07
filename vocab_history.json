@@ -139,6 +139,24 @@
         "text_reveal:default",
         "waveform_spectrum:default"
       ]
+    },
+    "ep011": {
+      "used_combos": [
+        "flow_field_calm:vortex",
+        "flow_field_turbulent:opposing",
+        "particle_chain_awaken:default",
+        "particle_escape:chain_break",
+        "particle_orbit:ellipse_drift",
+        "particle_orbit:figure_eight",
+        "pixel_grid_life:default",
+        "pixel_grid_rain:default",
+        "pixel_waveform_cascade:default",
+        "terra_globe:default",
+        "text_reveal:default",
+        "waveform:default",
+        "waveform_circular:default",
+        "waveform_spectrum:default"
+      ]
     }
   }
 }

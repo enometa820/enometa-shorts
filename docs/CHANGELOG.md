@@ -5,6 +5,17 @@
 
 ---
 
+## 2026-03-08 — EP011 추가 + script_data_extractor 버그 수정
+
+### Fixed
+- `scripts/script_data_extractor.py`: kiwipiepy가 "억", "만" 등 한국어 숫자 단위를 `SN` 태그로 분류할 때 `float()` 변환 실패하던 문제 수정 (2곳 — `analyze_sentence`, keyword loop)
+
+### Added
+- `src/ep011Script.ts`: EP011 데이터 import/export
+- `src/Root.tsx`: EP011 Composition 등록
+
+---
+
 ## 2026-03-08 — Terra Vision 3D 비주얼 시스템 추가
 
 ### Added
