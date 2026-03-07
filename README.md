@@ -214,6 +214,24 @@ enometa-shorts/
 | [audio_analyzer.py](scripts/audio_analyzer.py) | `mixed.wav` → 프레임별 bass/mid/high/rms/onset 분석 → `audio_analysis.json` |
 | [sequence_generators.py](scripts/sequence_generators.py) | 음악 패턴용 수열 생성 (Thue-Morse, Norgard, Rudin-Shapiro) |
 
+### Python 비주얼 레이어 (scripts/visual_layers/)
+
+`visual_renderer.py`가 이 레이어들을 조합해 배경 프레임 이미지를 만든다. 각 레이어는 numpy 배열(1080×1080)을 반환하고 `composite.py`가 알파 합성으로 쌓는다.
+
+| 파일 | 역할 |
+|------|------|
+| [composite.py](scripts/visual_layers/composite.py) | 여러 레이어를 알파 블렌딩으로 합성하는 유틸리티 (`composite_layers` / `composite_dual_source`) |
+| [barcode_layer.py](scripts/visual_layers/barcode_layer.py) | 토큰의 UTF-8 바이트 → 수직 바코드 스트라이프 (단어마다 고유 패턴, SI 기반 선굵기/색상 변조) |
+| [text_data_layer.py](scripts/visual_layers/text_data_layer.py) | 대본 키워드/형태소를 화면 위에 타이포그래피로 배치 (TextDataLayer) |
+| [data_stream_layer.py](scripts/visual_layers/data_stream_layer.py) | 수평 스크롤 데이터 텍스트 8~12줄 — 컴퓨터가 텍스트를 해석하는 과정 시각화 (SI 기반 속도/크기 가변) |
+| [data_matrix_layer.py](scripts/visual_layers/data_matrix_layer.py) | 악기 에너지/합성 파라미터를 매트릭스·그리드로 시각화 — Ryoji Ikeda 스타일 |
+| [particle_layer.py](scripts/visual_layers/particle_layer.py) | 부유하는 파티클 시스템 (ParticleLayer) |
+| [waveform_layer.py](scripts/visual_layers/waveform_layer.py) | 오디오 파형 시각화 레이어 (WaveformLayer) |
+| [sine_wave_layer.py](scripts/visual_layers/sine_wave_layer.py) | 사인파 배경 레이어 — SI 낮을수록 강하게 표시 (SineWaveLayer) |
+| [bytebeat_layer.py](scripts/visual_layers/bytebeat_layer.py) | bytebeat 공식 값이 직접 픽셀이 되는 레이어 — "데이터가 곧 소리이고 곧 화면" |
+| [feedback_layer.py](scripts/visual_layers/feedback_layer.py) | 이전 프레임이 다음 프레임에 영향을 주는 피드백 루프 시각화 (자기참조 구조) |
+| [tts_effects.py](scripts/visual_layers/tts_effects.py) | 포스트프로세싱 유틸 함수 — 글리치/스캔라인/색수차/글로우/파형 왜곡 등 |
+
 ### Remotion / React (src/)
 
 | 파일 | 역할 |
