@@ -79,6 +79,25 @@ class TextDataLayer:
         dim_color = tts_effects.intensity_color(accent, si * 0.6, brightness * 0.5)
         very_dim = tts_effects.intensity_color(accent, si * 0.3, brightness * 0.25)
 
+        # 품사 타입별 베이스 색상 (accent hue에서 shift)
+        # noun=기본, verb=초록(+0.33), science=청록(+0.16), chemical=보라(-0.16), body=주황(+0.08), number=금색(+0.12)
+        _TYPE_HUE_SHIFT = {
+            "noun":     0.0,
+            "verb":     0.33,
+            "science":  0.16,
+            "chemical": -0.16,
+            "body":     0.08,
+            "number":   0.12,
+            "adverb":   -0.05,
+        }
+
+        def type_color(kw_type, kw_intensity):
+            shift = _TYPE_HUE_SHIFT.get(kw_type, 0.0)
+            base = tts_effects.intensity_color(accent, kw_intensity, brightness)
+            if shift != 0.0:
+                base = tts_effects.hue_shift_color(base, shift)
+            return base
+
         # Hue shift (si > 0.5)
         if si > 0.5:
             shift = np.sin(time_sec * 0.8) * (si - 0.5) * 0.4
@@ -163,8 +182,8 @@ class TextDataLayer:
             border_w = tts_effects.scale_pulse(
                 int(1 + 3 * kw_intensity), kw_intensity, frame_idx, bpm, 0.3
             )
-            # 키워드별 색상
-            kw_color = tts_effects.intensity_color(accent, kw_intensity, brightness)
+            # 키워드별 색상 (품사 타입별 hue 분기)
+            kw_color = type_color(kw_type, kw_intensity)
 
             draw.rectangle(
                 [(cx, cy), (cx + card_width - 8, cy + card_height)],

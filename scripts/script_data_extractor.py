@@ -18,16 +18,39 @@ from operator import xor
 from pathlib import Path
 
 from kiwipiepy import Kiwi
+try:
+    from soynlp.normalizer import repeat_normalize
+    HAS_SOYNLP = True
+except ImportError:
+    HAS_SOYNLP = False
+    def repeat_normalize(text, num_repeats=2): return text
+
 _kiwi = Kiwi()
 
-# ENOMETA 도메인 전문용어를 kiwi 사용자 사전에 등록
+# ENOMETA 도메인 전문용어를 kiwi 사용자 사전에 등록 (v12.1 대폭 확장)
 _KIWI_USER_WORDS = [
-    # 뇌과학 복합어
+    # 뇌과학 — 구조
     "전전두엽", "대뇌피질", "수상돌기", "미주신경", "신경세포",
+    "측두엽피질", "두정엽피질", "전두피질", "변연계", "기저핵",
+    "신경가소성", "시냅스가소성", "장기강화", "장기억압",
+    # 뇌과학 — 신경전달물질
     "노르에피네프린", "아세틸콜린", "바소프레신",
-    # 컴퓨팅/과학
-    "메타인지", "자유의지", "결정론", "정규분포", "표준편차",
-    "지연시간",
+    "글루타민산", "가바수용체", "도파민회로", "보상회로",
+    # 철학 — 인식론/존재론
+    "메타인지", "자유의지", "결정론", "인식론", "존재론",
+    "현상학", "형이상학", "유물론", "관념론", "이원론",
+    "환원주의", "전체론", "실증주의", "구성주의",
+    # 철학 — 윤리/논리
+    "공리주의", "의무론", "덕윤리", "귀납법", "연역법",
+    "변증법", "비판이론", "해석학",
+    # 데이터/컴퓨팅
+    "정규분포", "표준편차", "지연시간", "머신러닝", "딥러닝",
+    "신경망", "강화학습", "지도학습", "비지도학습",
+    "데이터셋", "과적합", "정규화", "활성함수",
+    "역전파", "경사하강", "배치학습", "트랜스포머",
+    # 사회/인문학
+    "집단지성", "사회구조", "문화자본", "상징자본",
+    "이데올로기", "헤게모니", "담론분석",
 ]
 for _w in _KIWI_USER_WORDS:
     _kiwi.add_user_word(_w, "NNG")
@@ -448,7 +471,11 @@ load_custom_dictionary()
 
 
 def tokenize_korean(text):
-    """kiwipiepy 기반 한국어 형태소 분석 + ENOMETA 도메인 사전 오버라이드"""
+    """kiwipiepy 기반 한국어 형태소 분석 + ENOMETA 도메인 사전 오버라이드
+    soynlp repeat_normalize 전처리 적용 (반복 문자/노이즈 정규화)
+    """
+    if HAS_SOYNLP:
+        text = repeat_normalize(text, num_repeats=2)
     kiwi_result = _kiwi.tokenize(text)
 
     tokens = []
