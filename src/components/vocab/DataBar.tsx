@@ -185,12 +185,21 @@ export const DataBar: React.FC<VocabComponentProps> = ({
           const ratio = (bar.value / maxValue) * eased;
           const color = bar.color || defaultColor;
 
-          // 오디오 리액티브 떨림
-          const audioShake = audio.bass * 3;
+          // 오디오 리액티브 — bass bounce + onset surge
+          const bassBounce = audio.bass * 14;
+          const onsetSurge = audio.onset ? ratio * barAreaWidth * 0.07 : 0;
+          const audioShake = bassBounce + onsetSurge;
+          const glowIntensity = 12 + audio.rms * 40 + (audio.onset ? 30 : 0);
+          // 스캔 스위프: 바 채워지는 방향으로 빛이 흐름
+          const scanOpacity = interpolate(eased, [0.05, 0.95], [0.8, 0], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          });
 
           if (orientation === "horizontal") {
             const y = i * (barThickness + barGap);
             const barWidth = ratio * barAreaWidth + audioShake;
+            const scanPos = eased * barAreaWidth;
 
             return (
               <div key={i} style={{ position: "absolute", top: y, left: 0 }}>
@@ -213,9 +222,37 @@ export const DataBar: React.FC<VocabComponentProps> = ({
                     height: barThickness,
                     backgroundColor: color,
                     borderRadius: barThickness / 2,
-                    boxShadow: `0 0 ${10 + audio.rms * 20}px ${color}60`,
+                    boxShadow: `0 0 ${glowIntensity}px ${color}90`,
+                    overflow: "hidden",
                   }}
-                />
+                >
+                  {/* 스캔 스위프: 채워지는 선단에 흰 빛 */}
+                  <div style={{
+                    position: "absolute",
+                    top: 0,
+                    left: scanPos - 12,
+                    width: 24,
+                    height: barThickness,
+                    background: `linear-gradient(to right, transparent, rgba(255,255,255,${scanOpacity * 0.7}), transparent)`,
+                  }} />
+                </div>
+                {/* 선단 글로우 닷 */}
+                {eased > 0.05 && (
+                  <div style={{
+                    position: "absolute",
+                    top: barThickness / 2 - barThickness * 0.4,
+                    left: Math.max(barWidth - barThickness * 0.4, 0),
+                    width: barThickness * 0.8,
+                    height: barThickness * 0.8,
+                    borderRadius: "50%",
+                    backgroundColor: "rgba(255,255,255,0.9)",
+                    boxShadow: `0 0 ${8 + audio.bass * 18}px ${color}, 0 0 ${20 + audio.bass * 30}px ${color}60`,
+                    opacity: interpolate(audio.bass, [0, 0.3], [0.6, 1], {
+                      extrapolateLeft: "clamp",
+                      extrapolateRight: "clamp",
+                    }),
+                  }} />
+                )}
                 {/* 라벨 */}
                 {showLabels && (
                   <div
@@ -283,9 +320,37 @@ export const DataBar: React.FC<VocabComponentProps> = ({
                   height: Math.max(barHeight, 0),
                   backgroundColor: color,
                   borderRadius: barThickness / 2,
-                  boxShadow: `0 0 ${10 + audio.rms * 20}px ${color}60`,
+                  boxShadow: `0 0 ${glowIntensity}px ${color}90`,
+                  overflow: "hidden",
                 }}
-              />
+              >
+                {/* 수직 스캔 스위프 */}
+                <div style={{
+                  position: "absolute",
+                  left: 0,
+                  bottom: eased * barAreaHeight - 12,
+                  width: barThickness,
+                  height: 24,
+                  background: `linear-gradient(to top, transparent, rgba(255,255,255,${scanOpacity * 0.7}), transparent)`,
+                }} />
+              </div>
+              {/* 선단 글로우 */}
+              {eased > 0.05 && (
+                <div style={{
+                  position: "absolute",
+                  left: barThickness / 2 - barThickness * 0.4,
+                  bottom: Math.max(barHeight - barThickness * 0.4, 0),
+                  width: barThickness * 0.8,
+                  height: barThickness * 0.8,
+                  borderRadius: "50%",
+                  backgroundColor: "rgba(255,255,255,0.9)",
+                  boxShadow: `0 0 ${8 + audio.bass * 18}px ${color}, 0 0 ${20 + audio.bass * 30}px ${color}60`,
+                  opacity: interpolate(audio.bass, [0, 0.3], [0.6, 1], {
+                    extrapolateLeft: "clamp",
+                    extrapolateRight: "clamp",
+                  }),
+                }} />
+              )}
               {/* 값 */}
               {showValues && eased > 0.3 && (
                 <div

@@ -5,6 +5,21 @@
 
 ---
 
+## 2026-03-07 — DataBar 애니메이션 강화 + TextDataLayer 가시성 개선
+
+### Changed
+- `src/components/vocab/DataBar.tsx`: 오디오 리액티브 대폭 강화
+  - bass bounce: `bass * 3` → `bass * 14` (4.7배)
+  - **onset surge**: onset 감지 시 바 길이 +7% 순간 서지
+  - **glow**: `rms*20` → `rms*40 + (onset ? +30)` — onset 플래시
+  - **scan sweep**: 바 채워지는 선단에 흰 빛이 흐르는 스위프 효과
+  - **선단 글로우 닷**: 바 끝 흰 점 + bass 박자 연동 pulse
+- `scripts/visual_layers/text_data_layer.py`: 카드 가시성 개선
+  - **카드 배경 fill 추가**: outline만 → 어두운 솔리드 fill (컬러 틴트) — 배경에 묻히지 않음
+- `scripts/visual_renderer.py`: enometa preset TextDataLayer intensity `0.95 → 1.2`
+
+---
+
 ## 2026-03-07 — 오디오 1:1 균형 + 고정 해시태그 정책 + 고정 댓글 개선
 
 ### Changed

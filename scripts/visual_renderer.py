@@ -107,7 +107,7 @@ GENRE_LAYER_PRESETS = {
             {"layer": "ParticleLayer",   "intensity": 0.3},
         ],
         "tts_layers": [
-            {"layer": "TextDataLayer",   "intensity": 0.95},
+            {"layer": "TextDataLayer",   "intensity": 1.2},
             {"layer": "BarcodeLayer",    "intensity": 0.85},
             {"layer": "DataStreamLayer", "intensity": 0.75},
             {"layer": "DataMatrixLayer", "intensity": 0.65},

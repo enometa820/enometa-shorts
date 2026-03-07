@@ -185,9 +185,13 @@ class TextDataLayer:
             # 키워드별 색상 (품사 타입별 hue 분기)
             kw_color = type_color(kw_type, kw_intensity)
 
+            # 카드 배경 fill — 어두운 솔리드로 배경과 대비 확보
+            # (터미널 카드 스타일: 거의 검정 + 약한 컬러 틴트)
+            r, g, b = kw_color
+            card_fill = (max(0, r // 12), max(0, g // 12), max(0, b // 8))
             draw.rectangle(
                 [(cx, cy), (cx + card_width - 8, cy + card_height)],
-                outline=kw_color, width=border_w
+                fill=card_fill, outline=kw_color, width=border_w
             )
 
             # 카드 제목: 다이나믹 폰트 크기 (20→48px, 키워드별 intensity)
