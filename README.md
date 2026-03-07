@@ -194,6 +194,65 @@ enometa-shorts/
 
 ---
 
+## 코드 파일 가이드
+
+각 파일이 무슨 일을 하는지 한 줄 설명 + 링크.
+
+### Python 스크립트 (scripts/)
+
+| 파일 | 역할 |
+|------|------|
+| [enometa_render.py](scripts/enometa_render.py) | **파이프라인 진입점** — 아래 모든 단계를 순서대로 자동 실행 |
+| [gen_timing.py](scripts/gen_timing.py) | 대본 문장 → TTS 실측 길이 기반 타이밍 배치 → `narration_timing.json` |
+| [generate_voice_edge.py](scripts/generate_voice_edge.py) | `narration_timing.json` → Edge-TTS 음성 합성 → `narration.wav` |
+| [script_data_extractor.py](scripts/script_data_extractor.py) | 대본 형태소 분석(kiwipiepy) + 문장별 감정 강도(SI) 계산 → `script_data.json` |
+| [enometa_music_engine.py](scripts/enometa_music_engine.py) | **BGM 합성** — numpy로 직접 음파 생성 (9장르, 10레이어, ~5000줄) → `bgm.wav` |
+| [audio_mixer.py](scripts/audio_mixer.py) | `narration.wav` + `bgm.wav` → FFmpeg 믹싱 + -14 LUFS 정규화 → `mixed.wav` |
+| [visual_script_generator.py](scripts/visual_script_generator.py) | `script_data.json` → 씬/감정/vocab 선택 → `visual_script.json` |
+| [visual_strategies.py](scripts/visual_strategies.py) | 비주얼 전략 6종 프리셋 정의 (dense/breathing/cinematic 등) — visual_script_generator가 참조 |
+| [visual_renderer.py](scripts/visual_renderer.py) | `visual_script.json` → Python(Pillow)으로 배경 프레임 이미지 생성 → `frames/` |
+| [audio_analyzer.py](scripts/audio_analyzer.py) | `mixed.wav` → 프레임별 bass/mid/high/rms/onset 분석 → `audio_analysis.json` |
+| [sequence_generators.py](scripts/sequence_generators.py) | 음악 패턴용 수열 생성 (Thue-Morse, Norgard, Rudin-Shapiro) |
+
+### Remotion / React (src/)
+
+| 파일 | 역할 |
+|------|------|
+| [src/Root.tsx](src/Root.tsx) | 모든 에피소드 Composition 등록 + calcMeta (영상 길이 자동 계산) |
+| [src/EnometaShorts.tsx](src/EnometaShorts.tsx) | **메인 레이아웃** — TitleSection / VisualSection / SubtitleSection / LogoEndcard 조합 |
+| [src/types.ts](src/types.ts) | 전체 TypeScript 타입 정의 (Scene, VisualScript, VocabEntry, VocabComponentProps 등) |
+| [src/hooks/useAudioData.ts](src/hooks/useAudioData.ts) | `audio_analysis.json` → 현재 프레임의 `AudioFrame`(bass/mid/high/rms/onset) 반환 |
+| [src/ep001Script.ts](src/ep001Script.ts) | EP001 데이터 모듈 — json 파일 import + 타입 캐스팅 export (EP002~010도 동일 패턴) |
+| [src/components/VisualSection.tsx](src/components/VisualSection.tsx) | Python 배경 프레임 + vocab 컴포넌트 오버레이 — `VOCAB_MAP`으로 문자열→컴포넌트 변환 |
+| [src/components/SubtitleSection.tsx](src/components/SubtitleSection.tsx) | `narration_timing` 기반 자막 싱크 표시 (EP005 레퍼런스 유지) |
+| [src/components/TitleSection.tsx](src/components/TitleSection.tsx) | 제목 표시 — `fitText`로 글자 수에 따라 fontSize 자동 조절 (최대 72px) |
+| [src/components/ShapeMotion.tsx](src/components/ShapeMotion.tsx) | emotion별 기하 도형 애니메이션 (tension/climax/awakening/intro/buildup) |
+| [src/components/LogoEndcard.tsx](src/components/LogoEndcard.tsx) | 영상 마지막 엔드카드 (로고 + 태그라인 + 파티클 180개) |
+| [src/components/vocab/TextReveal.tsx](src/components/vocab/TextReveal.tsx) | 타이포그래피 모션 4종 (typewriter/wave/glitch/scatter) |
+| [src/components/vocab/DataBar.tsx](src/components/vocab/DataBar.tsx) | 오디오 리액티브 수직 바 차트 (`data_bar` / `data_ring`) |
+| [src/components/vocab/Lissajous.tsx](src/components/vocab/Lissajous.tsx) | 리사주 곡선 (수학 패턴, bass→위상/rms→선굵기/onset→교차점) |
+| [src/components/vocab/PixelGrid.tsx](src/components/vocab/PixelGrid.tsx) | 8bit 레트로 픽셀 그리드 (life/rain/outline 변형) |
+| [src/components/vocab/NeuralNetwork.tsx](src/components/vocab/NeuralNetwork.tsx) | 신경망 노드-엣지 애니메이션 |
+| [src/components/vocab/FlowField.tsx](src/components/vocab/FlowField.tsx) | 유동장 파티클 (`flow_field_calm` / `flow_field_turbulent`) |
+| [src/components/vocab/ParticleBirth.tsx](src/components/vocab/ParticleBirth.tsx) | 파티클 탄생 — scatter/converge/orbit/escape/chain/split 등 6종 변형도 동일 폴더 |
+| [src/utils/palettes.ts](src/utils/palettes.ts) | 팔레트 8종 색상 정의 |
+
+### Vocab이란?
+
+**vocab** = 씬마다 화면에 그려지는 시각 어휘. `visual_script.json`의 `scenes[].layers.semantic[]`에 문자열로 지정되면 [VisualSection.tsx](src/components/VisualSection.tsx)의 `VOCAB_MAP`이 해당 React 컴포넌트를 찾아 렌더링한다.
+
+```
+visual_script.json                VisualSection.tsx           화면
+scenes[0].layers.semantic = [     VOCAB_MAP["lissajous"]  →  <Lissajous>
+  { vocab: "lissajous", ... },    VOCAB_MAP["data_bar"]   →  <DataBar>
+  { vocab: "data_bar",  ... }
+]
+```
+
+오디오 반응형 — 모든 vocab 컴포넌트는 `AudioFrame(bass/mid/high/rms/onset)`을 받아 실시간 움직임에 반영한다.
+
+---
+
 ## 아키텍처 결정 (ADR)
 
 주요 기술 선택의 이유는 [`docs/decisions/`](docs/decisions/) 에 기록되어 있다.
