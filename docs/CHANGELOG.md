@@ -5,6 +5,22 @@
 
 ---
 
+## 2026-03-08 — Terra Vision 3D 비주얼 시스템 추가
+
+### Added
+- `@remotion/three` + `three` 패키지 설치 — Remotion에서 Three.js 3D 렌더링 지원
+- `src/components/vocab/three/ThreeVocabWrapper.tsx`: ThreeCanvas + 조명 공통 래퍼
+- `src/components/vocab/three/TerraGlobe.tsx`: 로우폴리 와이어프레임 지구 회전 + 데이터 포인트 (`terra_globe`, `terra_globe_data`)
+- `src/components/vocab/three/TerraFlythrough.tsx`: 무한 와이어프레임 터널 / 줌인 효과 (`terra_flythrough`, `terra_tunnel`)
+- `src/components/vocab/three/TerraTerrain.tsx`: 높이맵 기반 3D 지형 + 데이터 바 (`terra_terrain`, `terra_terrain_bars`)
+- `scripts/visual_script_generator.py`: VOCAB_CATEGORIES에 `"terra"` 카테고리 + EMOTION_VOCAB_POOL 4개 감정에 terra vocab 배치 + generate_vocab_params() terra 파라미터 + 씬당 terra_* 최대 1개 제약
+
+### Changed
+- `src/components/VisualSection.tsx`: VOCAB_MAP에 6개 terra 키 등록
+- `CLAUDE.md`: vocab 목록에 3D/Terra 카테고리 추가, 의존성 목록 업데이트
+
+---
+
 ## 2026-03-07 — DataBar 애니메이션 강화 + TextDataLayer 가시성 개선
 
 ### Changed

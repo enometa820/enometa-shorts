@@ -104,6 +104,11 @@ VOCAB_CATEGORIES = {
         "pixel_grid", "pixel_grid_outline", "pixel_grid_life", "pixel_grid_rain",
         "pixel_waveform", "pixel_waveform_steps", "pixel_waveform_cascade",
     ],
+    "terra": [
+        "terra_globe", "terra_globe_data",
+        "terra_flythrough", "terra_tunnel",
+        "terra_terrain", "terra_terrain_bars",
+    ],
 }
 
 # ============================================================
@@ -318,22 +323,22 @@ EMOTION_KEYWORDS = {
 # ============================================================
 EMOTION_VOCAB_POOL = {
     "neutral_curious": {
-        "primary": ["particle_birth", "particle_orbit", "flow_field_calm", "lissajous", "waveform"],
-        "secondary": ["waveform", "counter_up", "brightness_pulse", "data_bar", "grid_mesh"],
+        "primary": ["particle_birth", "particle_orbit", "flow_field_calm", "lissajous", "waveform", "terra_globe"],
+        "secondary": ["waveform", "counter_up", "brightness_pulse", "data_bar", "grid_mesh", "terra_terrain"],
         "text_mode": "wave",
         "bg_mode": "subtle",  # B-8: calm→subtle (더 조용한 배경)
         "reactivity": "low",
     },
     "tension_reveal": {
-        "primary": ["particle_scatter", "neural_network", "fractal_crack", "grid_morph", "waveform_spectrum"],
+        "primary": ["particle_scatter", "neural_network", "fractal_crack", "grid_morph", "waveform_spectrum", "terra_flythrough"],
         "secondary": ["grid_morph", "waveform_spectrum", "color_shift", "data_bar", "loop_ring"],
         "text_mode": "glitch",
         "bg_mode": "turbulent",
         "reactivity": "high",
     },
     "neutral_analytical": {
-        "primary": ["grid_morph", "data_bar", "neural_network", "lissajous", "counter_up"],
-        "secondary": ["waveform_spectrum", "counter_up", "grid_mesh", "lissajous", "brightness_pulse"],
+        "primary": ["grid_morph", "data_bar", "neural_network", "lissajous", "counter_up", "terra_terrain", "terra_terrain_bars"],
+        "secondary": ["waveform_spectrum", "counter_up", "grid_mesh", "lissajous", "brightness_pulse", "terra_globe_data"],
         "text_mode": "typewriter",
         "bg_mode": "calm",
         "reactivity": "medium",
@@ -381,8 +386,8 @@ EMOTION_VOCAB_POOL = {
         "reactivity": "medium",
     },
     "awakening_climax": {
-        "primary": ["particle_chain_awaken", "particle_escape", "fractal_crack", "color_bloom", "waveform_circular"],
-        "secondary": ["waveform_circular", "brightness_pulse", "light_source", "particle_scatter", "lissajous"],
+        "primary": ["particle_chain_awaken", "particle_escape", "fractal_crack", "color_bloom", "waveform_circular", "terra_flythrough"],
+        "secondary": ["waveform_circular", "brightness_pulse", "light_source", "particle_scatter", "lissajous", "terra_globe_data"],
         "text_mode": "scatter",
         "bg_mode": "intense",  # B-8: turbulent→intense
         "reactivity": "max",
@@ -671,6 +676,32 @@ def generate_vocab_params(vocab: str, palette: dict, rng: random.Random) -> dict
             "position": rng.choice(["center", "bottom"]),
         }
 
+    # 3D / Terra Vision (90년대 CGI)
+    if vocab.startswith("terra_globe"):
+        return {
+            "dataPoints": rng.choice([8, 12, 16, 20]),
+            "wireColor": rng.choice(colors),
+            "dotColor": rng.choice(colors),
+            "rotationSpeed": R(rng.uniform(0.01, 0.025)),
+            "detail": rng.choice([1, 2, 2, 3]),
+        }
+    if vocab.startswith("terra_fly") or vocab == "terra_tunnel":
+        return {
+            "ringCount": rng.choice([10, 14, 18]),
+            "tunnelLength": rng.choice([25, 30, 35]),
+            "speed": R(rng.uniform(0.05, 0.12)),
+            "ringColor": rng.choice(colors),
+            "shape": rng.choice(["circle", "square", "hexagon"]),
+        }
+    if vocab.startswith("terra_terrain"):
+        return {
+            "segments": rng.choice([8, 10, 12, 14]),
+            "heightScale": R(rng.uniform(0.5, 1.2)),
+            "barCount": rng.choice([6, 8, 10, 12]),
+            "terrainColor": rng.choice(colors),
+            "barColor": rng.choice(colors),
+        }
+
     return {}
 
 
@@ -787,6 +818,14 @@ def build_scene(
     if inject_vocabs and rng.random() < inject_chance * 0.5:
         # 보조 비주얼도 8bit로 교체 (절반 확률)
         secondary_vocab = rng.choice(inject_vocabs)
+
+    # terra_* 제약: 씬당 최대 1개 (WebGL 컨텍스트 다중 생성 방지)
+    if primary_vocab.startswith("terra_") and secondary_vocab and secondary_vocab.startswith("terra_"):
+        secondary_candidates_no_terra = [v for v in secondary_candidates if not v.startswith("terra_")]
+        if secondary_candidates_no_terra:
+            secondary_vocab = rng.choice(secondary_candidates_no_terra)
+        else:
+            secondary_vocab = None
 
     # 사용 기록 (최근 2개만 추적)
     used_vocabs.clear()

@@ -28,6 +28,9 @@ import { WaveformVisualizer } from "./vocab/WaveformVisualizer";
 import { PixelGrid } from "./vocab/PixelGrid";
 import { PixelWaveform } from "./vocab/PixelWaveform";
 import { Lissajous } from "./vocab/Lissajous";
+import { TerraGlobe } from "./vocab/three/TerraGlobe";
+import { TerraFlythrough } from "./vocab/three/TerraFlythrough";
+import { TerraTerrain } from "./vocab/three/TerraTerrain";
 
 // 비주얼 어휘 → 컴포넌트 매핑
 const VOCAB_MAP: Record<string, React.FC<VocabComponentProps>> = {
@@ -74,6 +77,13 @@ const VOCAB_MAP: Record<string, React.FC<VocabComponentProps>> = {
   // 수학적 패턴
   lissajous: Lissajous,
   lissajous_complex: Lissajous,
+  // 3D / Terra Vision (90년대 CGI)
+  terra_globe: TerraGlobe,
+  terra_globe_data: TerraGlobe,
+  terra_flythrough: TerraFlythrough,
+  terra_tunnel: TerraFlythrough,
+  terra_terrain: TerraTerrain,
+  terra_terrain_bars: TerraTerrain,
 };
 
 interface VisualSectionProps {

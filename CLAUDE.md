@@ -85,7 +85,9 @@ script.txt → gen_timing.py → narration_timing.json
 | `Root.tsx` | Composition 정의 + calcMeta (lastScene.end_sec + endcard 기준) |
 | `EnometaShorts.tsx` | 메인 컴포넌트 — 레이아웃 (제목/비주얼/자막/엔드카드) |
 | `ep0XXScript.ts` | 에피소드별 데이터 import (visual_script, audio_analysis 등) |
-| `components/VisualSection.tsx` | Python 프레임 배경 + Remotion vocab 오버레이 |
+| `components/VisualSection.tsx` | Python 프레임 배경 + Remotion vocab 오버레이 (VOCAB_MAP 레지스트리) |
+| `components/vocab/` | 2D Canvas vocab 컴포넌트 (24개) |
+| `components/vocab/three/` | 3D Three.js vocab 컴포넌트 — ThreeCanvas 래퍼 + Terra Vision 계열 |
 | `components/SubtitleSection.tsx` | 나레이션 싱크 자막 (EP005 레퍼런스 유지) |
 | `components/TextReveal.tsx` | 4모드 타이포그래픽 모션그래픽 |
 | `types.ts` | 중앙 타입 정의 — `Scene`, `VisualScript`, `VocabEntry`, `VocabComponentProps` 등 |
@@ -111,6 +113,7 @@ script.txt → gen_timing.py → narration_timing.json
 **데이터/수학**: `counter_up` `neural_network` `loop_ring` `fractal_crack` `data_bar` `data_ring` `grid_morph` `grid_mesh` `waveform` `waveform_spectrum` `waveform_circular` `lissajous` `lissajous_complex`
 **텍스트**: `text_reveal` `text_wave` `text_glitch` `text_scatter`
 **레트로**: `pixel_grid` `pixel_grid_outline` `pixel_grid_life` `pixel_grid_rain` `pixel_waveform` `pixel_waveform_steps` `pixel_waveform_cascade`
+**3D/Terra**: `terra_globe` `terra_globe_data` `terra_flythrough` `terra_tunnel` `terra_terrain` `terra_terrain_bars` (씬당 최대 1개, @remotion/three 기반, `.claude/rules/3d.md` 규칙 준수)
 **자동 적용**: `post_process` (VisualSection이 항상 렌더링, vocab에 추가 불필요)
 
 ### ⚠️ 오디오 경로 주의
@@ -120,7 +123,7 @@ mix 단계 후 `public/epXXX/mixed.wav`도 반드시 동기화 필요.
 
 ### 의존성
 - **Python**: numpy, scipy, Pillow, edge-tts, kiwipiepy, soynlp
-- **Node**: remotion, @remotion/cli, @remotion/layout-utils
+- **Node**: remotion, @remotion/cli, @remotion/layout-utils, @remotion/three, three
 
 ## v16 시스템 철학 — 음악적 완성도 + 볼륨 고정
 

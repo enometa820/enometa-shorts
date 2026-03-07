@@ -139,7 +139,7 @@ py scripts/enometa_render.py episodes/ep010 --title "제목" --step bgm --force
 
 | 역할 | 기술 |
 |------|------|
-| 영상 합성 | [Remotion](https://remotion.dev) (React) |
+| 영상 합성 | [Remotion](https://remotion.dev) (React) + [@remotion/three](https://www.remotion.dev/docs/three) (3D) |
 | TTS | Edge-TTS `ko-KR-SunHiNeural` |
 | BGM | Python (numpy) 직접 합성 |
 | 비주얼 프레임 | Python (numpy + Pillow) |
@@ -173,7 +173,8 @@ enometa-shorts/
 │   │   ├── TextReveal.tsx         # 4모드 타이포그래픽 모션
 │   │   ├── LogoEndcard.tsx        # 엔드카드 애니메이션
 │   │   ├── TitleSection.tsx       # 제목 (fitText 자동 조절)
-│   │   └── ShapeMotion.tsx        # emotion별 기하 도형
+│   │   ├── ShapeMotion.tsx        # emotion별 기하 도형
+│   │   └── vocab/three/          # 3D Three.js vocab (Terra Vision 계열)
 │   └── utils/
 │       └── palettes.ts            # 팔레트 정의
 ├── episodes/
@@ -253,6 +254,9 @@ enometa-shorts/
 | [src/components/vocab/NeuralNetwork.tsx](src/components/vocab/NeuralNetwork.tsx) | 신경망 노드-엣지 애니메이션 |
 | [src/components/vocab/FlowField.tsx](src/components/vocab/FlowField.tsx) | 유동장 파티클 (`flow_field_calm` / `flow_field_turbulent`) |
 | [src/components/vocab/ParticleBirth.tsx](src/components/vocab/ParticleBirth.tsx) | 파티클 탄생 — scatter/converge/orbit/escape/chain/split 등 6종 변형도 동일 폴더 |
+| [src/components/vocab/three/TerraGlobe.tsx](src/components/vocab/three/TerraGlobe.tsx) | 90년대 CGI 와이어프레임 지구 회전 + 데이터 포인트 (@remotion/three) |
+| [src/components/vocab/three/TerraFlythrough.tsx](src/components/vocab/three/TerraFlythrough.tsx) | 무한 와이어프레임 터널 / 줌인 효과 (원형/사각/육각) |
+| [src/components/vocab/three/TerraTerrain.tsx](src/components/vocab/three/TerraTerrain.tsx) | 로우폴리 3D 지형 + 솟아오르는 데이터 바 (flat shading) |
 | [src/utils/palettes.ts](src/utils/palettes.ts) | 팔레트 8종 색상 정의 |
 
 ### Vocab이란?
