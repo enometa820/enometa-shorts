@@ -73,11 +73,11 @@ class TextDataLayer:
         draw = ImageDraw.Draw(img)
 
         # ===== 다이나믹 색상 =====
-        brightness = (si * 0.7 + 0.1) + frame_rms * 0.4
+        brightness = (si * 0.5 + 0.35) + frame_rms * 0.4
         brightness = min(1.0, brightness) * self.intensity
         accent_color = tts_effects.intensity_color(accent, si, brightness)
-        dim_color = tts_effects.intensity_color(accent, si * 0.6, brightness * 0.5)
-        very_dim = tts_effects.intensity_color(accent, si * 0.3, brightness * 0.25)
+        dim_color = tts_effects.intensity_color(accent, si * 0.7, brightness * 0.65)
+        very_dim = tts_effects.intensity_color(accent, si * 0.4, brightness * 0.35)
 
         # 품사 타입별 베이스 색상 (accent hue에서 shift)
         # noun=기본, verb=초록(+0.33), science=청록(+0.16), chemical=보라(-0.16), body=주황(+0.08), number=금색(+0.12)
@@ -188,7 +188,7 @@ class TextDataLayer:
             # 카드 배경 fill — 어두운 솔리드로 배경과 대비 확보
             # (터미널 카드 스타일: 거의 검정 + 약한 컬러 틴트)
             r, g, b = kw_color
-            card_fill = (max(0, r // 12), max(0, g // 12), max(0, b // 8))
+            card_fill = (max(0, r // 6), max(0, g // 6), max(0, b // 5))
             draw.rectangle(
                 [(cx, cy), (cx + card_width - 8, cy + card_height)],
                 fill=card_fill, outline=kw_color, width=border_w

@@ -30,6 +30,7 @@ import os
 import json
 import argparse
 import subprocess
+import shutil
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS_DIR = os.path.join(PROJECT_DIR, "scripts")
@@ -269,6 +270,12 @@ def step_render(episode_dir: str, force: bool = False):
         print("  [skip] output.mp4 이미 존재")
         return output
 
+    # Webpack 캐시 삭제 — TSX 코드 변경이 항상 반영되도록
+    webpack_cache = os.path.join(PROJECT_DIR, "node_modules", ".cache")
+    if os.path.isdir(webpack_cache):
+        shutil.rmtree(webpack_cache, ignore_errors=True)
+        print("  Webpack 캐시 삭제 완료")
+
     print("  Remotion 렌더링 중...")
     ep_num = os.path.basename(episode_dir).upper()  # ep010 → EP010
     cmd = ["npx", "remotion", "render",
@@ -276,6 +283,16 @@ def step_render(episode_dir: str, force: bool = False):
            output,
            "--concurrency=2"]
     run(cmd, "Remotion render", shell=True)
+
+    # 렌더 성공 후 frames/ 자동 정리 (중간 산출물, ~200MB-1GB 절약)
+    frames_dir = os.path.join(episode_dir, "frames")
+    public_frames = os.path.join(PROJECT_DIR, "public",
+                                 os.path.basename(episode_dir), "frames")
+    for fdir in [frames_dir, public_frames]:
+        if os.path.isdir(fdir):
+            shutil.rmtree(fdir, ignore_errors=True)
+            print(f"  frames 정리 완료: {fdir}")
+
     return output
 
 

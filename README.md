@@ -16,14 +16,224 @@ script.txt
   │
   ├─ gen_timing.py          → narration_timing.json  (TTS 실측 기반 연속 배치)
   ├─ generate_voice_edge.py → narration.wav           (Edge-TTS ko-KR-SunHiNeural)
-  ├─ script_data_extractor  → script_data.json        (kiwipiepy 형태소 분석 + soynlp 전처리 + SI 커브)
-  ├─ enometa_music_engine   → bgm.wav                 (numpy 직접 합성, 9장르(v18), 10레이어)
+  ├─ script_data_extractor  → script_data.json        (kiwipiepy 형태소 분석 + SI 커브)
+  ├─ enometa_music_engine   → bgm.wav + music_script  (numpy 합성, 10장르, Vertical Remixing)
   ├─ audio_mixer.py         → mixed.wav               (narration 0.90 + bgm 1.0, -14 LUFS)
   ├─ visual_script_gen      → visual_script.json      (씬/감정/vocab 매핑)
   ├─ visual_renderer.py     → frames/000000.png~      (1080×1080, numpy+Pillow)
   ├─ audio_analyzer.py      → audio_analysis.json     (RMS/onset/beat 분석)
   └─ Remotion (React)       → output.mp4              (1080×1920 YouTube Shorts)
 ```
+
+---
+
+## 비주얼 아키텍처 — 누가 뭘 그리나
+
+최종 영상의 비주얼은 **두 엔진이 합성**한다:
+
+```
+Python (numpy+Pillow)          Remotion (React)
+─────────────────────          ────────────────
+1080×1080 배경 PNG 시퀀스   →   PythonFrameBackground (배경)
+                                  ↑ 위에 겹침
+                               Vocab 컴포넌트 (오버레이)
+                               SubtitleSection (자막)
+                               TitleSection / LogoEndcard
+                               PostProcess (스캔라인/글리치)
+```
+
+### Python 배경 레이어 (scripts/visual_layers/)
+
+배경 이미지를 구성하는 9개 레이어. `visual_renderer.py`가 장르별로 조합한다.
+
+| 레이어 | 그리는 것 | 데이터 소스 |
+|--------|-----------|-------------|
+| TextDataLayer | 터미널 스타일 키워드 카드 (품사/바이트/해시) | script_data |
+| BarcodeLayer | 토큰 UTF-8 → 수직 바코드 스트라이프 | script_data |
+| DataStreamLayer | 수평 스크롤 데이터 텍스트 8~12줄 | script_data |
+| DataMatrixLayer | 악기 에너지 매트릭스/그리드 (Ikeda 스타일) | music_script |
+| SineWaveLayer | 사인파 배경 (SI 낮을수록 강함) | 내부 수학 |
+| WaveformLayer | 오디오 파형 시각화 | audio RMS |
+| ParticleLayer | 부유 파티클 시스템 | 내부 물리 |
+| BytebeatLayer | bytebeat 공식 → 픽셀 | 내부 수학 |
+| FeedbackLayer | 이전 프레임 피드백 루프 | 자기참조 |
+
+**장르별 레이어 조합** (`GENRE_LAYER_PRESETS`):
+
+| visual genre | 음악 레이어 | TTS 레이어 | 특성 |
+|-------------|------------|-----------|------|
+| `enometa` | SineWave + Waveform + Particle | TextData + Barcode + DataStream + DataMatrix | 풀 세트 데이터아트 |
+| `cooper` | SineWave + Particle | DataStream | 미니멀 유기적 |
+| `abstract` | SineWave | DataMatrix | 정제된 기하 |
+| `data` | Waveform + SineWave | TextData + Barcode + DataStream + DataMatrix | 최고 밀도 |
+
+### Remotion Vocab 컴포넌트 (src/components/vocab/)
+
+`visual_script.json`의 vocab 문자열 → `VOCAB_MAP` → React 컴포넌트. 모두 오디오 리액티브 (bass/mid/high/rms/onset).
+
+| 카테고리 | vocab 문자열 | 컴포넌트 | 설명 |
+|---------|-------------|---------|------|
+| **파티클** | `particle_birth` `_scatter` `_converge` `_orbit` `_escape` `_chain_awaken` `_split_ratio` | ParticleBirth 외 6종 | 파티클 생명 주기 |
+| **흐름/색** | `flow_field_calm` `_turbulent` `color_shift` `_warm` `_cold` `_drain` `_bloom` `brightness_pulse` `light_source` | FlowField, ColorShift, BrightnessPulse, LightSource | 유동장 + 색상 변조 |
+| **데이터** | `counter_up` `neural_network` `loop_ring` `fractal_crack` `data_bar` `data_ring` `grid_morph` `grid_mesh` | CounterUp, NeuralNetwork, LoopRing, FractalCrack, DataBar, GridMorph | 데이터 시각화 |
+| **파형** | `waveform` `_spectrum` `_circular` `lissajous` `_complex` | WaveformVisualizer, Lissajous | 수학적 곡선 |
+| **텍스트** | `text_reveal` `_wave` `_glitch` `_scatter` | TextReveal | 4모드 타이포그래피 |
+| **심볼** | `symbol_morph` | SymbolMotion | 품사→추상도형 (noun→육각형, verb→화살표) |
+| **ASCII** | `ascii_block` `_shape` `_matrix` | AsciiArt | 비트맵 블록 / 품사 패턴 / 터미널 스트림 |
+| **레트로** | `pixel_grid` `_outline` `_life` `_rain` `pixel_waveform` `_steps` `_cascade` | PixelGrid, PixelWaveform | 8bit 레트로 |
+| **3D** | `terra_globe` `_data` `terra_flythrough` `_tunnel` `_terrain` `_terrain_bars` | TerraGlobe, TerraFlythrough, TerraTerrain | @remotion/three 3D (씬당 최대 1개) |
+| **자동** | `post_process` | PostProcess | 항상 렌더링 (vocab에 추가 불필요) |
+
+### 합성 흐름
+
+```
+visual_script.json
+  └── scenes[0].layers.semantic = [
+        { vocab: "lissajous", ... },     VOCAB_MAP["lissajous"]  →  <Lissajous>
+        { vocab: "data_bar",  ... }      VOCAB_MAP["data_bar"]   →  <DataBar>
+      ]
+
+최종 화면 (1080×1920):
+  ┌──────────────────┐
+  │   TitleSection   │  ← 제목 (fitText 자동 조절)
+  ├──────────────────┤
+  │  Python 배경 PNG │  ← 1080×1080 정사각
+  │  + Vocab 오버레이│  ← React 컴포넌트
+  │  + PostProcess   │  ← 스캔라인/글리치
+  ├──────────────────┤
+  │  SubtitleSection │  ← 나레이션 싱크 자막
+  └──────────────────┘
+  (마지막 6초: LogoEndcard)
+```
+
+---
+
+## Claude 개입 지점 (3-Gate 시스템)
+
+파이프라인은 자동이지만, Claude가 **4개 지점**에서 개입하여 다양성과 품질을 보장한다.
+
+```
+대본 작성 (enometa-writing 스킬)
+  │
+  ├─ Gate 0: 주제 선택
+  │    "글쓰기 시작하자" → 5대 도메인 교차점에서 3~5개 주제 추천
+  │    사용자가 선택 → 대본 작성 → 컨펌
+  │
+  └─ publish.md 생성 → enometa-produce 스킬 자동 invoke
+       │
+       ├─ Gate 1: 비주얼 다양성 개입 (visual_script 생성 후)
+       │    - 이전 EP와 vocab 중복 검사
+       │    - ascii_block에 맥락 맞는 ascii_text 영어 삽입
+       │    - 필요 시 vocab 교체/추가
+       │
+       ├─ Gate 2: seq_config 음색 설계 (music_script 생성 후)
+       │    - 이전 EP와 seq_config 비교 (BPM/킥/필터/코러스 등)
+       │    - mood_layers는 편집하지 않음 (장르 정체성)
+       │    - seq_config 파라미터만 조정하여 음색 차별화
+       │
+       └─ Gate 3: BGM 청취 확인
+            - 사용자가 bgm.wav 듣고 OK → 나머지 자동 진행
+            - (mix → audio_analysis → python_frames → render)
+```
+
+**핵심**: Gate 1~2는 Claude가 자동 개입. Gate 0/3은 사용자 승인 필요.
+
+---
+
+## 옵션 레퍼런스
+
+### 팔레트 (`--palette`)
+
+| 값 | 분위기 | accent | 특성 |
+|----|--------|--------|------|
+| `phantom` | 보라/청색 (기본) | 보라 | 몽환적 |
+| `neon_noir` | 네온 누아르 | 민트 | 사이버펑크 |
+| `cold_steel` | 차가운 철색 | 슬레이트 | 무채색 금속 |
+| `ember` | 붉은 불꽃 | 오렌지 | 따뜻한 에너지 |
+| `synapse` | 신경망 청록 | 에메랄드 | 생명/과학 |
+| `gameboy` | 게임보이 그린 | GB 라임 | 8bit 레트로 |
+| `c64` | Commodore 64 | 연보라 | 홈컴퓨터 레트로 |
+| `enometa` | 흑백 모노크롬 | 순수 흰색 | 미니멀 |
+
+### 음악 장르 (`--music-mood`) — v20
+
+| 값 | 레퍼런스 | BPM | 핵심 악기 |
+|----|----------|-----|-----------|
+| `acid` | Phuture, DJ Pierre | 126–138 | TB-303 acid bass |
+| `ambient` | Brian Eno | 60–72 | 공간감, 리버브 |
+| `microsound` | Ryoji Ikeda, Alva Noto | 85–100 | 정밀 펄스, 초단파 클릭 |
+| `IDM` | Aphex Twin, Autechre | 100–155 | 비정형 폴리리듬 |
+| `minimal` | Robert Hood, Richie Hawtin | 124–132 | 절제된 텍스처 |
+| `dub` | Basic Channel | 110–125 | tape delay, chord stab |
+| `glitch` | Oval, Farmers Manual | 92–108 | E(5,16), 비트크러시 |
+| `industrial` | Perc, Ansome | 138–155 | 왜곡 킥, 고에너지 |
+| `techno` | Jeff Mills, UR | 128–138 | 4-on-the-floor |
+| `house` | Larry Heard | 118–126 | Rhodes 패드(minor 9), 오프비트 하이햇 |
+
+### 비주얼 무드 (`--visual-mood`)
+
+`--visual-mood` 생략 시 `--music-mood`에서 자동 결정:
+
+| music-mood | → visual genre |
+|------------|----------------|
+| `ambient` / `microsound` / `dub` / `house` | `cooper` |
+| `IDM` / `minimal` | `abstract` |
+| `techno` / `industrial` | `data` |
+| `acid` / `glitch` | `enometa` |
+
+### seq_config 파라미터 (ep_seed 자동 파생)
+
+`music_script.json`의 `metadata.seq_config`에 저장. 에피소드마다 ep_seed에서 자동 결정.
+
+| 파라미터 | 범위 | 영향 |
+|---------|------|------|
+| `drum_seq_type` | 0–2 | Thue-Morse / Norgard / Rudin-Shapiro 수열 선택 |
+| `drum_rotation` | 0–7 | 드럼 패턴 회전 |
+| `pitch_rotation` | 0–7 | 음정 패턴 회전 |
+| `pitch_length` | 3–6 | 음정 시퀀스 길이 |
+| `bpm` | 장르 범위 | 장르별 고정 범위 내 결정 |
+| `saw_harmonics` | {1: 1.0, ...} | 톱니파 배음 구성 (음색 결정) |
+| `filter_cutoff_base` | 800–4000 Hz | LP 필터 컷오프 기본값 |
+| `chorus_depth_ms` | 1.5–5.0 | 코러스 딜레이 깊이 |
+| `fm_mod_ratio` | 1.5–3.5 | FM 베이스 변조 비율 |
+| `bass_detune` | 0.001–0.008 | 드론 베이스 디튜닝 |
+| `kick_character` | 0/1/2 | tight / boomy / punchy |
+| `arp_pattern` | [배수 배열] | 아르페지오 음정 패턴 |
+| `arp_division` | 3–6 | 아르페지오 박자 분할 |
+
+### 다양성 시스템 (Vertical Remixing)
+
+에피소드마다 음악과 비주얼이 자동으로 달라지는 3축 구조:
+
+| 축 | 결정 요소 | 결과 |
+|----|-----------|------|
+| **음색** | `ep_seed` → `seq_config` (13개 파라미터) | 드럼 패턴, 배음, 필터, 코러스, 킥 등 에피소드마다 고유 |
+| **레이어 조합** | `_GENRE_SPECS`의 required + optional풀 | 같은 장르라도 ep_seed로 다른 레이어 ON/OFF + 볼륨 |
+| **비주얼 전략** | genre → strategy 동적 매핑 + SI 승격 | SI ≥ 0.80이면 전략 한 단계 상향 (밀도 증가) |
+
+### 드럼 모드 (`--drum-mode`)
+
+| 값 | 동작 |
+|----|------|
+| `default` | 무드 기본값 따름 (기본) |
+| `on` | 풀 드럼 강제 ON |
+| `off` | 드럼 강제 OFF |
+| `simple` | 4-on-the-floor 킥 + 8분 하이햇 + 스네어 2,4박, 필인 없음 |
+| `dynamic` | 풀 드럼 + SI 최대 + 필인 2배 (4/8바 주기) |
+
+### 특정 단계만 재실행 (`--step --force`)
+
+```bash
+py scripts/enometa_render.py episodes/ep010 --title "제목" --step bgm --force
+```
+
+| step 값 | 실행 범위 |
+|---------|-----------|
+| `tts` | TTS 생성 |
+| `bgm` | BGM 합성 |
+| `mix` | 오디오 믹싱 |
+| `visual` | 비주얼 스크립트 + 프레임 렌더 |
+| `render` | Remotion 최종 렌더 |
 
 ---
 
@@ -47,14 +257,14 @@ node --version
 
 ```
 episodes/
-└── ep010/
+└── ep013/
     └── script.txt   # 대본 파일 (빈 줄로 문단 구분)
 ```
 
 ### 3. 전체 파이프라인 실행
 
 ```bash
-py scripts/enometa_render.py episodes/ep010 --title "제목" --palette phantom --music-mood acid
+py scripts/enometa_render.py episodes/ep013 --title "제목" --palette phantom --music-mood acid
 ```
 
 ### 4. Remotion 프리뷰
@@ -65,95 +275,42 @@ npx remotion studio --port 3000
 
 ---
 
-## 옵션 레퍼런스
+## 프로젝트 구조
 
-### 팔레트 (`--palette`)
-
-| 값 | 분위기 |
-|----|--------|
-| `phantom` | 어두운 보라/청색 (기본) |
-| `neon_noir` | 네온 누아르 |
-| `cold_steel` | 차가운 철색 |
-| `ember` | 붉은 불꽃 |
-| `synapse` | 신경망 청록 |
-| `gameboy` | 게임보이 그린 |
-| `c64` | Commodore 64 |
-| `enometa` | 흑백 모노크롬 |
-
-### 음악 장르 (`--music-mood`) — v20
-
-| 값 | 레퍼런스 | 특성 |
-|----|----------|------|
-| `acid` | Phuture, DJ Pierre | TB-303 acid bass, BPM 126–138 (기본) |
-| `ambient` | Brian Eno | 공간감, 리버브 중심, BPM 60–72 |
-| `microsound` | Ryoji Ikeda, Alva Noto | 정밀 펄스, 초단파 클릭, BPM 85–100 |
-| `IDM` | Aphex Twin, Autechre | 비정형 리듬, 폴리리듬, BPM 100–155 |
-| `minimal` | Robert Hood, Richie Hawtin | 극도로 절제된 텍스처, BPM 124–132 |
-| `dub` | Basic Channel, Rhythm & Sound | tape delay, 보이드 킥, BPM 110–125 |
-| `glitch` | Oval, Farmers Manual | Euclidean E(5,16) 패턴, 비트크러시, BPM 92–108 |
-| `industrial` | Perc, Ansome, Surgeon | 왜곡 킥, 고에너지, BPM 138–155 |
-| `techno` | Jeff Mills, Underground Resistance | 4-on-the-floor, TB-303 arp, BPM 128–138 |
-| `house` | Larry Heard, Frankie Knuckles | Rhodes 패드(minor 9), 4-on-the-floor, 오프비트 하이햇, BPM 118–126 |
-
-### 비주얼 무드 (`--visual-mood`)
-
-Python 배경 프레임과 Remotion vocab 레이어를 동시에 제어한다.
-
-`--visual-mood`를 생략하면 `--music-mood`에서 자동 결정된다.
-
-| music-mood | → visual genre 자동 선택 |
-|------------|--------------------------|
-| `ambient` / `microsound` / `dub` / `house` | `cooper` |
-| `IDM` / `minimal` | `abstract` |
-| `techno` / `industrial` | `data` |
-| `acid` / `glitch` (기본) | `enometa` |
-
-| 값 | Python 레이어 | Remotion vocab | 특성 |
-|----|--------------|----------------|------|
-| `enometa` (기본) | TextData + Barcode + DataStream + DataMatrix | 데이터아트 | 풀 세트 |
-| `cooper` | Particle + DataStream | 유기적 파형 | 미니멀, Barcode 없음 |
-| `abstract` | DataMatrix 단일 | 기하 추상 | 정제된 느낌 |
-| `data` | TextData + Barcode + DataStream + DataMatrix (최대) | 시각화 데이터 스트림 | 최고 밀도 |
-
-### 다양성 시스템
-
-에피소드마다 음악과 비주얼이 자동으로 달라지는 구조:
-
-| 축 | 결정 요소 | 결과 |
-|----|-----------|------|
-| **음악 음색** | `ep_seed` → `seq_config` (10개 파라미터) | 드럼 패턴, saw 배음, 필터 컷오프, 코러스, 킥 캐릭터 등 에피소드마다 고유 |
-| **음악 구조** | `music_mood` → `_MOOD_LAYERS` | 장르별 레이어 ON/OFF + BPM 범위 |
-| **비주얼 전략** | `genre` → strategy 동적 매핑 | cooper→breathing, abstract→cinematic, data→dense |
-| **비주얼 승격** | SI ≥ 0.80 → 전략 한 단계 상향 | 감정 고조 시 밀도 증가 |
-| **vocab 선택** | strategy의 prefer/avoid + SI 기반 레이어 수 | 씬마다 다른 vocab 조합 |
-
-### 드럼 모드 (`--drum-mode`)
-
-| 값 | 동작 |
-|----|------|
-| `default` | 무드 기본값 따름 (기본) |
-| `on` | 풀 드럼 강제 ON |
-| `off` | 드럼 강제 OFF |
-| `simple` | 4-on-the-floor 킥 + 8분음표 하이햇 + 스네어 2,4박, 필인 없음 (베이직 테크노 루프) |
-| `dynamic` | 풀 드럼+SI 최대+필인 2배 (4/8바 주기) |
-
-```bash
-py scripts/enometa_render.py episodes/ep010 --title "제목" --drum-mode simple
 ```
-
-### 특정 단계만 재실행 (`--step --force`)
-
-```bash
-py scripts/enometa_render.py episodes/ep010 --title "제목" --step bgm --force
+enometa-shorts/
+├── scripts/
+│   ├── enometa_render.py          # 전체 파이프라인 진입점
+│   ├── enometa_music_engine.py    # BGM 합성 (10장르, 13+레이어, ~5000줄)
+│   ├── visual_script_generator.py # 대본 → 씬/감정/vocab 매핑
+│   ├── visual_renderer.py         # numpy+Pillow 프레임 렌더링
+│   ├── visual_strategies.py       # 비주얼 전략 6종 프리셋
+│   ├── gen_timing.py              # TTS 실측 기반 타이밍 생성
+│   ├── generate_voice_edge.py     # Edge-TTS 나레이션 생성
+│   ├── script_data_extractor.py   # 형태소 분석 + SI 커브 추출
+│   ├── audio_mixer.py             # narration + bgm 믹싱
+│   ├── audio_analyzer.py          # RMS/onset/beat 분석
+│   ├── sequence_generators.py     # Thue-Morse / Norgard / Rudin-Shapiro 수열
+│   └── visual_layers/             # Python 배경 레이어 9종 (위 표 참조)
+├── src/
+│   ├── Root.tsx                   # Remotion Composition 정의
+│   ├── EnometaShorts.tsx          # 메인 레이아웃 컴포넌트
+│   ├── components/
+│   │   ├── VisualSection.tsx      # Python 프레임 + vocab 오버레이 합성
+│   │   ├── SubtitleSection.tsx    # 나레이션 싱크 자막
+│   │   ├── TitleSection.tsx       # 제목 (fitText 자동 조절)
+│   │   ├── ShapeMotion.tsx        # emotion별 기하 도형
+│   │   ├── LogoEndcard.tsx        # 엔드카드 (파티클 수렴 애니메이션)
+│   │   └── vocab/                 # Vocab 컴포넌트 30종 (위 표 참조)
+│   │       └── three/             # 3D Three.js vocab (Terra 계열)
+│   └── utils/palettes.ts          # 팔레트 8종 색상 정의
+├── episodes/ep001~ep012/          # 에피소드별 산출물
+├── public/                        # Remotion 정적 에셋 (mixed.wav 등)
+├── docs/
+│   ├── CHANGELOG.md
+│   └── decisions/                 # 아키텍처 결정 기록 (ADR)
+└── CLAUDE.md                      # AI 협업 가이드
 ```
-
-| step 값 | 실행 범위 |
-|---------|-----------|
-| `tts` | TTS 생성 |
-| `bgm` | BGM 합성 |
-| `mix` | 오디오 믹싱 |
-| `visual` | 비주얼 스크립트 + 프레임 렌더 |
-| `render` | Remotion 최종 렌더 |
 
 ---
 
@@ -165,138 +322,16 @@ py scripts/enometa_render.py episodes/ep010 --title "제목" --step bgm --force
 | TTS | Edge-TTS `ko-KR-SunHiNeural` |
 | BGM | Python (numpy) 직접 합성 |
 | 비주얼 프레임 | Python (numpy + Pillow) |
-| 오디오 분석 | Python (librosa-free, scipy) |
 | 형태소 분석 | [kiwipiepy](https://github.com/bab2min/kiwipiepy) |
 | 오디오 믹싱 | FFmpeg (EBU R128 `-14 LUFS`) |
 
 ---
 
-## 프로젝트 구조
+## 오디오 경로 주의
 
-```
-enometa-shorts/
-├── scripts/
-│   ├── enometa_render.py          # 전체 파이프라인 진입점
-│   ├── enometa_music_engine.py    # BGM 합성 (9장르(v18), 10레이어, ~5000줄)
-│   ├── visual_script_generator.py # 대본 → 씬/감정/vocab 매핑
-│   ├── visual_renderer.py         # numpy+Pillow 프레임 렌더링
-│   ├── gen_timing.py              # TTS 실측 기반 타이밍 생성
-│   ├── generate_voice_edge.py     # Edge-TTS 나레이션 생성
-│   ├── script_data_extractor.py   # 형태소 분석 + SI 커브 추출
-│   ├── audio_mixer.py             # narration + bgm 믹싱
-│   ├── audio_analyzer.py          # RMS/onset/beat 분석
-│   └── sequence_generators.py     # Thue-Morse / Norgard / Rudin-Shapiro 수열
-├── src/
-│   ├── Root.tsx                   # Remotion Composition 정의
-│   ├── EnometaShorts.tsx          # 메인 컴포넌트
-│   ├── components/
-│   │   ├── VisualSection.tsx      # Python 프레임 + vocab 오버레이
-│   │   ├── SubtitleSection.tsx    # 나레이션 싱크 자막
-│   │   ├── TextReveal.tsx         # 4모드 타이포그래픽 모션
-│   │   ├── SymbolMotion.tsx      # 품사 기반 추상 도형 모션
-│   │   ├── LogoEndcard.tsx        # 엔드카드 애니메이션
-│   │   ├── TitleSection.tsx       # 제목 (fitText 자동 조절)
-│   │   ├── ShapeMotion.tsx        # emotion별 기하 도형
-│   │   └── vocab/three/          # 3D Three.js vocab (Terra Vision 계열)
-│   └── utils/
-│       └── palettes.ts            # 팔레트 정의
-├── episodes/
-│   └── ep001~ep011/               # 에피소드별 산출물
-├── public/                        # Remotion 정적 에셋 (mixed.wav 등)
-├── docs/
-│   ├── CHANGELOG.md               # 변경 이력
-│   ├── dev-concepts.md            # 개발 개념 사전
-│   └── decisions/                 # 아키텍처 결정 기록 (ADR)
-│       ├── 001-kiwipiepy-vs-konlpy.md
-│       ├── 002-edge-tts-vs-chatterbox.md
-│       ├── 003-hybrid-render.md
-│       ├── 004-fixed-volume-no-cr.md
-│       ├── 005-music-engine-monolith.md
-│       └── 006-genre-rename-v18.md
-└── CLAUDE.md                      # AI 협업 가이드 (파이프라인 전체 규칙)
-```
-
----
-
-## 코드 파일 가이드
-
-각 파일이 무슨 일을 하는지 한 줄 설명 + 링크.
-
-### Python 스크립트 (scripts/)
-
-| 파일 | 역할 |
-|------|------|
-| [enometa_render.py](scripts/enometa_render.py) | **파이프라인 진입점** — 아래 모든 단계를 순서대로 자동 실행 |
-| [gen_timing.py](scripts/gen_timing.py) | 대본 문장 → TTS 실측 길이 기반 타이밍 배치 → `narration_timing.json` |
-| [generate_voice_edge.py](scripts/generate_voice_edge.py) | `narration_timing.json` → Edge-TTS 음성 합성 → `narration.wav` |
-| [script_data_extractor.py](scripts/script_data_extractor.py) | 대본 형태소 분석(kiwipiepy) + 문장별 감정 강도(SI) 계산 → `script_data.json` |
-| [enometa_music_engine.py](scripts/enometa_music_engine.py) | **BGM 합성** — numpy로 직접 음파 생성 (9장르, 10레이어, ~5000줄) → `bgm.wav` |
-| [audio_mixer.py](scripts/audio_mixer.py) | `narration.wav` + `bgm.wav` → FFmpeg 믹싱 + -14 LUFS 정규화 → `mixed.wav` |
-| [visual_script_generator.py](scripts/visual_script_generator.py) | `script_data.json` → 씬/감정/vocab 선택 → `visual_script.json`. `music_mood` 기반 visual genre 자동 결정 |
-| [visual_strategies.py](scripts/visual_strategies.py) | 비주얼 전략 6종 프리셋 정의 (dense/breathing/cinematic 등) — visual_script_generator가 참조 |
-| [visual_renderer.py](scripts/visual_renderer.py) | `visual_script.json` → Python(Pillow)으로 배경 프레임 이미지 생성 → `frames/` |
-| [audio_analyzer.py](scripts/audio_analyzer.py) | `mixed.wav` → 프레임별 bass/mid/high/rms/onset 분석 → `audio_analysis.json` |
-| [sequence_generators.py](scripts/sequence_generators.py) | 음악 패턴용 수열 생성 (Thue-Morse, Norgard, Rudin-Shapiro) |
-
-### Python 비주얼 레이어 (scripts/visual_layers/)
-
-`visual_renderer.py`가 이 레이어들을 조합해 배경 프레임 이미지를 만든다. 각 레이어는 numpy 배열(1080×1080)을 반환하고 `composite.py`가 알파 합성으로 쌓는다.
-
-| 파일 | 역할 |
-|------|------|
-| [composite.py](scripts/visual_layers/composite.py) | 여러 레이어를 알파 블렌딩으로 합성하는 유틸리티 (`composite_layers` / `composite_dual_source`) |
-| [barcode_layer.py](scripts/visual_layers/barcode_layer.py) | 토큰의 UTF-8 바이트 → 수직 바코드 스트라이프 (단어마다 고유 패턴, SI 기반 선굵기/색상 변조) |
-| [text_data_layer.py](scripts/visual_layers/text_data_layer.py) | 대본 키워드/형태소를 화면 위에 타이포그래피로 배치 (TextDataLayer) |
-| [data_stream_layer.py](scripts/visual_layers/data_stream_layer.py) | 수평 스크롤 데이터 텍스트 8~12줄 — 컴퓨터가 텍스트를 해석하는 과정 시각화 (SI 기반 속도/크기 가변) |
-| [data_matrix_layer.py](scripts/visual_layers/data_matrix_layer.py) | 악기 에너지/합성 파라미터를 매트릭스·그리드로 시각화 — Ryoji Ikeda 스타일 |
-| [particle_layer.py](scripts/visual_layers/particle_layer.py) | 부유하는 파티클 시스템 (ParticleLayer) |
-| [waveform_layer.py](scripts/visual_layers/waveform_layer.py) | 오디오 파형 시각화 레이어 (WaveformLayer) |
-| [sine_wave_layer.py](scripts/visual_layers/sine_wave_layer.py) | 사인파 배경 레이어 — SI 낮을수록 강하게 표시 (SineWaveLayer) |
-| [bytebeat_layer.py](scripts/visual_layers/bytebeat_layer.py) | bytebeat 공식 값이 직접 픽셀이 되는 레이어 — "데이터가 곧 소리이고 곧 화면" |
-| [feedback_layer.py](scripts/visual_layers/feedback_layer.py) | 이전 프레임이 다음 프레임에 영향을 주는 피드백 루프 시각화 (자기참조 구조) |
-| [tts_effects.py](scripts/visual_layers/tts_effects.py) | 포스트프로세싱 유틸 함수 — 글리치/스캔라인/색수차/글로우/파형 왜곡 등 |
-
-### Remotion / React (src/)
-
-| 파일 | 역할 |
-|------|------|
-| [src/Root.tsx](src/Root.tsx) | 모든 에피소드 Composition 등록 + calcMeta (영상 길이 자동 계산) |
-| [src/EnometaShorts.tsx](src/EnometaShorts.tsx) | **메인 레이아웃** — TitleSection / VisualSection / SubtitleSection / LogoEndcard 조합 |
-| [src/types.ts](src/types.ts) | 전체 TypeScript 타입 정의 (Scene, VisualScript, VocabEntry, VocabComponentProps 등) |
-| [src/hooks/useAudioData.ts](src/hooks/useAudioData.ts) | `audio_analysis.json` → 현재 프레임의 `AudioFrame`(bass/mid/high/rms/onset) 반환 |
-| [src/ep001Script.ts](src/ep001Script.ts) | EP001 데이터 모듈 — json 파일 import + 타입 캐스팅 export (EP002~011도 동일 패턴) |
-| [src/components/VisualSection.tsx](src/components/VisualSection.tsx) | Python 배경 프레임 + vocab 컴포넌트 오버레이 — `VOCAB_MAP`으로 문자열→컴포넌트 변환 |
-| [src/components/SubtitleSection.tsx](src/components/SubtitleSection.tsx) | `narration_timing` 기반 자막 싱크 표시 (EP005 레퍼런스 유지) |
-| [src/components/TitleSection.tsx](src/components/TitleSection.tsx) | 제목 표시 — `fitText` fontSize 자동 조절 (최대 72px) + `text-wrap: balance` 2줄 균등 분배 |
-| [src/components/ShapeMotion.tsx](src/components/ShapeMotion.tsx) | emotion별 기하 도형 애니메이션 (tension/climax/awakening/intro/buildup) |
-| [src/components/LogoEndcard.tsx](src/components/LogoEndcard.tsx) | 영상 마지막 엔드카드 (로고 + 태그라인 + 파티클 180개) |
-| [src/components/vocab/TextReveal.tsx](src/components/vocab/TextReveal.tsx) | 타이포그래피 모션 4종 (typewriter/wave/glitch/scatter) |
-| [src/components/vocab/SymbolMotion.tsx](src/components/vocab/SymbolMotion.tsx) | 품사 기반 추상 도형 모션 — noun→육각형, verb→화살표, adjective→물결, science→동심원, philosophy→이중원 |
-| [src/components/vocab/AsciiArt.tsx](src/components/vocab/AsciiArt.tsx) | ASCII 아트 3모드 — block(비트맵 블록문자), shape(품사별 ASCII 패턴), matrix(터미널 데이터 스트림) |
-| [src/components/vocab/DataBar.tsx](src/components/vocab/DataBar.tsx) | 오디오 리액티브 수직 바 차트 (`data_bar` / `data_ring`) |
-| [src/components/vocab/Lissajous.tsx](src/components/vocab/Lissajous.tsx) | 리사주 곡선 (수학 패턴, bass→위상/rms→선굵기/onset→교차점) |
-| [src/components/vocab/PixelGrid.tsx](src/components/vocab/PixelGrid.tsx) | 8bit 레트로 픽셀 그리드 (life/rain/outline 변형) |
-| [src/components/vocab/NeuralNetwork.tsx](src/components/vocab/NeuralNetwork.tsx) | 신경망 노드-엣지 애니메이션 |
-| [src/components/vocab/FlowField.tsx](src/components/vocab/FlowField.tsx) | 유동장 파티클 (`flow_field_calm` / `flow_field_turbulent`) |
-| [src/components/vocab/ParticleBirth.tsx](src/components/vocab/ParticleBirth.tsx) | 파티클 탄생 — scatter/converge/orbit/escape/chain/split 등 6종 변형도 동일 폴더 |
-| [src/components/vocab/three/TerraGlobe.tsx](src/components/vocab/three/TerraGlobe.tsx) | 90년대 CGI 와이어프레임 지구 회전 + 데이터 포인트 (@remotion/three) |
-| [src/components/vocab/three/TerraFlythrough.tsx](src/components/vocab/three/TerraFlythrough.tsx) | 무한 와이어프레임 터널 / 줌인 효과 (원형/사각/육각) |
-| [src/components/vocab/three/TerraTerrain.tsx](src/components/vocab/three/TerraTerrain.tsx) | 로우폴리 3D 지형 + 솟아오르는 데이터 바 (flat shading) |
-| [src/utils/palettes.ts](src/utils/palettes.ts) | 팔레트 8종 색상 정의 |
-
-### Vocab이란?
-
-**vocab** = 씬마다 화면에 그려지는 시각 어휘. `visual_script.json`의 `scenes[].layers.semantic[]`에 문자열로 지정되면 [VisualSection.tsx](src/components/VisualSection.tsx)의 `VOCAB_MAP`이 해당 React 컴포넌트를 찾아 렌더링한다.
-
-```
-visual_script.json                VisualSection.tsx           화면
-scenes[0].layers.semantic = [     VOCAB_MAP["lissajous"]  →  <Lissajous>
-  { vocab: "lissajous", ... },    VOCAB_MAP["data_bar"]   →  <DataBar>
-  { vocab: "data_bar",  ... }
-]
-```
-
-오디오 반응형 — 모든 vocab 컴포넌트는 `AudioFrame(bass/mid/high/rms/onset)`을 받아 실시간 움직임에 반영한다.
+Remotion은 `public/epXXX/mixed.wav`를 참조한다.
+`episodes/epXXX/mixed.wav`와 **별개의 파일**이므로, 수동 재믹스 시 반드시 동기화 필요.
+(`enometa_render.py`는 자동 처리)
 
 ---
 
@@ -312,18 +347,6 @@ scenes[0].layers.semantic = [     VOCAB_MAP["lissajous"]  →  <Lissajous>
 | [004](docs/decisions/004-fixed-volume-no-cr.md) | 볼륨 고정 + 콜앤리스폰스 제거 |
 | [005](docs/decisions/005-music-engine-monolith.md) | 음악 엔진 모놀리스 유지 |
 | [006](docs/decisions/006-genre-rename-v18.md) | 프로토타입 무드 → 실존 언더그라운드 장르 리네이밍 |
-
----
-
-## 오디오 경로 주의
-
-Remotion은 `public/epXXX/mixed.wav`를 참조한다.
-`episodes/epXXX/mixed.wav`와 **별개의 파일**이므로, 수동 재믹스 시 반드시 동기화 필요.
-
-```bash
-# 수동 동기화 (enometa_render.py는 자동 처리)
-copy episodes\ep010\mixed.wav public\ep010\mixed.wav
-```
 
 ---
 

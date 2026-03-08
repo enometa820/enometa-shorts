@@ -145,11 +145,11 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
     const ctx = offscreen.getContext("2d")!;
 
     ctx.fillStyle = "#FFFFFF";
-    ctx.font = `300 140px "Pretendard Variable", "Segoe UI", sans-serif`;
+    ctx.font = `300 120px "Pretendard Variable", "Segoe UI", sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    (ctx as any).letterSpacing = "45px";
-    ctx.fillText("ENOMETA", W / 2 + 22, H / 2 - 60);
+    (ctx as any).letterSpacing = "14px";
+    ctx.fillText("ENOMETA", W / 2 + 7, H / 2 - 60);
 
     const imageData = ctx.getImageData(0, 0, W, H);
     const pixels: { x: number; y: number }[] = [];
@@ -319,6 +319,20 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
           }
         }
       }
+    }
+
+    // 텍스트 골격 오버레이 (수렴 후 가독성 보강)
+    if (convergeProgress > 0.7) {
+      const textAlpha = Math.min(0.35, (convergeProgress - 0.7) / 0.3 * 0.35);
+      ctx.save();
+      ctx.globalAlpha = textAlpha;
+      ctx.font = `300 120px "Pretendard Variable", "Segoe UI", sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      (ctx as any).letterSpacing = "14px";
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillText("ENOMETA", W / 2 + 7, H / 2 - 60);
+      ctx.restore();
     }
 
     // 스캔라인 효과 (수렴 후)

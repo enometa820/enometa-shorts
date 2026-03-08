@@ -5,6 +5,17 @@
 
 ---
 
+## 2026-03-08 — EP012 피드백 반영 + README 재구성 + 파이프라인 개선
+
+### Changed
+- `README.md`: 전면 재구성 — "비주얼 아키텍처" (Python 9레이어 + Remotion 30 vocab 매핑 표), "Claude 3-Gate 개입 지점", seq_config 파라미터 레퍼런스 추가. 중복 "코드 파일 가이드" 섹션 제거
+- `LogoEndcard.tsx`: ENOMETA 텍스트 잘림 수정 — fontSize 140→120, letterSpacing 45→14, 텍스트 골격 오버레이(35%) 추가
+- `text_data_layer.py`: TextDataLayer 감도 향상 — brightness 바닥값 0.1→0.35, dim_color/very_dim 배수 상향, card_fill //12→//6
+- `enometa_render.py`: Webpack 캐시(`node_modules/.cache/`) 자동 삭제 + 렌더 성공 후 frames/ 자동 정리 추가
+- `enometa-writing.md`: STEP 4에 enometa-produce 스킬 자동 invoke 지시 추가 (스킬 핸드오프 강화)
+
+---
+
 ## 2026-03-08 — v20 House 장르 추가 + Rhodes 패드 + Gate 2 seq_config 개입
 
 ### Added
