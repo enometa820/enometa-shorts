@@ -384,3 +384,13 @@ Remotion은 `public/epXXX/mixed.wav`를 참조한다.
 ## 변경 이력
 
 [docs/CHANGELOG.md](docs/CHANGELOG.md)
+
+---
+
+## 참조 문서
+
+| 문서 | 내용 |
+|------|------|
+| [docs/visual-architecture.md](docs/visual-architecture.md) | 비주얼 3파트 상세 — Python 배경 레이어, Vocab 30종, PostProcess 5효과, 팔레트, 비주얼 장르/무드, 감정 색상 |
+| [docs/CHANGELOG.md](docs/CHANGELOG.md) | 버전별 변경 이력 |
+| [docs/decisions/](docs/decisions/) | 아키텍처 결정 기록 (ADR) |
