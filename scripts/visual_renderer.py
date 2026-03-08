@@ -23,6 +23,7 @@ from visual_layers import (
     BytebeatLayer, WaveformLayer, ParticleLayer,
     DataMatrixLayer, FeedbackLayer,
     BarcodeLayer, SineWaveLayer, DataStreamLayer, TextDataLayer,
+    AsciiBackgroundLayer,
     composite_layers, composite_dual_source,
 )
 
@@ -107,10 +108,11 @@ GENRE_LAYER_PRESETS = {
             {"layer": "ParticleLayer",   "intensity": 0.3},
         ],
         "tts_layers": [
-            {"layer": "TextDataLayer",   "intensity": 1.2},
-            {"layer": "BarcodeLayer",    "intensity": 0.85},
-            {"layer": "DataStreamLayer", "intensity": 0.75},
-            {"layer": "DataMatrixLayer", "intensity": 0.90},
+            {"layer": "TextDataLayer",        "intensity": 1.2},
+            {"layer": "BarcodeLayer",         "intensity": 0.85},
+            {"layer": "DataStreamLayer",      "intensity": 0.75},
+            {"layer": "DataMatrixLayer",      "intensity": 0.90},
+            {"layer": "AsciiBackgroundLayer", "intensity": 0.20},
         ],
         "blend_ratio": 0.45,
     },
@@ -122,8 +124,9 @@ GENRE_LAYER_PRESETS = {
             {"layer": "ParticleLayer",   "intensity": 0.7},
         ],
         "tts_layers": [
-            {"layer": "TextDataLayer",   "intensity": 0.70},
-            {"layer": "DataStreamLayer", "intensity": 0.90},
+            {"layer": "TextDataLayer",        "intensity": 0.70},
+            {"layer": "DataStreamLayer",      "intensity": 0.90},
+            {"layer": "AsciiBackgroundLayer", "intensity": 0.18},
         ],
         "blend_ratio": 0.55,
     },
@@ -134,8 +137,9 @@ GENRE_LAYER_PRESETS = {
             {"layer": "WaveformLayer",   "intensity": 0.8},
         ],
         "tts_layers": [
-            {"layer": "TextDataLayer",   "intensity": 0.60},
-            {"layer": "DataMatrixLayer", "intensity": 0.95},
+            {"layer": "TextDataLayer",        "intensity": 0.60},
+            {"layer": "DataMatrixLayer",      "intensity": 0.95},
+            {"layer": "AsciiBackgroundLayer", "intensity": 0.22},
         ],
         "blend_ratio": 0.50,
     },
@@ -146,10 +150,11 @@ GENRE_LAYER_PRESETS = {
             {"layer": "SineWaveLayer",   "intensity": 0.4},
         ],
         "tts_layers": [
-            {"layer": "TextDataLayer",   "intensity": 1.0},
-            {"layer": "BarcodeLayer",    "intensity": 1.0},
-            {"layer": "DataStreamLayer", "intensity": 0.95},
-            {"layer": "DataMatrixLayer", "intensity": 0.90},
+            {"layer": "TextDataLayer",        "intensity": 1.0},
+            {"layer": "BarcodeLayer",         "intensity": 1.0},
+            {"layer": "DataStreamLayer",      "intensity": 0.95},
+            {"layer": "DataMatrixLayer",      "intensity": 0.90},
+            {"layer": "AsciiBackgroundLayer", "intensity": 0.25},
         ],
         "blend_ratio": 0.35,
     },
@@ -165,6 +170,7 @@ LAYER_CLASSES = {
     "SineWaveLayer": SineWaveLayer,
     "DataStreamLayer": DataStreamLayer,
     "TextDataLayer": TextDataLayer,
+    "AsciiBackgroundLayer": AsciiBackgroundLayer,
 }
 
 # SI 기반 레이어 강도 스케일 함수
@@ -179,7 +185,8 @@ SI_INTENSITY_SCALE = {
     "TextDataLayer":   lambda si: 0.88 + si * 0.12,             # si=0→0.88, si=1→1.0 (강화)
     "BarcodeLayer":    lambda si: 0.60 + si * 0.40,             # si=0→0.60, si=1→1.0
     "DataStreamLayer": lambda si: 0.50 + si * 0.50,             # si=0→0.50, si=1→1.0
-    "DataMatrixLayer": lambda si: max(0.55, si ** 0.6),         # si=0→0.55, si=1→1.0 (강화)
+    "DataMatrixLayer":      lambda si: max(0.55, si ** 0.6),         # si=0→0.55, si=1→1.0 (강화)
+    "AsciiBackgroundLayer": lambda si: 0.15 + si * 0.15,             # si=0→0.15, si=1→0.30 (은은)
 }
 
 

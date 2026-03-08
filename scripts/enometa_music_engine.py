@@ -1495,6 +1495,10 @@ class EnometaMusicEngine:
                 kick_character=sc.get("kick_character", 0),
                 arp_pattern=sc.get("arp_pattern", [1, 1.25, 1.5, 2, 1.5, 1.25]),
                 arp_division=sc.get("arp_division", 4),
+                # v21 멜로디 다양화
+                melody_scale_offset=sc.get("melody_scale_offset", 0),
+                melody_beat_base=sc.get("melody_beat_base", 3.0),
+                melody_norgard_offset=sc.get("melody_norgard_offset", 0),
             )
         else:
             # fallback: episode_id 해시 기반 시드 (고정 시드 42 방지)
@@ -1505,6 +1509,14 @@ class EnometaMusicEngine:
         palette = script.get("palette", {})
         self.bass_freq = palette.get("bass_freq", 82.4)
         self.pad_root = palette.get("pad_root", 329.6)
+
+        # v21: ep_seed 기반 멜로디 시퀀스 rebuild
+        global SINE_MELODY_SEQUENCES
+        SINE_MELODY_SEQUENCES = build_sine_melody_sequences(
+            self.pad_root,
+            scale_offset=self.seq_config.melody_scale_offset,
+            beat_base=self.seq_config.melody_beat_base,
+        )
         self.pad_fifth = palette.get("pad_fifth", 493.9)
         self.arp_root = palette.get("arp_root", 220)
         self.arp_pattern = palette.get("arp_pattern", [1, 1.25, 1.5, 2, 1.5, 1.25])
@@ -2056,22 +2068,21 @@ class EnometaMusicEngine:
     # ---- Ikeda 전용 연속 렌더러 ----
 
     def _render_continuous_sine_interference(self, sections):
-        """v8: 전체 길이 사인파 간섭 드론 — 감정별 멜로디 시퀀스 + 4마디 주파수 전환"""
-        print("  [sine_interference] v8 melodic interference drone...", flush=True)
+        """v21: ep_seed 기반 멜로디 변주 + Norgard pitch modulation"""
+        print("  [sine_interference] v21 seed-varied melodic drone...", flush=True)
         bpm = self.script.get("metadata", {}).get("base_bpm", 60)
         bar_duration = (60.0 / bpm) * 4  # 4/4 박자 1마디
         fade_sec = 0.1  # 주파수 쌍 전환 크로스페이드
 
-        # script_data에서 기본 주파수 쌍 추출 (fallback용)
-        base_freq_pairs = []
-        if self._script_data:
-            freq_map = self._script_data.get("global", {}).get("freq_map", {})
-            freqs = sorted(set(freq_map.values()))
-            if len(freqs) >= 2:
-                for i in range(len(freqs) - 1):
-                    base_freq_pairs.append((freqs[i], freqs[i + 1]))
-        if not base_freq_pairs:
-            base_freq_pairs = [(220, 223), (440, 443)]  # 기본 3Hz 비팅
+        # Norgard pitch modulation 준비 (ep_seed 기반)
+        norgard_offset = self.seq_config.melody_norgard_offset
+        from sequence_generators import norgard as norgard_seq, rotate
+        norgard_raw = norgard_seq(64)
+        norgard_rotated = rotate(norgard_raw, norgard_offset)
+        # Norgard 값을 0.95~1.05 범위의 미세 음고 변조 비율로 매핑
+        n_min, n_max = min(norgard_rotated[:32]), max(norgard_rotated[:32])
+        n_range = max(1, n_max - n_min)
+        norgard_ratios = [0.97 + 0.06 * (v - n_min) / n_range for v in norgard_rotated]
 
         total = np.zeros(self.total_samples)
         t = np.linspace(0, self.duration, self.total_samples, endpoint=False)
@@ -2091,8 +2102,6 @@ class EnometaMusicEngine:
             melody_seq = SINE_MELODY_SEQUENCES.get(melody_key, SINE_MELODY_SEQUENCES["neutral"])
 
             # 섹션 내에서 4마디 단위로 주파수 쌍 순환
-            sec_duration = sec_end - sec_start
-            num_bars_in_section = max(1, int(sec_duration / bar_duration))
             chunk_bars = 4  # 4마디마다 전환
 
             local_pos = 0
@@ -2101,6 +2110,12 @@ class EnometaMusicEngine:
                 # 현재 chunk의 주파수 쌍
                 pair_idx = chunk_idx % len(melody_seq)
                 f1, f2 = melody_seq[pair_idx]
+
+                # Norgard pitch modulation: 매 4바 chunk마다 미세 음고 이동
+                norgard_idx = chunk_idx % len(norgard_ratios)
+                pitch_mod = norgard_ratios[norgard_idx]
+                f1 *= pitch_mod
+                f2 *= pitch_mod
 
                 chunk_samples = int(chunk_bars * bar_duration * self.sr)
                 chunk_end = min(local_pos + chunk_samples, s1 - s0)
@@ -4398,21 +4413,29 @@ EMOTION_MAP = {
 # _render_continuous_sine_interference()에서 사용
 # ============================================================
 
-def build_sine_melody_sequences(pad_root: float) -> dict:
-    """v9: key_palette의 pad_root 기반으로 SINE_MELODY_SEQUENCES 동적 생성.
-    하드코딩된 220Hz 대신 실제 선택된 키의 음정을 사용.
-    beat_offset: 맥놀이 주파수 (Hz) — 작을수록 느린 비팅
+def build_sine_melody_sequences(pad_root: float, scale_offset: int = 0,
+                                beat_base: float = 3.0) -> dict:
+    """v21: ep_seed 기반 멜로디 다양화.
+    scale_offset: 스케일 시작점 회전 (0~6) — 같은 emotion이라도 다른 음정 사용
+    beat_base: 맥놀이 기본 주파수 (Hz) — 에피소드마다 다른 비팅 속도
     """
     r = pad_root
     # 스케일 음정 비율 (단조: 1, 9/8, 6/5, 4/3, 3/2, 8/5, 9/5)
-    scale = [r, r * 9/8, r * 6/5, r * 4/3, r * 3/2, r * 8/5, r * 9/5, r * 2]
-    def bp(f, beat): return (round(f, 1), round(f + beat, 1))
+    full_scale = [1, 9/8, 6/5, 4/3, 3/2, 8/5, 9/5]
+    # scale_offset으로 시작점 회전 → 같은 "ascending"이라도 다른 음에서 시작
+    rotated = full_scale[scale_offset:] + full_scale[:scale_offset]
+    scale = [r * ratio for ratio in rotated] + [r * rotated[0] * 2]  # 옥타브 추가
+
+    # beat_base로 맥놀이 속도 변조 (기존 고정 3/4/5/7... → beat_base 기반 스케일링)
+    b = beat_base
+    def bp(f, beat_mult): return (round(f, 1), round(f + b * beat_mult, 1))
+
     return {
-        "ascending":  [bp(scale[0], 3), bp(scale[2], 4), bp(scale[4], 3), bp(scale[6], 5)],
-        "descending": [bp(scale[6], 5), bp(scale[4], 3), bp(scale[2], 4), bp(scale[0], 3)],
-        "tension":    [bp(scale[0], 7), bp(scale[0], 13), bp(scale[0], 20), bp(scale[0], 27)],
-        "release":    [bp(scale[4], 27), bp(scale[4], 20), bp(scale[4], 13), bp(scale[4], 7)],
-        "neutral":    [bp(scale[0], 3), bp(scale[2], 3), bp(scale[0], 3), bp(scale[2], 3)],
+        "ascending":  [bp(scale[0], 1.0), bp(scale[2], 1.3), bp(scale[4], 1.0), bp(scale[6], 1.7)],
+        "descending": [bp(scale[6], 1.7), bp(scale[4], 1.0), bp(scale[2], 1.3), bp(scale[0], 1.0)],
+        "tension":    [bp(scale[0], 2.3), bp(scale[0], 4.3), bp(scale[0], 6.7), bp(scale[0], 9.0)],
+        "release":    [bp(scale[4], 9.0), bp(scale[4], 6.7), bp(scale[4], 4.3), bp(scale[4], 2.3)],
+        "neutral":    [bp(scale[0], 1.0), bp(scale[2], 1.0), bp(scale[0], 1.0), bp(scale[2], 1.0)],
     }
 
 # 기본값 (generate_music_script에서 키 선택 후 덮어씌움)

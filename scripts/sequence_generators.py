@@ -128,6 +128,10 @@ class EpisodeSequenceConfig:
     # v19: 아르페지오 다양화
     arp_pattern: list          # 음정 비율 패턴 (예: [1, 1.25, 1.5, 2])
     arp_division: int          # BPM 분할 (2=8분, 3=3연음, 4=16분)
+    # v21: 멜로디 다양화 (sine_interference)
+    melody_scale_offset: int   # 0~6, 스케일 시작 음계 회전
+    melody_beat_base: float    # 2.0~8.0 Hz, 맥놀이 기본 주파수
+    melody_norgard_offset: int # 0~15, Norgard 수열 시작점 오프셋
 
 
 # ── 아르페지오 패턴 풀 ─────────────────────────────────────
@@ -171,6 +175,10 @@ def derive_episode_sequences(ep_seed: int) -> EpisodeSequenceConfig:
     # v19: 아르페지오 다양화
     arp_pattern = rng.choice(ARP_PATTERN_POOL)
     arp_division = rng.choice(ARP_DIVISION_POOL)
+    # v21: 멜로디 다양화
+    melody_scale_offset = rng.randint(0, 6)
+    melody_beat_base = round(rng.uniform(2.0, 8.0), 1)
+    melody_norgard_offset = rng.randint(0, 15)
     return EpisodeSequenceConfig(
         drum_seq_type=drum_seq_type,
         drum_rotation=drum_rotation,
@@ -185,6 +193,9 @@ def derive_episode_sequences(ep_seed: int) -> EpisodeSequenceConfig:
         kick_character=rng.randint(0, 2),
         arp_pattern=arp_pattern,
         arp_division=arp_division,
+        melody_scale_offset=melody_scale_offset,
+        melody_beat_base=melody_beat_base,
+        melody_norgard_offset=melody_norgard_offset,
     )
 
 

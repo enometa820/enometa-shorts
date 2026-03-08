@@ -10,6 +10,7 @@ from .barcode_layer import BarcodeLayer
 from .sine_wave_layer import SineWaveLayer
 from .data_stream_layer import DataStreamLayer
 from .text_data_layer import TextDataLayer
+from .ascii_background_layer import AsciiBackgroundLayer
 from . import tts_effects
 
 __all__ = [
@@ -24,5 +25,6 @@ __all__ = [
     "SineWaveLayer",
     "DataStreamLayer",
     "TextDataLayer",
+    "AsciiBackgroundLayer",
     "tts_effects",
 ]

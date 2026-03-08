@@ -5,6 +5,19 @@
 
 ---
 
+## 2026-03-08 — v21 멜로디 다양성 + ASCII 배경 레이어
+
+### Added
+- `ascii_background_layer.py`: 신규 Python 비주얼 레이어 — 12×12px 셀 그리드, SI 기반 문자 밀도(7단계), 키워드 하이라이트, ep_seed 결정론적
+- `sequence_generators.py`: `EpisodeSequenceConfig`에 v21 멜로디 필드 3개 추가 (`melody_scale_offset`, `melody_beat_base`, `melody_norgard_offset`)
+- `visual_renderer.py`: 4개 장르 프리셋 모두에 `AsciiBackgroundLayer` 추가 (intensity 0.18~0.25)
+
+### Changed
+- `enometa_music_engine.py`: `build_sine_melody_sequences()` — ep_seed 기반 스케일 회전 + 맥놀이 주파수 변주로 에피소드별 고유 멜로디
+- `enometa_music_engine.py`: `_render_continuous_sine_interference()` — Norgard 수열 연결하여 4바 단위 피치 모듈레이션
+
+---
+
 ## 2026-03-08 — EP012 피드백 반영 + README 재구성 + 파이프라인 개선
 
 ### Changed
