@@ -125,7 +125,24 @@ class EpisodeSequenceConfig:
     fm_mod_ratio: float       # FM 베이스 모듈레이터 비율
     bass_detune: float        # 베이스 디튜닝 비율 (0.001~0.01)
     kick_character: int       # 킥 캐릭터 0=tight 1=boomy 2=punchy
+    # v19: 아르페지오 다양화
+    arp_pattern: list          # 음정 비율 패턴 (예: [1, 1.25, 1.5, 2])
+    arp_division: int          # BPM 분할 (2=8분, 3=3연음, 4=16분)
 
+
+# ── 아르페지오 패턴 풀 ─────────────────────────────────────
+ARP_PATTERN_POOL = [
+    [1, 1.25, 1.5, 2, 1.5, 1.25],     # 0: up-down (클래식)
+    [1, 1.5, 1.25, 2],                  # 1: broken up (불규칙 상승)
+    [2, 1.5, 1.25, 1, 1.25, 1.5],      # 2: down-up (역방향)
+    [1, 2, 1.5, 1.25],                  # 3: octave-first (옥타브 점프)
+    [1, 1.25, 2, 1.5, 1.25, 1],        # 4: peak-middle (중간 피크)
+    [1, 1.5, 2, 1.5],                   # 5: fifths (5도 중심)
+    [1, 1.333, 1.5, 2, 1.333, 1],      # 6: minor feel (단조 느낌)
+    [0.5, 1, 1.5, 2],                   # 7: wide ascending (넓은 상승)
+]
+
+ARP_DIVISION_POOL = [4, 4, 3, 2]  # 4=16분음표, 3=3연음, 2=8분음표
 
 BPM_POOL = [108, 115, 120, 125, 128, 130, 135, 138, 140, 145, 150, 155, 160, 162]
 
@@ -151,6 +168,9 @@ def derive_episode_sequences(ep_seed: int) -> EpisodeSequenceConfig:
         h = rng.choice([x for x in _HARMONIC_POOL if x not in used])
         saw_harmonics[h] = round(rng.uniform(0.15, 0.8), 2)
         used.add(h)
+    # v19: 아르페지오 다양화
+    arp_pattern = rng.choice(ARP_PATTERN_POOL)
+    arp_division = rng.choice(ARP_DIVISION_POOL)
     return EpisodeSequenceConfig(
         drum_seq_type=drum_seq_type,
         drum_rotation=drum_rotation,
@@ -163,6 +183,8 @@ def derive_episode_sequences(ep_seed: int) -> EpisodeSequenceConfig:
         fm_mod_ratio=round(rng.uniform(1.5, 3.5), 2),
         bass_detune=round(rng.uniform(0.001, 0.008), 4),
         kick_character=rng.randint(0, 2),
+        arp_pattern=arp_pattern,
+        arp_division=arp_division,
     )
 
 
