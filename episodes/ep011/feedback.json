@@ -1,0 +1,92 @@
+{
+  "episode": "ep011",
+  "date": "2026-03-08",
+  "overall_rating": null,
+  "music": {
+    "rating": null,
+    "liked": [],
+    "disliked": [
+      "EP009와 거의 같은 음악 — 장르(acid vs techno) 달라도 차이 없음",
+      "같은 패턴이 계속 반복됨 (saw 3-rotation 순환)"
+    ]
+  },
+  "visual": {
+    "rating": null,
+    "liked": [],
+    "disliked": [
+      "1:1 비주얼 바깥 영역이 검정이어야 하는데 불확실",
+      "Terra Vision 3D 요소가 아예 안 나옴",
+      "DataMatrix 레이어가 약함 — 강화 필요",
+      "Barcode 레이어가 거의 항상 노출됨 — SI 게이팅 필요",
+      "ASCII art 요소가 Python 배경에도 적용되면 좋겠음"
+    ]
+  },
+  "narration": {
+    "rating": null,
+    "liked": [],
+    "disliked": []
+  },
+  "script": {
+    "rating": null,
+    "liked": [],
+    "disliked": []
+  },
+  "issues": [
+    {
+      "type": "music",
+      "target": "_plan_song_structure + GENRE_PRESETS",
+      "detail": "V19 mood_layers가 metadata에만 기록되고 sections instruments에 미적용 → 모든 에피소드가 동일한 _FLAT_INSTRUMENTS 사용",
+      "severity": "major",
+      "status": "fixed"
+    },
+    {
+      "type": "music",
+      "target": "_render_continuous_saw_sequence",
+      "detail": "saw 패턴이 energy 레벨(high/mid/low)로만 결정, 3개 rotation만 순환. pitch_rotation 시드가 충분히 활용 안 됨",
+      "severity": "major",
+      "status": "open"
+    },
+    {
+      "type": "pipeline",
+      "target": "enometa_render.py --force",
+      "detail": "--force로 특정 step만 재생성 시 하위 단계 자동 재실행 없음. 이전 데이터 값이 계속 반영되는 느낌",
+      "severity": "major",
+      "status": "open"
+    },
+    {
+      "type": "visual",
+      "target": "visual_strategies.py enometa avoid_vocabs",
+      "detail": "enometa 전략이 terra_* 6종을 avoid_vocabs로 차단 → Terra Vision 3D 비주얼 미사용",
+      "severity": "minor",
+      "status": "open"
+    },
+    {
+      "type": "visual",
+      "target": "visual_renderer.py BarcodeLayer",
+      "detail": "BarcodeLayer가 enometa 프리셋에서 항상 포함(intensity=0.85), SI 게이팅 없음",
+      "severity": "minor",
+      "status": "open"
+    },
+    {
+      "type": "visual",
+      "target": "visual_renderer.py DataMatrixLayer",
+      "detail": "DataMatrixLayer intensity=0.65로 약함, SI scaling도 보수적 max(0.40, si^0.8)",
+      "severity": "minor",
+      "status": "open"
+    },
+    {
+      "type": "visual",
+      "target": "visual_renderer.py + EnometaShorts",
+      "detail": "1:1 비주얼 바깥 영역(상하 420px)이 검정이어야 함 — 확인 필요",
+      "severity": "minor",
+      "status": "open"
+    }
+  ],
+  "system_suggestions": [
+    "파이프라인에 --cascade-force 플래그 추가 (의존 단계 자동 재실행)",
+    "saw 패턴 다양화: energy 기반 → seed+energy 복합 결정",
+    "Barcode SI 게이팅: si < 0.3이면 렌더링 스킵",
+    "DataMatrix intensity 0.65 → 0.85 상향",
+    "enometa 전략에서 terra_globe/terra_terrain 정도는 avoid 해제 검토"
+  ]
+}
