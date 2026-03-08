@@ -1687,26 +1687,29 @@ class EnometaMusicEngine:
                 si_avg = sec.get("energy", 0.5)
             section_si[sid] = si_avg
             role = sec.get("_role", sec.get("emotion", "drop"))
-            # drum_mode별 effective_si: simple=희소, dynamic=조밀
-            if drum_mode == "simple":
-                effective_si = 0.0   # si_mult=0.7 고정 → 최소 밀도
-            elif drum_mode == "dynamic":
-                effective_si = 1.0   # si_mult=1.3 고정 → 최대 밀도
-            else:
-                effective_si = si_avg
-            base_pat = generate_drum_pattern(self.seq_config, role, effective_si)
 
-            # v17: 무드별 유클리드 패턴 오버라이드 (MOOD_RHYTHM_PRESETS)
-            rhythm_preset = self.MOOD_RHYTHM_PRESETS.get(music_mood)
-            if rhythm_preset is not None:
-                for part in ("kick", "snare", "hihat"):
-                    euclid_spec = rhythm_preset.get(part)
-                    if euclid_spec is not None:
-                        pulses, steps = euclid_spec
-                        raw_pat = list(euclidean_rhythm(steps, pulses))
-                        # 렌더러는 16-step 고정 → cycling으로 정규화
-                        base_pat[part] = [raw_pat[i % len(raw_pat)] for i in range(16)]
-                    # None → seq_config 기본값 유지 (base_pat 그대로)
+            if drum_mode == "simple":
+                # 베이직 테크노 루프: 4-on-the-floor 킥 + 8분음표 클로즈드 하이햇 + 스네어 2,4박
+                # 생성 패턴이 아닌 고정 패턴 — 필인/변주 없음
+                base_pat = {
+                    "kick":  [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0],
+                    "snare": [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+                    "hihat": [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0],
+                }
+            else:
+                # dynamic=조밀, default=si_avg
+                effective_si = 1.0 if drum_mode == "dynamic" else si_avg
+                base_pat = generate_drum_pattern(self.seq_config, role, effective_si)
+
+                # v17: 무드별 유클리드 패턴 오버라이드 (MOOD_RHYTHM_PRESETS)
+                rhythm_preset = self.MOOD_RHYTHM_PRESETS.get(music_mood)
+                if rhythm_preset is not None:
+                    for part in ("kick", "snare", "hihat"):
+                        euclid_spec = rhythm_preset.get(part)
+                        if euclid_spec is not None:
+                            pulses, steps = euclid_spec
+                            raw_pat = list(euclidean_rhythm(steps, pulses))
+                            base_pat[part] = [raw_pat[i % len(raw_pat)] for i in range(16)]
 
             section_drum_pat[sid] = base_pat
 
@@ -1759,11 +1762,8 @@ class EnometaMusicEngine:
 
             # v16: 패턴 결정 — drum_mode별 필인 빈도 차별화
             if drum_mode == "simple":
-                # simple: 32바마다만 fill_buildup (영상 전체 약 2회)
-                if bar_idx % 32 == 31:
-                    pat = generate_fill_pattern(self.seq_config, "fill_buildup")
-                else:
-                    pat = section_drum_pat.get(sid, generate_drum_pattern(self.seq_config, cur_role, 0.5))
+                # simple: 베이직 테크노 루프 — 필인 없이 고정 패턴 반복
+                pat = section_drum_pat.get(sid, base_pat)
             elif drop_state == 1:
                 pat = generate_fill_pattern(self.seq_config, "drop_impact")
                 drop_state = 0
@@ -2949,29 +2949,29 @@ class EnometaMusicEngine:
                 "bass_drone":   {"volume": (0.7, 0.9)},   # 깊은 드론 = ambient 정체성
             },
             "optional_pool": {
-                "sine_interference": {"volume": (0.4, 0.7)},   # 줄임 (0.9→0.4~0.7)
+                "sine_interference": {"volume": (0.4, 0.7)},
                 "pulse_train":       {"volume": (0.4, 0.7)},
-                "arpeggio":          {"volume": (0.4, 0.6)},   # 올림 (0.3→0.4~0.6)
+                "arpeggio":          {"volume": (0.4, 0.6)},
                 "fm_bass":           {"volume": (0.4, 0.6)},
-                "saw_sequence":      {"volume": (0.3, 0.5)},   # 새로 추가 — 느린 텍스처
+                "saw_sequence":      {"volume": (0.3, 0.5)},
             },
             "optional_count": (2, 3),
-            "inactive": ["kick", "snare", "data_click", "ultrahigh_texture",
+            "inactive": ["kick", "snare", "hi_hat", "data_click", "ultrahigh_texture",
                          "stutter_gate", "gap_burst", "glitch", "bytebeat"],
         },
         "microsound": {
             "required": {
-                "data_click":        {"volume": (1.2, 1.6)},   # 올림 — Ikeda 클릭 = 정체성
+                "data_click":        {"volume": (1.2, 1.6)},   # Ikeda 클릭 = 정체성
                 "ultrahigh_texture":  {"volume": (0.8, 1.0)},   # 디지털 공기
             },
             "optional_pool": {
-                "sine_interference": {"volume": (0.3, 0.5)},   # 줄임 (1.0→0.3~0.5)
+                "sine_interference": {"volume": (0.3, 0.5)},
                 "pulse_train":       {"volume": (0.5, 0.8)},
                 "stutter_gate":      {"volume": (0.5, 0.8)},
-                "arpeggio":          {"volume": (0.3, 0.5)},   # 새로 추가
+                "arpeggio":          {"volume": (0.3, 0.5)},
             },
             "optional_count": (1, 2),
-            "inactive": ["kick", "snare", "saw_sequence", "bass_drone",
+            "inactive": ["kick", "snare", "hi_hat", "saw_sequence", "bass_drone",
                          "glitch", "bytebeat", "gap_burst"],
         },
         "IDM": {
@@ -2981,6 +2981,7 @@ class EnometaMusicEngine:
                 "stutter_gate":  {"volume": (0.6, 0.8)},   # 글리치 리듬 = IDM 정체성
             },
             "optional_pool": {
+                "hi_hat":            {"volume": (0.3, 0.5)},   # 불규칙 하이햇
                 "saw_sequence":      {"volume": (0.4, 0.6)},
                 "arpeggio":          {"volume": (0.5, 0.8)},
                 "glitch":            {"volume": (0.5, 0.7), "extra": {"density": 0.7}},
@@ -2997,6 +2998,7 @@ class EnometaMusicEngine:
                 "kick":      {"volume": (0.4, 0.6)},
             },
             "optional_pool": {
+                "hi_hat":            {"volume": (0.3, 0.5)},   # 희소 하이햇
                 "bass_drone":        {"volume": (0.5, 0.7)},
                 "arpeggio":          {"volume": (0.5, 0.7)},
                 "sine_interference": {"volume": (0.3, 0.5)},
@@ -3015,6 +3017,7 @@ class EnometaMusicEngine:
                 "tape_delay":   {"volume": 1.0, "extra": {"feedback": (0.5, 0.75)}},
             },
             "optional_pool": {
+                "hi_hat":            {"volume": (0.3, 0.5)},   # dub 하이햇 (희소)
                 "snare":             {"volume": (0.3, 0.5)},
                 "sine_interference": {"volume": (0.3, 0.6)},
                 "arpeggio":          {"volume": (0.3, 0.5)},
@@ -3039,13 +3042,14 @@ class EnometaMusicEngine:
                 "saw_sequence":      {"volume": (0.3, 0.5)},
             },
             "optional_count": (2, 3),
-            "inactive": ["arpeggio", "bass_drone", "fm_bass"],
+            "inactive": ["hi_hat", "arpeggio", "bass_drone", "fm_bass"],  # 글리치가 대신
         },
         "acid": {
             "required": {
-                "kick":        {"volume": (0.8, 1.0)},
-                "snare":       {"volume": (0.7, 0.9)},
-                "acid_bass":   {"volume": (0.8, 1.0)},   # TB-303 = acid 정체성
+                "kick":         {"volume": (0.8, 1.0)},
+                "snare":        {"volume": (0.7, 0.9)},
+                "hi_hat":       {"volume": (0.4, 0.6)},   # 808/909 하이햇 = acid 필수
+                "acid_bass":    {"volume": (0.8, 1.0)},   # TB-303 = acid 정체성
                 "saw_sequence": {"volume": (0.8, 1.0)},
             },
             "optional_pool": {
@@ -3066,6 +3070,7 @@ class EnometaMusicEngine:
                 "distorted_kick":  {"volume": (0.7, 0.9)},   # 디스토션 킥 = industrial 정체성
             },
             "optional_pool": {
+                "hi_hat":            {"volume": (0.4, 0.6)},   # industrial 하이햇
                 "ultrahigh_texture": {"volume": (0.6, 0.9)},
                 "feedback_loop":     {"volume": (0.5, 0.8)},
                 "gap_burst":         {"volume": (0.7, 1.0)},
@@ -3080,6 +3085,7 @@ class EnometaMusicEngine:
             "required": {
                 "kick":         {"volume": (0.9, 1.0)},   # 4-on-the-floor = techno 정체성
                 "snare":        {"volume": (0.6, 0.8)},
+                "hi_hat":       {"volume": (0.5, 0.7)},   # 클로즈드 하이햇 = techno 필수
                 "saw_sequence": {"volume": (0.8, 1.0)},
             },
             "optional_pool": {
@@ -3221,7 +3227,7 @@ class EnometaMusicEngine:
         elif drum_mode == "on":
             drum_on, snare_on = True, True
         elif drum_mode == "simple":
-            drum_on, snare_on = True, False   # 킥+하이햇만, 스네어 OFF
+            drum_on, snare_on = True, True   # 베이직 4/4 루프 — 킥+하이햇+스네어 전부 ON (고정 패턴은 렌더러에서)
         elif drum_mode == "dynamic":
             drum_on, snare_on = True, True
         else:  # "default"

@@ -5,6 +5,18 @@
 
 ---
 
+## 2026-03-08 — 드럼 다양성 강화 — Hi-hat 활성화 + simple 모드 재정의
+
+### Changed
+- `enometa_music_engine.py`: `_GENRE_SPECS`에 hi_hat 추가 — techno/acid=required, IDM/minimal/dub/industrial=optional_pool, glitch/ambient/microsound=inactive. 기존에 모든 장르에서 누락되어 완전 무음이었음.
+- `enometa_music_engine.py`: `drum_mode="simple"` 재정의 — "희소 패턴"에서 "베이직 테크노 루프"(4-on-the-floor 킥 + 8분음표 하이햇 + 스네어 2,4박)로 변경. 필인 완전 제거.
+
+### 이유
+- hi_hat이 `_generate_mood_layers()`에서 `_GENRE_SPECS` 기반으로 레이어를 생성하는데 모든 장르에 hi_hat이 없어 `smooth_envelope(default=0.0)` → 완전 무음
+- simple 모드의 개념을 사용자 의도("일반적인 테크노 뮤직 베이직 드럼 루프")에 맞게 재정의
+
+---
+
 ## 2026-03-08 — EP011 피드백 반영 — 다양성 강화 + 비주얼/엔드카드 개선
 
 ### Added
