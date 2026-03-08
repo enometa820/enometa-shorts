@@ -93,6 +93,7 @@ VOCAB_CATEGORIES = {
     ],
     "text": ["text_reveal"],  # mode: wave/glitch/scatter/typewriter
     "symbol": ["symbol_morph"],  # 품사 기반 추상 도형 (v19)
+    "ascii": ["ascii_block", "ascii_shape", "ascii_matrix"],  # ASCII 아트 (v19)
     "grid": ["grid_morph", "grid_mesh"],
     "network": ["neural_network"],
     "ring": ["loop_ring"],
@@ -647,6 +648,22 @@ def generate_vocab_params(vocab: str, palette: dict, rng: random.Random) -> dict
             "size": rng.choice([100, 120, 140, 160]),
             "showLabel": rng.random() > 0.3,  # 70% 확률로 키워드 라벨 표시
         }
+    # --- ASCII 아트 ---
+    elif vocab.startswith("ascii_"):
+        mode_map = {
+            "ascii_block": "block",
+            "ascii_shape": "shape",
+            "ascii_matrix": "matrix",
+        }
+        return {
+            "text": "",          # build_scene에서 덮어씀
+            "mode": mode_map.get(vocab, "block"),
+            "posType": "noun",   # build_scene에서 덮어씀 (shape 모드용)
+            "color": rng.choice(["#00FF80", "#00FFFF", "#FFD700", accent]),
+            "glowColor": glow,
+            "position": rng.choice(["center", "top", "upper", "bottom"]),
+            "density": rng.choice(["low", "medium", "high"]),
+        }
     # --- 수학적 패턴 ---
     elif vocab.startswith("lissajous"):
         return {
@@ -911,14 +928,23 @@ def build_scene(
     if not keyword:
         keyword = extract_highlight_word(sentence)
     if keyword and rng.random() < text_chance:
-        # v19: text_reveal vs symbol_morph 선택 (40% 확률로 도형)
-        use_symbol = rng.random() < 0.4 and keyword_type != "noun_fallback"
-        if use_symbol:
-            symbol_params = generate_vocab_params("symbol_morph", palette, rng)
-            symbol_params["text"] = keyword
-            symbol_params["posType"] = _map_pos_type(keyword_type)
-            semantic.append({"vocab": "symbol_morph", "params": symbol_params})
+        # v19: text_reveal(45%) / symbol_morph(25%) / ascii_art(30%) 가중 선택
+        roll = rng.random()
+        if roll < 0.25 and keyword_type != "noun_fallback":
+            # symbol_morph: 품사 기반 추상 도형
+            sym_params = generate_vocab_params("symbol_morph", palette, rng)
+            sym_params["text"] = keyword
+            sym_params["posType"] = _map_pos_type(keyword_type)
+            semantic.append({"vocab": "symbol_morph", "params": sym_params})
+        elif roll < 0.55:
+            # ascii_art: ASCII 아트 (3모드 중 랜덤)
+            ascii_vocab = rng.choice(["ascii_block", "ascii_shape", "ascii_matrix"])
+            ascii_params = generate_vocab_params(ascii_vocab, palette, rng)
+            ascii_params["text"] = keyword
+            ascii_params["posType"] = _map_pos_type(keyword_type)
+            semantic.append({"vocab": ascii_vocab, "params": ascii_params})
         else:
+            # text_reveal: 기존 타이포그래피 모션
             text_mode = force_text_mode or pool.get("text_mode", "wave")
             text_params = generate_vocab_params("text_reveal", palette, rng)
             text_params["mode"] = text_mode

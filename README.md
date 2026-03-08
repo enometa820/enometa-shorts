@@ -271,6 +271,7 @@ enometa-shorts/
 | [src/components/LogoEndcard.tsx](src/components/LogoEndcard.tsx) | 영상 마지막 엔드카드 (로고 + 태그라인 + 파티클 180개) |
 | [src/components/vocab/TextReveal.tsx](src/components/vocab/TextReveal.tsx) | 타이포그래피 모션 4종 (typewriter/wave/glitch/scatter) |
 | [src/components/vocab/SymbolMotion.tsx](src/components/vocab/SymbolMotion.tsx) | 품사 기반 추상 도형 모션 — noun→육각형, verb→화살표, adjective→물결, science→동심원, philosophy→이중원 |
+| [src/components/vocab/AsciiArt.tsx](src/components/vocab/AsciiArt.tsx) | ASCII 아트 3모드 — block(비트맵 블록문자), shape(품사별 ASCII 패턴), matrix(터미널 데이터 스트림) |
 | [src/components/vocab/DataBar.tsx](src/components/vocab/DataBar.tsx) | 오디오 리액티브 수직 바 차트 (`data_bar` / `data_ring`) |
 | [src/components/vocab/Lissajous.tsx](src/components/vocab/Lissajous.tsx) | 리사주 곡선 (수학 패턴, bass→위상/rms→선굵기/onset→교차점) |
 | [src/components/vocab/PixelGrid.tsx](src/components/vocab/PixelGrid.tsx) | 8bit 레트로 픽셀 그리드 (life/rain/outline 변형) |

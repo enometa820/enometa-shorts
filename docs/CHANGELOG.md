@@ -5,12 +5,14 @@
 
 ---
 
-## 2026-03-08 — SymbolMotion: 품사 기반 추상 도형 모션그래픽
+## 2026-03-08 — SymbolMotion + AsciiArt: 키워드 시각화 3축 체계
 
 ### Added
-- `src/components/vocab/SymbolMotion.tsx`: 키워드 품사(POS)에 따라 추상 도형으로 시각화하는 새 vocab 컴포넌트. noun→육각형, verb→화살표, adjective→물결, science→동심원, philosophy→이중원. 오디오 리액티브 + 라벨 표시
-- `scripts/visual_script_generator.py`: `symbol_morph` vocab 파라미터 생성 + `_map_pos_type()` 품사 매핑 함수. 40% 확률로 text_reveal 대신 symbol_morph 사용
+- `src/components/vocab/SymbolMotion.tsx`: 키워드 품사(POS)에 따라 추상 도형으로 시각화. noun→육각형, verb→화살표, adjective→물결, science→동심원, philosophy→이중원. 오디오 리액티브 + 라벨 표시
+- `src/components/vocab/AsciiArt.tsx`: ASCII 아트 3모드 — block(비트맵 블록 문자 렌더링), shape(품사별 ASCII 도형 패턴), matrix(터미널 데이터 스트림). 5x7 비트맵 폰트 내장
+- `scripts/visual_script_generator.py`: `symbol_morph` + `ascii_block/shape/matrix` vocab 파라미터 생성 + `_map_pos_type()` 품사 매핑 함수
 - `scripts/visual_script_generator.py`: `script_data_keywords`에 품사 타입 정보 포함 (`{text, type}` 딕트 리스트로 변경)
+- 키워드 표현 3축 가중 선택: text_reveal(45%) / ascii_art(30%) / symbol_morph(25%)
 
 ### Changed
 - `src/components/VisualSection.tsx`: VOCAB_MAP에 `symbol_morph` 등록

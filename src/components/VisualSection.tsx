@@ -29,6 +29,7 @@ import { PixelGrid } from "./vocab/PixelGrid";
 import { PixelWaveform } from "./vocab/PixelWaveform";
 import { Lissajous } from "./vocab/Lissajous";
 import { SymbolMotion } from "./vocab/SymbolMotion";
+import { AsciiArt } from "./vocab/AsciiArt";
 import { TerraGlobe } from "./vocab/three/TerraGlobe";
 import { TerraFlythrough } from "./vocab/three/TerraFlythrough";
 import { TerraTerrain } from "./vocab/three/TerraTerrain";
@@ -80,6 +81,10 @@ const VOCAB_MAP: Record<string, React.FC<VocabComponentProps>> = {
   lissajous_complex: Lissajous,
   // 품사 기반 추상 도형
   symbol_morph: SymbolMotion,
+  // ASCII 아트
+  ascii_block: AsciiArt,
+  ascii_shape: AsciiArt,
+  ascii_matrix: AsciiArt,
   // 3D / Terra Vision (90년대 CGI)
   terra_globe: TerraGlobe,
   terra_globe_data: TerraGlobe,
