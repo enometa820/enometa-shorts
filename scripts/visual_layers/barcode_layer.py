@@ -50,6 +50,10 @@ class BarcodeLayer:
         if not current_seg:
             return canvas
 
+        # SI 게이팅: semantic_intensity 낮으면 바코드 스킵 (여백 확보)
+        if si < 0.35:
+            return canvas
+
         keywords = current_seg.get("analysis", {}).get("keywords", [])
         if not keywords:
             return canvas

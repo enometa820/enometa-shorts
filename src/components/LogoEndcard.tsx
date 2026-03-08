@@ -1,5 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { useCurrentFrame, useVideoConfig, interpolate } from "remotion";
+import { ThreeCanvas } from "@remotion/three";
+import * as THREE from "three";
 import { Palette } from "../utils/palettes";
 
 /**
@@ -27,6 +29,79 @@ function hexToRGBA(hex: string, alpha: number): string {
   const b = parseInt(clean.slice(4, 6), 16);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
+
+/** 엔드카드 Terra 3D 씬 — 와이어프레임 구체 + 데이터 포인트 */
+const TerraEndcardScene: React.FC<{ convergeProgress: number; accentHex: string }> = ({
+  convergeProgress,
+  accentHex,
+}) => {
+  // accentHex → THREE.Color
+  const accentColor = new THREE.Color(accentHex);
+
+  // convergeProgress 0→1 구간별 연출
+  // 0~0.5: globe 서서히 등장 + 회전
+  // 0.5~0.8: globe가 점 데이터로 분해 (불투명도 감소)
+  // 0.8~1.0: 점들이 중심으로 수렴 (파티클 수렴과 호응)
+  const globeOpacity =
+    convergeProgress < 0.5
+      ? interpolate(convergeProgress, [0, 0.3], [0, 0.25], { extrapolateRight: "clamp" })
+      : interpolate(convergeProgress, [0.5, 0.8], [0.25, 0.0], { extrapolateRight: "clamp" });
+
+  const pointOpacity =
+    convergeProgress < 0.4
+      ? 0
+      : convergeProgress < 0.8
+      ? interpolate(convergeProgress, [0.4, 0.7], [0, 0.5], { extrapolateRight: "clamp" })
+      : interpolate(convergeProgress, [0.8, 1.0], [0.5, 0.0], { extrapolateRight: "clamp" });
+
+  // frame 기반 회전 (useCurrentFrame 대신 convergeProgress로 파생)
+  const rotY = convergeProgress * Math.PI * 2;
+
+  const RADIUS = 3.2;
+  const SEGMENTS = 16;
+
+  // 데이터 포인트 100개 — 결정론적 구면 좌표
+  const dataPoints = React.useMemo(() => {
+    const pts: { x: number; y: number; z: number }[] = [];
+    for (let i = 0; i < 100; i++) {
+      const phi = Math.acos(1 - 2 * (i + 0.5) / 100);
+      const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+      pts.push({
+        x: RADIUS * Math.sin(phi) * Math.cos(theta),
+        y: RADIUS * Math.sin(phi) * Math.sin(theta),
+        z: RADIUS * Math.cos(phi),
+      });
+    }
+    return pts;
+  }, []);
+
+  return (
+    <>
+      <ambientLight intensity={0.2} />
+      {/* 와이어프레임 구체 */}
+      <mesh rotation={[0.3, rotY, 0]}>
+        <sphereGeometry args={[RADIUS, SEGMENTS, SEGMENTS]} />
+        <meshBasicMaterial
+          color={accentColor}
+          wireframe
+          transparent
+          opacity={globeOpacity}
+        />
+      </mesh>
+      {/* 데이터 포인트 */}
+      {dataPoints.map((pt, i) => (
+        <mesh key={i} position={[pt.x, pt.y, pt.z]}>
+          <sphereGeometry args={[0.06, 4, 4]} />
+          <meshBasicMaterial
+            color={accentColor}
+            transparent
+            opacity={pointOpacity}
+          />
+        </mesh>
+      ))}
+    </>
+  );
+};
 
 interface LogoEndcardProps {
   startFrame: number;
@@ -70,15 +145,15 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
     const ctx = offscreen.getContext("2d")!;
 
     ctx.fillStyle = "#FFFFFF";
-    ctx.font = `200 110px "Pretendard Variable", "Segoe UI", sans-serif`;
+    ctx.font = `300 140px "Pretendard Variable", "Segoe UI", sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    (ctx as any).letterSpacing = "35px";
-    ctx.fillText("ENOMETA", W / 2 + 18, H / 2 - 60);
+    (ctx as any).letterSpacing = "45px";
+    ctx.fillText("ENOMETA", W / 2 + 22, H / 2 - 60);
 
     const imageData = ctx.getImageData(0, 0, W, H);
     const pixels: { x: number; y: number }[] = [];
-    const step = 3;
+    const step = 2;
     for (let y = 0; y < H; y += step) {
       for (let x = 0; x < W; x += step) {
         const i = (y * W + x) * 4;
@@ -141,9 +216,10 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
         Math.min(1, (convergeProgress - delay) / (1 - delay)),
       );
 
-      // 노이즈 (수렴 중 유기적 움직임)
-      const noiseX = Math.sin(t * 1.5 + i * 3.7) * (1 - pp) * 20;
-      const noiseY = Math.cos(t * 1.2 + i * 2.3) * (1 - pp) * 20;
+      // 노이즈 (수렴 중 유기적 움직임, pp>0.95 이후 거의 0)
+      const noiseScale = pp > 0.95 ? 0.05 : (1 - pp);
+      const noiseX = Math.sin(t * 1.5 + i * 3.7) * noiseScale * 20;
+      const noiseY = Math.cos(t * 1.2 + i * 2.3) * noiseScale * 20;
 
       // 안착 후 호흡 (v2: 진폭 증가)
       const breatheX = pp > 0.85 ? Math.sin(t * 1.2 + i * 5) * 2.5 : 0;
@@ -155,8 +231,9 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
       if (pp > 0.9) {
         const wavePhase =
           t * 2.0 + target.x * 0.005 + target.y * 0.003;
-        waveX = Math.sin(wavePhase) * 3.0;
-        waveY = Math.cos(wavePhase * 0.7) * 2.0;
+        const waveAmp = pp > 0.95 ? 0.5 : 3.0;
+        waveX = Math.sin(wavePhase) * waveAmp;
+        waveY = Math.cos(wavePhase * 0.7) * (waveAmp * 0.67);
       }
 
       // 흩어짐 단계 떠돌기
@@ -333,6 +410,13 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
 
+  // Terra 3D용 convergeProgress (useEffect 내 계산과 동일 로직)
+  const _scatterEnd = 0.03;
+  const _convergeDuration = 2.0;
+  const convergeProgress = easeInOutQuart(
+    Math.min(Math.max((t - _scatterEnd) / _convergeDuration, 0), 1)
+  );
+
   return (
     <div
       style={{
@@ -356,6 +440,13 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
           backgroundColor: p.bg,
         }}
       />
+
+      {/* Terra 3D 배경 — 와이어프레임 구체 (zIndex: 1) */}
+      <div style={{ position: "absolute", top: 0, left: 0, width: W, height: H, zIndex: 1 }}>
+        <ThreeCanvas width={W} height={H}>
+          <TerraEndcardScene convergeProgress={convergeProgress} accentHex={p.accent} />
+        </ThreeCanvas>
+      </div>
 
       {/* 파티클 캔버스 */}
       <canvas

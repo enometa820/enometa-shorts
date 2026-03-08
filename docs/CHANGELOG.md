@@ -5,6 +5,29 @@
 
 ---
 
+## 2026-03-08 — EP011 피드백 반영 — 다양성 강화 + 비주얼/엔드카드 개선
+
+### Added
+- `enometa_render.py`: `--cascade` 플래그 — `--step X --force --cascade` 시 X 이후 단계 자동 force 재실행
+- `LogoEndcard.tsx`: ThreeCanvas Terra 3D 배경 — 와이어프레임 구체 + 데이터 포인트, convergeProgress 연동
+- `.claude/skills/enometa-produce.md`: 3-Gate Claude 다양성 개입 시스템 (vocab 비교/terra 삽입/music_script 비교)
+
+### Changed
+- `enometa_music_engine.py`: Saw 패턴 다양화 — seed 기반 pat_list 3~5개 변형, chunk_bars 4/6/8바 변동, gate_div seed 미세 변동
+- `visual_strategies.py`: enometa 전략 avoid_vocabs — terra_flythrough/tunnel만 유지, terra_globe/terrain 허용
+- `visual_renderer.py`: DataMatrix intensity 0.65→0.90, SI_INTENSITY_SCALE max 0.40→0.55
+- `barcode_layer.py`: SI<0.35 게이팅 추가 (SI 낮을 때 바코드 스킵)
+- `AsciiArt.tsx`: block cellSize 16→28px, cellHeight 1.4→1.6, matrix fontSize 20→26, shape fontSize 18+bass*6→24+bass*8, bottom 위치 0.72→0.62 (자막 침범 금지)
+- `LogoEndcard.tsx`: ENOMETA 텍스트 110px/w200→140px/w300, 파티클 step=3→2, 수렴 후 노이즈/wave 급감
+- `EnometaShorts.tsx`: 비주얼 바깥 영역 palette.bg → 강제 #000000
+- 고정 해시태그: 3개→5개 (`#데이터아트` `#전자음악` `#오디오비주얼` `#철학` `#동기부여`), 주제 태그 5→3개
+
+### 이유
+- EP011 피드백: EP009와 동일한 음악, Terra 3D 미사용, Barcode 항상 노출, DataMatrix 약함
+- Claude 개입이 다양성 보장의 최상위 수단 — 코드는 "안전한 기본값"만 제공
+
+---
+
 ## 2026-03-08 — v19 Vertical Remixing + AsciiArt 한글→영어 변환
 
 ### Added

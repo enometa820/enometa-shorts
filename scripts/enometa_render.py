@@ -289,6 +289,7 @@ def run_pipeline(
     palette: str = "phantom",
     step: str | None = None,
     force: bool = False,
+    cascade: bool = False,
     bpm: float = 135,
     music_mood: str = "acid",
     visual_mood: str | None = None,
@@ -309,12 +310,22 @@ def run_pipeline(
     print(f"{'='*60}\n")
 
     _stop_requested = [False]
+    _eff_force = [force]  # 캐스케이드 시 downstream force 활성화용
 
     def do(name: str, fn):
         if _stop_requested[0]:
             return
-        if step is not None and step != name:
-            return
+        if step is not None:
+            step_idx = STEPS.index(step)
+            curr_idx = STEPS.index(name)
+            if curr_idx < step_idx:
+                return  # 지정 단계 이전: 스킵
+            elif curr_idx == step_idx:
+                _eff_force[0] = True  # 지정 단계: 강제 실행
+            elif cascade:
+                _eff_force[0] = True  # 캐스케이드: 이후 단계도 강제
+            else:
+                return  # 캐스케이드 없음: 지정 단계만 실행
         label_map = {
             "gen_timing":    "[1/9] 마디 타이밍 생성",
             "tts":           "[2/9] TTS 나레이션",
@@ -346,15 +357,15 @@ def run_pipeline(
 
     try:
         do("gen_timing",   lambda: step_gen_timing(episode_dir, bpm, music_mood, visual_mood, drum_mode, gap, paragraph_gap))
-        do("tts",          lambda: step_tts(episode_dir, force))
-        do("script_data",  lambda: step_script_data(episode_dir, force))
-        do("visual_script",lambda: step_visual_script(episode_dir, title, episode_id, palette, force, visual_mood or ""))
-        do("bgm",          lambda: step_bgm(episode_dir, episode_id, force))
-        do("mix",            lambda: step_mix(episode_dir, force))
-        do("audio_analysis", lambda: step_audio_analysis(episode_dir, force))
-        do("python_frames",  lambda: step_python_frames(episode_dir, force, visual_mood or ""))
+        do("tts",          lambda: step_tts(episode_dir, _eff_force[0]))
+        do("script_data",  lambda: step_script_data(episode_dir, _eff_force[0]))
+        do("visual_script",lambda: step_visual_script(episode_dir, title, episode_id, palette, _eff_force[0], visual_mood or ""))
+        do("bgm",          lambda: step_bgm(episode_dir, episode_id, _eff_force[0]))
+        do("mix",            lambda: step_mix(episode_dir, _eff_force[0]))
+        do("audio_analysis", lambda: step_audio_analysis(episode_dir, _eff_force[0]))
+        do("python_frames",  lambda: step_python_frames(episode_dir, _eff_force[0], visual_mood or ""))
         step_copy_public(episode_dir, episode_id)
-        do("render",       lambda: step_render(episode_dir, force))
+        do("render",       lambda: step_render(episode_dir, _eff_force[0]))
 
     except Exception as e:
         print(f"\n[ERROR] {e}")
@@ -523,6 +534,8 @@ def main():
     parser.add_argument("--step", default=None, choices=STEPS,
                         help="특정 단계만 실행")
     parser.add_argument("--force", action="store_true", help="기존 파일 덮어쓰기")
+    parser.add_argument("--cascade", action="store_true",
+                        help="--step 지정 시 해당 단계 이후 모든 단계도 자동 force 재실행")
     parser.add_argument("--bpm", type=float, default=135,
                         help="gen_timing BPM (기본: 135)")
     parser.add_argument("--music-mood", default="acid",
@@ -573,6 +586,7 @@ def main():
         palette=args.palette,
         step=args.step,
         force=args.force,
+        cascade=args.cascade,
         bpm=args.bpm,
         music_mood=args.music_mood,
         visual_mood=args.visual_mood,

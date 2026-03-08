@@ -107,7 +107,7 @@ const BlockMode: React.FC<{
     // 비트맵 렌더링: 각 문자를 5x7 그리드로 표시
     const charSpacing = 1;
     const totalCols = upperText.length * (5 + charSpacing) - charSpacing;
-    const cellSize = Math.min(Math.floor((width * 0.8) / totalCols), 16);
+    const cellSize = Math.min(Math.floor((width * 0.85) / totalCols), 28);
 
     // 프레임별 점진적 등장
     const totalCells = totalCols * 7;
@@ -154,7 +154,7 @@ const BlockMode: React.FC<{
               key={`${ci}-${col}`}
               style={{
                 width: cellSize,
-                height: cellSize * 1.4,
+                height: cellSize * 1.6,
                 display: "inline-flex",
                 justifyContent: "center",
                 alignItems: "center",
@@ -346,7 +346,7 @@ const ShapeMode: React.FC<{
     <div
       style={{
         fontFamily: "'Courier New', monospace",
-        fontSize: 18 + bass * 6,
+        fontSize: 24 + bass * 8,
         lineHeight: 1.3,
         transform: `scale(${breathe})`,
         position: "relative",
@@ -514,7 +514,7 @@ const MatrixMode: React.FC<{
     <div
       style={{
         fontFamily: "'Courier New', monospace",
-        fontSize: 20,
+        fontSize: 26,
         opacity: exitOpacity,
         padding: "16px 20px",
         backgroundColor: "rgba(0, 0, 0, 0.4)",
@@ -564,7 +564,7 @@ export const AsciiArt: React.FC<VocabComponentProps> = ({
   const posY =
     position === "top" ? height * 0.15 :
     position === "upper" ? height * 0.32 :
-    position === "bottom" ? height * 0.72 :
+    position === "bottom" ? height * 0.62 :
     height * 0.42;
 
   // 입장 애니메이션

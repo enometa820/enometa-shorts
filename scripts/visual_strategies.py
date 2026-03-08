@@ -79,9 +79,7 @@ STRATEGIES: Dict[str, Dict[str, Any]] = {
         "text_chance": 0.9,
         "bg_opacity_mult": 1.0,
         "prefer_vocabs": ["text_reveal", "data_bar", "waveform", "lissajous"],
-        "avoid_vocabs": ["terra_globe", "terra_globe_data", "terra_flythrough",
-                         "terra_tunnel", "terra_terrain", "terra_terrain_bars",
-                         "color_bloom"],
+        "avoid_vocabs": ["terra_flythrough", "terra_tunnel", "color_bloom"],
         "reactivity_boost": 0,
     },
 }

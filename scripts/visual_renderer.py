@@ -110,7 +110,7 @@ GENRE_LAYER_PRESETS = {
             {"layer": "TextDataLayer",   "intensity": 1.2},
             {"layer": "BarcodeLayer",    "intensity": 0.85},
             {"layer": "DataStreamLayer", "intensity": 0.75},
-            {"layer": "DataMatrixLayer", "intensity": 0.65},
+            {"layer": "DataMatrixLayer", "intensity": 0.90},
         ],
         "blend_ratio": 0.45,
     },
@@ -179,7 +179,7 @@ SI_INTENSITY_SCALE = {
     "TextDataLayer":   lambda si: 0.88 + si * 0.12,             # si=0→0.88, si=1→1.0 (강화)
     "BarcodeLayer":    lambda si: 0.60 + si * 0.40,             # si=0→0.60, si=1→1.0
     "DataStreamLayer": lambda si: 0.50 + si * 0.50,             # si=0→0.50, si=1→1.0
-    "DataMatrixLayer": lambda si: max(0.40, si ** 0.8),         # si=0→0.40, si=1→1.0
+    "DataMatrixLayer": lambda si: max(0.55, si ** 0.6),         # si=0→0.55, si=1→1.0 (강화)
 }
 
 

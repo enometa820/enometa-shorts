@@ -590,17 +590,18 @@ def glitch_texture(duration, density=0.3, sr=SAMPLE_RATE):
 
 
 def arpeggio_sequence(base_freq, duration, pattern=None, speed=0.2, sr=SAMPLE_RATE,
-                      bpm=0, apply_chorus=False, chorus_depth_ms=2.5):
-    """시퀀서 아르페지오 v14 — BPM 동기 + 코러스 옵션
-    bpm>0이면 speed를 BPM 16분음표로 자동 동기화.
+                      bpm=0, division=4, apply_chorus=False, chorus_depth_ms=2.5):
+    """시퀀서 아르페지오 v19 — BPM 동기 + division 변주 + 코러스 옵션
+    bpm>0이면 speed를 BPM 기반으로 자동 동기화.
+    division: 2=8분음표, 3=3연음, 4=16분음표
     """
     if pattern is None:
         pattern = [1, 1.25, 1.5, 2, 1.5, 1.25]
     total_samples = int(sr * duration)
 
-    # v14: BPM 동기화 (16분음표 단위)
+    # v19: BPM 동기화 (division 기반)
     if bpm > 0:
-        speed = 60.0 / bpm / 4  # 16분음표
+        speed = 60.0 / bpm / division  # division에 따른 노트 길이
 
     step_samples = max(int(sr * speed), 1)
 
@@ -1456,6 +1457,8 @@ class EnometaMusicEngine:
                 fm_mod_ratio=sc.get("fm_mod_ratio", 2.0),
                 bass_detune=sc.get("bass_detune", 0.002),
                 kick_character=sc.get("kick_character", 0),
+                arp_pattern=sc.get("arp_pattern", [1, 1.25, 1.5, 2, 1.5, 1.25]),
+                arp_division=sc.get("arp_division", 4),
             )
         else:
             # fallback: episode_id 해시 기반 시드 (고정 시드 42 방지)
@@ -1962,9 +1965,14 @@ class EnometaMusicEngine:
                 speeds.append(arp_cfg.get("speed", 0.2))
         avg_speed = np.mean(speeds) if speeds else 0.2
 
+        # v19: seq_config에서 아르페지오 패턴/분할 가져오기
+        arp_pat = self.seq_config.arp_pattern
+        arp_div = self.seq_config.arp_division
+        print(f"  [arp] pattern={arp_pat}, division={arp_div} ({'16th' if arp_div==4 else '8th' if arp_div==2 else 'triplet'})", flush=True)
+
         arp = arpeggio_sequence(
-            self.arp_root, self.duration, self.arp_pattern,
-            speed=avg_speed, sr=self.sr, bpm=self.bpm,
+            self.arp_root, self.duration, arp_pat,
+            speed=avg_speed, sr=self.sr, bpm=self.bpm, division=arp_div,
             apply_chorus=True, chorus_depth_ms=self.seq_config.chorus_depth_ms
         )
         vol_env = smooth_envelope(
@@ -1976,8 +1984,8 @@ class EnometaMusicEngine:
         # 디튠 스테레오 쌍
         arp2 = arpeggio_sequence(
             self.arp_root + 1, self.duration,
-            [p * 1.01 for p in self.arp_pattern],
-            speed=avg_speed * 1.02, sr=self.sr
+            [p * 1.01 for p in arp_pat],
+            speed=avg_speed * 1.02, sr=self.sr, division=arp_div
         )
         arp2 *= vol_env * 0.7  # v16: si_gate 제거
 
@@ -2165,21 +2173,31 @@ class EnometaMusicEngine:
         else:
             fixed_pat_key = "mid"
 
-        fixed_gate_div = GATE_DIV[fixed_pat_key]
+        # v14+: seed 기반 gate_div 미세 변동 (같은 energy라도 에피소드마다 다른 gate 밀도)
+        import random as _rng
+        _gate_options = {
+            "mid":     [8, 8, 16],
+            "high":    [16, 16, 32],
+            "tension": [16, 32],
+            "low":     [4, 8],
+        }
+        _gate_rng = _rng.Random(self._ep_seed + 3333)
+        fixed_gate_div = _gate_rng.choice(_gate_options.get(fixed_pat_key, [8]))
         fixed_note_len = 0.85 if fixed_pat_key in ["low", "mid"] else 0.6
 
-        # v13: Norgard 수열에서 3개 변형 생성 (4바 로테이션)
+        # v14+: seed 기반 동적 pat_list 생성 (3~5개 변형, 에피소드마다 다른 rotation 오프셋)
         base_pitch_pat = generate_pitch_pattern(self.seq_config, fixed_pat_key)
-        pat_list = [
-            base_pitch_pat,
-            seq_rotate(base_pitch_pat, 2),
-            seq_rotate(base_pitch_pat, len(base_pitch_pat) // 2),
-        ]
-        print(f"  [saw_seq] v13 sequence pitch: {fixed_pat_key} (avg_energy={avg_energy:.2f}, pat_len={len(base_pitch_pat)})", flush=True)
+        _pat_rng = _rng.Random(self._ep_seed + 7777)
+        num_variations = 3 + self.seq_config.pitch_rotation % 3  # 3~5개
+        pat_len = len(base_pitch_pat)
+        _max_offset = pat_len * 2
+        rotation_offsets = sorted(_pat_rng.sample(range(1, _max_offset), min(num_variations - 1, _max_offset - 1)))
+        pat_list = [base_pitch_pat] + [seq_rotate(base_pitch_pat, off) for off in rotation_offsets]
+        print(f"  [saw_seq] v14+ seed={self._ep_seed}: {fixed_pat_key}, gate_div={fixed_gate_div}, pat_variants={len(pat_list)}, offsets={rotation_offsets}", flush=True)
 
-        # 전체 길이를 4바 청크로 연속 렌더링 (섹션 경계 무시)
+        # 전체 길이를 4~8바 청크로 연속 렌더링 (seed 기반 변동)
         bar_dur = (60.0 / bpm) * 4  # 4/4 1바 길이
-        chunk_bars = 4  # 4바마다 패턴 로테이션
+        chunk_bars = 4 + (self._ep_seed % 3) * 2  # 4, 6, 8 중 하나 (최소 4바 보장)
         chunk_dur = bar_dur * chunk_bars
         bar_counter = 0
         t = 0.0
@@ -4582,7 +4600,8 @@ ROLE_BAR_RATIOS = [
 
 
 def _plan_song_structure(total_duration: float, bpm: float,
-                         climax_time: float = None, outro_time: float = None) -> list:
+                         climax_time: float = None, outro_time: float = None,
+                         mood_layers: dict = None) -> list:
     """v12: 대본 길이와 클라이맥스 시점으로 댄스 음악 구조 자동 생성.
 
     Args:
@@ -4661,14 +4680,25 @@ def _plan_song_structure(total_duration: float, bpm: float,
         end_sec = t + bars * bar_dur
 
         # ARRANGEMENT_TABLE에서 악기 편성 가져와서 smooth_envelope 형태로 변환
+        # v19: mood_layers로 장르별 레이어 ON/OFF + 볼륨 적용
         arr = ARRANGEMENT_TABLE[role_name]
         instruments = {}
         for inst_key, vol in arr.items():
             # genre_preset volume_scale 적용
             scaled_vol = vol * vol_scale.get(inst_key, 1.0)
+
+            # v19: mood_layers가 있으면 레이어 활성/비활성 + 볼륨 오버라이드
+            if mood_layers and inst_key in mood_layers:
+                ml = mood_layers[inst_key]
+                if not ml.get("active", False):
+                    scaled_vol = 0.0  # 비활성 레이어 → 볼륨 0
+                else:
+                    # mood_layers 볼륨을 base로, ARRANGEMENT_TABLE 비율로 스케일
+                    scaled_vol = ml.get("volume", scaled_vol)
+
             instruments[inst_key] = {
                 "active": scaled_vol > 0.01,
-                "volume": scaled_vol,
+                "volume": round(scaled_vol, 4),
             }
 
         section = {
@@ -4696,6 +4726,13 @@ def _plan_song_structure(total_duration: float, bpm: float,
 
     print(f"  [v12] Song structure: {' → '.join(f'{r}({b}bar)' for r, b in roles_bars)}")
     print(f"  [v12] Total: {sum(b for _, b in roles_bars)} bars = {t:.1f}sec (target: {total_duration:.1f}sec)")
+
+    # v19: 활성 레이어 로그
+    if mood_layers:
+        active = [k for k, v in mood_layers.items() if v.get("active")]
+        inactive = [k for k, v in mood_layers.items() if not v.get("active")]
+        print(f"  [v19] Active layers ({len(active)}): {', '.join(active)}")
+        print(f"  [v19] Inactive layers ({len(inactive)}): {', '.join(inactive)}")
 
     return sections, t  # sections + 실제 total_duration 반환
 
@@ -4797,8 +4834,12 @@ def generate_music_script(script_data_path: str, visual_script_path: str = None)
         peak_seg = max(segments, key=lambda s: s.get("analysis", {}).get("semantic_intensity", 0))
         si_peak_time = (peak_seg.get("start_sec", 0) + peak_seg.get("end_sec", 0)) / 2
 
+    # v19: 장르별 레이어 조합 생성
+    mood_layers = EnometaMusicEngine._generate_mood_layers(music_mood, seed_val)
+
     sections, actual_dur = _plan_song_structure(
-        total_dur, bpm, climax_time=si_peak_time
+        total_dur, bpm, climax_time=si_peak_time,
+        mood_layers=mood_layers
     )
     # v16: BGM 길이는 요청 길이(TTS+엔드카드)로 고정 — 초과 확장 금지
     total_dur = min(total_dur, actual_dur)
@@ -4832,14 +4873,15 @@ def generate_music_script(script_data_path: str, visual_script_path: str = None)
             "drum_mode": drum_mode_out,
             "seq_config": dataclasses.asdict(seq_config),
             # v19: seed 기반 Vertical Remixing 레이어 조합 기록 (재현성)
-            "mood_layers": EnometaMusicEngine._generate_mood_layers(music_mood_out, seed_val),
+            "mood_layers": mood_layers,
         },
         "palette": {
             "bass_freq": base_freq,
             "pad_root": base_freq * 2,
             "pad_fifth": base_freq * 3,
             "arp_root": base_freq * 4,
-            "arp_pattern": [1, 1.25, 1.5, 2, 1.5, 1.25]
+            "arp_pattern": seq_config.arp_pattern,
+            "arp_division": seq_config.arp_division
         },
         "sections": sections
     }

@@ -49,7 +49,7 @@ export const EnometaShorts: React.FC<EnometaShortsProps> = ({
   const endcardDurationFrames = Math.round(endcardDurationSec * 30);
 
   return (
-    <AbsoluteFill style={{ backgroundColor: palette.bg }}>
+    <AbsoluteFill style={{ backgroundColor: "#000000" }}>
       {/* 오디오 트랙 — 엔드카드 구간 BGM 페이드 아웃 (여운) */}
       {audioSrc && (
         <Audio

@@ -65,32 +65,105 @@ Claude가 아래 순서로 **모든 옵션을 표 형태로 전부 보여주고*
 ### 5. 제목 (필수)
 입력받으면 kiwipiepy가 키워드 자동 추출
 
-수집 완료 후 **BGM 확인 게이트 포함**해서 실행:
+---
+
+## 파이프라인 실행 — 3-Gate 다양성 개입 시스템
+
+**최상위 목표**: 에피소드마다 비주얼과 BGM이 확실히 달라야 한다.
+코드 자동화는 "안전한 기본값"을 만들고, Claude가 "이전과 다르게"를 강제한다.
 
 ```bash
-# 1단계: BGM까지 실행 후 중단 (확인용)
+# 1단계: visual_script까지 실행 후 중단
 py scripts/enometa_render.py episodes/epXXX \
   --title "제목" \
   --palette phantom \
   --music-mood techno \
   --drum-mode default \
-  --stop-after bgm
+  --stop-after visual_script
 ```
 
-BGM 확인 후 OK → 믹스까지:
-```bash
-# 2단계: mix까지 실행 후 중단
-py scripts/enometa_render.py episodes/epXXX --title "제목" --step mix
-# 믹스 확인 후 OK → 나머지 전체
-py scripts/enometa_render.py episodes/epXXX --title "제목" --step visual_script
+---
+
+### ★ Gate 1: 비주얼 다양성 개입 (visual_script 생성 후) — 필수
+
+**목표**: 이전 에피소드와 다른 비주얼 조합 강제
+
+**A. vocab 중복 제거 (필수)**
+이전 EP의 `visual_script.json`을 읽어 vocab 빈도표를 만들고, 현재 EP와 비교.
+같은 vocab이 50% 이상 겹치면 대체 vocab으로 교체.
+
+```python
+# 비교 방법: 이전 EP vocab 집계
+prev = episodes/ep{N-1}/visual_script.json
+curr = episodes/epXXX/visual_script.json
+# vocab별 사용 횟수 비교 → 겹치는 상위 vocab 교체
 ```
+
+**B. ascii_text 번역 (필수)**
+`visual_script.json`에서 `ascii_text: ""` 항목을 찾아 대본 맥락에 맞는 영어 삽입.
+- 5자 이하 (비트맵 렌더링 제한)
+- "코드" → CODE / PROGRAM / SCRIPT 중 선택
+- "자연" → NATURE / WILD / BIO 중 에피소드 톤에 맞게
+
+**C. highlightWords 보강 (권장)**
+자동 추출된 `highlightWords` 배열에서 누락된 핵심어 추가.
+형태소 분석은 "출력값으로"의 "출력값" 같은 펀치라인 핵심어를 놓침.
+
+**D. terra vocab 강제 삽입 (선택)**
+SI 피크 씬 중 하나에 `terra_globe` 또는 `terra_terrain` vocab을 수동으로 semantic 레이어에 추가.
+씬당 terra_* 는 최대 1개 제한.
+
+개입 완료 후:
+```bash
+# 2단계: BGM 생성
+py scripts/enometa_render.py episodes/epXXX --title "제목" --step bgm
+```
+
+---
+
+### ★ Gate 2: BGM 다양성 개입 (music_script 생성 후) — 필수
+
+**목표**: 이전 에피소드와 다른 음악적 특성 강제
+
+**A. 이전 EP 비교 (필수)**
+`episodes/ep{N-1}/music_script.json`과 현재 `music_script.json`을 비교:
+- `metadata.mood_layers`의 active 레이어 목록 비교
+- 3개 이상 겹치면 optional_pool에서 수동 교체 후 `--step bgm --force`
+
+**B. section energy 변주 (권장)**
+`sections[].energy` 값을 대본 내러티브에 맞게 수동 조정.
+자동 계산은 SI 평균만 반영 — 스토리 아크(긴장→해소)는 수동 개입 필요.
+
+**C. palette 미세조정 (선택)**
+`palette.arp_root` 또는 `palette.bass_freq` 조정으로 음역대 차별화.
+기본 60Hz → 에피소드 테마에 맞는 키 선택 (예: 82Hz=E2, 110Hz=A2).
+
+음악 조정 완료 후 사용자에게 BGM 확인 요청:
+
+---
+
+### ★ Gate 3: BGM 청취 확인
+
+사용자가 BGM을 듣고 OK 하면 나머지 진행:
+
+```bash
+# 3단계: mix + 나머지
+py scripts/enometa_render.py episodes/epXXX --title "제목" --step mix
+py scripts/enometa_render.py episodes/epXXX --title "제목" --step audio_analysis
+py scripts/enometa_render.py episodes/epXXX --title "제목" --step python_frames
+py scripts/enometa_render.py episodes/epXXX --title "제목" --step render
+```
+
+---
 
 ## 특정 단계만 재실행
 
 ```bash
+# 단일 단계 재실행
 py scripts/enometa_render.py episodes/epXXX --title "제목" --step bgm --force
-py scripts/enometa_render.py episodes/epXXX --title "제목" --step mix --force
-py scripts/enometa_render.py episodes/epXXX --title "제목" --step render --force
+
+# 캐스케이드: 해당 단계 + 하위 단계 전부 재실행
+py scripts/enometa_render.py episodes/epXXX --title "제목" --step bgm --force --cascade
 ```
 
 `--step` 선택지: `gen_timing` / `tts` / `script_data` / `visual_script` / `bgm` / `mix` / `audio_analysis` / `python_frames` / `render`
@@ -100,7 +173,7 @@ py scripts/enometa_render.py episodes/epXXX --title "제목" --step render --for
 ## 검증
 
 - `episodes/epXXX/output.mp4` 생성 확인
-- 음악 이상 시: `--step bgm --force` 재실행
+- 음악 이상 시: `--step bgm --force --cascade` 재실행
 - 자막 오류 시: `--step render --force` 재실행
 
 ## 완료 후

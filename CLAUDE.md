@@ -20,7 +20,8 @@ Claude는:
 - **비주얼**: render_mode 항상 `"hybrid"` (legacy 모드 제거됨). genre→strategy 동적 매핑 (cooper→breathing, abstract→collision, data→dense, enometa→enometa). SI 기반 전략 승격
 - **음악**: v19 실존 언더그라운드 장르 9종 (acid/ambient/microsound/IDM/minimal/dub/glitch/industrial/techno). 대본 리액티브 댄스 뮤직. 패턴 엔진 v18 + v19 Vertical Remixing: 장르별 required/optional 레이어 분리 + ep_seed 기반 레이어 조합 자동 변주. 전용 합성 함수 + **ep_seed 기반 seq_config**로 에피소드마다 드럼/음색/패턴 자동 분화
 - **오디오**: narration_volume=0.90, bgm_volume=1.0 (기본), 사이드체인 없음, loudnorm -14 LUFS, 엔드카드 BGM 자동 연장
-- **태그**: 주제 기반 5개 + 고정 3개(`#데이터아트` `#전자음악` `#오디오비주얼`) = 해시태그 항상 8개. **완전 금지** (어디에도 사용 불가): `#쇼츠` `#shorts` `#ENOMETA` `#이노메타`
+- **태그**: 주제 기반 3개 + 고정 5개(`#데이터아트` `#전자음악` `#오디오비주얼` `#철학` `#동기부여`) = 해시태그 항상 8개. **완전 금지** (어디에도 사용 불가): `#쇼츠` `#shorts` `#ENOMETA` `#이노메타`
+- **AsciiArt position**: 자막 영역(y≥1230 전체 캔버스) 침범 금지. bottom 위치 = height*0.62. TextReveal과 동일 규칙.
 
 ## 빌드 & 실행 명령
 
