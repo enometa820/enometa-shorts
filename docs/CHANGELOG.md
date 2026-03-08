@@ -5,6 +5,28 @@
 
 ---
 
+## 2026-03-08 — v20 House 장르 추가 + Rhodes 패드 + Gate 2 seq_config 개입
+
+### Added
+- `enometa_music_engine.py`: `rhodes_pad()` 함수 — minor 9 배음 5개 additive 합성, 느린 어택(250ms), LP 필터, Deep House 특유 따뜻한 코드 사운드
+- `enometa_music_engine.py`: `_render_continuous_rhodes_pad()` 메서드 — 2바 주기 반복, 스테레오 와이드닝 포함
+- `enometa_music_engine.py`: `house` 장르 (`_GENRE_SPECS`, `MOOD_BPM_RANGES`, `MOOD_RHYTHM_PRESETS`, `MOOD_KICK_CHARACTER`, `_MOOD_DRUM_DEFAULT`) 전체 등록
+  - BPM 118–126 / required: kick+hi_hat+rhodes_pad+bass_drone / optional: snare/chord_stab/arpeggio/fm_bass
+  - kick_character=1 (boomy, TR-909 스타일)
+- `enometa_music_engine.py`: `generate()` 렌더링 연결에 `rhodes_pad` 레이어 추가
+
+### Changed
+- `enometa-produce.md`: Gate 2 전면 개정 — mood_layers 비교(효과 없음) → seq_config 음색 설계 + 섹션 볼륨 조율로 교체. 대본 테마별 음색 방향 가이드 추가
+- `enometa-produce.md`: 음악 장르 테이블에 house(10번) 추가
+- `CLAUDE.md`, `README.md`: 음악 장르 v19→v20, house 장르 추가 기록
+
+### 이유
+- 코드만으로는 에피소드 간 구조적 다름을 만들 수 없음 → Gate 2를 seq_config 직접 설계로 전환
+- house 장르: Rhodes 패드로 기존 9장르에 없던 코드 사운드 추가 (다양성 최우선)
+- mood_layers 수동 편집이 실제 무시됨을 발견 → Gate 2 지침 정정
+
+---
+
 ## 2026-03-08 — 드럼 다양성 강화 — Hi-hat 활성화 + simple 모드 재정의
 
 ### Changed

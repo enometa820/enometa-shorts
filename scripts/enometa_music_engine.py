@@ -1069,6 +1069,42 @@ def chord_stab(root_freq=130.8, duration=2.0, sr=SAMPLE_RATE):
     return chord
 
 
+def rhodes_pad(root_freq=120.0, duration=2.0, sr=SAMPLE_RATE, brightness=0.5):
+    """로즈 스타일 패드 — Deep House 코드 사운드.
+    Minor 9 배음 구조 (root+m3+5th+m7+9th) additive 합성 + 느린 어택 + LP 필터.
+    brightness: 0.0=어두운 따뜻함 / 1.0=밝은 샤이닝 (filter_cutoff 제어)
+    """
+    total_samples = int(sr * duration)
+    if total_samples < 2:
+        return np.zeros(total_samples)
+    t = np.linspace(0, duration, total_samples, endpoint=False)
+    # Minor 9 코드 배음: root, m3(×1.189), 5th(×1.498), m7(×1.782), 9th(×2.245)
+    ratios     = [1.0,  1.189, 1.498, 1.782, 2.245]
+    amplitudes = [1.0,  0.70,  0.50,  0.30,  0.15]
+    pad = np.zeros(total_samples)
+    for ratio, amp in zip(ratios, amplitudes):
+        freq = root_freq * ratio
+        # 미세 detune — 로즈 특유의 두꺼운 유니즌 느낌
+        detune = 1.0 + (ratio - 1.0) * 0.0012
+        pad += amp * np.sin(2 * np.pi * freq * detune * t)
+    pad /= sum(amplitudes)
+    # 느린 어택 엔벨로프 (250ms 페이드인 — 로즈 공명 느낌)
+    attack_s   = min(int(sr * 0.25), total_samples)
+    release_s  = min(int(sr * 0.50), total_samples)
+    env = np.ones(total_samples)
+    if attack_s > 0:
+        env[:attack_s] = np.linspace(0, 1, attack_s)
+    fade_start = max(total_samples - release_s, attack_s)
+    if fade_start < total_samples:
+        env[fade_start:] = np.linspace(1, 0, total_samples - fade_start)
+    pad *= env * 0.40
+    # LP 필터 — brightness로 밝기 제어 (400~2500 Hz)
+    cutoff = 400 + brightness * 2100
+    if len(pad) > 20:
+        pad = resonant_lowpass(pad, cutoff, sr=sr, order=4)
+    return pad
+
+
 def soft_clip(signal, drive=2.0):
     """소프트 클리핑 디스토션"""
     driven = signal * drive
@@ -1578,6 +1614,31 @@ class EnometaMusicEngine:
                 self.master_L[start_sample:end_sample] += stab[:length] * local_vol
                 self.master_R[start_sample:end_sample] += stab[:length] * local_vol
             pos += stab_interval
+
+    def _render_continuous_rhodes_pad(self, sections):
+        """Deep House 로즈 패드 — 2바마다 minor 9 코드 반복.
+        느린 어택 + LP 필터로 따뜻한 house 질감. 스테레오 미세 와이드닝 포함.
+        """
+        print("  [rhodes_pad] continuous Deep House rhodes pad...", flush=True)
+        vol_env = smooth_envelope(
+            self.total_samples, sections, "rhodes_pad", "volume",
+            default=0.0, morph_sec=1.5, sr=self.sr
+        )
+        bar_sec = (60.0 / self.bpm) * 4
+        pad_interval = bar_sec * 2          # 2바마다 새 코드
+        pad_dur = min(pad_interval * 1.05, 4.0)  # 약간 겹치게 — 음이 끊기지 않음
+        pos = 0.0
+        while pos < self.duration:
+            pad = rhodes_pad(self.pad_root * 0.5, pad_dur, self.sr, brightness=0.5)
+            start_sample = int(pos * self.sr)
+            end_sample = min(start_sample + len(pad), self.total_samples)
+            length = end_sample - start_sample
+            if length > 0:
+                local_vol = vol_env[start_sample:end_sample]
+                # 스테레오 와이드닝 (L/R 미세 비율 차)
+                self.master_L[start_sample:end_sample] += pad[:length] * local_vol * 1.04
+                self.master_R[start_sample:end_sample] += pad[:length] * local_vol * 0.96
+            pos += pad_interval
 
     def _render_continuous_distorted_kick(self, sections):
         """industrial 디스토션 킥 — 정규 킥과 교대 배치"""
@@ -2935,6 +2996,7 @@ class EnometaMusicEngine:
         "ambient": False, "microsound": False, "IDM": True,
         "minimal": True,  "dub": True,         "glitch": True,
         "acid": True,     "industrial": True,  "techno": True,
+        "house": True,
     }
     # ── v19: 장르별 레이어 스펙 (Vertical Remixing) ─────────────────────────
     # required = 항상 ON (장르 정체성)
@@ -3098,6 +3160,25 @@ class EnometaMusicEngine:
             "optional_count": (2, 3),
             "inactive": ["glitch", "bytebeat", "gap_burst", "data_click"],
         },
+        "house": {
+            "required": {
+                "kick":         {"volume": (0.8, 1.0)},   # 4-on-the-floor = house 정체성
+                "hi_hat":       {"volume": (0.5, 0.7)},   # 오프비트 하이햇 = house 필수
+                "rhodes_pad":   {"volume": (0.6, 0.8)},   # Rhodes 코드 = deep house 정체성
+                "bass_drone":   {"volume": (0.6, 0.8)},   # 깊은 서브베이스
+            },
+            "optional_pool": {
+                "snare":             {"volume": (0.5, 0.7)},   # 2, 4박 스네어
+                "chord_stab":        {"volume": (0.4, 0.6)},   # dub 분위기 코드 추가
+                "arpeggio":          {"volume": (0.4, 0.6)},   # 하이 아르페지오
+                "fm_bass":           {"volume": (0.4, 0.6)},   # FM 베이스 레이어
+                "sine_interference": {"volume": (0.2, 0.4)},   # 배경 사인파 질감
+            },
+            "optional_count": (2, 3),
+            "inactive": ["saw_sequence", "acid_bass", "distorted_kick", "glitch",
+                         "bytebeat", "data_click", "ultrahigh_texture", "gap_burst",
+                         "stutter_gate"],
+        },
     }
 
     @staticmethod
@@ -3173,6 +3254,7 @@ class EnometaMusicEngine:
     MOOD_BPM_RANGES = {
         "ambient":      (60,  72),   # very slow, spacious (60-72 BPM)
         "microsound":   (85, 100),   # precise, data-driven (Ikeda/Alva Noto)
+        "house":        (118, 126),  # Deep House sweet spot (Larry Heard/Larry Heard)
         "minimal":      (118, 126),  # steady, hypnotic
         "dub":          (110, 125),  # deep, spacious (Basic Channel)
         "IDM":          (100, 155),  # wide range, unpredictable (Aphex/Autechre)
@@ -3180,12 +3262,14 @@ class EnometaMusicEngine:
         "acid":         (126, 138),  # TB-303 sweet spot
         "industrial":   (138, 155),  # fast, aggressive (Perc/Ansome)
         "techno":       (128, 138),  # 4-on-the-floor sweet spot
+        "house":        (118, 126),  # Deep House sweet spot
     }
 
     # ── 장르별 유클리드 드럼 패턴 ─────────────────────────────────────────────
     # (pulses, steps): euclidean_rhythm(steps, pulses) → 장르 DNA
     # None = 해당 파트 seq_config 기본값 유지
     MOOD_RHYTHM_PRESETS = {
+        "house":        {"kick": (4, 16), "snare": (2, 16), "hihat": (8, 16)},  # 4-on-the-floor + 오프비트 하이햇
         "techno":       {"kick": (4, 16), "snare": (2, 16), "hihat": (8, 16)},
         "glitch":       {"kick": (5, 16), "snare": (3, 11), "hihat": (11, 16)},
         "minimal":      {"kick": (3, 16), "snare": None,    "hihat": (5, 12)},
@@ -3200,6 +3284,7 @@ class EnometaMusicEngine:
     # ── 장르별 킥 캐릭터 ─────────────────────────────────────────────────────
     # 0=tight(단단), 1=boomy(울림), 2=punchy(어택)
     MOOD_KICK_CHARACTER = {
+        "house":        1,   # boomy — 깊고 따뜻한 Deep House 킥 (Roland TR-909 스타일)
         "techno":       2,   # punchy — 믹스 관통
         "glitch":       0,   # tight — 짧고 클릭
         "minimal":      0,   # tight
@@ -3413,6 +3498,11 @@ class EnometaMusicEngine:
                 self._render_continuous_chord_stab(sections)
             else:
                 print("  [chord_stab] SKIPPED (mood layer off)", flush=True)
+            # house 전용: Rhodes 패드
+            if _layer_on("rhodes_pad", default=False):
+                self._render_continuous_rhodes_pad(sections)
+            else:
+                print("  [rhodes_pad] SKIPPED (mood layer off)", flush=True)
             if _layer_on("distorted_kick", default=False):
                 self._render_continuous_distorted_kick(sections)
             else:
@@ -4815,6 +4905,7 @@ def generate_music_script(script_data_path: str, visual_script_path: str = None)
     _MOOD_BPM_RANGES = {
         "ambient":      (60,  72),
         "microsound":   (85, 100),
+        "house":        (118, 126),
         "minimal":      (118, 126),
         "dub":          (110, 125),
         "IDM":          (100, 155),

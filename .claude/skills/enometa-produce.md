@@ -43,6 +43,7 @@ Claude가 아래 순서로 **모든 옵션을 표 형태로 전부 보여주고*
 | 7 | `glitch` | Oval, Farmers Manual | 92–108 |
 | 8 | `industrial` | Perc, Ansome, Surgeon | 138–155 |
 | 9 | `techno` | Jeff Mills, Underground Resistance | 128–138 |
+| 10 | `house` | Larry Heard, Frankie Knuckles | 118–126 (Rhodes 패드) |
 
 ### 3. 비주얼 무드 (선택, 생략=자동)
 | # | 값 | Python 레이어 | 전략 | 특성 |
@@ -121,22 +122,53 @@ py scripts/enometa_render.py episodes/epXXX --title "제목" --step bgm
 
 ---
 
-### ★ Gate 2: BGM 다양성 개입 (music_script 생성 후) — 필수
+### ★ Gate 2: seq_config 음색 설계 (music_script 생성 후) — 필수
 
-**목표**: 이전 에피소드와 다른 음악적 특성 강제
+**목표**: 이전 에피소드와 다른 음색 + 대본 테마 반영
 
-**A. 이전 EP 비교 (필수)**
-`episodes/ep{N-1}/music_script.json`과 현재 `music_script.json`을 비교:
-- `metadata.mood_layers`의 active 레이어 목록 비교
-- 3개 이상 겹치면 optional_pool에서 수동 교체 후 `--step bgm --force`
+> ⚠️ `mood_layers`는 편집 금지 (코드가 자동 재생성해서 무시됨)
+> ⚠️ `episode`, `duration` 절대 변경 금지
 
-**B. section energy 변주 (권장)**
-`sections[].energy` 값을 대본 내러티브에 맞게 수동 조정.
-자동 계산은 SI 평균만 반영 — 스토리 아크(긴장→해소)는 수동 개입 필요.
+**A. seq_config 비교 (필수)**
+`episodes/ep{N-1}/music_script.json`의 `seq_config`와 현재를 비교:
 
-**C. palette 미세조정 (선택)**
-`palette.arp_root` 또는 `palette.bass_freq` 조정으로 음역대 차별화.
-기본 60Hz → 에피소드 테마에 맞는 키 선택 (예: 82Hz=E2, 110Hz=A2).
+| 비교 항목 | 허용 범위 | 개입 기준 |
+|-----------|-----------|-----------|
+| `base_bpm` | ±15 BPM 이상 차이 권장 | 같으면 BPM 조정 |
+| `kick_character` | 이전과 다른 값 | 같으면 0↔1↔2 교체 |
+| `filter_cutoff_base` | ±500 Hz 이상 차이 | 같은 톤이면 조정 |
+| `saw_harmonics` | 배음 구성 1개 이상 다름 | 동일이면 교체 |
+| `bass_detune` | ±0.002 이상 차이 | 같은 두께면 조정 |
+
+**B. 대본 테마 기반 seq_config 설계 (권장)**
+
+| 대본 테마 | 음색 방향 |
+|-----------|-----------|
+| 뇌과학/복잡계 | 홀수 배음 강조(1,3,5), `filter_cutoff_base` 낮게(1500~2500) |
+| 철학/명상 | `bass_detune` 크게(0.006~0.008), `chorus_depth_ms` 크게(2.5~3.0) |
+| 컴퓨팅/데이터 | `kick_character=0`(tight), `filter_cutoff_base` 높게(4000~6000) |
+| 인문/감성 | `fm_mod_ratio` 낮게(1.5~2.0), `kick_character=1`(boomy) |
+
+수정 가능한 파라미터 범위:
+```json
+"seq_config": {
+  "kick_character": 0,          // 0=tight / 1=boomy / 2=punchy
+  "filter_cutoff_base": 2500,   // 1000~6000 Hz
+  "fm_mod_ratio": 1.8,          // 1.5~3.5
+  "bass_detune": 0.005,         // 0.001~0.008
+  "chorus_depth_ms": 2.0,       // 0.1~3.0
+  "saw_harmonics": {"1":1.0, "3":0.6, "5":0.2}  // 배음 구성 자유 설계
+}
+```
+
+**C. 섹션 볼륨 내러티브 조율 (선택)**
+클라이맥스 섹션에서 주요 악기 volume 강조:
+```json
+"instruments": {
+  "acid_bass":    {"active": true, "volume": 0.95},
+  "arp_sequence": {"active": true, "volume": 0.80}
+}
+```
 
 음악 조정 완료 후 사용자에게 BGM 확인 요청:
 

@@ -80,7 +80,7 @@ npx remotion studio --port 3000
 | `c64` | Commodore 64 |
 | `enometa` | 흑백 모노크롬 |
 
-### 음악 장르 (`--music-mood`) — v18
+### 음악 장르 (`--music-mood`) — v20
 
 | 값 | 레퍼런스 | 특성 |
 |----|----------|------|
@@ -93,6 +93,7 @@ npx remotion studio --port 3000
 | `glitch` | Oval, Farmers Manual | Euclidean E(5,16) 패턴, 비트크러시, BPM 92–108 |
 | `industrial` | Perc, Ansome, Surgeon | 왜곡 킥, 고에너지, BPM 138–155 |
 | `techno` | Jeff Mills, Underground Resistance | 4-on-the-floor, TB-303 arp, BPM 128–138 |
+| `house` | Larry Heard, Frankie Knuckles | Rhodes 패드(minor 9), 4-on-the-floor, 오프비트 하이햇, BPM 118–126 |
 
 ### 비주얼 무드 (`--visual-mood`)
 
