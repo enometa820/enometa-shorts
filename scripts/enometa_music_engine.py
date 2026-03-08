@@ -1527,7 +1527,7 @@ class EnometaMusicEngine:
         최소 BPM: 무드별 하한 (ambient/ikeda/chill=70, 나머지=95)
         """
         music_mood = self.script.get("metadata", {}).get("music_mood", "acid")
-        min_bpm = 70 if music_mood in ("ambient", "microsound", "dub") else 95
+        min_bpm = 60 if music_mood in ("ambient", "dub") else 85 if music_mood == "microsound" else 95
         fixed_bpm = max(float(self.bpm), min_bpm)
         return np.full(self.total_samples, fixed_bpm)
 
@@ -2856,9 +2856,9 @@ class EnometaMusicEngine:
     }
     _MOOD_LAYERS = {
         "ambient":      {"bass_drone": {"active": True, "volume": 0.8}, "sine_interference": {"active": True, "volume": 0.9}, "pulse_train": {"active": True, "volume": 0.6},
-                         "saw_sequence": {"active": False}, "arpeggio": {"active": False}, "kick": {"active": False}, "snare": {"active": False}},
-        "microsound":   {"sine_interference": {"active": True, "volume": 1.0}, "data_click": {"active": True, "volume": 0.9}, "pulse_train": {"active": True, "volume": 0.8},
-                         "ultrahigh_texture": {"active": True, "volume": 0.6}, "saw_sequence": {"active": False}, "arpeggio": {"active": False}, "kick": {"active": False}, "snare": {"active": False}},
+                         "saw_sequence": {"active": False}, "arpeggio": {"active": True, "volume": 0.30}, "kick": {"active": False}, "snare": {"active": False}},
+        "microsound":   {"sine_interference": {"active": True, "volume": 1.0}, "data_click": {"active": True, "volume": 1.2}, "pulse_train": {"active": True, "volume": 0.8},
+                         "ultrahigh_texture": {"active": True, "volume": 0.9}, "saw_sequence": {"active": False}, "arpeggio": {"active": False}, "kick": {"active": False}, "snare": {"active": False}},
         "IDM":          {"kick": {"active": True, "volume": 0.7}, "snare": {"active": True, "volume": 0.5},
                          "saw_sequence": {"active": True, "volume": 0.5}, "arpeggio": {"active": True, "volume": 0.7},
                          "glitch": {"active": True, "volume": 0.6}, "stutter_gate": {"active": True, "volume": 0.7}, "bytebeat": {"active": True, "volume": 0.5}},
@@ -2893,8 +2893,8 @@ class EnometaMusicEngine:
     # ── 장르별 BPM 범위 ──────────────────────────────────────────────────────
     # ep_seed로 범위 내에서 결정론적 선택 → 장르별 템포 캐릭터 확보
     MOOD_BPM_RANGES = {
-        "ambient":      (72,  90),   # slow, meditative
-        "microsound":   (80,  96),   # slow, data-driven (Ikeda/Alva Noto)
+        "ambient":      (60,  72),   # very slow, spacious (60-72 BPM)
+        "microsound":   (85, 100),   # precise, data-driven (Ikeda/Alva Noto)
         "minimal":      (118, 126),  # steady, hypnotic
         "dub":          (110, 125),  # deep, spacious (Basic Channel)
         "IDM":          (100, 155),  # wide range, unpredictable (Aphex/Autechre)
@@ -4602,8 +4602,8 @@ def generate_music_script(script_data_path: str, visual_script_path: str = None)
     _LEGACY_MOOD_MAP = {"raw": "acid", "ikeda": "microsound", "experimental": "IDM", "chill": "dub", "intense": "industrial"}
     music_mood = _LEGACY_MOOD_MAP.get(music_mood, music_mood)
     _MOOD_BPM_RANGES = {
-        "ambient":      (72,  90),
-        "microsound":   (80,  96),
+        "ambient":      (60,  72),
+        "microsound":   (85, 100),
         "minimal":      (118, 126),
         "dub":          (110, 125),
         "IDM":          (100, 155),

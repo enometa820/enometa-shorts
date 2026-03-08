@@ -1141,7 +1141,7 @@ def generate_visual_script(
         "meta": {
             "strategy": strategy_name,
             "strategy_description": strategy.get("description", ""),
-            "genre": "enometa",
+            "genre": genre,
             "palette": palette_name,
             "seed": seed,
             "render_mode": "hybrid",
@@ -1220,18 +1220,33 @@ def main():
         # narration_timing.json과 같은 디렉토리에 visual_script.json
         output = os.path.join(os.path.dirname(narration_timing), "visual_script.json")
 
-    # v8: 장르 항상 enometa (단일 장르 시스템)
+    # v9: music_mood → visual genre 자동 매핑 (narration_timing.json에서 mood 읽기)
     # 하위호환: "ikeda" → "enometa" 자동 매핑
-    if genre == "ikeda":
-        genre = "enometa"
-    if genre and genre != "enometa":
-        print(f"⚠ WARNING: --genre {genre} 무시됨. v8부터 enometa 단일 장르 시스템입니다.")
-    genre = "enometa"
+    _MOOD_TO_VISUAL_GENRE = {
+        "ambient":    "cooper",    # 미니멀, BarcodeLayer 없음
+        "microsound": "cooper",    # 미니멀, 정밀
+        "minimal":    "abstract",  # TextData + DataMatrix만
+        "IDM":        "abstract",  # 복잡하지만 정제된 느낌
+        "acid":       "enometa",   # 기본 풀 세트
+        "techno":     "data",      # 최고 밀도
+        "industrial": "data",      # 최고 밀도
+        "glitch":     "enometa",   # 기본 풀 세트
+        "dub":        "cooper",    # 여유, 미니멀
+    }
+    if not genre or genre == "ikeda" or genre == "enometa":
+        # narration_timing.json에서 music_mood 읽어서 자동 결정
+        try:
+            with open(narration_timing, encoding='utf-8') as _f:
+                _timing_data = json.load(_f)
+            _music_mood = _timing_data.get("music_mood", "")
+            genre = _MOOD_TO_VISUAL_GENRE.get(_music_mood, "enometa")
+        except Exception:
+            genre = "enometa"
 
-    print(f"=== ENOMETA Visual Script Generator v8 ===")
+    print(f"=== ENOMETA Visual Script Generator v9 ===")
     print(f"Narration timing: {narration_timing}")
     print(f"Palette: {palette_name}")
-    print(f"Genre: enometa (v8 단일 장르)")
+    print(f"Genre: {genre} (v9: music_mood 기반 자동 선택)")
     if strategy_name:
         print(f"Strategy: {strategy_name}")
     if not title:
