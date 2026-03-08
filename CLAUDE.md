@@ -68,31 +68,6 @@ script.txt → gen_timing.py → narration_timing.json
            → Remotion (src/Root.tsx) → output.mp4
 ```
 
-### Python 핵심 파일 (scripts/)
-| 파일 | 역할 |
-|------|------|
-| `enometa_music_engine.py` | BGM 합성 (numpy, ~5000줄). 10레이어, 9장르(v18), Euclidean 패턴 엔진 |
-| `script_data_extractor.py` | 대본 분석 — kiwipiepy 형태소 분석 + soynlp 전처리 + semantic_intensity + 도메인 사전 (50+용어) |
-| `visual_script_generator.py` | 대본 → 씬/감정/vocab 매핑 → visual_script.json. music_mood 기반 visual genre 자동 결정 (ambient/microsound/dub→cooper, IDM/minimal→abstract, techno/industrial→data, 기본→enometa) |
-| `visual_renderer.py` | numpy+Pillow 프레임 렌더링 (1080x1080) |
-| `gen_timing.py` | TTS 실측 기반 연속 배치 (v16: 마디 snap 제거) |
-| `sequence_generators.py` | Thue-Morse/Norgard/Rudin-Shapiro 수열 생성 |
-| `visual_strategies.py` | 비주얼 전략 6종 프리셋 (dense/breathing/cinematic/data_viz/retro/abstract) — visual_script_generator.py `--strategy` 옵션에서 참조 |
-
-### Remotion 핵심 파일 (src/)
-| 파일 | 역할 |
-|------|------|
-| `Root.tsx` | Composition 정의 + calcMeta (lastScene.end_sec + endcard 기준) |
-| `EnometaShorts.tsx` | 메인 컴포넌트 — 레이아웃 (제목/비주얼/자막/엔드카드) |
-| `ep0XXScript.ts` | 에피소드별 데이터 import (visual_script, audio_analysis 등) |
-| `components/VisualSection.tsx` | Python 프레임 배경 + Remotion vocab 오버레이 (VOCAB_MAP 레지스트리) |
-| `components/vocab/` | 2D Canvas vocab 컴포넌트 (24개) |
-| `components/vocab/three/` | 3D Three.js vocab 컴포넌트 — ThreeCanvas 래퍼 + Terra Vision 계열 |
-| `components/SubtitleSection.tsx` | 나레이션 싱크 자막 (EP005 레퍼런스 유지) |
-| `components/TextReveal.tsx` | 4모드 타이포그래픽 모션그래픽 |
-| `types.ts` | 중앙 타입 정의 — `Scene`, `VisualScript`, `VocabEntry`, `VocabComponentProps` 등 |
-| `hooks/useAudioData.ts` | `AudioFrame`(bass/mid/high/rms/onset) + `useAudioData()` 훅 + `useSimulatedAudio()` |
-
 ### 팔레트
 `phantom` / `neon_noir` / `cold_steel` / `ember` / `synapse` / `gameboy` / `c64` / `enometa`
 
@@ -125,31 +100,17 @@ mix 단계 후 `public/epXXX/mixed.wav`도 반드시 동기화 필요.
 - **Python**: numpy, scipy, Pillow, edge-tts, kiwipiepy, soynlp
 - **Node**: remotion, @remotion/cli, @remotion/layout-utils, @remotion/three, three
 
-## v16 시스템 철학 — 음악적 완성도 + 볼륨 고정
+## 핵심 원칙
 
-**최우선 목표**: 음악적 완성도. 처음부터 끝까지 따로 놀지 않는 음악.
-TTS / 비주얼 / BGM이 하나의 통합 유기체로 움직여야 한다.
+- **레이어 ON/OFF + 볼륨 고정**: 에너지는 볼륨 커브가 아닌 레이어 추가/제거로 표현. 콜앤리스폰스/song_arc 비활성. 마스터 페이드 없음 (5ms anti-click만).
+- **고정 BPM**: 가변 BPM은 섹션 경계에서 리듬 파괴. 장르 범위 내 단일 BPM 유지.
+- **타이밍**: 영상 길이 = `lastScene.end_sec + endcard`. BGM 초과분 자동 잘림. 문장 갭 `--gap 0.3`, 문단 갭 `--paragraph-gap 0.8`.
 
-### 3원칙
+### 메모리 과부하 방지
 
-1. **TTS 실측 기반 타이밍**: `gen_timing.py`가 TTS 실측 길이로 연속 배치.
-   - 문장 간 갭: `--gap 0.3` (같은 문단), `--paragraph-gap 0.8` (빈줄 구분)
-   - BGM은 TTS 총 길이 + 엔드카드(8초)로 별도 생성
-   - 영상 길이 = lastScene.end_sec + endcard (BGM 초과분 자동 잘림)
-
-2. **레이어 ON/OFF + 볼륨 고정**: 에너지 표현은 볼륨 커브가 아닌 레이어 추가/제거.
-   - 콜앤리스폰스 비활성. song_arc/SI modulation/breath 비활성.
-   - 마스터 페이드 없음 (5ms anti-click만).
-
-3. **모든 요소의 상호작용**: 음악이 비주얼을 이끌고, 비주얼이 자막을 감싸고,
-   자막이 리듬에 맞춰 호흡한다. 하나라도 따로 놀면 실패.
-
-### MEMORY.md 과부하 방지 규칙
-
-- 에피소드 상세 교훈은 `episodes/epXXX/feedback.json` 저장
+- 에피소드 교훈 → `episodes/epXXX/feedback.json`
 - MEMORY.md: 시스템 규칙 + 최신 교훈만 (200줄 이내)
-- 주요 아키텍처 결정은 `docs/decisions/NNN-*.md` (ADR) 저장 — "왜" 이 결정을 했는지 기록
-- 코드와 CLAUDE.md가 진실의 소스
+- 아키텍처 결정 이유 → `docs/decisions/NNN-*.md` (ADR)
 
 ## 시니어 개발자 관점 — 지적 & 제안 프로토콜
 
