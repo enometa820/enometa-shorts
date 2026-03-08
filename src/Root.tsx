@@ -78,6 +78,13 @@ import {
   ep011AudioSrc,
   ep011NarrationSegments,
 } from "./ep011Script";
+import {
+  ep012VisualScript,
+  ep012Title,
+  ep012AudioAnalysis,
+  ep012AudioSrc,
+  ep012NarrationSegments,
+} from "./ep012Script";
 
 // calculateMetadata: audioAnalysis.duration_sec 기반 durationInFrames 자동 계산
 // endcardDurationSec 기본 6초 포함
@@ -293,6 +300,25 @@ export const Root: React.FC = () => {
           audioSrc: ep011AudioSrc,
           narrationSegments: ep011NarrationSegments,
           highlightWords: ["자연", "DNA", "코딩", "진화"],
+        }}
+      />
+
+      {/* EP012: 집단지성의 거짓말 */}
+      <Composition
+        id="EP012"
+        component={EnometaShorts}
+        durationInFrames={30 * 30}
+        fps={30}
+        width={1080}
+        height={1920}
+        calculateMetadata={calcMeta}
+        defaultProps={{
+          visualScript: ep012VisualScript,
+          title: ep012Title,
+          audioAnalysis: ep012AudioAnalysis,
+          audioSrc: ep012AudioSrc,
+          narrationSegments: ep012NarrationSegments,
+          highlightWords: ["집단", "동조", "진실", "용기"],
         }}
       />
 

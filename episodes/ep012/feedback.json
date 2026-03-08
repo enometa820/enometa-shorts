@@ -1,0 +1,70 @@
+{
+  "episode": "ep012",
+  "date": "2026-03-08",
+  "title": "집단지성의 거짓말",
+  "options": {
+    "palette": "enometa",
+    "music_mood": "dub",
+    "visual_mood": "enometa",
+    "drum_mode": "simple"
+  },
+  "overall_rating": 7,
+  "music": {
+    "rating": 7,
+    "liked": ["dub 장르 분위기 좋음", "tape_delay 공간감"],
+    "disliked": ["멜로디가 에피소드마다 똑같이 느껴짐 — sine_interference가 5개 고정 emotion 매핑, ep_seed 변화 제로"]
+  },
+  "visual": {
+    "rating": 7,
+    "liked": ["enometa 팔레트 흑백 감성", "전반적 데이터아트 느낌"],
+    "disliked": ["TextDataLayer 감도 부족 (세션 중 부분 수정 완료)", "엔드카드 ENOMETA 텍스트 잘림 (세션 중 수정)"]
+  },
+  "narration": {
+    "rating": 8,
+    "liked": ["Edge-TTS 안정적"],
+    "disliked": []
+  },
+  "script": {
+    "rating": 8,
+    "liked": ["집단적 무지성 비판 강도", "하지만 진실은 다수결이 아니다 — 펀치라인"],
+    "disliked": []
+  },
+  "issues": [
+    {
+      "type": "music",
+      "target": "sine_interference melody",
+      "detail": "5개 고정 emotion→melody 매핑만 존재. generate_pitch_pattern()(Norgard 수열)은 코드 있으나 미사용. 에피소드 간 멜로디 차이 체감 불가.",
+      "severity": "major"
+    },
+    {
+      "type": "pipeline",
+      "target": "skill handoff (writing→produce)",
+      "detail": "글쓰기 스킬 완료 후 제작 스킬로 자동 전환되지 않음. enometa-writing.md STEP 4에 invoke 지시 추가로 수정 완료.",
+      "severity": "major"
+    },
+    {
+      "type": "pipeline",
+      "target": "Webpack cache",
+      "detail": "TSX 코드 수정 후 렌더링해도 캐시된 이전 번들 사용. enometa_render.py에 node_modules/.cache/ 자동 삭제 추가로 수정 완료.",
+      "severity": "major"
+    },
+    {
+      "type": "visual",
+      "target": "LogoEndcard letterSpacing",
+      "detail": "ENOMETA 텍스트가 캔버스 폭 초과로 잘림. fontSize 140→120, letterSpacing 45→14px + 텍스트 오버레이 35% 추가로 수정.",
+      "severity": "minor"
+    },
+    {
+      "type": "visual",
+      "target": "TextDataLayer brightness",
+      "detail": "데이터 카드 텍스트 너무 어두움. brightness 바닥값 0.1→0.35, card_fill //12→//6으로 수정.",
+      "severity": "minor"
+    }
+  ],
+  "system_suggestions": [
+    "멜로디 다양성: sine_interference에 ep_seed 기반 변주 + Norgard pitch_pattern 연결",
+    "README 재구성: Python vs Remotion 비주얼 매핑 표 + Claude 3-Gate 개입 지점 문서화",
+    "ASCII 감성 확장: Python 배경 레이어로 ASCII 텍스처 추가",
+    "프레임 용량 관리: render 성공 후 frames/ 자동 삭제 (현재 ~3.5GB 점유)"
+  ]
+}

@@ -1,0 +1,935 @@
+{
+  "title": "집단지성의 거짓말",
+  "tagline": "존재와 사유,\n그 경계를 초월하다",
+  "highlightWords": [
+    "배우",
+    "명확",
+    "정답",
+    "솔로몬",
+    "잔인"
+  ],
+  "meta": {
+    "strategy": "breathing",
+    "strategy_description": "여백 + 느린 호흡 — 명상적, 미니멀",
+    "genre": "cooper",
+    "palette": "enometa",
+    "seed": 1334950230,
+    "render_mode": "hybrid",
+    "frames_dir": "ep012/frames",
+    "total_frames": 3252
+  },
+  "global": {
+    "color_palette": [
+      "#FFFFFF",
+      "#AAAAAA",
+      "#555555",
+      "#222222"
+    ],
+    "background_color": "#000000",
+    "particle_total": 2000,
+    "font": "Pretendard Variable",
+    "palette": "enometa"
+  },
+  "scenes": [
+    {
+      "id": "scene_01",
+      "sentence": "방 안에 8명이 있었다. 7명은 배우였다.",
+      "start_sec": 0.0,
+      "end_sec": 5.388,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 500,
+              "color": "#FFFFFF",
+              "rings": 4,
+              "speed": 0.488
+            },
+            "variant": "ellipse_drift"
+          },
+          {
+            "vocab": "symbol_morph",
+            "params": {
+              "text": "배우",
+              "posType": "noun",
+              "shapeColor": "#FFFFFF",
+              "glowColor": "#CCCCCC",
+              "position": "top",
+              "size": 140,
+              "showLabel": false
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0015,
+            "speed": 0.03,
+            "line_opacity": 0.044,
+            "line_color": "#222222"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_02",
+      "sentence": "선의 길이를 맞추는 문제. 답은 명확했다.",
+      "start_sec": 6.188,
+      "end_sec": 11.216,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {},
+            "variant": "opposing"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "명확",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#FFFFFF",
+              "position": "center",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0016,
+            "speed": 0.023,
+            "line_opacity": 0.05,
+            "line_color": "#444444"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_03",
+      "sentence": "배우들이 입을 모았다. 틀린 답으로.",
+      "start_sec": 12.016,
+      "end_sec": 16.66,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "terra_globe",
+            "params": {
+              "dataPoints": 12,
+              "wireColor": "#AAAAAA",
+              "dotColor": "#AAAAAA",
+              "rotationSpeed": 0.014,
+              "detail": 2
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "배우",
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#FFD700",
+              "position": "top",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0025,
+            "speed": 0.029,
+            "line_opacity": 0.063,
+            "line_color": "#444444"
+          },
+          "variant": "vortex",
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_04",
+      "sentence": "75퍼센트가 따랐다. 눈에 정답이 보이는데도.",
+      "start_sec": 17.46,
+      "end_sec": 23.16,
+      "emotion": "awakening_spark",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_chain_awaken",
+            "params": {
+              "count": 600,
+              "color": "#FFFFFF",
+              "chain_speed": 1.164,
+              "glow_color": "#CCCCCC"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "정답",
+              "mode": "scatter",
+              "fontSize": 72,
+              "color": "#00FFFF",
+              "position": "top",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0032,
+            "speed": 0.05,
+            "line_opacity": 0.061,
+            "line_color": "#444444"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_05",
+      "sentence": "솔로몬 아쉬. 1951년.",
+      "start_sec": 23.96,
+      "end_sec": 28.184,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 500,
+              "color": "#FFFFFF",
+              "rings": 5,
+              "speed": 0.521
+            },
+            "variant": "figure_eight"
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "솔로몬",
+              "mode": "wave",
+              "fontSize": 80,
+              "color": "#FFFFFF",
+              "position": "upper",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 80
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0025,
+            "speed": 0.034,
+            "line_opacity": 0.058,
+            "line_color": "#222222"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_06",
+      "sentence": "54년 후. fMRI가 더 잔인한 걸 보여줬다.",
+      "start_sec": 28.984,
+      "end_sec": 34.852,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {}
+          },
+          {
+            "vocab": "symbol_morph",
+            "params": {
+              "text": "잔인",
+              "posType": "noun",
+              "shapeColor": "#FFD700",
+              "glowColor": "#CCCCCC",
+              "position": "top",
+              "size": 160,
+              "showLabel": false
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0014,
+            "speed": 0.025,
+            "line_opacity": 0.042,
+            "line_color": "#444444"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_07",
+      "sentence": "동조할 때 켜진 것은. 거짓말 처리 영역이 아니었다.",
+      "start_sec": 35.652,
+      "end_sec": 41.4,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 300,
+              "color": "#FFFFFF",
+              "rings": 4,
+              "speed": 0.388
+            },
+            "variant": "figure_eight"
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0026,
+            "speed": 0.038,
+            "line_opacity": 0.066,
+            "line_color": "#444444"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_08",
+      "sentence": "시각과 공간의 영역이었다. 집단이 말하면.",
+      "start_sec": 42.2,
+      "end_sec": 47.896,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {}
+          },
+          {
+            "vocab": "ascii_block",
+            "params": {
+              "text": "집단",
+              "mode": "block",
+              "posType": "noun",
+              "color": "#00FF80",
+              "glowColor": "#CCCCCC",
+              "position": "top",
+              "density": "high",
+              "ascii_text": "BRAIN"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0027,
+            "speed": 0.038,
+            "line_opacity": 0.042,
+            "line_color": "#222222"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_09",
+      "sentence": "인식 자체가 오염된다. 틀린 것이 옳아 보이게 된다.",
+      "start_sec": 48.196,
+      "end_sec": 54.444,
+      "emotion": "awakening_spark",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "color_bloom",
+            "params": {
+              "from_color": "#FFFFFF",
+              "to_color": "#222222",
+              "rhythm": "slow"
+            }
+          },
+          {
+            "vocab": "ascii_shape",
+            "params": {
+              "text": "인식",
+              "mode": "shape",
+              "posType": "science",
+              "color": "#00FF80",
+              "glowColor": "#CCCCCC",
+              "position": "bottom",
+              "density": "low",
+              "ascii_text": "BLIND"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0024,
+            "speed": 0.05,
+            "line_opacity": 0.068,
+            "line_color": "#888888"
+          },
+          "variant": "vortex"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_10",
+      "sentence": "의심할 여지가 사라진다. 이것이 집단적 무지성의 구조다.",
+      "start_sec": 54.744,
+      "end_sec": 61.376,
+      "emotion": "somber_reflective",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "loop_ring",
+            "params": {
+              "rings": 4,
+              "color": "#FFFFFF",
+              "pulse_speed": 0.965
+            }
+          },
+          {
+            "vocab": "ascii_matrix",
+            "params": {
+              "text": "구조",
+              "mode": "matrix",
+              "posType": "science",
+              "color": "#FFD700",
+              "glowColor": "#CCCCCC",
+              "position": "bottom",
+              "density": "low",
+              "ascii_text": "FALSE"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0015,
+            "speed": 0.023,
+            "line_opacity": 0.045,
+            "line_color": "#888888"
+          },
+          "variant": "opposing"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_11",
+      "sentence": "역사 속 모든 집단적 오류는.",
+      "start_sec": 62.176,
+      "end_sec": 65.176,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 500,
+              "color": "#FFFFFF",
+              "rings": 5,
+              "speed": 0.347
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "집단",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#FFFFFF",
+              "position": "center",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0029,
+            "speed": 0.037,
+            "line_opacity": 0.043,
+            "line_color": "#222222"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_12",
+      "sentence": "이렇게 작동했다. 다수가 틀렸기 때문이 아니라.",
+      "start_sec": 65.476,
+      "end_sec": 71.148,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {}
+          },
+          {
+            "vocab": "symbol_morph",
+            "params": {
+              "text": "이렇",
+              "posType": "noun",
+              "shapeColor": "#FFD700",
+              "glowColor": "#CCCCCC",
+              "position": "center",
+              "size": 160,
+              "showLabel": true
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0025,
+            "speed": 0.029,
+            "line_opacity": 0.061,
+            "line_color": "#444444"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_13",
+      "sentence": "다수가 틀린 것을 옳다고 봤기 때문에.",
+      "start_sec": 71.448,
+      "end_sec": 74.784,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 300,
+              "color": "#FFFFFF",
+              "rings": 3,
+              "speed": 0.354
+            },
+            "variant": "figure_eight"
+          },
+          {
+            "vocab": "ascii_matrix",
+            "params": {
+              "text": "다수",
+              "mode": "matrix",
+              "posType": "noun",
+              "color": "#FFD700",
+              "glowColor": "#CCCCCC",
+              "position": "top",
+              "density": "medium",
+              "ascii_text": "CROWD"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0029,
+            "speed": 0.024,
+            "line_opacity": 0.064,
+            "line_color": "#444444"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_14",
+      "sentence": "혼자 다른 눈을 가질 때. 편도체가 켜진다.",
+      "start_sec": 75.584,
+      "end_sec": 80.852,
+      "emotion": "neutral_curious",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "flow_field_calm",
+            "params": {}
+          },
+          {
+            "vocab": "symbol_morph",
+            "params": {
+              "text": "다른",
+              "posType": "noun",
+              "shapeColor": "#FFFFFF",
+              "glowColor": "#CCCCCC",
+              "position": "top",
+              "size": 160,
+              "showLabel": true
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.002,
+            "speed": 0.028,
+            "line_opacity": 0.04,
+            "line_color": "#444444"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_15",
+      "sentence": "공포가 켜진다. 그 공포는 생존 반응이다.",
+      "start_sec": 81.152,
+      "end_sec": 86.872,
+      "emotion": "somber_warning",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "color_drain",
+            "params": {
+              "from_color": "#FFFFFF",
+              "to_color": "#222222",
+              "rhythm": "breath"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "반응",
+              "mode": "glitch",
+              "fontSize": 80,
+              "color": "#00FFFF",
+              "position": "top",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 60
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
+        },
+        "background": {
+          "vocab": "flow_field_turbulent",
+          "params": {
+            "noise_scale": 0.0056,
+            "speed": 0.233,
+            "line_opacity": 0.116,
+            "line_color": "#222222"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_16",
+      "sentence": "하지만 진실은 다수결이 아니다.",
+      "start_sec": 87.172,
+      "end_sec": 90.364,
+      "emotion": "transcendent_open",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "particle_orbit",
+            "params": {
+              "count": 300,
+              "color": "#FFFFFF",
+              "rings": 3,
+              "speed": 0.327
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "진실",
+              "mode": "wave",
+              "fontSize": 80,
+              "color": "#00FFFF",
+              "position": "bottom",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 100
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0013,
+            "speed": 0.036,
+            "line_opacity": 0.042,
+            "line_color": "#888888"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_17",
+      "sentence": "틀린 것은 다수여도 틀렸다. 옳은 것은 혼자여도 옳다.",
+      "start_sec": 91.164,
+      "end_sec": 97.176,
+      "emotion": "transcendent_open",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "color_bloom",
+            "params": {
+              "from_color": "#FFFFFF",
+              "to_color": "#222222",
+              "rhythm": "breath"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "혼자",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#00FFFF",
+              "position": "bottom",
+              "glowColor": "#CCCCCC",
+              "staggerMs": 120
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0012,
+            "speed": 0.036,
+            "line_opacity": 0.047,
+            "line_color": "#888888"
+          }
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    },
+    {
+      "id": "scene_18",
+      "sentence": "그것을 향해 걷는 것. 그게 용기다.",
+      "start_sec": 97.976,
+      "end_sec": 102.428,
+      "emotion": "hopeful",
+      "layers": {
+        "semantic": [
+          {
+            "vocab": "waveform_circular",
+            "params": {
+              "mode": "circular",
+              "color": "#FFFFFF",
+              "lineWidth": 1.5,
+              "sensitivity": 1.899
+            }
+          },
+          {
+            "vocab": "ascii_shape",
+            "params": {
+              "text": "용기",
+              "mode": "shape",
+              "posType": "noun",
+              "color": "#00FFFF",
+              "glowColor": "#CCCCCC",
+              "position": "bottom",
+              "density": "medium",
+              "ascii_text": "TRUTH"
+            }
+          }
+        ],
+        "audio_reactive": {
+          "particle_opacity": "rms * 0.7 + 0.3",
+          "particle_size": "bass * 3 + 1",
+          "glow_intensity": "rms * 0.8"
+        },
+        "background": {
+          "vocab": "flow_field_calm",
+          "params": {
+            "noise_scale": 0.0043,
+            "speed": 0.05,
+            "line_opacity": 0.072,
+            "line_color": "#444444"
+          },
+          "transition_to": "flow_field_turbulent"
+        }
+      },
+      "shape_params": {
+        "speed": 1.1,
+        "scale": 1.05,
+        "count": 1
+      }
+    }
+  ]
+}

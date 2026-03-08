@@ -1,0 +1,335 @@
+{
+  "voice": "ko-KR-SunHiNeural",
+  "rate": "+5%",
+  "bpm": 135.0,
+  "sec_per_bar": 1.777778,
+  "total_duration_sec": 102.428,
+  "music_mood": "dub",
+  "gap_sec": 0.3,
+  "paragraph_gap_sec": 0.8,
+  "segments": [
+    {
+      "index": 0,
+      "text": "방 안에 8명이 있었다.",
+      "start_sec": 0.0,
+      "end_sec": 2.688,
+      "duration_sec": 2.688,
+      "actual_tts_sec": 2.688
+    },
+    {
+      "index": 1,
+      "text": "7명은 배우였다.",
+      "start_sec": 2.988,
+      "end_sec": 5.388,
+      "duration_sec": 2.4,
+      "actual_tts_sec": 2.4
+    },
+    {
+      "index": 2,
+      "text": "선의 길이를 맞추는 문제.",
+      "start_sec": 6.188,
+      "end_sec": 8.756,
+      "duration_sec": 2.568,
+      "actual_tts_sec": 2.568
+    },
+    {
+      "index": 3,
+      "text": "답은 명확했다.",
+      "start_sec": 9.056,
+      "end_sec": 11.216,
+      "duration_sec": 2.16,
+      "actual_tts_sec": 2.16
+    },
+    {
+      "index": 4,
+      "text": "배우들이 입을 모았다.",
+      "start_sec": 12.016,
+      "end_sec": 14.44,
+      "duration_sec": 2.424,
+      "actual_tts_sec": 2.424
+    },
+    {
+      "index": 5,
+      "text": "틀린 답으로.",
+      "start_sec": 14.74,
+      "end_sec": 16.66,
+      "duration_sec": 1.92,
+      "actual_tts_sec": 1.92
+    },
+    {
+      "index": 6,
+      "text": "75퍼센트가 따랐다.",
+      "start_sec": 17.46,
+      "end_sec": 20.22,
+      "duration_sec": 2.76,
+      "actual_tts_sec": 2.76
+    },
+    {
+      "index": 7,
+      "text": "눈에 정답이 보이는데도.",
+      "start_sec": 20.52,
+      "end_sec": 23.16,
+      "duration_sec": 2.64,
+      "actual_tts_sec": 2.64
+    },
+    {
+      "index": 8,
+      "text": "솔로몬 아쉬. 1951년.",
+      "start_sec": 23.96,
+      "end_sec": 28.184,
+      "duration_sec": 4.224,
+      "actual_tts_sec": 4.224
+    },
+    {
+      "index": 9,
+      "text": "54년 후.",
+      "start_sec": 28.984,
+      "end_sec": 31.072,
+      "duration_sec": 2.088,
+      "actual_tts_sec": 2.088
+    },
+    {
+      "index": 10,
+      "text": "fMRI가 더 잔인한 걸 보여줬다.",
+      "start_sec": 31.372,
+      "end_sec": 34.852,
+      "duration_sec": 3.48,
+      "actual_tts_sec": 3.48
+    },
+    {
+      "index": 11,
+      "text": "동조할 때 켜진 것은.",
+      "start_sec": 35.652,
+      "end_sec": 38.172,
+      "duration_sec": 2.52,
+      "actual_tts_sec": 2.52
+    },
+    {
+      "index": 12,
+      "text": "거짓말 처리 영역이 아니었다.",
+      "start_sec": 38.472,
+      "end_sec": 41.4,
+      "duration_sec": 2.928,
+      "actual_tts_sec": 2.928
+    },
+    {
+      "index": 13,
+      "text": "시각과 공간의 영역이었다.",
+      "start_sec": 42.2,
+      "end_sec": 45.032,
+      "duration_sec": 2.832,
+      "actual_tts_sec": 2.832
+    },
+    {
+      "index": 14,
+      "text": "집단이 말하면.",
+      "start_sec": 45.832,
+      "end_sec": 47.896,
+      "duration_sec": 2.064,
+      "actual_tts_sec": 2.064
+    },
+    {
+      "index": 15,
+      "text": "인식 자체가 오염된다.",
+      "start_sec": 48.196,
+      "end_sec": 50.812,
+      "duration_sec": 2.616,
+      "actual_tts_sec": 2.616
+    },
+    {
+      "index": 16,
+      "text": "틀린 것이 옳아 보이게 된다.",
+      "start_sec": 51.612,
+      "end_sec": 54.444,
+      "duration_sec": 2.832,
+      "actual_tts_sec": 2.832
+    },
+    {
+      "index": 17,
+      "text": "의심할 여지가 사라진다.",
+      "start_sec": 54.744,
+      "end_sec": 57.456,
+      "duration_sec": 2.712,
+      "actual_tts_sec": 2.712
+    },
+    {
+      "index": 18,
+      "text": "이것이 집단적 무지성의 구조다.",
+      "start_sec": 58.256,
+      "end_sec": 61.376,
+      "duration_sec": 3.12,
+      "actual_tts_sec": 3.12
+    },
+    {
+      "index": 19,
+      "text": "역사 속 모든 집단적 오류는.",
+      "start_sec": 62.176,
+      "end_sec": 65.176,
+      "duration_sec": 3.0,
+      "actual_tts_sec": 3.0
+    },
+    {
+      "index": 20,
+      "text": "이렇게 작동했다.",
+      "start_sec": 65.476,
+      "end_sec": 67.684,
+      "duration_sec": 2.208,
+      "actual_tts_sec": 2.208
+    },
+    {
+      "index": 21,
+      "text": "다수가 틀렸기 때문이 아니라.",
+      "start_sec": 68.484,
+      "end_sec": 71.148,
+      "duration_sec": 2.664,
+      "actual_tts_sec": 2.664
+    },
+    {
+      "index": 22,
+      "text": "다수가 틀린 것을 옳다고 봤기 때문에.",
+      "start_sec": 71.448,
+      "end_sec": 74.784,
+      "duration_sec": 3.336,
+      "actual_tts_sec": 3.336
+    },
+    {
+      "index": 23,
+      "text": "혼자 다른 눈을 가질 때.",
+      "start_sec": 75.584,
+      "end_sec": 78.224,
+      "duration_sec": 2.64,
+      "actual_tts_sec": 2.64
+    },
+    {
+      "index": 24,
+      "text": "편도체가 켜진다.",
+      "start_sec": 78.524,
+      "end_sec": 80.852,
+      "duration_sec": 2.328,
+      "actual_tts_sec": 2.328
+    },
+    {
+      "index": 25,
+      "text": "공포가 켜진다.",
+      "start_sec": 81.152,
+      "end_sec": 83.312,
+      "duration_sec": 2.16,
+      "actual_tts_sec": 2.16
+    },
+    {
+      "index": 26,
+      "text": "그 공포는 생존 반응이다.",
+      "start_sec": 84.112,
+      "end_sec": 86.872,
+      "duration_sec": 2.76,
+      "actual_tts_sec": 2.76
+    },
+    {
+      "index": 27,
+      "text": "하지만 진실은 다수결이 아니다.",
+      "start_sec": 87.172,
+      "end_sec": 90.364,
+      "duration_sec": 3.192,
+      "actual_tts_sec": 3.192
+    },
+    {
+      "index": 28,
+      "text": "틀린 것은 다수여도 틀렸다.",
+      "start_sec": 91.164,
+      "end_sec": 94.092,
+      "duration_sec": 2.928,
+      "actual_tts_sec": 2.928
+    },
+    {
+      "index": 29,
+      "text": "옳은 것은 혼자여도 옳다.",
+      "start_sec": 94.392,
+      "end_sec": 97.176,
+      "duration_sec": 2.784,
+      "actual_tts_sec": 2.784
+    },
+    {
+      "index": 30,
+      "text": "그것을 향해 걷는 것.",
+      "start_sec": 97.976,
+      "end_sec": 100.232,
+      "duration_sec": 2.256,
+      "actual_tts_sec": 2.256
+    },
+    {
+      "index": 31,
+      "text": "그게 용기다.",
+      "start_sec": 100.532,
+      "end_sec": 102.428,
+      "duration_sec": 1.896,
+      "actual_tts_sec": 1.896
+    }
+  ],
+  "paragraph_breaks": [
+    {
+      "start_sec": 5.388,
+      "end_sec": 6.188
+    },
+    {
+      "start_sec": 11.216,
+      "end_sec": 12.016
+    },
+    {
+      "start_sec": 16.66,
+      "end_sec": 17.46
+    },
+    {
+      "start_sec": 23.16,
+      "end_sec": 23.96
+    },
+    {
+      "start_sec": 28.184,
+      "end_sec": 28.984
+    },
+    {
+      "start_sec": 34.852,
+      "end_sec": 35.652
+    },
+    {
+      "start_sec": 41.4,
+      "end_sec": 42.2
+    },
+    {
+      "start_sec": 45.032,
+      "end_sec": 45.832
+    },
+    {
+      "start_sec": 50.812,
+      "end_sec": 51.612
+    },
+    {
+      "start_sec": 57.456,
+      "end_sec": 58.256
+    },
+    {
+      "start_sec": 61.376,
+      "end_sec": 62.176
+    },
+    {
+      "start_sec": 67.684,
+      "end_sec": 68.484
+    },
+    {
+      "start_sec": 74.784,
+      "end_sec": 75.584
+    },
+    {
+      "start_sec": 83.312,
+      "end_sec": 84.112
+    },
+    {
+      "start_sec": 90.364,
+      "end_sec": 91.164
+    },
+    {
+      "start_sec": 97.176,
+      "end_sec": 97.976
+    }
+  ],
+  "drum_mode": "simple"
+}
