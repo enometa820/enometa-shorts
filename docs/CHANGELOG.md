@@ -5,6 +5,21 @@
 
 ---
 
+## 2026-03-08 — 히스토리 기반 회피 시스템 제거
+
+### Removed
+- `scripts/visual_script_generator.py`: vocab 히스토리 추적 제거 — `load_vocab_history()`, `save_vocab_history()`, `get_recent_used()`, `record_episode_history()`, `HISTORY_PATH` 상수 삭제. `select_variant()`에서 `recent_used` 파라미터 제거
+- `scripts/enometa_music_engine.py`: 텍스처 모듈/키 히스토리 제거 — `_load_music_history()`, `_save_music_history()`, `_select_texture_modules_from_history()`, `_select_key_from_history()`, `KEY_PRIORITY`, `AVAILABLE_TEXTURE_MODULES` 삭제
+- `vocab_history.json`, `episodes/music_history.json` 파일 삭제
+
+### 이유
+- vocab 풀 30+개에서 2 에피소드 회피는 확률적으로 무의미 (체감 효과 0)
+- 텍스처 모듈 5개 중 2 에피분 회피 → 후보 1~2개만 남아 역효과
+- 진짜 다양성은 ep_seed → seq_config, genre → 전략, 3축 키워드 표현이 담당
+- 유지 대상: 전략별 `avoid_vocabs` (큐레이션), 에피소드 내 `used_vocabs` (씬 간 반복 방지)
+
+---
+
 ## 2026-03-08 — SymbolMotion + AsciiArt: 키워드 시각화 3축 체계
 
 ### Added

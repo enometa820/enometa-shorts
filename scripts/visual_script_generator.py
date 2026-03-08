@@ -132,68 +132,12 @@ VARIANT_REGISTRY = {
 }
 
 
-def select_variant(vocab: str, rng: random.Random, recent_used: set = None) -> Optional[str]:
+def select_variant(vocab: str, rng: random.Random) -> Optional[str]:
     """vocab에 대한 variant를 선택. variant가 없는 vocab은 None 반환."""
     variants = VARIANT_REGISTRY.get(vocab)
     if not variants:
         return None
-
-    # 최근 사용된 조합 회피
-    if recent_used:
-        preferred = [v for v in variants if f"{vocab}:{v}" not in recent_used]
-        if preferred:
-            return rng.choice(preferred)
-
     return rng.choice(variants)
-
-
-# ============================================================
-# Vocab 이력 추적 (에피소드 간 중복 회피)
-# ============================================================
-HISTORY_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "vocab_history.json")
-
-
-def load_vocab_history() -> Dict[str, Any]:
-    """vocab_history.json 로드 (없으면 빈 구조 반환)"""
-    try:
-        with open(HISTORY_PATH, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {"episodes": {}}
-
-
-def save_vocab_history(history: Dict[str, Any]) -> None:
-    """vocab_history.json 저장"""
-    with open(HISTORY_PATH, 'w', encoding='utf-8') as f:
-        json.dump(history, f, ensure_ascii=False, indent=2)
-
-
-def get_recent_used(history: Dict[str, Any], lookback: int = 2) -> set:
-    """최근 lookback개 에피소드에서 사용된 vocab:variant 조합 반환"""
-    episodes = history.get("episodes", {})
-    # 에피소드 키를 정렬해서 최근 N개 선택
-    sorted_eps = sorted(episodes.keys(), reverse=True)[:lookback]
-    recent = set()
-    for ep_key in sorted_eps:
-        for combo in episodes[ep_key].get("used_combos", []):
-            recent.add(combo)
-    return recent
-
-
-def record_episode_history(history: Dict[str, Any], episode_id: str, scenes: List[Dict]) -> None:
-    """에피소드의 vocab:variant 사용 이력 기록"""
-    combos = set()
-    for scene in scenes:
-        for entry in scene.get("layers", {}).get("semantic", []):
-            vocab = entry.get("vocab", "")
-            variant = entry.get("variant", "default")
-            combos.add(f"{vocab}:{variant}")
-        bg = scene.get("layers", {}).get("background", {})
-        if bg.get("variant"):
-            combos.add(f"{bg['vocab']}:{bg['variant']}")
-    history.setdefault("episodes", {})[episode_id] = {
-        "used_combos": sorted(combos),
-    }
 
 
 # ============================================================
@@ -816,7 +760,6 @@ def build_scene(
     highlight_words: list,
     genre: str = "",
     strategy: dict = None,
-    recent_combos: set = None,
     si: float = 0.5,
     sd_keywords: Optional[List[Dict[str, str]]] = None,  # [{text, type}, ...]
     mood_override: dict = None,
@@ -887,7 +830,7 @@ def build_scene(
     semantic: List[Dict] = []
     primary_params = generate_vocab_params(primary_vocab, palette, rng)
     primary_entry: Dict[str, Any] = {"vocab": primary_vocab, "params": primary_params}
-    primary_variant = select_variant(primary_vocab, rng, recent_combos)
+    primary_variant = select_variant(primary_vocab, rng)
     if primary_variant and primary_variant != "default":
         primary_entry["variant"] = primary_variant
     semantic.append(primary_entry)
@@ -895,7 +838,7 @@ def build_scene(
     if secondary_vocab:
         secondary_params = generate_vocab_params(secondary_vocab, palette, rng)
         secondary_entry: Dict[str, Any] = {"vocab": secondary_vocab, "params": secondary_params}
-        secondary_variant = select_variant(secondary_vocab, rng, recent_combos)
+        secondary_variant = select_variant(secondary_vocab, rng)
         if secondary_variant and secondary_variant != "default":
             secondary_entry["variant"] = secondary_variant
         semantic.append(secondary_entry)
@@ -1120,12 +1063,6 @@ def generate_visual_script(
     except UnicodeEncodeError:
         print(f"  Strategy: {strategy_name}")
 
-    # 이력 로드 (최근 2개 에피소드 vocab:variant 조합 회피)
-    vocab_history = load_vocab_history()
-    recent_combos = get_recent_used(vocab_history, lookback=2)
-    if recent_combos:
-        print(f"  History: {len(recent_combos)} combos from recent episodes avoided")
-
     # 장르 기반 팔레트 오버라이드
     genre_override = GENRE_VISUAL_OVERRIDES.get(genre, {})
     if genre_override.get("palette") and palette_name == "phantom":
@@ -1185,7 +1122,6 @@ def generate_visual_script(
             used_vocabs, highlight_words,
             genre=genre,
             strategy=scene_strategy,
-            recent_combos=recent_combos,
             si=scene_si,
             sd_keywords=scene_sd_keywords if scene_sd_keywords else None,
             mood_override=mood_override,
@@ -1199,12 +1135,6 @@ def generate_visual_script(
         title_words = re.findall(r'[가-힣]{2,4}', title)
         highlight_words = title_words[:2] if title_words else []
     highlight_words = highlight_words[:5]  # B-10: 최대 5개 (3→5)
-
-    # 이력 기록 (episode_id가 있으면)
-    if episode_id:
-        record_episode_history(vocab_history, episode_id, scenes)
-        save_vocab_history(vocab_history)
-        print(f"  History saved for {episode_id}")
 
     # v8: frames_dir + total_frames 자동 계산 (hybrid 전용)
     last_end = merged_scenes[-1]["end"] if merged_scenes else 0
