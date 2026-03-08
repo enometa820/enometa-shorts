@@ -15,6 +15,8 @@
 ### Changed
 - `enometa_music_engine.py`: `build_sine_melody_sequences()` — ep_seed 기반 스케일 회전 + 맥놀이 주파수 변주로 에피소드별 고유 멜로디
 - `enometa_music_engine.py`: `_render_continuous_sine_interference()` — Norgard 수열 연결하여 4바 단위 피치 모듈레이션
+- `CLAUDE.md`: 음악 장르 v18→v20 (house 추가), seq_config 10→13개, 비주얼 장르 매핑 표 추가
+- `README.md`: Python 레이어 9→10개, 장르 프리셋 표 AsciiBackground 반영, seq_config melody 3개 파라미터 추가
 
 ---
 

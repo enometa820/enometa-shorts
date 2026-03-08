@@ -32,19 +32,32 @@ script.txt
 최종 영상의 비주얼은 **두 엔진이 합성**한다:
 
 ```
-Python (numpy+Pillow)          Remotion (React)
-─────────────────────          ────────────────
-1080×1080 배경 PNG 시퀀스   →   PythonFrameBackground (배경)
-                                  ↑ 위에 겹침
-                               Vocab 컴포넌트 (오버레이)
-                               SubtitleSection (자막)
-                               TitleSection / LogoEndcard
-                               PostProcess (스캔라인/글리치)
+최종 프레임 (1080×1920 세로)         누가 그리나?
+┌──────────────────────────┐
+│     TitleSection         │  ← Remotion (React)
+├──────────────────────────┤
+│                          │
+│  ┌── Python 배경 PNG ──┐ │  ← Python (numpy+Pillow) 10개 레이어 합성
+│  │  SineWave + Particle │ │    → frames/000000.png~ 으로 저장
+│  │  + TextData + ASCII  │ │
+│  └──────────────────────┘ │
+│    ↑ 그 위에 겹침         │
+│  ┌── Vocab 오버레이 ────┐ │  ← Remotion (React) 30종 컴포넌트
+│  │  Lissajous, DataBar  │ │    오디오 리액티브 애니메이션
+│  │  ParticleBirth ...   │ │
+│  └──────────────────────┘ │
+│    ↑ 그 위에 겹침         │
+│  PostProcess (스캔라인)   │  ← Remotion (항상 적용)
+│                          │
+├──────────────────────────┤
+│  SubtitleSection (자막)  │  ← Remotion (나레이션 싱크)
+└──────────────────────────┘
+  마지막 6초 → LogoEndcard로 교체
 ```
 
 ### Python 배경 레이어 (scripts/visual_layers/)
 
-배경 이미지를 구성하는 9개 레이어. `visual_renderer.py`가 장르별로 조합한다.
+배경 이미지를 구성하는 10개 레이어. `visual_renderer.py`가 장르별로 조합한다.
 
 | 레이어 | 그리는 것 | 데이터 소스 |
 |--------|-----------|-------------|
@@ -57,15 +70,16 @@ Python (numpy+Pillow)          Remotion (React)
 | ParticleLayer | 부유 파티클 시스템 | 내부 물리 |
 | BytebeatLayer | bytebeat 공식 → 픽셀 | 내부 수학 |
 | FeedbackLayer | 이전 프레임 피드백 루프 | 자기참조 |
+| AsciiBackgroundLayer | SI 기반 ASCII 문자 텍스처 (12×12px 셀 그리드) | script_data + SI |
 
 **장르별 레이어 조합** (`GENRE_LAYER_PRESETS`):
 
 | visual genre | 음악 레이어 | TTS 레이어 | 특성 |
 |-------------|------------|-----------|------|
-| `enometa` | SineWave + Waveform + Particle | TextData + Barcode + DataStream + DataMatrix | 풀 세트 데이터아트 |
-| `cooper` | SineWave + Particle | DataStream | 미니멀 유기적 |
-| `abstract` | SineWave | DataMatrix | 정제된 기하 |
-| `data` | Waveform + SineWave | TextData + Barcode + DataStream + DataMatrix | 최고 밀도 |
+| `enometa` | SineWave + Waveform + Particle | TextData + Barcode + DataStream + DataMatrix + AsciiBackground | 풀 세트 데이터아트 |
+| `cooper` | SineWave + Particle | DataStream + AsciiBackground | 미니멀 유기적 |
+| `abstract` | SineWave | DataMatrix + AsciiBackground | 정제된 기하 |
+| `data` | Waveform + SineWave | TextData + Barcode + DataStream + DataMatrix + AsciiBackground | 최고 밀도 |
 
 ### Remotion Vocab 컴포넌트 (src/components/vocab/)
 
@@ -200,6 +214,9 @@ visual_script.json
 | `kick_character` | 0/1/2 | tight / boomy / punchy |
 | `arp_pattern` | [배수 배열] | 아르페지오 음정 패턴 |
 | `arp_division` | 3–6 | 아르페지오 박자 분할 |
+| `melody_scale_offset` | 0–6 | 사인 멜로디 스케일 시작 음계 회전 |
+| `melody_beat_base` | 2.0–8.0 Hz | 사인 간섭 맥놀이 기본 주파수 |
+| `melody_norgard_offset` | 0–15 | Norgard 수열 시작점 오프셋 (피치 모듈레이션) |
 
 ### 다양성 시스템 (Vertical Remixing)
 
@@ -291,7 +308,7 @@ enometa-shorts/
 │   ├── audio_mixer.py             # narration + bgm 믹싱
 │   ├── audio_analyzer.py          # RMS/onset/beat 분석
 │   ├── sequence_generators.py     # Thue-Morse / Norgard / Rudin-Shapiro 수열
-│   └── visual_layers/             # Python 배경 레이어 9종 (위 표 참조)
+│   └── visual_layers/             # Python 배경 레이어 10종 (위 표 참조)
 ├── src/
 │   ├── Root.tsx                   # Remotion Composition 정의
 │   ├── EnometaShorts.tsx          # 메인 레이아웃 컴포넌트
