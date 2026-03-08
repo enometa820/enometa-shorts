@@ -29,6 +29,8 @@ script.txt
 
 ## 비주얼 아키텍처 — 누가 뭘 그리나
 
+> 📄 상세 문서: [docs/visual-architecture.md](docs/visual-architecture.md) — 레이어별 역할, SI 반응, 팔레트, 비주얼 장르/무드, PostProcess 효과 상세 설명
+
 최종 영상(1080x1920)의 비주얼은 **Python + Remotion 두 엔진이 합성**한다:
 
 ```
