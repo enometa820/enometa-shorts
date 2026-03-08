@@ -9,7 +9,26 @@
       "enometa_mode": true
     },
     "music_mood": "ambient",
-    "drum_mode": "default"
+    "drum_mode": "default",
+    "seq_config": {
+      "drum_seq_type": 0,
+      "drum_rotation": 4,
+      "pitch_rotation": 2,
+      "pitch_length": 8,
+      "bpm": 160,
+      "saw_harmonics": {
+        "1": 1.0,
+        "7": 0.32,
+        "6": 0.47,
+        "5": 0.66,
+        "2": 0.27
+      },
+      "filter_cutoff_base": 2000,
+      "chorus_depth_ms": 3.4,
+      "fm_mod_ratio": 3.0,
+      "bass_detune": 0.0075,
+      "kick_character": 2
+    }
   },
   "palette": {
     "bass_freq": 60.0,
