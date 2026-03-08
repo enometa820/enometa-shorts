@@ -64,6 +64,22 @@ const BITMAP_FONT: Record<string, number[]> = {
   "9": [0x0E, 0x11, 0x11, 0x0F, 0x01, 0x02, 0x0C],
 };
 
+// 한글 키워드 → 영어 fallback 사전 (ascii_text 파라미터 미지정 시 사용)
+// 주된 번역은 파이프라인에서 Claude가 ascii_text 파라미터로 삽입
+const KO_TO_EN_FALLBACK: Record<string, string> = {
+  "코드": "CODE", "데이터": "DATA", "시간": "TIME", "뇌": "BRAIN",
+  "숫자": "NUM", "패턴": "PTRN", "신호": "SIGNAL", "세포": "CELL",
+  "존재": "EXIST", "진화": "EVOLVE", "생명": "LIFE", "자연": "NATURE",
+};
+
+// ascii_text 파라미터 → KO_TO_EN fallback → 원문 순으로 결정
+function resolveAsciiText(text: string, asciiText?: string): string {
+  if (asciiText) return asciiText.toUpperCase();
+  if (KO_TO_EN_FALLBACK[text]) return KO_TO_EN_FALLBACK[text];
+  if (/^[A-Za-z0-9]+$/.test(text)) return text.toUpperCase();
+  return text;
+}
+
 // 블록 문자 세트 — 밀도에 따라 선택
 const BLOCK_CHARS = ["█", "▓", "▒", "░"];
 const DATA_CHARS = "01█▓▒░╔╗╚╝║═├┤┬┴┼─│".split("");
@@ -72,6 +88,7 @@ const DATA_CHARS = "01█▓▒░╔╗╚╝║═├┤┬┴┼─│".split
 
 const BlockMode: React.FC<{
   text: string;
+  asciiText?: string;
   color: string;
   glowColor: string;
   frame: number;
@@ -81,9 +98,9 @@ const BlockMode: React.FC<{
   onset: boolean;
   width: number;
   sceneProgress: number;
-}> = ({ text, color, glowColor, frame, fps, rms, bass, onset, width, sceneProgress }) => {
-  // 영문/숫자만 비트맵 렌더링, 한글은 큰 블록 문자로 표현
-  const upperText = text.toUpperCase();
+}> = ({ text, asciiText, color, glowColor, frame, fps, rms, bass, onset, width }) => {
+  // ascii_text 파라미터 → fallback 사전 → 원문 순으로 결정
+  const upperText = resolveAsciiText(text, asciiText);
   const isLatin = /^[A-Z0-9]+$/.test(upperText);
 
   if (isLatin && upperText.length <= 5) {
@@ -394,8 +411,8 @@ const MatrixMode: React.FC<{
   width: number;
   sceneProgress: number;
 }> = ({ text, color, glowColor, frame, fps, rms, bass, onset, density, width, sceneProgress }) => {
-  const lineCount = density === "high" ? 12 : density === "low" ? 6 : 9;
-  const charsPerLine = Math.floor(width / 14);
+  const lineCount = density === "high" ? 10 : density === "low" ? 5 : 8;
+  const charsPerLine = Math.floor(width / 22);
 
   // 스크롤 오프셋
   const scrollSpeed = 0.15 + rms * 0.1;
@@ -409,7 +426,7 @@ const MatrixMode: React.FC<{
   for (let i = 0; i < lineCount; i++) {
     const lineSeed = (i + Math.floor(scrollOffset)) * 137;
     const isHighlightLine = i === highlightLine;
-    const lineOpacity = isHighlightLine ? 1 : 0.3 + seededRand(lineSeed + 99) * 0.4;
+    const lineOpacity = isHighlightLine ? 1 : 0.5 + seededRand(lineSeed + 99) * 0.35;
 
     // 각 행의 문자열 생성
     const lineChars: React.ReactNode[] = [];
@@ -432,9 +449,12 @@ const MatrixMode: React.FC<{
             key={c}
             style={{
               color: isKeyword ? glowColor : color,
-              fontWeight: isKeyword ? "bold" : "normal",
-              textShadow: isKeyword ? `0 0 ${8 + rms * 15}px ${glowColor}` : "none",
-              opacity: isKeyword ? 1 : 0.6,
+              fontWeight: isKeyword ? 900 : "normal",
+              fontSize: isKeyword ? "1.15em" : undefined,
+              textShadow: isKeyword
+                ? `0 0 ${10 + rms * 20}px ${glowColor}, 0 0 ${20 + rms * 30}px ${glowColor}40`
+                : "none",
+              opacity: isKeyword ? 1 : 0.7,
             }}
           >
             {ch}
@@ -453,9 +473,9 @@ const MatrixMode: React.FC<{
             key={c}
             style={{
               color: isActive ? color : color,
-              opacity: isActive ? lineOpacity : lineOpacity * 0.3,
-              textShadow: isActive && rms > 0.3
-                ? `0 0 4px ${glowColor}40`
+              opacity: isActive ? lineOpacity : lineOpacity * 0.5,
+              textShadow: isActive
+                ? `0 0 ${3 + rms * 8}px ${glowColor}60`
                 : "none",
             }}
           >
@@ -494,24 +514,24 @@ const MatrixMode: React.FC<{
     <div
       style={{
         fontFamily: "'Courier New', monospace",
-        fontSize: 13,
+        fontSize: 20,
         opacity: exitOpacity,
-        padding: "12px 16px",
-        backgroundColor: "rgba(0, 0, 0, 0.3)",
-        borderRadius: 4,
-        border: `1px solid ${color}30`,
-        maxWidth: width * 0.85,
+        padding: "16px 20px",
+        backgroundColor: "rgba(0, 0, 0, 0.4)",
+        borderRadius: 6,
+        border: `1px solid ${color}40`,
+        maxWidth: width * 0.92,
       }}
     >
       {/* 터미널 헤더 */}
       <div
         style={{
-          fontSize: 10,
+          fontSize: 14,
           color: color,
-          opacity: 0.4,
-          marginBottom: 6,
-          borderBottom: `1px solid ${color}20`,
-          paddingBottom: 4,
+          opacity: 0.5,
+          marginBottom: 8,
+          borderBottom: `1px solid ${color}30`,
+          paddingBottom: 6,
         }}
       >
         ┌─ ENOMETA DATA STREAM ─ {text} ─┐
@@ -533,6 +553,7 @@ export const AsciiArt: React.FC<VocabComponentProps> = ({
   ...params
 }) => {
   const text: string = params.text || "DATA";
+  const asciiText: string | undefined = params.ascii_text || undefined;
   const mode: string = params.mode || "block";
   const posType: string = params.posType || "noun";
   const color: string = params.color || "#00FF80";
@@ -576,13 +597,13 @@ export const AsciiArt: React.FC<VocabComponentProps> = ({
   const renderMode = () => {
     switch (mode) {
       case "block":
-        return <BlockMode {...sharedProps} text={text} width={width} />;
+        return <BlockMode {...sharedProps} text={text} asciiText={asciiText} width={width} />;
       case "shape":
         return <ShapeMode {...sharedProps} posType={posType} />;
       case "matrix":
         return <MatrixMode {...sharedProps} text={text} density={density} width={width} />;
       default:
-        return <BlockMode {...sharedProps} text={text} width={width} />;
+        return <BlockMode {...sharedProps} text={text} asciiText={asciiText} width={width} />;
     }
   };
 

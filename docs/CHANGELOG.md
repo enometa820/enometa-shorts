@@ -5,6 +5,20 @@
 
 ---
 
+## 2026-03-08 — v19 Vertical Remixing + AsciiArt 한글→영어 변환
+
+### Added
+- `enometa_music_engine.py`: v19 Vertical Remixing — `_GENRE_SPECS` 9개 장르별 required/optional/inactive 레이어 정의 + `_generate_mood_layers()` ep_seed 기반 레이어 조합 자동 변주
+- `enometa_music_engine.py`: orphaned 악기 3종 렌더링 연결 — `chord_stab`(dub), `distorted_kick`(industrial), `tape_delay`(dub) 실제 파이프라인 연결
+- `AsciiArt.tsx`: `ascii_text` 파라미터 + `KO_TO_EN_FALLBACK` 사전 + `resolveAsciiText()` 3계층 변환
+- `visual_script_generator.py`: ascii_art vocab에 `ascii_text` 빈 파라미터 추가 (파이프라인 개입용)
+
+### Changed
+- `enometa_music_engine.py`: 정적 `_MOOD_LAYERS` → 동적 `_generate_mood_layers()` 전환 (같은 장르도 ep_seed로 다른 레이어 조합)
+- `AsciiArt.tsx` MatrixMode: 폰트 크기 13→20px, 키워드 강조 강화, 터미널 헤더/밀도 조정
+
+---
+
 ## 2026-03-08 — feedback_defaults.json 제거 + 진화 서사 정리
 
 ### Removed

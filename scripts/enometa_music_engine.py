@@ -1433,6 +1433,12 @@ class EnometaMusicEngine:
         self._highlight_words = meta.get("highlight_words", [])
         self._accent_times = []  # load_script_data() 후 빌드
 
+        # v19: ep_seed 저장 (Vertical Remixing용)
+        import hashlib as _hl
+        _ep_id = str(meta.get("episode", "ep000"))
+        self._ep_seed = int(_hl.md5(_ep_id.encode()).hexdigest(), 16) % (2**32)
+        self._mood_layers_cache = None  # _generate_mood_layers 결과 캐시
+
         # v13+v14: 시퀀스+음색 설정 로드
         from sequence_generators import EpisodeSequenceConfig, derive_episode_sequences
         sc = meta.get("seq_config", {})
@@ -1544,6 +1550,62 @@ class EnometaMusicEngine:
         return float(np.mean(self._tempo_curve[start:end]))
 
     # ---- 기반 악기: 전체 길이 연속 렌더링 ----
+
+    # ── v19: 미구현이었던 dub/industrial 전용 악기 연속 렌더 ──────────────
+
+    def _render_continuous_chord_stab(self, sections):
+        """dub techno 코드 스탭 — 2초 주기로 반복, tape_delay와 조합"""
+        print("  [chord_stab] continuous dub chord stab...", flush=True)
+        vol_env = smooth_envelope(
+            self.total_samples, sections, "chord_stab", "volume",
+            default=0.0, morph_sec=1.0, sr=self.sr
+        )
+        # BPM 기반 스탭 주기: 2바마다 1회
+        bar_sec = (60.0 / self.bpm) * 4
+        stab_interval = bar_sec * 2  # 2바마다
+        stab_dur = min(stab_interval * 0.8, 2.0)  # 최대 2초
+        pos = 0.0
+        while pos < self.duration:
+            stab = chord_stab(self.pad_root * 0.5, stab_dur, self.sr)
+            start_sample = int(pos * self.sr)
+            end_sample = min(start_sample + len(stab), self.total_samples)
+            length = end_sample - start_sample
+            if length > 0:
+                local_vol = vol_env[start_sample:end_sample]
+                self.master_L[start_sample:end_sample] += stab[:length] * local_vol
+                self.master_R[start_sample:end_sample] += stab[:length] * local_vol
+            pos += stab_interval
+
+    def _render_continuous_distorted_kick(self, sections):
+        """industrial 디스토션 킥 — 정규 킥과 교대 배치"""
+        print("  [distorted_kick] continuous industrial kick...", flush=True)
+        vol_env = smooth_envelope(
+            self.total_samples, sections, "distorted_kick", "volume",
+            default=0.0, morph_sec=0.5, sr=self.sr
+        )
+        # 매 2바의 2번째 바 첫 박에 배치 (정규 킥과 교대)
+        bar_sec = (60.0 / self.bpm) * 4
+        pos = bar_sec  # 2번째 바부터 시작
+        dk = distorted_kick(50, self.sr, drive=3.5)
+        while pos < self.duration:
+            start_sample = int(pos * self.sr)
+            end_sample = min(start_sample + len(dk), self.total_samples)
+            length = end_sample - start_sample
+            if length > 0:
+                local_vol = vol_env[start_sample:end_sample]
+                self.master_L[start_sample:end_sample] += dk[:length] * local_vol
+                self.master_R[start_sample:end_sample] += dk[:length] * local_vol
+            pos += bar_sec * 2  # 2바마다
+
+    def _apply_tape_delay_to_master(self):
+        """dub techno 테이프 딜레이 — 마스터 전체에 적용"""
+        print("  [tape_delay] applying dub tape delay to master...", flush=True)
+        cfg = (self._mood_layers_cache or {}).get("tape_delay", {})
+        feedback = cfg.get("feedback", 0.6)
+        # BPM 동기 딜레이: 3/16 노트 (dub 스타일)
+        delay_ms = (60000.0 / self.bpm) * (3.0 / 4.0)  # dotted 8th
+        self.master_L[:] = tape_delay(self.master_L, delay_ms=delay_ms, feedback=feedback, sr=self.sr)
+        self.master_R[:] = tape_delay(self.master_R, delay_ms=delay_ms, feedback=feedback * 0.9, sr=self.sr)
 
     def _render_continuous_bass(self, sections):
         """전체 길이 베이스 드론 — 볼륨만 섹션별 모핑"""
@@ -2856,35 +2918,225 @@ class EnometaMusicEngine:
         "minimal": True,  "dub": True,         "glitch": True,
         "acid": True,     "industrial": True,  "techno": True,
     }
+    # ── v19: 장르별 레이어 스펙 (Vertical Remixing) ─────────────────────────
+    # required = 항상 ON (장르 정체성)
+    # optional_pool = seed가 N개 선택 (에피소드별 변형)
+    # optional_count = (min, max) 선택 개수
+    # 볼륨: (min, max) 튜플이면 seed가 범위 내 결정, 스칼라면 고정
+    # inactive = 항상 OFF (장르에서 절대 안 쓰는 레이어)
+    # extra = 추가 파라미터 (density, formula 등)
+    _GENRE_SPECS = {
+        "ambient": {
+            "required": {
+                "bass_drone":   {"volume": (0.7, 0.9)},   # 깊은 드론 = ambient 정체성
+            },
+            "optional_pool": {
+                "sine_interference": {"volume": (0.4, 0.7)},   # 줄임 (0.9→0.4~0.7)
+                "pulse_train":       {"volume": (0.4, 0.7)},
+                "arpeggio":          {"volume": (0.4, 0.6)},   # 올림 (0.3→0.4~0.6)
+                "fm_bass":           {"volume": (0.4, 0.6)},
+                "saw_sequence":      {"volume": (0.3, 0.5)},   # 새로 추가 — 느린 텍스처
+            },
+            "optional_count": (2, 3),
+            "inactive": ["kick", "snare", "data_click", "ultrahigh_texture",
+                         "stutter_gate", "gap_burst", "glitch", "bytebeat"],
+        },
+        "microsound": {
+            "required": {
+                "data_click":        {"volume": (1.2, 1.6)},   # 올림 — Ikeda 클릭 = 정체성
+                "ultrahigh_texture":  {"volume": (0.8, 1.0)},   # 디지털 공기
+            },
+            "optional_pool": {
+                "sine_interference": {"volume": (0.3, 0.5)},   # 줄임 (1.0→0.3~0.5)
+                "pulse_train":       {"volume": (0.5, 0.8)},
+                "stutter_gate":      {"volume": (0.5, 0.8)},
+                "arpeggio":          {"volume": (0.3, 0.5)},   # 새로 추가
+            },
+            "optional_count": (1, 2),
+            "inactive": ["kick", "snare", "saw_sequence", "bass_drone",
+                         "glitch", "bytebeat", "gap_burst"],
+        },
+        "IDM": {
+            "required": {
+                "kick":          {"volume": (0.6, 0.8)},
+                "snare":         {"volume": (0.4, 0.6)},
+                "stutter_gate":  {"volume": (0.6, 0.8)},   # 글리치 리듬 = IDM 정체성
+            },
+            "optional_pool": {
+                "saw_sequence":      {"volume": (0.4, 0.6)},
+                "arpeggio":          {"volume": (0.5, 0.8)},
+                "glitch":            {"volume": (0.5, 0.7), "extra": {"density": 0.7}},
+                "bytebeat":          {"volume": (0.4, 0.6)},
+                "fm_bass":           {"volume": (0.4, 0.6)},
+                "ultrahigh_texture": {"volume": (0.3, 0.5)},
+            },
+            "optional_count": (3, 4),
+            "inactive": ["bass_drone", "gap_burst"],
+        },
+        "minimal": {
+            "required": {
+                "fm_bass":   {"volume": (0.7, 0.9)},   # 미니멀 FM 베이스 = 정체성
+                "kick":      {"volume": (0.4, 0.6)},
+            },
+            "optional_pool": {
+                "bass_drone":        {"volume": (0.5, 0.7)},
+                "arpeggio":          {"volume": (0.5, 0.7)},
+                "sine_interference": {"volume": (0.3, 0.5)},
+                "pulse_train":       {"volume": (0.3, 0.5)},
+                "saw_sequence":      {"volume": (0.3, 0.5)},
+            },
+            "optional_count": (2, 3),
+            "inactive": ["snare", "glitch", "bytebeat", "gap_burst",
+                         "data_click", "ultrahigh_texture"],
+        },
+        "dub": {
+            "required": {
+                "bass_drone":   {"volume": (0.8, 1.0)},   # 딥 서브 = dub 정체성
+                "kick":         {"volume": (0.6, 0.8)},
+                "chord_stab":   {"volume": (0.6, 0.8)},   # 코드 스탭 = dub 정체성
+                "tape_delay":   {"volume": 1.0, "extra": {"feedback": (0.5, 0.75)}},
+            },
+            "optional_pool": {
+                "snare":             {"volume": (0.3, 0.5)},
+                "sine_interference": {"volume": (0.3, 0.6)},
+                "arpeggio":          {"volume": (0.3, 0.5)},
+                "pulse_train":       {"volume": (0.3, 0.5)},
+            },
+            "optional_count": (1, 2),
+            "inactive": ["saw_sequence", "glitch", "bytebeat",
+                         "data_click", "ultrahigh_texture", "gap_burst"],
+        },
+        "glitch": {
+            "required": {
+                "kick":          {"volume": (0.7, 0.9)},
+                "snare":         {"volume": (0.5, 0.7)},
+                "glitch":        {"volume": (0.8, 1.0), "extra": {"density": (0.5, 0.8)}},
+                "stutter_gate":  {"volume": (0.8, 1.0)},   # 글리치 = 정체성
+            },
+            "optional_pool": {
+                "bytebeat":          {"volume": (0.5, 0.7), "extra": {"formula": "glitch"}},
+                "gap_burst":         {"volume": (0.8, 1.0)},
+                "data_click":        {"volume": (0.7, 1.0)},
+                "ultrahigh_texture": {"volume": (0.4, 0.6)},
+                "saw_sequence":      {"volume": (0.3, 0.5)},
+            },
+            "optional_count": (2, 3),
+            "inactive": ["arpeggio", "bass_drone", "fm_bass"],
+        },
+        "acid": {
+            "required": {
+                "kick":        {"volume": (0.8, 1.0)},
+                "snare":       {"volume": (0.7, 0.9)},
+                "acid_bass":   {"volume": (0.8, 1.0)},   # TB-303 = acid 정체성
+                "saw_sequence": {"volume": (0.8, 1.0)},
+            },
+            "optional_pool": {
+                "arpeggio":          {"volume": (0.5, 0.8)},
+                "fm_bass":           {"volume": (0.4, 0.6)},
+                "stutter_gate":      {"volume": (0.4, 0.6)},
+                "ultrahigh_texture": {"volume": (0.3, 0.5)},
+            },
+            "optional_count": (1, 2),
+            "inactive": ["bass_drone", "glitch", "bytebeat", "gap_burst",
+                         "data_click"],
+        },
+        "industrial": {
+            "required": {
+                "kick":            {"volume": (0.9, 1.0)},
+                "snare":           {"volume": (0.9, 1.0)},
+                "saw_sequence":    {"volume": (0.9, 1.0)},
+                "distorted_kick":  {"volume": (0.7, 0.9)},   # 디스토션 킥 = industrial 정체성
+            },
+            "optional_pool": {
+                "ultrahigh_texture": {"volume": (0.6, 0.9)},
+                "feedback_loop":     {"volume": (0.5, 0.8)},
+                "gap_burst":         {"volume": (0.7, 1.0)},
+                "stutter_gate":      {"volume": (0.6, 0.8)},
+                "fm_bass":           {"volume": (0.5, 0.7)},
+            },
+            "optional_count": (2, 3),
+            "inactive": ["arpeggio", "bass_drone", "glitch", "bytebeat",
+                         "data_click"],
+        },
+        "techno": {
+            "required": {
+                "kick":         {"volume": (0.9, 1.0)},   # 4-on-the-floor = techno 정체성
+                "snare":        {"volume": (0.6, 0.8)},
+                "saw_sequence": {"volume": (0.8, 1.0)},
+            },
+            "optional_pool": {
+                "arpeggio":          {"volume": (0.6, 0.9)},
+                "fm_bass":           {"volume": (0.5, 0.8)},
+                "ultrahigh_texture": {"volume": (0.4, 0.7)},
+                "stutter_gate":      {"volume": (0.4, 0.6)},
+                "bass_drone":        {"volume": (0.3, 0.5)},
+            },
+            "optional_count": (2, 3),
+            "inactive": ["glitch", "bytebeat", "gap_burst", "data_click"],
+        },
+    }
+
+    @staticmethod
+    def _generate_mood_layers(genre: str, ep_seed: int) -> dict:
+        """v19: seed 기반 Vertical Remixing — 같은 장르라도 에피소드마다 다른 레이어 조합.
+
+        Returns: _MOOD_LAYERS 형식 dict (기존 소비 코드와 100% 호환)
+        """
+        import random as _rng_mod
+        specs = EnometaMusicEngine._GENRE_SPECS
+        spec = specs.get(genre, specs["acid"])
+        rng = _rng_mod.Random(ep_seed)
+        layers = {}
+
+        def _resolve_vol(vol_spec):
+            """볼륨: 튜플이면 seed 범위 선택, 스칼라면 고정."""
+            if isinstance(vol_spec, tuple):
+                return round(rng.uniform(vol_spec[0], vol_spec[1]), 2)
+            return vol_spec
+
+        def _resolve_extra(extra_spec):
+            """extra 파라미터: 튜플이면 seed 범위 선택."""
+            if not extra_spec:
+                return {}
+            resolved = {}
+            for k, v in extra_spec.items():
+                resolved[k] = round(rng.uniform(v[0], v[1]), 2) if isinstance(v, tuple) else v
+            return resolved
+
+        # 1. 필수 레이어 — 항상 ON
+        for name, cfg in spec["required"].items():
+            entry = {"active": True, "volume": _resolve_vol(cfg["volume"])}
+            entry.update(_resolve_extra(cfg.get("extra")))
+            layers[name] = entry
+
+        # 2. 선택 레이어 — seed가 풀에서 N개 선택
+        pool_names = list(spec["optional_pool"].keys())
+        count_min, count_max = spec["optional_count"]
+        n = rng.randint(count_min, min(count_max, len(pool_names)))
+        chosen = rng.sample(pool_names, n)
+        for name in chosen:
+            cfg = spec["optional_pool"][name]
+            entry = {"active": True, "volume": _resolve_vol(cfg["volume"])}
+            entry.update(_resolve_extra(cfg.get("extra")))
+            layers[name] = entry
+
+        # 3. 비활성 레이어 — 항상 OFF
+        for name in spec.get("inactive", []):
+            if name not in layers:
+                layers[name] = {"active": False}
+
+        # 4. 선택풀에 있었지만 뽑히지 않은 것도 OFF
+        for name in pool_names:
+            if name not in layers:
+                layers[name] = {"active": False}
+
+        return layers
+
+    # 기존 _MOOD_LAYERS는 fallback + 호환용으로 유지 (신규 코드는 _generate_mood_layers 사용)
     _MOOD_LAYERS = {
-        "ambient":      {"bass_drone": {"active": True, "volume": 0.8}, "sine_interference": {"active": True, "volume": 0.9}, "pulse_train": {"active": True, "volume": 0.6},
-                         "saw_sequence": {"active": False}, "arpeggio": {"active": True, "volume": 0.30}, "kick": {"active": False}, "snare": {"active": False}},
-        "microsound":   {"sine_interference": {"active": True, "volume": 1.0}, "data_click": {"active": True, "volume": 1.2}, "pulse_train": {"active": True, "volume": 0.8},
-                         "ultrahigh_texture": {"active": True, "volume": 0.9}, "saw_sequence": {"active": False}, "arpeggio": {"active": False}, "kick": {"active": False}, "snare": {"active": False}},
-        "IDM":          {"kick": {"active": True, "volume": 0.7}, "snare": {"active": True, "volume": 0.5},
-                         "saw_sequence": {"active": True, "volume": 0.5}, "arpeggio": {"active": True, "volume": 0.7},
-                         "glitch": {"active": True, "volume": 0.6}, "stutter_gate": {"active": True, "volume": 0.7}, "bytebeat": {"active": True, "volume": 0.5}},
-        "minimal":      {"fm_bass": {"active": True, "volume": 0.9}, "bass_drone": {"active": True, "volume": 0.7}, "arpeggio": {"active": True, "volume": 0.6},
-                         "kick": {"active": True, "volume": 0.5}, "saw_sequence": {"active": False}, "snare": {"active": False}},
-        "dub":          {"kick": {"active": True, "volume": 0.7}, "snare": {"active": True, "volume": 0.4},
-                         "bass_drone": {"active": True, "volume": 0.9}, "chord_stab": {"active": True, "volume": 0.7},
-                         "saw_sequence": {"active": False}, "arpeggio": {"active": False},
-                         "tape_delay": {"active": True, "feedback": 0.65}, "sine_interference": {"active": True, "volume": 0.5}},
-        "glitch":       {"kick": {"active": True, "volume": 0.8}, "snare": {"active": True, "volume": 0.6},
-                         "saw_sequence": {"active": False}, "arpeggio": {"active": False},
-                         "glitch": {"active": True, "volume": 1.0, "density": 0.7},
-                         "bytebeat": {"active": True, "volume": 0.6, "formula": "glitch"},
-                         "stutter_gate": {"active": True, "volume": 1.0}, "gap_burst": {"active": True, "volume": 1.0}, "data_click": {"active": True, "volume": 0.9}},
-        "acid":         {"kick": {"active": True, "volume": 0.9}, "snare": {"active": True, "volume": 0.8},
-                         "saw_sequence": {"active": True, "volume": 1.0}, "arpeggio": {"active": True, "volume": 0.7},
-                         "acid_bass": {"active": True, "volume": 0.9}},
-        "industrial":   {"kick": {"active": True, "volume": 1.0}, "snare": {"active": True, "volume": 1.0},
-                         "saw_sequence": {"active": True, "volume": 1.0}, "arpeggio": {"active": False},
-                         "distorted_kick": {"active": True, "volume": 0.8}, "ultrahigh_texture": {"active": True, "volume": 0.8},
-                         "feedback_loop": {"active": True, "volume": 0.7}, "gap_burst": {"active": True, "volume": 0.9}},
-        "techno":       {"kick": {"active": True, "volume": 1.0}, "snare": {"active": True, "volume": 0.7},
-                         "saw_sequence": {"active": True, "volume": 0.9}, "arpeggio": {"active": True, "volume": 0.9},
-                         "fm_bass": {"active": True, "volume": 0.7}, "ultrahigh_texture": {"active": True, "volume": 0.6}},
+        "acid": {"kick": {"active": True, "volume": 0.9}, "snare": {"active": True, "volume": 0.8},
+                 "saw_sequence": {"active": True, "volume": 1.0}, "arpeggio": {"active": True, "volume": 0.7},
+                 "acid_bass": {"active": True, "volume": 0.9}},
     }
     _GAP_FILL_INTENSITY = {
         "ambient": 0.0, "microsound": 0.3, "IDM": 1.0,
@@ -2936,8 +3188,13 @@ class EnometaMusicEngine:
     }
 
     def apply_mood_to_sections(self, sections: list, mood: str, drum_mode: str = "default"):
-        """v16: 무드 프리셋 + drum_mode 4종(on/off/simple/dynamic)으로 섹션별 instrument 적용."""
-        mood_layers = self._MOOD_LAYERS.get(mood, self._MOOD_LAYERS["acid"])
+        """v19: seed 기반 Vertical Remixing + drum_mode 4종으로 섹션별 instrument 적용."""
+        # v19: 동적 레이어 생성 (캐시 재사용)
+        if self._mood_layers_cache is None:
+            self._mood_layers_cache = self._generate_mood_layers(mood, self._ep_seed)
+            active_names = [k for k, v in self._mood_layers_cache.items() if v.get("active")]
+            print(f"  [v19 Vertical Remixing] genre={mood}, seed={self._ep_seed}, active={active_names}", flush=True)
+        mood_layers = self._mood_layers_cache
         drum_layers = {"kick", "snare", "hi_hat"}
 
         # drum_mode별 활성화 결정
@@ -3088,8 +3345,12 @@ class EnometaMusicEngine:
             self.apply_mood_to_sections(sections, "acid", drum_mode)
 
         if is_enometa:
-            # v18: 장르별 레이어 게이팅 — _MOOD_LAYERS에서 active 여부 확인
-            _mood_cfg = self._MOOD_LAYERS.get(music_mood, {})
+            # v19: seed 기반 Vertical Remixing — 같은 장르라도 에피소드마다 다른 레이어 조합
+            if self._mood_layers_cache is None:
+                self._mood_layers_cache = self._generate_mood_layers(music_mood or "acid", self._ep_seed)
+                active_names = [k for k, v in self._mood_layers_cache.items() if v.get("active")]
+                print(f"  [v19 Vertical Remixing] genre={music_mood}, seed={self._ep_seed}, active={active_names}", flush=True)
+            _mood_cfg = self._mood_layers_cache
             def _layer_on(name, default=True):
                 return _mood_cfg.get(name, {}).get("active", default)
             # 레이어 1: 리듬 뼈대 (킥 + 하이햇) — 항상 실행 (drum_mode가 off면 내부에서 처리)
@@ -3123,6 +3384,19 @@ class EnometaMusicEngine:
                 self._render_continuous_ultrahigh(sections)
             else:
                 print("  [ultrahigh] SKIPPED (mood layer off)", flush=True)
+            # v19: 미구현이었던 dub/industrial 전용 레이어 연결
+            if _layer_on("chord_stab", default=False):
+                self._render_continuous_chord_stab(sections)
+            else:
+                print("  [chord_stab] SKIPPED (mood layer off)", flush=True)
+            if _layer_on("distorted_kick", default=False):
+                self._render_continuous_distorted_kick(sections)
+            else:
+                print("  [distorted_kick] SKIPPED (mood layer off)", flush=True)
+            if _layer_on("tape_delay", default=False):
+                self._apply_tape_delay_to_master()
+            else:
+                print("  [tape_delay] SKIPPED (mood layer off)", flush=True)
             # 레이어 9: 게이트 + 스터터
             if _layer_on("stutter_gate", default=True):
                 self._render_continuous_gate_stutter(sections)
@@ -4557,6 +4831,8 @@ def generate_music_script(script_data_path: str, visual_script_path: str = None)
             "music_mood": music_mood_out,
             "drum_mode": drum_mode_out,
             "seq_config": dataclasses.asdict(seq_config),
+            # v19: seed 기반 Vertical Remixing 레이어 조합 기록 (재현성)
+            "mood_layers": EnometaMusicEngine._generate_mood_layers(music_mood_out, seed_val),
         },
         "palette": {
             "bass_freq": base_freq,

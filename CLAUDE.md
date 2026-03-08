@@ -17,8 +17,8 @@ Claude는:
 - **환경**: `py` 명령 사용 (`python`은 Windows Store alias 문제). entry point: `src/index.tsx`
 - **TTS**: `scripts/generate_voice_edge.py` 전용. `generate_voice.py`(Chatterbox) **절대 금지**
 - **글쓰기**: 대본 컨펌 전 제목/음악/비주얼 등 후속 단계 진행 **금지** (글 컨펌 게이트)
-- **비주얼**: render_mode 항상 `"hybrid"` (legacy 모드 제거됨). genre→strategy 동적 매핑 (cooper→breathing, abstract→cinematic, data→dense, enometa→enometa). SI 기반 전략 승격
-- **음악**: v18 실존 언더그라운드 장르 9종 (acid/ambient/microsound/IDM/minimal/dub/glitch/industrial/techno). 대본 리액티브 댄스 뮤직. 패턴 엔진 v18: Euclidean 리듬 + 장르별 레이어 스택 + 전용 합성 함수. **ep_seed 기반 seq_config**로 에피소드마다 드럼/음색/패턴 자동 분화
+- **비주얼**: render_mode 항상 `"hybrid"` (legacy 모드 제거됨). genre→strategy 동적 매핑 (cooper→breathing, abstract→collision, data→dense, enometa→enometa). SI 기반 전략 승격
+- **음악**: v19 실존 언더그라운드 장르 9종 (acid/ambient/microsound/IDM/minimal/dub/glitch/industrial/techno). 대본 리액티브 댄스 뮤직. 패턴 엔진 v18 + v19 Vertical Remixing: 장르별 required/optional 레이어 분리 + ep_seed 기반 레이어 조합 자동 변주. 전용 합성 함수 + **ep_seed 기반 seq_config**로 에피소드마다 드럼/음색/패턴 자동 분화
 - **오디오**: narration_volume=0.90, bgm_volume=1.0 (기본), 사이드체인 없음, loudnorm -14 LUFS, 엔드카드 BGM 자동 연장
 - **태그**: 주제 기반 5개 + 고정 3개(`#데이터아트` `#전자음악` `#오디오비주얼`) = 해시태그 항상 8개. **완전 금지** (어디에도 사용 불가): `#쇼츠` `#shorts` `#ENOMETA` `#이노메타`
 

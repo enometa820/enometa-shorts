@@ -885,6 +885,11 @@ def build_scene(
             ascii_params = generate_vocab_params(ascii_vocab, palette, rng)
             ascii_params["text"] = keyword
             ascii_params["posType"] = _map_pos_type(keyword_type)
+            # ascii_text: block/matrix 모드에서 비트맵 렌더링에 사용할 영어 텍스트
+            # 파이프라인 개입 시 Claude가 맥락에 맞는 영어 번역을 여기에 삽입
+            # 미지정 시 AsciiArt.tsx의 fallback 사전 사용
+            if "ascii_text" not in ascii_params:
+                ascii_params["ascii_text"] = ""
             semantic.append({"vocab": ascii_vocab, "params": ascii_params})
         else:
             # text_reveal: 기존 타이포그래피 모션
@@ -984,7 +989,7 @@ def generate_visual_script(
             print(f"  Warning: Could not load script_data.json keywords: {e}")
 
     # B-9: script_path에서 tagline 추출 (없으면 기본값)
-    tagline = "존재와 사유, 그 경계를 초월하다"
+    tagline = "존재와 사유,\n그 경계를 초월하다"
     if script_path:
         try:
             with open(script_path, 'r', encoding='utf-8') as f:
