@@ -5,6 +5,20 @@
 
 ---
 
+## 2026-03-08 — feedback_defaults.json 제거 + 진화 서사 정리
+
+### Removed
+- `scripts/feedback_defaults.json` 삭제 — 파이프라인 코드에서 참조하지 않는 메모 파일. 실제 규칙은 이미 CLAUDE.md/MEMORY.md에 반영됨
+- `.claude/skills/enometa-feedback.md`: feedback_defaults.json 참조 → CLAUDE.md/MEMORY.md 참조로 변경
+- MEMORY.md: "시스템 성장" 서사 제거, "피드백 루프" → "피드백" 간소화
+
+### 이유
+- feedback_defaults.json은 어떤 코드에서도 import/read 되지 않음 (선언적 메모에 불과)
+- "에피소드마다 시스템이 진화한다"는 코드 수준 자동화 없이 서사만 존재
+- 실제 다양성은 ep_seed→seq_config, genre→전략 매핑이 담당
+
+---
+
 ## 2026-03-08 — 히스토리 기반 회피 시스템 제거
 
 ### Removed

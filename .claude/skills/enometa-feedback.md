@@ -60,13 +60,13 @@ episodes/epXXX/feedback.json (방금 작성)
 
 | 조건 | 행동 |
 |------|------|
-| severity = major | 즉시 `scripts/feedback_defaults.json`에 반영 |
-| 같은 issue type+target 2회 이상 반복 | `feedback_defaults.json`에 기본값으로 반영 |
-| 사용자가 "항상/절대" 표현 사용 | 즉시 `feedback_defaults.json` + MEMORY.md |
+| severity = major | 즉시 CLAUDE.md 또는 관련 코드에 반영 |
+| 같은 issue type+target 2회 이상 반복 | CLAUDE.md에 규칙으로 추가 |
+| 사용자가 "항상/절대" 표현 사용 | 즉시 CLAUDE.md + MEMORY.md |
 
 ### 5단계: 문서 업데이트
 
-시스템 변경이 발생한 경우 `memory/protocols.md`의 범위별 선택적 Read 규칙에 따라 마스터 문서 업데이트.
+시스템 변경이 발생한 경우 CLAUDE.md 또는 MEMORY.md 업데이트.
 
 ### 6단계: 요약 보고
 
