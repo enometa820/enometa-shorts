@@ -73,7 +73,7 @@ script.txt → gen_timing.py → narration_timing.json
 |------|------|
 | `enometa_music_engine.py` | BGM 합성 (numpy, ~5000줄). 10레이어, 9장르(v18), Euclidean 패턴 엔진 |
 | `script_data_extractor.py` | 대본 분석 — kiwipiepy 형태소 분석 + soynlp 전처리 + semantic_intensity + 도메인 사전 (50+용어) |
-| `visual_script_generator.py` | 대본 → 씬/감정/vocab 매핑 → visual_script.json |
+| `visual_script_generator.py` | 대본 → 씬/감정/vocab 매핑 → visual_script.json. music_mood 기반 visual genre 자동 결정 (ambient/microsound/dub→cooper, IDM/minimal→abstract, techno/industrial→data, 기본→enometa) |
 | `visual_renderer.py` | numpy+Pillow 프레임 렌더링 (1080x1080) |
 | `gen_timing.py` | TTS 실측 기반 연속 배치 (v16: 마디 snap 제거) |
 | `sequence_generators.py` | Thue-Morse/Norgard/Rudin-Shapiro 수열 생성 |
@@ -102,7 +102,7 @@ script.txt → gen_timing.py → narration_timing.json
 ### 새 에피소드 추가 절차
 
 1. `episodes/epXXX/` 디렉토리 생성 후 파이프라인 실행
-2. `src/epXXXScript.ts` 생성 — ep010Script.ts 패턴 복사 (json import + export 5개)
+2. `src/epXXXScript.ts` 생성 — ep011Script.ts 패턴 복사 (json import + export 5개)
 3. `src/Root.tsx` 상단 import 추가, `<Composition id="EPXXX" ... calcMeta>` 블록 추가
 4. `public/epXXX/mixed.wav` 동기화 (`episodes/epXXX/mixed.wav` 복사)
 

@@ -85,8 +85,8 @@ npx remotion studio --port 3000
 | 값 | 레퍼런스 | 특성 |
 |----|----------|------|
 | `acid` | Phuture, DJ Pierre | TB-303 acid bass, BPM 126–138 (기본) |
-| `ambient` | Brian Eno | 공간감, 리버브 중심, BPM 72–88 |
-| `microsound` | Ryoji Ikeda, Alva Noto | 정밀 펄스, 초단파 클릭, BPM 80–96 |
+| `ambient` | Brian Eno | 공간감, 리버브 중심, BPM 60–72 |
+| `microsound` | Ryoji Ikeda, Alva Noto | 정밀 펄스, 초단파 클릭, BPM 85–100 |
 | `IDM` | Aphex Twin, Autechre | 비정형 리듬, 폴리리듬, BPM 100–155 |
 | `minimal` | Robert Hood, Richie Hawtin | 극도로 절제된 텍스처, BPM 124–132 |
 | `dub` | Basic Channel, Rhythm & Sound | tape delay, 보이드 킥, BPM 110–125 |
@@ -98,12 +98,21 @@ npx remotion studio --port 3000
 
 Python 배경 프레임과 Remotion vocab 레이어를 동시에 제어한다.
 
-| 값 | Python 레이어 | Remotion vocab | 팔레트 |
-|----|--------------|----------------|--------|
-| `ikeda` (기본) | TextData + Barcode + DataStream + DataMatrix | 데이터아트 | 에피소드 선택 |
-| `cooper` | Particle + DataStream | 유기적 파형 | phantom |
-| `abstract` | DataMatrix 단일 | 기하 추상 | synapse |
-| `data` | TextData + Barcode + DataStream + DataMatrix (최대) | 시각화 데이터 스트림 | cold_steel |
+`--visual-mood`를 생략하면 `--music-mood`에서 자동 결정된다.
+
+| music-mood | → visual genre 자동 선택 |
+|------------|--------------------------|
+| `ambient` / `microsound` / `dub` | `cooper` |
+| `IDM` / `minimal` | `abstract` |
+| `techno` / `industrial` | `data` |
+| `acid` / `glitch` (기본) | `enometa` |
+
+| 값 | Python 레이어 | Remotion vocab | 특성 |
+|----|--------------|----------------|------|
+| `enometa` (기본) | TextData + Barcode + DataStream + DataMatrix | 데이터아트 | 풀 세트 |
+| `cooper` | Particle + DataStream | 유기적 파형 | 미니멀, Barcode 없음 |
+| `abstract` | DataMatrix 단일 | 기하 추상 | 정제된 느낌 |
+| `data` | TextData + Barcode + DataStream + DataMatrix (최대) | 시각화 데이터 스트림 | 최고 밀도 |
 
 ### 드럼 모드 (`--drum-mode`)
 
@@ -178,7 +187,7 @@ enometa-shorts/
 │   └── utils/
 │       └── palettes.ts            # 팔레트 정의
 ├── episodes/
-│   └── ep001~ep009/               # 에피소드별 산출물
+│   └── ep001~ep011/               # 에피소드별 산출물
 ├── public/                        # Remotion 정적 에셋 (mixed.wav 등)
 ├── docs/
 │   ├── CHANGELOG.md               # 변경 이력
@@ -209,7 +218,7 @@ enometa-shorts/
 | [script_data_extractor.py](scripts/script_data_extractor.py) | 대본 형태소 분석(kiwipiepy) + 문장별 감정 강도(SI) 계산 → `script_data.json` |
 | [enometa_music_engine.py](scripts/enometa_music_engine.py) | **BGM 합성** — numpy로 직접 음파 생성 (9장르, 10레이어, ~5000줄) → `bgm.wav` |
 | [audio_mixer.py](scripts/audio_mixer.py) | `narration.wav` + `bgm.wav` → FFmpeg 믹싱 + -14 LUFS 정규화 → `mixed.wav` |
-| [visual_script_generator.py](scripts/visual_script_generator.py) | `script_data.json` → 씬/감정/vocab 선택 → `visual_script.json` |
+| [visual_script_generator.py](scripts/visual_script_generator.py) | `script_data.json` → 씬/감정/vocab 선택 → `visual_script.json`. `music_mood` 기반 visual genre 자동 결정 |
 | [visual_strategies.py](scripts/visual_strategies.py) | 비주얼 전략 6종 프리셋 정의 (dense/breathing/cinematic 등) — visual_script_generator가 참조 |
 | [visual_renderer.py](scripts/visual_renderer.py) | `visual_script.json` → Python(Pillow)으로 배경 프레임 이미지 생성 → `frames/` |
 | [audio_analyzer.py](scripts/audio_analyzer.py) | `mixed.wav` → 프레임별 bass/mid/high/rms/onset 분석 → `audio_analysis.json` |
@@ -241,7 +250,7 @@ enometa-shorts/
 | [src/EnometaShorts.tsx](src/EnometaShorts.tsx) | **메인 레이아웃** — TitleSection / VisualSection / SubtitleSection / LogoEndcard 조합 |
 | [src/types.ts](src/types.ts) | 전체 TypeScript 타입 정의 (Scene, VisualScript, VocabEntry, VocabComponentProps 등) |
 | [src/hooks/useAudioData.ts](src/hooks/useAudioData.ts) | `audio_analysis.json` → 현재 프레임의 `AudioFrame`(bass/mid/high/rms/onset) 반환 |
-| [src/ep001Script.ts](src/ep001Script.ts) | EP001 데이터 모듈 — json 파일 import + 타입 캐스팅 export (EP002~010도 동일 패턴) |
+| [src/ep001Script.ts](src/ep001Script.ts) | EP001 데이터 모듈 — json 파일 import + 타입 캐스팅 export (EP002~011도 동일 패턴) |
 | [src/components/VisualSection.tsx](src/components/VisualSection.tsx) | Python 배경 프레임 + vocab 컴포넌트 오버레이 — `VOCAB_MAP`으로 문자열→컴포넌트 변환 |
 | [src/components/SubtitleSection.tsx](src/components/SubtitleSection.tsx) | `narration_timing` 기반 자막 싱크 표시 (EP005 레퍼런스 유지) |
 | [src/components/TitleSection.tsx](src/components/TitleSection.tsx) | 제목 표시 — `fitText`로 글자 수에 따라 fontSize 자동 조절 (최대 72px) |
