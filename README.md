@@ -133,7 +133,7 @@ Python 배경 프레임과 Remotion vocab 레이어를 동시에 제어한다.
 | `default` | 무드 기본값 따름 (기본) |
 | `on` | 풀 드럼 강제 ON |
 | `off` | 드럼 강제 OFF |
-| `simple` | 킥+하이햇만, 필인 최소 (32바마다 1회) |
+| `simple` | 4-on-the-floor 킥 + 8분음표 하이햇 + 스네어 2,4박, 필인 없음 (베이직 테크노 루프) |
 | `dynamic` | 풀 드럼+SI 최대+필인 2배 (4/8바 주기) |
 
 ```bash
