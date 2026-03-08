@@ -5,6 +5,27 @@
 
 ---
 
+## 2026-03-08 — 다양성 시스템 v19 + 고정화 버그 수정
+
+### Fixed
+- `scripts/enometa_music_engine.py`: `seq_config`가 `music_script.json`에 누락되어 모든 에피소드가 seed 42로 동일한 드럼/음색/패턴을 사용하던 치명적 버그 수정. ep_seed 기반 `derive_episode_sequences()` → `dataclasses.asdict()` → metadata 포함
+- `scripts/enometa_music_engine.py`: fallback seed 42 → episode_id MD5 해시로 변경 (안전장치 강화)
+- `scripts/visual_script_generator.py`: `_MOOD_TO_VISUAL_GENRE` 매핑을 README와 통일 (microsound→cooper, techno→data, industrial→data)
+- `scripts/enometa_render.py`: `--visual-mood` choices에서 deprecated `ikeda` 제거, `enometa` 추가
+
+### Added
+- `scripts/visual_strategies.py`: `promote_strategy_by_si()` 함수 — SI≥0.80에서 전략 자동 승격 (breathing→enometa→dense)
+- `scripts/visual_strategies.py`: genre→strategy 동적 매핑 (cooper→breathing, abstract→collision, data→dense)
+- `scripts/visual_script_generator.py`: 씬 빌드 루프에서 SI 기반 전략 승격 적용
+
+### Changed
+- `scripts/visual_strategies.py`: "enometa" 전략 제약 완화 — avoid_vocabs 15→7개, max_semantic_layers 2→3, prefer_vocabs 다양화
+- `src/components/TitleSection.tsx`: `text-wrap: balance` 추가 (2줄 제목 균등 분배)
+- `src/components/LogoEndcard.tsx`: 태그라인 줄 간격 gap 8→20
+- `.claude/skills/enometa-produce.md`: 옵션 수집 시 전체 테이블 의무 표시
+
+---
+
 ## 2026-03-08 — EP011 추가 + script_data_extractor 버그 수정
 
 ### Fixed

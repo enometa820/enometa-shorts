@@ -114,6 +114,18 @@ Python 배경 프레임과 Remotion vocab 레이어를 동시에 제어한다.
 | `abstract` | DataMatrix 단일 | 기하 추상 | 정제된 느낌 |
 | `data` | TextData + Barcode + DataStream + DataMatrix (최대) | 시각화 데이터 스트림 | 최고 밀도 |
 
+### 다양성 시스템
+
+에피소드마다 음악과 비주얼이 자동으로 달라지는 구조:
+
+| 축 | 결정 요소 | 결과 |
+|----|-----------|------|
+| **음악 음색** | `ep_seed` → `seq_config` (10개 파라미터) | 드럼 패턴, saw 배음, 필터 컷오프, 코러스, 킥 캐릭터 등 에피소드마다 고유 |
+| **음악 구조** | `music_mood` → `_MOOD_LAYERS` | 장르별 레이어 ON/OFF + BPM 범위 |
+| **비주얼 전략** | `genre` → strategy 동적 매핑 | cooper→breathing, abstract→cinematic, data→dense |
+| **비주얼 승격** | SI ≥ 0.80 → 전략 한 단계 상향 | 감정 고조 시 밀도 증가 |
+| **vocab 선택** | strategy의 prefer/avoid + SI 기반 레이어 수 | 씬마다 다른 vocab 조합 |
+
 ### 드럼 모드 (`--drum-mode`)
 
 | 값 | 동작 |
@@ -253,7 +265,7 @@ enometa-shorts/
 | [src/ep001Script.ts](src/ep001Script.ts) | EP001 데이터 모듈 — json 파일 import + 타입 캐스팅 export (EP002~011도 동일 패턴) |
 | [src/components/VisualSection.tsx](src/components/VisualSection.tsx) | Python 배경 프레임 + vocab 컴포넌트 오버레이 — `VOCAB_MAP`으로 문자열→컴포넌트 변환 |
 | [src/components/SubtitleSection.tsx](src/components/SubtitleSection.tsx) | `narration_timing` 기반 자막 싱크 표시 (EP005 레퍼런스 유지) |
-| [src/components/TitleSection.tsx](src/components/TitleSection.tsx) | 제목 표시 — `fitText`로 글자 수에 따라 fontSize 자동 조절 (최대 72px) |
+| [src/components/TitleSection.tsx](src/components/TitleSection.tsx) | 제목 표시 — `fitText` fontSize 자동 조절 (최대 72px) + `text-wrap: balance` 2줄 균등 분배 |
 | [src/components/ShapeMotion.tsx](src/components/ShapeMotion.tsx) | emotion별 기하 도형 애니메이션 (tension/climax/awakening/intro/buildup) |
 | [src/components/LogoEndcard.tsx](src/components/LogoEndcard.tsx) | 영상 마지막 엔드카드 (로고 + 태그라인 + 파티클 180개) |
 | [src/components/vocab/TextReveal.tsx](src/components/vocab/TextReveal.tsx) | 타이포그래피 모션 4종 (typewriter/wave/glitch/scatter) |

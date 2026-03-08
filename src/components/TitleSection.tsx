@@ -44,7 +44,10 @@ export const TitleSection: React.FC<TitleSectionProps> = ({
   const glowIntensity = 8 + audio.rms * 20;
 
   // 마침표 뒤 공백에서 문장 단위 줄바꿈 (2줄 처리)
-  const titleFormatted = title.replace(/\.\s+/g, ".\n");
+  // text-wrap: balance가 자동 균등 분배하므로 \n 강제 삽입은 마침표 케이스만
+  const titleFormatted = title.includes(". ")
+    ? title.replace(/\.\s+/g, ".\n")
+    : title;
 
   // fitText: 제목 길이에 따라 fontSize 자동 조절 (최대 72px)
   const { fontSize } = fitText({
@@ -125,6 +128,7 @@ export const TitleSection: React.FC<TitleSectionProps> = ({
           wordBreak: "keep-all" as const,
           overflowWrap: "normal" as const,
           whiteSpace: "pre-line" as const,
+          textWrap: "balance" as const,
         }}
       >
         {renderTitle()}

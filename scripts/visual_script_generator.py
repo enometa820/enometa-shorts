@@ -16,6 +16,7 @@ from typing import List, Dict, Any, Tuple, Optional
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from visual_strategies import (
     get_strategy, get_default_strategy, boost_reactivity,
+    promote_strategy_by_si,
 )
 
 # ============================================================
@@ -1102,15 +1103,20 @@ def generate_visual_script(
         for seg_idx in scene_data.get("_seg_indices", []):
             scene_sd_keywords.extend(script_data_keywords.get(seg_idx, []))
 
+        # SI 기반 전략 승격: 고에너지 씬에서 더 밀도 높은 비주얼
+        scene_si = scene_data.get("si", 0.5)
+        scene_strategy_name = promote_strategy_by_si(strategy_name, scene_si)
+        scene_strategy = get_strategy(scene_strategy_name) if scene_strategy_name != strategy_name else strategy
+
         scene = build_scene(
             i, scene_data["text"],
             scene_data["start"], scene_data["end"],
             emotion, palette, rng,
             used_vocabs, highlight_words,
             genre=genre,
-            strategy=strategy,
+            strategy=scene_strategy,
             recent_combos=recent_combos,
-            si=scene_data.get("si", 0.5),
+            si=scene_si,
             sd_keywords=scene_sd_keywords if scene_sd_keywords else None,
             mood_override=mood_override,
         )

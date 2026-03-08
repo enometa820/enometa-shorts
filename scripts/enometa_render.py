@@ -395,13 +395,13 @@ MUSIC_MOOD_DESC = {
     "techno":       "4-on-the-floor 킥 + FM베이스",
 }
 
-VISUAL_MOOD_CHOICES = [None, "ikeda", "cooper", "abstract", "data"]
+VISUAL_MOOD_CHOICES = [None, "cooper", "abstract", "data", "enometa"]
 VISUAL_MOOD_DESC = {
-    None:       "무드 자동 (기본)",
-    "ikeda":    "디지털 라인",
-    "cooper":   "기하학적",
-    "abstract": "추상",
-    "data":     "데이터 시각화",
+    None:       "무드 자동 — music_mood에서 결정 (기본)",
+    "cooper":   "미니멀, Barcode 없음 (breathing 전략)",
+    "abstract": "기하학적 추상 (cinematic 전략)",
+    "data":     "최고 밀도 데이터 시각화 (dense 전략)",
+    "enometa":  "데이터아트 풀 세트 (enometa 전략)",
 }
 
 
@@ -529,7 +529,7 @@ def main():
                         choices=["ambient", "microsound", "IDM", "minimal", "dub", "glitch", "acid", "industrial", "techno"],
                         help="음악 장르 (기본: acid)")
     parser.add_argument("--visual-mood", default=None,
-                        choices=["ikeda", "cooper", "abstract", "data"],
+                        choices=["cooper", "abstract", "data", "enometa"],
                         help="비주얼 무드 (선택)")
     parser.add_argument("--drum-mode", default="default",
                         choices=["default", "on", "off", "simple", "dynamic"],

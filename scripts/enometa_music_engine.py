@@ -1452,8 +1452,10 @@ class EnometaMusicEngine:
                 kick_character=sc.get("kick_character", 0),
             )
         else:
-            # fallback: 시드 42
-            self.seq_config = derive_episode_sequences(42)
+            # fallback: episode_id 해시 기반 시드 (고정 시드 42 방지)
+            import hashlib as _hl
+            _fb_seed = int(_hl.md5(str(meta.get("episode", "ep000")).encode()).hexdigest(), 16) % (2**32)
+            self.seq_config = derive_episode_sequences(_fb_seed)
 
         palette = script.get("palette", {})
         self.bass_freq = palette.get("bass_freq", 82.4)
@@ -4589,10 +4591,15 @@ def generate_music_script(script_data_path: str, visual_script_path: str = None)
     episode_id = meta.get("episode", "default")
     
     import hashlib
+    import dataclasses
     seed_val = int(hashlib.md5(episode_id.encode()).hexdigest(), 16) % (2**32)
     random.seed(seed_val)
     np.random.seed(seed_val)
     print(f"  [MusicEngine] Fixed seed for episode '{episode_id}': {seed_val}")
+
+    # v18: seq_config 생성 (에피소드 시드 기반 결정론적 음색/패턴)
+    from sequence_generators import derive_episode_sequences
+    seq_config = derive_episode_sequences(seed_val)
 
     segments = script_data.get("segments", [])
     total_dur = script_data.get("global", {}).get("total_duration_sec", 60.0)
@@ -4662,6 +4669,7 @@ def generate_music_script(script_data_path: str, visual_script_path: str = None)
             "synthesis_overrides": {"enometa_mode": True},
             "music_mood": music_mood_out,
             "drum_mode": drum_mode_out,
+            "seq_config": dataclasses.asdict(seq_config),
         },
         "palette": {
             "bass_freq": base_freq,

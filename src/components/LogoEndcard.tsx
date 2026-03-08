@@ -388,7 +388,7 @@ export const LogoEndcard: React.FC<LogoEndcardProps> = ({
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 8,
+            gap: 20,
           }}
         >
           {tagline.split("\n").map((line, lineIdx) => {

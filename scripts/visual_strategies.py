@@ -74,14 +74,14 @@ STRATEGIES: Dict[str, Dict[str, Any]] = {
     },
     "enometa": {
         "description": "ENOMETA data art - minimal+terminal+sine",
-        "max_semantic_layers": 2,
+        "max_semantic_layers": 3,
         "particle_density": 0.0,
         "text_chance": 0.9,
         "bg_opacity_mult": 1.0,
-        "prefer_vocabs": ["text_reveal"],
-        "avoid_vocabs": ["particle_birth", "particle_scatter", "color_bloom",
-                         "neural_network", "light_source", "fractal_crack",
-                         "data_bar", "counter_up"],
+        "prefer_vocabs": ["text_reveal", "data_bar", "waveform", "lissajous"],
+        "avoid_vocabs": ["terra_globe", "terra_globe_data", "terra_flythrough",
+                         "terra_tunnel", "terra_terrain", "terra_terrain_bars",
+                         "color_bloom"],
         "reactivity_boost": 0,
     },
 }
@@ -96,7 +96,10 @@ GENRE_DEFAULT_STRATEGY: Dict[str, str] = {
     "bytebeat": "minimal",
     "chiptune": "layered",
     "enometa": "enometa",
-    "ikeda": "enometa",  # 하위호환
+    "ikeda": "enometa",       # 하위호환
+    "cooper": "breathing",    # 비주얼 무드 매핑
+    "abstract": "collision",  # 비주얼 무드 매핑
+    "data": "dense",          # 비주얼 무드 매핑
 }
 
 # ============================================================
@@ -113,6 +116,17 @@ def get_strategy(name: str) -> Dict[str, Any]:
 def get_default_strategy(genre: str) -> str:
     """장르에 맞는 기본 전략 이름 반환"""
     return GENRE_DEFAULT_STRATEGY.get(genre, "dense")
+
+
+def promote_strategy_by_si(strategy_name: str, si: float) -> str:
+    """SI가 높으면 전략을 한 단계 상향 (더 밀도 높은 비주얼)"""
+    if si >= 0.85 and strategy_name in ("enometa", "collision", "layered"):
+        return "dense"        # 표준/충돌/레이어 → 고밀도
+    if si >= 0.80 and strategy_name == "breathing":
+        return "enometa"      # 미니멀 호흡 → 표준
+    if si >= 0.80 and strategy_name == "minimal":
+        return "breathing"    # 극소 → 미니멀 호흡
+    return strategy_name
 
 
 def boost_reactivity(level: str, boost: int) -> str:

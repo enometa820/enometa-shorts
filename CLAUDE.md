@@ -17,8 +17,8 @@ Claude는:
 - **환경**: `py` 명령 사용 (`python`은 Windows Store alias 문제). entry point: `src/index.tsx`
 - **TTS**: `scripts/generate_voice_edge.py` 전용. `generate_voice.py`(Chatterbox) **절대 금지**
 - **글쓰기**: 대본 컨펌 전 제목/음악/비주얼 등 후속 단계 진행 **금지** (글 컨펌 게이트)
-- **비주얼**: render_mode 항상 `"hybrid"` (legacy 모드 제거됨)
-- **음악**: v18 실존 언더그라운드 장르 9종 (acid/ambient/microsound/IDM/minimal/dub/glitch/industrial/techno). 대본 리액티브 댄스 뮤직. 패턴 엔진 v18: Euclidean 리듬 + 장르별 레이어 스택 + 전용 합성 함수
+- **비주얼**: render_mode 항상 `"hybrid"` (legacy 모드 제거됨). genre→strategy 동적 매핑 (cooper→breathing, abstract→cinematic, data→dense, enometa→enometa). SI 기반 전략 승격
+- **음악**: v18 실존 언더그라운드 장르 9종 (acid/ambient/microsound/IDM/minimal/dub/glitch/industrial/techno). 대본 리액티브 댄스 뮤직. 패턴 엔진 v18: Euclidean 리듬 + 장르별 레이어 스택 + 전용 합성 함수. **ep_seed 기반 seq_config**로 에피소드마다 드럼/음색/패턴 자동 분화
 - **오디오**: narration_volume=0.90, bgm_volume=1.0 (기본), 사이드체인 없음, loudnorm -14 LUFS, 엔드카드 BGM 자동 연장
 - **태그**: 주제 기반 5개 + 고정 3개(`#데이터아트` `#전자음악` `#오디오비주얼`) = 해시태그 항상 8개. **완전 금지** (어디에도 사용 불가): `#쇼츠` `#shorts` `#ENOMETA` `#이노메타`
 
@@ -105,6 +105,7 @@ mix 단계 후 `public/epXXX/mixed.wav`도 반드시 동기화 필요.
 - **레이어 ON/OFF + 볼륨 고정**: 에너지는 볼륨 커브가 아닌 레이어 추가/제거로 표현. 콜앤리스폰스/song_arc 비활성. 마스터 페이드 없음 (5ms anti-click만).
 - **고정 BPM**: 가변 BPM은 섹션 경계에서 리듬 파괴. 장르 범위 내 단일 BPM 유지.
 - **타이밍**: 영상 길이 = `lastScene.end_sec + endcard`. BGM 초과분 자동 잘림. 문장 갭 `--gap 0.3`, 문단 갭 `--paragraph-gap 0.8`.
+- **다양성 보장**: ep_seed → seq_config(드럼/음색/패턴 10개 파라미터) 에피소드마다 자동 분화. 비주얼 전략은 genre에 따라 동적 선택, SI≥0.80에서 전략 승격. vocab avoid 목록은 최소한만 유지.
 
 ### 메모리 과부하 방지
 

@@ -142,20 +142,22 @@
     },
     "ep011": {
       "used_combos": [
+        "flow_field_calm:opposing",
         "flow_field_calm:vortex",
         "flow_field_turbulent:opposing",
-        "particle_chain_awaken:default",
-        "particle_escape:chain_break",
-        "particle_orbit:ellipse_drift",
-        "particle_orbit:figure_eight",
-        "pixel_grid_life:default",
-        "pixel_grid_rain:default",
-        "pixel_waveform_cascade:default",
+        "grid_morph:pixel_dissolve",
+        "grid_morph:wave_propagation",
+        "light_source:default",
+        "lissajous:default",
+        "particle_birth:dots_grid",
+        "particle_birth:lines_scatter",
+        "particle_birth:triangles_rise",
+        "particle_escape:default",
+        "particle_orbit:default",
         "terra_globe:default",
         "text_reveal:default",
         "waveform:default",
-        "waveform_circular:default",
-        "waveform_spectrum:default"
+        "waveform_circular:default"
       ]
     }
   }
