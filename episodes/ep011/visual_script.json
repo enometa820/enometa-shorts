@@ -2,33 +2,33 @@
   "title": "자연은 우리보다 38억 년 먼저 코딩했다",
   "tagline": "존재와 사유,\n그 경계를 초월하다",
   "highlightWords": [
-    "코딩",
+    "자연",
     "C.",
     "문자",
-    "인간",
+    "게놈",
     "염기"
   ],
   "meta": {
-    "strategy": "breathing",
-    "strategy_description": "여백 + 느린 호흡 — 명상적, 미니멀",
-    "genre": "cooper",
-    "palette": "cold_steel",
-    "seed": 1842553170,
+    "strategy": "enometa",
+    "strategy_description": "ENOMETA data art - minimal+terminal+sine",
+    "genre": "enometa",
+    "palette": "gameboy",
+    "seed": 726956363,
     "render_mode": "hybrid",
     "frames_dir": "ep011/frames",
     "total_frames": 3244
   },
   "global": {
     "color_palette": [
-      "#64748B",
-      "#94A3B8",
-      "#CBD5E1",
-      "#E2E8F0"
+      "#9bbc0f",
+      "#8bac0f",
+      "#306230",
+      "#0f380f"
     ],
-    "background_color": "#080810",
+    "background_color": "#0f380f",
     "particle_total": 2000,
     "font": "Pretendard Variable",
-    "palette": "cold_steel"
+    "palette": "gameboy"
   },
   "scenes": [
     {
@@ -40,20 +40,32 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "flow_field_calm",
-            "params": {},
-            "variant": "opposing"
+            "vocab": "loop_ring",
+            "params": {
+              "rings": 4,
+              "color": "#9bbc0f",
+              "pulse_speed": 1.419
+            }
           },
           {
-            "vocab": "text_reveal",
+            "vocab": "loop_ring",
             "params": {
-              "text": "코딩",
-              "mode": "wave",
-              "fontSize": 80,
-              "color": "#FFFFFF",
-              "position": "top",
-              "glowColor": "#475569",
-              "staggerMs": 80
+              "rings": 4,
+              "color": "#9bbc0f",
+              "pulse_speed": 1.453
+            }
+          },
+          {
+            "vocab": "ascii_shape",
+            "params": {
+              "text": "자연",
+              "mode": "shape",
+              "posType": "noun",
+              "color": "#00FFFF",
+              "glowColor": "#8bac0f",
+              "position": "bottom",
+              "density": "medium",
+              "ascii_text": "NATURE"
             }
           }
         ],
@@ -65,10 +77,10 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0018,
-            "speed": 0.029,
-            "line_opacity": 0.048,
-            "line_color": "#64748B"
+            "noise_scale": 0.0012,
+            "speed": 0.027,
+            "line_opacity": 0.066,
+            "line_color": "#306230"
           }
         }
       },
@@ -87,25 +99,28 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "particle_orbit",
+            "vocab": "grid_morph",
             "params": {
-              "count": 500,
-              "color": "#64748B",
-              "rings": 3,
-              "speed": 0.8
+              "cols": 20,
+              "rows": 15,
+              "mode": "mesh",
+              "color": "#9bbc0f",
+              "accentColor": "#9bbc0f",
+              "morphIntensity": 0.652,
+              "showConnections": true
             },
-            "variant": "ellipse_drift"
+            "variant": "pixel_dissolve"
           },
           {
-            "vocab": "ascii_matrix",
+            "vocab": "text_reveal",
             "params": {
               "text": "C.",
-              "mode": "matrix",
-              "posType": "noun",
-              "color": "#00FF80",
-              "glowColor": "#475569",
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#00FFFF",
               "position": "top",
-              "density": "high"
+              "glowColor": "#8bac0f",
+              "staggerMs": 60
             }
           }
         ],
@@ -117,12 +132,11 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0024,
+            "noise_scale": 0.0021,
             "speed": 0.032,
-            "line_opacity": 0.067,
-            "line_color": "#94A3B8"
-          },
-          "variant": "opposing"
+            "line_opacity": 0.047,
+            "line_color": "#9bbc0f"
+          }
         }
       },
       "shape_params": {
@@ -140,20 +154,27 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "flow_field_calm",
-            "params": {},
-            "variant": "vortex"
+            "vocab": "grid_morph",
+            "params": {
+              "cols": 20,
+              "rows": 15,
+              "mode": "mesh",
+              "color": "#8bac0f",
+              "accentColor": "#9bbc0f",
+              "morphIntensity": 0.971,
+              "showConnections": false
+            }
           },
           {
-            "vocab": "symbol_morph",
+            "vocab": "text_reveal",
             "params": {
               "text": "문자",
-              "posType": "noun",
-              "shapeColor": "#00FFFF",
-              "glowColor": "#475569",
-              "position": "top",
-              "size": 140,
-              "showLabel": true
+              "mode": "wave",
+              "fontSize": 80,
+              "color": "#FFFFFF",
+              "position": "upper",
+              "glowColor": "#8bac0f",
+              "staggerMs": 80
             }
           }
         ],
@@ -165,12 +186,11 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0028,
+            "noise_scale": 0.0012,
             "speed": 0.021,
-            "line_opacity": 0.043,
-            "line_color": "#94A3B8"
-          },
-          "transition_to": "flow_field_turbulent"
+            "line_opacity": 0.042,
+            "line_color": "#0f380f"
+          }
         }
       },
       "shape_params": {
@@ -188,24 +208,24 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "particle_orbit",
+            "vocab": "loop_ring",
             "params": {
-              "count": 300,
-              "color": "#64748B",
-              "rings": 5,
-              "speed": 0.4
+              "rings": 4,
+              "color": "#9bbc0f",
+              "pulse_speed": 1.495
             }
           },
           {
-            "vocab": "symbol_morph",
+            "vocab": "ascii_matrix",
             "params": {
-              "text": "인간",
+              "text": "게놈",
+              "mode": "matrix",
               "posType": "noun",
-              "shapeColor": "#64748B",
-              "glowColor": "#475569",
-              "position": "center",
-              "size": 120,
-              "showLabel": false
+              "color": "#FFD700",
+              "glowColor": "#8bac0f",
+              "position": "top",
+              "density": "medium",
+              "ascii_text": "GENOME"
             }
           }
         ],
@@ -217,10 +237,10 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0026,
-            "speed": 0.035,
-            "line_opacity": 0.053,
-            "line_color": "#64748B"
+            "noise_scale": 0.0019,
+            "speed": 0.03,
+            "line_opacity": 0.067,
+            "line_color": "#306230"
           },
           "transition_to": "flow_field_turbulent"
         }
@@ -240,21 +260,26 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "flow_field_calm",
-            "params": {},
-            "variant": "opposing"
+            "vocab": "waveform",
+            "params": {
+              "mode": "waveform",
+              "color": "#9bbc0f",
+              "lineWidth": 2,
+              "sensitivity": 1.427
+            }
           },
           {
-            "vocab": "text_reveal",
+            "vocab": "grid_morph",
             "params": {
-              "text": "염기",
-              "mode": "wave",
-              "fontSize": 80,
-              "color": "#FFFFFF",
-              "position": "top",
-              "glowColor": "#475569",
-              "staggerMs": 100
-            }
+              "cols": 25,
+              "rows": 15,
+              "mode": "lines",
+              "color": "#9bbc0f",
+              "accentColor": "#9bbc0f",
+              "morphIntensity": 0.834,
+              "showConnections": true
+            },
+            "variant": "wave_propagation"
           }
         ],
         "audio_reactive": {
@@ -265,12 +290,11 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0014,
-            "speed": 0.037,
-            "line_opacity": 0.064,
-            "line_color": "#64748B"
-          },
-          "variant": "vortex"
+            "noise_scale": 0.003,
+            "speed": 0.03,
+            "line_opacity": 0.045,
+            "line_color": "#9bbc0f"
+          }
         }
       },
       "shape_params": {
@@ -288,14 +312,28 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "particle_orbit",
+            "vocab": "lissajous",
             "params": {
-              "count": 300,
-              "color": "#64748B",
-              "rings": 5,
-              "speed": 0.422
-            },
-            "variant": "ellipse_drift"
+              "ratioA": 1,
+              "ratioB": 2,
+              "phaseOffset": 2.21,
+              "color": "#00FFFF",
+              "glowColor": "#8bac0f",
+              "lineWidth": 1.5,
+              "trailLength": 1000
+            }
+          },
+          {
+            "vocab": "symbol_morph",
+            "params": {
+              "text": "염기",
+              "posType": "noun",
+              "shapeColor": "#FFFFFF",
+              "glowColor": "#8bac0f",
+              "position": "bottom",
+              "size": 140,
+              "showLabel": true
+            }
           }
         ],
         "audio_reactive": {
@@ -306,11 +344,12 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0029,
-            "speed": 0.038,
-            "line_opacity": 0.055,
-            "line_color": "#64748B"
-          }
+            "noise_scale": 0.001,
+            "speed": 0.033,
+            "line_opacity": 0.042,
+            "line_color": "#306230"
+          },
+          "variant": "vortex"
         }
       },
       "shape_params": {
@@ -328,20 +367,23 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "flow_field_calm",
-            "params": {},
-            "variant": "vortex"
+            "vocab": "loop_ring",
+            "params": {
+              "rings": 6,
+              "color": "#9bbc0f",
+              "pulse_speed": 0.688
+            }
           },
           {
             "vocab": "text_reveal",
             "params": {
-              "text": "명령",
+              "text": "코드",
               "mode": "wave",
-              "fontSize": 56,
+              "fontSize": 64,
               "color": "#FFD700",
-              "position": "bottom",
-              "glowColor": "#475569",
-              "staggerMs": 60
+              "position": "center",
+              "glowColor": "#8bac0f",
+              "staggerMs": 120
             }
           }
         ],
@@ -353,11 +395,12 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0012,
-            "speed": 0.02,
-            "line_opacity": 0.058,
-            "line_color": "#64748B"
-          }
+            "noise_scale": 0.0014,
+            "speed": 0.039,
+            "line_opacity": 0.059,
+            "line_color": "#9bbc0f"
+          },
+          "transition_to": "flow_field_turbulent"
         }
       },
       "shape_params": {
@@ -375,25 +418,23 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "particle_orbit",
+            "vocab": "color_shift",
             "params": {
-              "count": 300,
-              "color": "#64748B",
-              "rings": 5,
-              "speed": 0.538
-            },
-            "variant": "ellipse_drift"
+              "from_color": "#9bbc0f",
+              "to_color": "#0f380f",
+              "rhythm": "slow"
+            }
           },
           {
-            "vocab": "ascii_shape",
+            "vocab": "text_reveal",
             "params": {
-              "text": "복구",
-              "mode": "shape",
-              "posType": "noun",
-              "color": "#00FFFF",
-              "glowColor": "#475569",
-              "position": "center",
-              "density": "low"
+              "text": "DNA",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#FFD700",
+              "position": "bottom",
+              "glowColor": "#8bac0f",
+              "staggerMs": 80
             }
           }
         ],
@@ -405,11 +446,12 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0013,
-            "speed": 0.023,
-            "line_opacity": 0.049,
-            "line_color": "#94A3B8"
-          }
+            "noise_scale": 0.0016,
+            "speed": 0.04,
+            "line_opacity": 0.061,
+            "line_color": "#0f380f"
+          },
+          "transition_to": "flow_field_turbulent"
         }
       },
       "shape_params": {
@@ -427,20 +469,23 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "flow_field_calm",
-            "params": {},
-            "variant": "vortex"
+            "vocab": "loop_ring",
+            "params": {
+              "rings": 4,
+              "color": "#9bbc0f",
+              "pulse_speed": 1.456
+            }
           },
           {
-            "vocab": "ascii_shape",
+            "vocab": "symbol_morph",
             "params": {
-              "text": "수정",
-              "mode": "shape",
+              "text": "자동",
               "posType": "noun",
-              "color": "#64748B",
-              "glowColor": "#475569",
-              "position": "upper",
-              "density": "low"
+              "shapeColor": "#9bbc0f",
+              "glowColor": "#8bac0f",
+              "position": "center",
+              "size": 120,
+              "showLabel": true
             }
           }
         ],
@@ -452,11 +497,12 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0013,
-            "speed": 0.03,
-            "line_opacity": 0.043,
-            "line_color": "#94A3B8"
+            "noise_scale": 0.0018,
+            "speed": 0.031,
+            "line_opacity": 0.047,
+            "line_color": "#306230"
           },
+          "variant": "opposing",
           "transition_to": "flow_field_turbulent"
         }
       },
@@ -475,25 +521,28 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "particle_orbit",
+            "vocab": "grid_morph",
             "params": {
-              "count": 300,
-              "color": "#64748B",
-              "rings": 4,
-              "speed": 0.788
+              "cols": 20,
+              "rows": 15,
+              "mode": "dots",
+              "color": "#0f380f",
+              "accentColor": "#9bbc0f",
+              "morphIntensity": 0.85,
+              "showConnections": true
             },
-            "variant": "ellipse_drift"
+            "variant": "wave_propagation"
           },
           {
-            "vocab": "symbol_morph",
+            "vocab": "text_reveal",
             "params": {
               "text": "코드",
-              "posType": "science",
-              "shapeColor": "#FFD700",
-              "glowColor": "#475569",
-              "position": "bottom",
-              "size": 140,
-              "showLabel": true
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#00FFFF",
+              "position": "upper",
+              "glowColor": "#8bac0f",
+              "staggerMs": 60
             }
           }
         ],
@@ -505,10 +554,10 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0014,
-            "speed": 0.04,
-            "line_opacity": 0.066,
-            "line_color": "#94A3B8"
+            "noise_scale": 0.0028,
+            "speed": 0.037,
+            "line_opacity": 0.053,
+            "line_color": "#0f380f"
           }
         }
       },
@@ -527,43 +576,46 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "waveform_spectrum",
+            "vocab": "lissajous",
             "params": {
-              "mode": "spectrum",
-              "color": "#64748B",
+              "ratioA": 4,
+              "ratioB": 4,
+              "phaseOffset": 0.92,
+              "color": "#8bac0f",
+              "glowColor": "#8bac0f",
               "lineWidth": 2,
-              "sensitivity": 1.303
+              "trailLength": 1000
             }
           },
           {
-            "vocab": "text_reveal",
+            "vocab": "symbol_morph",
             "params": {
               "text": "발견",
-              "mode": "glitch",
-              "fontSize": 64,
-              "color": "#64748B",
-              "position": "upper",
-              "glowColor": "#475569",
-              "staggerMs": 100
+              "posType": "noun",
+              "shapeColor": "#FFD700",
+              "glowColor": "#8bac0f",
+              "position": "bottom",
+              "size": 120,
+              "showLabel": false
             }
           }
         ],
         "audio_reactive": {
-          "particle_opacity": "rms * 0.8 + 0.2",
-          "particle_size": "bass * 4 + 1",
-          "glow_intensity": "bass * 3",
-          "displacement": "rms * 3"
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
         },
         "background": {
           "vocab": "flow_field_turbulent",
           "params": {
-            "noise_scale": 0.0058,
-            "speed": 0.291,
-            "line_opacity": 0.085,
-            "line_color": "#64748B"
+            "noise_scale": 0.0077,
+            "speed": 0.165,
+            "line_opacity": 0.098,
+            "line_color": "#306230"
           },
-          "variant": "opposing",
-          "transition_to": "flow_field_calm"
+          "variant": "opposing"
         }
       },
       "shape_params": {
@@ -581,20 +633,35 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "flow_field_calm",
-            "params": {},
-            "variant": "opposing"
+            "vocab": "color_shift",
+            "params": {
+              "from_color": "#9bbc0f",
+              "to_color": "#0f380f",
+              "rhythm": "pulse"
+            }
           },
           {
-            "vocab": "ascii_shape",
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 1,
+              "ratioB": 5,
+              "phaseOffset": 5.02,
+              "color": "#FFFFFF",
+              "glowColor": "#8bac0f",
+              "lineWidth": 1.5,
+              "trailLength": 600
+            }
+          },
+          {
+            "vocab": "text_reveal",
             "params": {
               "text": "자연",
-              "mode": "shape",
-              "posType": "noun",
-              "color": "#64748B",
-              "glowColor": "#475569",
-              "position": "upper",
-              "density": "high"
+              "mode": "wave",
+              "fontSize": 64,
+              "color": "#9bbc0f",
+              "position": "center",
+              "glowColor": "#8bac0f",
+              "staggerMs": 120
             }
           }
         ],
@@ -606,11 +673,12 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.002,
-            "speed": 0.021,
-            "line_opacity": 0.055,
-            "line_color": "#94A3B8"
-          }
+            "noise_scale": 0.0011,
+            "speed": 0.028,
+            "line_opacity": 0.051,
+            "line_color": "#306230"
+          },
+          "transition_to": "flow_field_turbulent"
         }
       },
       "shape_params": {
@@ -628,25 +696,28 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "terra_globe",
+            "vocab": "grid_morph",
             "params": {
-              "dataPoints": 8,
-              "wireColor": "#CBD5E1",
-              "dotColor": "#64748B",
-              "rotationSpeed": 0.016,
-              "detail": 2
-            }
+              "cols": 15,
+              "rows": 25,
+              "mode": "wave",
+              "color": "#306230",
+              "accentColor": "#9bbc0f",
+              "morphIntensity": 0.821,
+              "showConnections": true
+            },
+            "variant": "wave_propagation"
           },
           {
-            "vocab": "text_reveal",
+            "vocab": "symbol_morph",
             "params": {
               "text": "변수",
-              "mode": "wave",
-              "fontSize": 56,
-              "color": "#FFD700",
-              "position": "center",
-              "glowColor": "#475569",
-              "staggerMs": 120
+              "posType": "science",
+              "shapeColor": "#9bbc0f",
+              "glowColor": "#8bac0f",
+              "position": "bottom",
+              "size": 100,
+              "showLabel": true
             }
           }
         ],
@@ -658,10 +729,10 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0024,
-            "speed": 0.022,
-            "line_opacity": 0.069,
-            "line_color": "#475569"
+            "noise_scale": 0.0017,
+            "speed": 0.025,
+            "line_opacity": 0.055,
+            "line_color": "#306230"
           }
         }
       },
@@ -680,12 +751,12 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "particle_split_ratio",
+            "vocab": "waveform_spectrum",
             "params": {
-              "count": 500,
-              "ratio": 0.75,
-              "color_a": "#64748B",
-              "color_b": "#94A3B8"
+              "mode": "spectrum",
+              "color": "#9bbc0f",
+              "lineWidth": 2,
+              "sensitivity": 1.349
             }
           },
           {
@@ -694,27 +765,29 @@
               "text": "자연",
               "mode": "glitch",
               "fontSize": 56,
-              "color": "#FFD700",
+              "color": "#00FFFF",
               "position": "bottom",
-              "glowColor": "#475569",
+              "glowColor": "#8bac0f",
               "staggerMs": 80
             }
           }
         ],
         "audio_reactive": {
-          "particle_opacity": "rms * 0.8 + 0.2",
-          "particle_size": "bass * 4 + 1",
-          "glow_intensity": "bass * 3",
-          "displacement": "rms * 3"
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
         },
         "background": {
           "vocab": "flow_field_turbulent",
           "params": {
-            "noise_scale": 0.0089,
-            "speed": 0.467,
-            "line_opacity": 0.092,
-            "line_color": "#94A3B8"
-          }
+            "noise_scale": 0.0077,
+            "speed": 0.41,
+            "line_opacity": 0.133,
+            "line_color": "#0f380f"
+          },
+          "transition_to": "flow_field_calm"
         }
       },
       "shape_params": {
@@ -732,44 +805,43 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "terra_flythrough",
+            "vocab": "particle_chain_awaken",
             "params": {
-              "ringCount": 14,
-              "tunnelLength": 25,
-              "speed": 0.095,
-              "ringColor": "#CBD5E1",
-              "shape": "circle"
+              "count": 600,
+              "color": "#9bbc0f",
+              "chain_speed": 1.245,
+              "glow_color": "#8bac0f"
             }
           },
           {
-            "vocab": "text_reveal",
+            "vocab": "symbol_morph",
             "params": {
-              "text": "디버깅",
-              "mode": "scatter",
-              "fontSize": 80,
-              "color": "#FFD700",
-              "position": "center",
-              "glowColor": "#475569",
-              "staggerMs": 60
+              "text": "프로그램",
+              "posType": "noun",
+              "shapeColor": "#9bbc0f",
+              "glowColor": "#8bac0f",
+              "position": "top",
+              "size": 140,
+              "showLabel": true
             }
           }
         ],
         "audio_reactive": {
-          "particle_opacity": "rms * 0.9 + 0.1",
-          "particle_size": "bass * 5 + 1",
-          "glow_intensity": "bass * 5",
-          "displacement": "bass * 4",
-          "speed_mult": "onset ? 4 : 1"
+          "particle_opacity": "rms * 0.95 + 0.05",
+          "particle_size": "bass * 7 + 1",
+          "glow_intensity": "bass * 7",
+          "displacement": "bass * 5",
+          "speed_mult": "onset ? 6 : 1",
+          "glitch_trigger": "onset ? 12 : 0"
         },
         "background": {
           "vocab": "flow_field_turbulent",
           "params": {
-            "noise_scale": 0.0069,
-            "speed": 0.337,
-            "line_opacity": 0.107,
-            "line_color": "#94A3B8"
-          },
-          "variant": "vortex"
+            "noise_scale": 0.0105,
+            "speed": 0.382,
+            "line_opacity": 0.108,
+            "line_color": "#9bbc0f"
+          }
         }
       },
       "shape_params": {
@@ -787,19 +859,31 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "flow_field_calm",
-            "params": {}
+            "vocab": "color_shift",
+            "params": {
+              "from_color": "#9bbc0f",
+              "to_color": "#0f380f",
+              "rhythm": "breath"
+            }
           },
           {
-            "vocab": "ascii_block",
+            "vocab": "color_shift",
             "params": {
-              "text": "코드",
-              "mode": "block",
-              "posType": "science",
-              "color": "#FFD700",
-              "glowColor": "#475569",
-              "position": "bottom",
-              "density": "low"
+              "from_color": "#9bbc0f",
+              "to_color": "#0f380f",
+              "rhythm": "pulse"
+            }
+          },
+          {
+            "vocab": "text_reveal",
+            "params": {
+              "text": "작성자",
+              "mode": "wave",
+              "fontSize": 80,
+              "color": "#9bbc0f",
+              "position": "upper",
+              "glowColor": "#8bac0f",
+              "staggerMs": 120
             }
           }
         ],
@@ -811,10 +895,10 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0027,
-            "speed": 0.031,
-            "line_opacity": 0.053,
-            "line_color": "#475569"
+            "noise_scale": 0.0011,
+            "speed": 0.026,
+            "line_opacity": 0.056,
+            "line_color": "#0f380f"
           }
         }
       },
@@ -829,28 +913,41 @@
       "sentence": "출력값으로. 코딩한다는 것.",
       "start_sec": 88.068,
       "end_sec": 92.708,
-      "emotion": "hopeful",
+      "emotion": "neutral_curious",
       "layers": {
         "semantic": [
           {
-            "vocab": "light_source",
+            "vocab": "waveform",
             "params": {
-              "rays": 20,
-              "color": "#64748B",
-              "intensity": 0.622,
-              "position": "center"
+              "mode": "waveform",
+              "color": "#9bbc0f",
+              "lineWidth": 3,
+              "sensitivity": 1.084
             }
           },
           {
-            "vocab": "ascii_block",
+            "vocab": "lissajous",
+            "params": {
+              "ratioA": 2,
+              "ratioB": 3,
+              "phaseOffset": 2.47,
+              "color": "#00FFFF",
+              "glowColor": "#8bac0f",
+              "lineWidth": 1.5,
+              "trailLength": 1000
+            }
+          },
+          {
+            "vocab": "ascii_matrix",
             "params": {
               "text": "출력",
-              "mode": "block",
+              "mode": "matrix",
               "posType": "noun",
-              "color": "#64748B",
-              "glowColor": "#475569",
+              "color": "#00FF80",
+              "glowColor": "#8bac0f",
               "position": "bottom",
-              "density": "high"
+              "density": "medium",
+              "ascii_text": "OUTPUT"
             }
           }
         ],
@@ -862,13 +959,11 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0037,
-            "speed": 0.05,
-            "line_opacity": 0.065,
-            "line_color": "#64748B"
-          },
-          "variant": "opposing",
-          "transition_to": "flow_field_turbulent"
+            "noise_scale": 0.002,
+            "speed": 0.02,
+            "line_opacity": 0.045,
+            "line_color": "#0f380f"
+          }
         }
       },
       "shape_params": {
@@ -882,39 +977,47 @@
       "sentence": "자연의 언어를 따라 쓰는 것이다.",
       "start_sec": 93.008,
       "end_sec": 96.008,
-      "emotion": "neutral_curious",
+      "emotion": "hopeful",
       "layers": {
         "semantic": [
           {
-            "vocab": "flow_field_calm",
-            "params": {},
-            "variant": "vortex"
+            "vocab": "grid_morph",
+            "params": {
+              "cols": 25,
+              "rows": 20,
+              "mode": "wave",
+              "color": "#9bbc0f",
+              "accentColor": "#9bbc0f",
+              "morphIntensity": 1.199,
+              "showConnections": true
+            }
           },
           {
-            "vocab": "symbol_morph",
+            "vocab": "text_reveal",
             "params": {
-              "text": "자연",
-              "posType": "noun",
-              "shapeColor": "#00FFFF",
-              "glowColor": "#475569",
+              "text": "언어",
+              "mode": "wave",
+              "fontSize": 56,
+              "color": "#00FFFF",
               "position": "bottom",
-              "size": 120,
-              "showLabel": true
+              "glowColor": "#8bac0f",
+              "staggerMs": 100
             }
           }
         ],
         "audio_reactive": {
-          "particle_opacity": "rms * 0.7 + 0.3",
-          "particle_size": "bass * 3 + 1",
-          "glow_intensity": "rms * 0.8"
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
         },
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0024,
-            "speed": 0.027,
-            "line_opacity": 0.045,
-            "line_color": "#475569"
+            "noise_scale": 0.0043,
+            "speed": 0.05,
+            "line_opacity": 0.069,
+            "line_color": "#306230"
           }
         }
       },
@@ -933,42 +1036,42 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "color_bloom",
+            "vocab": "loop_ring",
             "params": {
-              "from_color": "#64748B",
-              "to_color": "#E2E8F0",
-              "rhythm": "breath"
+              "rings": 8,
+              "color": "#9bbc0f",
+              "pulse_speed": 0.932
             }
           },
           {
-            "vocab": "ascii_shape",
+            "vocab": "symbol_morph",
             "params": {
               "text": "언어",
-              "mode": "shape",
               "posType": "noun",
-              "color": "#00FF80",
-              "glowColor": "#475569",
-              "position": "center",
-              "density": "medium"
+              "shapeColor": "#FFFFFF",
+              "glowColor": "#8bac0f",
+              "position": "upper",
+              "size": 140,
+              "showLabel": false
             }
           }
         ],
         "audio_reactive": {
-          "particle_opacity": "rms * 0.9 + 0.1",
-          "particle_size": "bass * 5 + 1",
-          "glow_intensity": "bass * 5",
-          "displacement": "bass * 4",
-          "speed_mult": "onset ? 4 : 1"
+          "particle_opacity": "rms * 0.95 + 0.05",
+          "particle_size": "bass * 7 + 1",
+          "glow_intensity": "bass * 7",
+          "displacement": "bass * 5",
+          "speed_mult": "onset ? 6 : 1",
+          "glitch_trigger": "onset ? 12 : 0"
         },
         "background": {
           "vocab": "flow_field_turbulent",
           "params": {
-            "noise_scale": 0.0072,
-            "speed": 0.251,
-            "line_opacity": 0.089,
-            "line_color": "#475569"
-          },
-          "transition_to": "flow_field_calm"
+            "noise_scale": 0.0119,
+            "speed": 0.39,
+            "line_opacity": 0.133,
+            "line_color": "#0f380f"
+          }
         }
       },
       "shape_params": {
