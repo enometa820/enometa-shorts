@@ -87,6 +87,7 @@ script.txt → gen_timing.py → narration_timing.json
 **흐름/색**: `flow_field_calm` `flow_field_turbulent` `color_shift` `color_shift_warm` `color_shift_cold` `color_drain` `color_bloom` `brightness_pulse` `light_source`
 **데이터/수학**: `counter_up` `neural_network` `loop_ring` `fractal_crack` `data_bar` `data_ring` `grid_morph` `grid_mesh` `waveform` `waveform_spectrum` `waveform_circular` `lissajous` `lissajous_complex`
 **텍스트**: `text_reveal` `text_wave` `text_glitch` `text_scatter`
+**심볼**: `symbol_morph` (품사 기반 추상 도형 — noun→육각형, verb→화살표, adjective→물결, science→동심원, philosophy→이중원. 40% 확률로 text_reveal 대신 사용)
 **레트로**: `pixel_grid` `pixel_grid_outline` `pixel_grid_life` `pixel_grid_rain` `pixel_waveform` `pixel_waveform_steps` `pixel_waveform_cascade`
 **3D/Terra**: `terra_globe` `terra_globe_data` `terra_flythrough` `terra_tunnel` `terra_terrain` `terra_terrain_bars` (씬당 최대 1개, @remotion/three 기반, `.claude/rules/3d.md` 규칙 준수)
 **자동 적용**: `post_process` (VisualSection이 항상 렌더링, vocab에 추가 불필요)

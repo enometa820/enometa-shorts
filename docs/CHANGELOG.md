@@ -5,6 +5,18 @@
 
 ---
 
+## 2026-03-08 — SymbolMotion: 품사 기반 추상 도형 모션그래픽
+
+### Added
+- `src/components/vocab/SymbolMotion.tsx`: 키워드 품사(POS)에 따라 추상 도형으로 시각화하는 새 vocab 컴포넌트. noun→육각형, verb→화살표, adjective→물결, science→동심원, philosophy→이중원. 오디오 리액티브 + 라벨 표시
+- `scripts/visual_script_generator.py`: `symbol_morph` vocab 파라미터 생성 + `_map_pos_type()` 품사 매핑 함수. 40% 확률로 text_reveal 대신 symbol_morph 사용
+- `scripts/visual_script_generator.py`: `script_data_keywords`에 품사 타입 정보 포함 (`{text, type}` 딕트 리스트로 변경)
+
+### Changed
+- `src/components/VisualSection.tsx`: VOCAB_MAP에 `symbol_morph` 등록
+
+---
+
 ## 2026-03-08 — 다양성 시스템 v19 + 고정화 버그 수정
 
 ### Fixed

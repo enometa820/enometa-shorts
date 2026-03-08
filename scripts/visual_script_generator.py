@@ -92,6 +92,7 @@ VOCAB_CATEGORIES = {
         "particle_split_ratio",
     ],
     "text": ["text_reveal"],  # mode: wave/glitch/scatter/typewriter
+    "symbol": ["symbol_morph"],  # 품사 기반 추상 도형 (v19)
     "grid": ["grid_morph", "grid_mesh"],
     "network": ["neural_network"],
     "ring": ["loop_ring"],
@@ -635,6 +636,17 @@ def generate_vocab_params(vocab: str, palette: dict, rng: random.Random) -> dict
             "glowColor": glow,
             "staggerMs": rng.choice([60, 80, 100, 120]),
         }
+    # --- 품사 기반 추상 도형 ---
+    elif vocab == "symbol_morph":
+        return {
+            "text": "",          # build_scene에서 덮어씀
+            "posType": "noun",   # build_scene에서 덮어씀
+            "shapeColor": rng.choice([accent, "#FFFFFF", "#FFD700", "#00FFFF"]),
+            "glowColor": glow,
+            "position": rng.choice(["center", "top", "upper", "bottom"]),
+            "size": rng.choice([100, 120, 140, 160]),
+            "showLabel": rng.random() > 0.3,  # 70% 확률로 키워드 라벨 표시
+        }
     # --- 수학적 패턴 ---
     elif vocab.startswith("lissajous"):
         return {
@@ -755,6 +767,26 @@ def generate_background(emotion: str, palette: dict, rng: random.Random, scene_i
     return bg
 
 
+# v19: script_data 품사 타입 → SymbolMotion posType 매핑
+def _map_pos_type(sd_type: str) -> str:
+    """script_data의 keyword type을 SymbolMotion의 posType으로 변환"""
+    _POS_MAP = {
+        "noun": "noun",
+        "body": "science",
+        "brain": "science",
+        "concept": "philosophy",
+        "compound": "noun",
+        "discipline": "philosophy",
+        "tech": "science",
+        "science": "science",
+        "philosophy": "philosophy",
+        "verb": "verb",
+        "chemical": "science",
+        "data": "science",
+    }
+    return _POS_MAP.get(sd_type, "noun")
+
+
 def build_scene(
     idx: int,
     sentence: str,
@@ -769,7 +801,7 @@ def build_scene(
     strategy: dict = None,
     recent_combos: set = None,
     si: float = 0.5,
-    sd_keywords: Optional[List[str]] = None,
+    sd_keywords: Optional[List[Dict[str, str]]] = None,  # [{text, type}, ...]
     mood_override: dict = None,
 ) -> dict:
     """단일 씬의 비주얼 스크립트 생성 (v5: 장르+전략+variant+SI)"""
@@ -851,7 +883,7 @@ def build_scene(
             secondary_entry["variant"] = secondary_variant
         semantic.append(secondary_entry)
 
-    # 텍스트 비주얼 추가 (전략의 text_chance 반영) — 키워드(명사) 단위만
+    # 텍스트/심볼 비주얼 추가 (전략의 text_chance 반영) — 키워드(명사) 단위만
     text_chance = strategy.get("text_chance", 0.5)
     force_text_mode = strategy.get("force_text_mode")
     # v16: script_data keywords 우선, 폴백으로 regex 추출
@@ -865,23 +897,33 @@ def build_scene(
     # v16: 활용형/용언 어미 패턴 필터 (NLP 오분류 방지)
     _verb_suffixes = ("했", "랬", "됐", "겠", "까", "는다", "한다")
     keyword = None
+    keyword_type = "noun"  # v19: 품사 타입 (symbol_morph용)
     if sd_keywords:
-        filtered_kws = [w for w in sd_keywords
-                        if w not in _text_stopwords
-                        and len(w) >= 2
-                        and not any(w.endswith(s) for s in _verb_suffixes)]
+        filtered_kws = [kw for kw in sd_keywords
+                        if kw["text"] not in _text_stopwords
+                        and len(kw["text"]) >= 2
+                        and not any(kw["text"].endswith(s) for s in _verb_suffixes)]
         if filtered_kws:
-            keyword = rng.choice(filtered_kws)
+            chosen = rng.choice(filtered_kws)
+            keyword = chosen["text"]
+            keyword_type = chosen["type"]
         text_chance = max(text_chance, 0.9)  # v16: 정확한 키워드가 있으면 거의 항상 노출
     if not keyword:
         keyword = extract_highlight_word(sentence)
     if keyword and rng.random() < text_chance:
-        text_mode = force_text_mode or pool.get("text_mode", "wave")
-        text_params = generate_vocab_params("text_reveal", palette, rng)
-        text_params["mode"] = text_mode
-        text_params["text"] = keyword
-
-        semantic.append({"vocab": "text_reveal", "params": text_params})
+        # v19: text_reveal vs symbol_morph 선택 (40% 확률로 도형)
+        use_symbol = rng.random() < 0.4 and keyword_type != "noun_fallback"
+        if use_symbol:
+            symbol_params = generate_vocab_params("symbol_morph", palette, rng)
+            symbol_params["text"] = keyword
+            symbol_params["posType"] = _map_pos_type(keyword_type)
+            semantic.append({"vocab": "symbol_morph", "params": symbol_params})
+        else:
+            text_mode = force_text_mode or pool.get("text_mode", "wave")
+            text_params = generate_vocab_params("text_reveal", palette, rng)
+            text_params["mode"] = text_mode
+            text_params["text"] = keyword
+            semantic.append({"vocab": "text_reveal", "params": text_params})
         if keyword not in highlight_words:
             highlight_words.append(keyword)
 
@@ -953,7 +995,8 @@ def generate_visual_script(
     segments = timing_data["segments"]
 
     # v16: script_data.json에서 정확한 키워드 로드 (같은 디렉토리에서 자동 탐색)
-    script_data_keywords: Dict[int, List[str]] = {}  # segment_index → [keyword_text, ...]
+    # v19: {text, type} 딕트 리스트로 변경 — symbol_morph 품사 매핑용
+    script_data_keywords: Dict[int, List[Dict[str, str]]] = {}  # segment_index → [{text, type}, ...]
     script_data_path = os.path.join(os.path.dirname(narration_timing_path), "script_data.json")
     if os.path.exists(script_data_path):
         try:
@@ -961,7 +1004,8 @@ def generate_visual_script(
                 sd = json.load(f)
             for seg in sd.get("segments", []):
                 idx = seg.get("index", 0)
-                kws = [k["text"] for k in seg.get("analysis", {}).get("keywords", [])
+                kws = [{"text": k["text"], "type": k.get("type", "noun")}
+                       for k in seg.get("analysis", {}).get("keywords", [])
                        if k.get("type") in ("noun", "body", "brain", "concept", "compound",
                                              "discipline", "tech", "science", "philosophy")]
                 if kws:
