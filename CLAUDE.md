@@ -72,8 +72,16 @@ script.txt → gen_timing.py → narration_timing.json
 ### 팔레트
 `phantom` / `neon_noir` / `cold_steel` / `ember` / `synapse` / `gameboy` / `c64` / `enometa`
 
-### 음악 장르 (v18)
-`acid` / `ambient` / `microsound` / `IDM` / `minimal` / `dub` / `glitch` / `industrial` / `techno`
+### 음악 장르 (v20)
+`acid` / `ambient` / `microsound` / `IDM` / `minimal` / `dub` / `glitch` / `industrial` / `techno` / `house`
+
+### 비주얼 장르 (4종) — 음악 장르에서 자동 매핑
+| 비주얼 장르 | 성격 | 팔레트 | 음악 장르 매핑 |
+|------------|------|--------|---------------|
+| `enometa` | 풀 세트 (데이터아트 기본) | enometa(흑백) | acid, glitch |
+| `cooper` | 유기적 미니멀 (Particle 중심) | phantom(보라) | ambient, microsound, dub, house |
+| `abstract` | 기하학 정제 (SineWave 극대화) | synapse(청록) | minimal, IDM |
+| `data` | 최고 밀도 수치 분석 | cold_steel(철색) | techno, industrial |
 
 ### 새 에피소드 추가 절차
 
@@ -108,7 +116,7 @@ mix 단계 후 `public/epXXX/mixed.wav`도 반드시 동기화 필요.
 - **레이어 ON/OFF + 볼륨 고정**: 에너지는 볼륨 커브가 아닌 레이어 추가/제거로 표현. 콜앤리스폰스/song_arc 비활성. 마스터 페이드 없음 (5ms anti-click만).
 - **고정 BPM**: 가변 BPM은 섹션 경계에서 리듬 파괴. 장르 범위 내 단일 BPM 유지.
 - **타이밍**: 영상 길이 = `lastScene.end_sec + endcard`. BGM 초과분 자동 잘림. 문장 갭 `--gap 0.3`, 문단 갭 `--paragraph-gap 0.8`.
-- **다양성 보장**: ep_seed → seq_config(드럼/음색/패턴 10개 파라미터) 에피소드마다 자동 분화. 비주얼 전략은 genre에 따라 동적 선택, SI≥0.80에서 전략 승격. vocab avoid 목록은 최소한만 유지.
+- **다양성 보장**: ep_seed → seq_config(드럼/음색/패턴/멜로디 13개 파라미터) 에피소드마다 자동 분화. 비주얼 전략은 genre에 따라 동적 선택, SI≥0.80에서 전략 승격. vocab avoid 목록은 최소한만 유지.
 
 ### 메모리 과부하 방지
 
