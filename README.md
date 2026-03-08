@@ -103,7 +103,7 @@ Python 배경 프레임과 Remotion vocab 레이어를 동시에 제어한다.
 
 | music-mood | → visual genre 자동 선택 |
 |------------|--------------------------|
-| `ambient` / `microsound` / `dub` | `cooper` |
+| `ambient` / `microsound` / `dub` / `house` | `cooper` |
 | `IDM` / `minimal` | `abstract` |
 | `techno` / `industrial` | `data` |
 | `acid` / `glitch` (기본) | `enometa` |

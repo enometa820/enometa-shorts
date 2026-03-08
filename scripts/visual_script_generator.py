@@ -1243,6 +1243,7 @@ def main():
         "industrial": "data",      # 최고 밀도
         "glitch":     "enometa",   # 기본 풀 세트
         "dub":        "cooper",    # 여유, 미니멀
+        "house":      "cooper",    # Deep House — 유기적, 미니멀 (BarcodeLayer 없음)
     }
     if not genre or genre == "ikeda" or genre == "enometa":
         # narration_timing.json에서 music_mood 읽어서 자동 결정
