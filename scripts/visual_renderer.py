@@ -404,7 +404,8 @@ def main():
     parser.add_argument("episode_dir", help="에피소드 디렉토리 경로")
     parser.add_argument("--genre", default="enometa",
                         choices=["techno", "bytebeat", "algorave", "harsh_noise",
-                                 "chiptune", "enometa", "ikeda"])
+                                 "chiptune", "enometa", "ikeda",
+                                 "cooper", "abstract", "data"])
     parser.add_argument("--width", type=int, default=1080)
     parser.add_argument("--height", type=int, default=1080)
     parser.add_argument("--fps", type=int, default=30)

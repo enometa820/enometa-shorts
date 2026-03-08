@@ -218,7 +218,20 @@ def step_python_frames(episode_dir: str, force: bool = False, visual_mood: str =
         print("  [skip] frames/ 이미 존재")
         return frames_dir
 
-    genre = visual_mood if visual_mood in ("cooper", "abstract", "data") else "enometa"
+    # visual_mood 인자가 없으면 visual_script.json에서 자동 읽기
+    if visual_mood in ("cooper", "abstract", "data", "enometa"):
+        genre = visual_mood
+    else:
+        visual_script_path = os.path.join(episode_dir, "visual_script.json")
+        try:
+            import json as _json
+            with open(visual_script_path, encoding="utf-8") as _f:
+                _vs = _json.load(_f)
+            genre = _vs.get("meta", {}).get("genre", "enometa")
+            if genre not in ("cooper", "abstract", "data", "enometa"):
+                genre = "enometa"
+        except Exception:
+            genre = "enometa"
     print(f"  Python 비주얼 프레임 렌더링 중 (genre={genre})...")
     cmd = [PYTHON, os.path.join(SCRIPTS_DIR, "visual_renderer.py"),
            episode_dir, "--genre", genre]
