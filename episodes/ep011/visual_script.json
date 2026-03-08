@@ -2,18 +2,18 @@
   "title": "자연은 우리보다 38억 년 먼저 코딩했다",
   "tagline": "존재와 사유, 그 경계를 초월하다",
   "highlightWords": [
-    "자연",
     "C.",
     "문자",
-    "실행",
-    "환산"
+    "지구",
+    "염기",
+    "아미노산"
   ],
   "meta": {
-    "strategy": "enometa",
-    "strategy_description": "ENOMETA data art - minimal+terminal+sine",
-    "genre": "enometa",
+    "strategy": "dense",
+    "strategy_description": "빽빽한 입자+레이어 — 압도적 시각 밀도",
+    "genre": "cooper",
     "palette": "cold_steel",
-    "seed": 566390363,
+    "seed": 1309053277,
     "render_mode": "hybrid",
     "frames_dir": "ep011/frames",
     "total_frames": 3244
@@ -40,26 +40,18 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "terra_globe",
+            "vocab": "particle_birth",
             "params": {
-              "dataPoints": 12,
-              "wireColor": "#CBD5E1",
-              "dotColor": "#E2E8F0",
-              "rotationSpeed": 0.013,
-              "detail": 3
-            }
-          },
-          {
-            "vocab": "text_reveal",
-            "params": {
-              "text": "자연",
-              "mode": "wave",
-              "fontSize": 56,
-              "color": "#FFD700",
-              "position": "center",
-              "glowColor": "#475569",
-              "staggerMs": 120
-            }
+              "count": 600,
+              "spawn_duration_sec": 2.977,
+              "spawn_pattern": "center_burst",
+              "initial_color": "#94A3B8",
+              "size_range": [
+                1,
+                4
+              ]
+            },
+            "variant": "triangles_rise"
           }
         ],
         "audio_reactive": {
@@ -70,10 +62,10 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0025,
-            "speed": 0.03,
-            "line_opacity": 0.061,
-            "line_color": "#64748B"
+            "noise_scale": 0.0018,
+            "speed": 0.035,
+            "line_opacity": 0.04,
+            "line_color": "#94A3B8"
           }
         }
       },
@@ -92,25 +84,24 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "particle_orbit",
+            "vocab": "waveform",
             "params": {
-              "count": 500,
+              "mode": "waveform",
               "color": "#64748B",
-              "rings": 4,
-              "speed": 0.309
-            },
-            "variant": "ellipse_drift"
+              "lineWidth": 3,
+              "sensitivity": 1.167
+            }
           },
           {
             "vocab": "text_reveal",
             "params": {
               "text": "C.",
               "mode": "wave",
-              "fontSize": 80,
-              "color": "#FFD700",
-              "position": "top",
+              "fontSize": 56,
+              "color": "#00FFFF",
+              "position": "center",
               "glowColor": "#475569",
-              "staggerMs": 100
+              "staggerMs": 80
             }
           }
         ],
@@ -122,10 +113,10 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.002,
-            "speed": 0.034,
-            "line_opacity": 0.055,
-            "line_color": "#64748B"
+            "noise_scale": 0.0017,
+            "speed": 0.024,
+            "line_opacity": 0.053,
+            "line_color": "#475569"
           },
           "transition_to": "flow_field_turbulent"
         }
@@ -145,21 +136,26 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "waveform",
+            "vocab": "particle_birth",
             "params": {
-              "mode": "waveform",
-              "color": "#64748B",
-              "lineWidth": 3,
-              "sensitivity": 1.08
-            }
+              "count": 1200,
+              "spawn_duration_sec": 3.981,
+              "spawn_pattern": "random",
+              "initial_color": "#E2E8F0",
+              "size_range": [
+                1,
+                4
+              ]
+            },
+            "variant": "lines_scatter"
           },
           {
             "vocab": "text_reveal",
             "params": {
               "text": "문자",
               "mode": "wave",
-              "fontSize": 64,
-              "color": "#FFFFFF",
+              "fontSize": 56,
+              "color": "#00FFFF",
               "position": "bottom",
               "glowColor": "#475569",
               "staggerMs": 120
@@ -174,9 +170,9 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0014,
-            "speed": 0.032,
-            "line_opacity": 0.042,
+            "noise_scale": 0.0011,
+            "speed": 0.023,
+            "line_opacity": 0.068,
             "line_color": "#94A3B8"
           }
         }
@@ -200,21 +196,20 @@
             "params": {
               "count": 500,
               "color": "#64748B",
-              "rings": 3,
-              "speed": 0.366
-            },
-            "variant": "ellipse_drift"
+              "rings": 4,
+              "speed": 0.413
+            }
           },
           {
             "vocab": "text_reveal",
             "params": {
-              "text": "실행",
+              "text": "지구",
               "mode": "wave",
-              "fontSize": 72,
+              "fontSize": 80,
               "color": "#FFD700",
-              "position": "upper",
+              "position": "top",
               "glowColor": "#475569",
-              "staggerMs": 120
+              "staggerMs": 100
             }
           }
         ],
@@ -226,10 +221,10 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0028,
-            "speed": 0.024,
-            "line_opacity": 0.067,
-            "line_color": "#475569"
+            "noise_scale": 0.0013,
+            "speed": 0.035,
+            "line_opacity": 0.044,
+            "line_color": "#64748B"
           },
           "variant": "vortex"
         }
@@ -249,26 +244,18 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "terra_globe",
+            "vocab": "particle_birth",
             "params": {
-              "dataPoints": 16,
-              "wireColor": "#E2E8F0",
-              "dotColor": "#E2E8F0",
-              "rotationSpeed": 0.022,
-              "detail": 3
-            }
-          },
-          {
-            "vocab": "text_reveal",
-            "params": {
-              "text": "환산",
-              "mode": "wave",
-              "fontSize": 64,
-              "color": "#FFFFFF",
-              "position": "top",
-              "glowColor": "#475569",
-              "staggerMs": 100
-            }
+              "count": 1000,
+              "spawn_duration_sec": 3.803,
+              "spawn_pattern": "center_burst",
+              "initial_color": "#94A3B8",
+              "size_range": [
+                1,
+                3
+              ]
+            },
+            "variant": "triangles_rise"
           }
         ],
         "audio_reactive": {
@@ -279,12 +266,11 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0021,
-            "speed": 0.029,
-            "line_opacity": 0.064,
-            "line_color": "#94A3B8"
-          },
-          "transition_to": "flow_field_turbulent"
+            "noise_scale": 0.002,
+            "speed": 0.028,
+            "line_opacity": 0.049,
+            "line_color": "#64748B"
+          }
         }
       },
       "shape_params": {
@@ -304,16 +290,16 @@
           {
             "vocab": "flow_field_calm",
             "params": {},
-            "variant": "vortex"
+            "variant": "opposing"
           },
           {
             "vocab": "text_reveal",
             "params": {
-              "text": "기가바이트",
+              "text": "염기",
               "mode": "wave",
               "fontSize": 80,
               "color": "#64748B",
-              "position": "center",
+              "position": "top",
               "glowColor": "#475569",
               "staggerMs": 60
             }
@@ -327,10 +313,10 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0017,
-            "speed": 0.025,
-            "line_opacity": 0.042,
-            "line_color": "#64748B"
+            "noise_scale": 0.0028,
+            "speed": 0.033,
+            "line_opacity": 0.04,
+            "line_color": "#475569"
           }
         }
       },
@@ -349,24 +335,29 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "waveform",
+            "vocab": "particle_birth",
             "params": {
-              "mode": "waveform",
-              "color": "#64748B",
-              "lineWidth": 2,
-              "sensitivity": 1.137
-            }
+              "count": 600,
+              "spawn_duration_sec": 3.761,
+              "spawn_pattern": "center_burst",
+              "initial_color": "#64748B",
+              "size_range": [
+                1,
+                4
+              ]
+            },
+            "variant": "lines_scatter"
           },
           {
             "vocab": "text_reveal",
             "params": {
-              "text": "코드",
+              "text": "아미노산",
               "mode": "wave",
               "fontSize": 80,
-              "color": "#64748B",
-              "position": "top",
+              "color": "#FFD700",
+              "position": "upper",
               "glowColor": "#475569",
-              "staggerMs": 120
+              "staggerMs": 80
             }
           }
         ],
@@ -378,11 +369,12 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0022,
-            "speed": 0.028,
-            "line_opacity": 0.048,
+            "noise_scale": 0.0013,
+            "speed": 0.022,
+            "line_opacity": 0.055,
             "line_color": "#475569"
           },
+          "variant": "vortex",
           "transition_to": "flow_field_turbulent"
         }
       },
@@ -401,19 +393,15 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "pixel_waveform_cascade",
+            "vocab": "lissajous",
             "params": {
-              "bars": 12,
-              "colors": [
-                "#64748B",
-                "#94A3B8",
-                "#CBD5E1",
-                "#E2E8F0"
-              ],
-              "mode": "cascade",
-              "quantize": 8,
-              "mirror": true,
-              "position": "center"
+              "ratioA": 1,
+              "ratioB": 4,
+              "phaseOffset": 4.96,
+              "color": "#FFFFFF",
+              "glowColor": "#475569",
+              "lineWidth": 2.5,
+              "trailLength": 800
             }
           },
           {
@@ -422,10 +410,10 @@
               "text": "오류",
               "mode": "wave",
               "fontSize": 56,
-              "color": "#FFFFFF",
+              "color": "#FFD700",
               "position": "bottom",
               "glowColor": "#475569",
-              "staggerMs": 80
+              "staggerMs": 100
             }
           }
         ],
@@ -437,11 +425,12 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0018,
-            "speed": 0.038,
-            "line_opacity": 0.049,
-            "line_color": "#94A3B8"
-          }
+            "noise_scale": 0.0013,
+            "speed": 0.024,
+            "line_opacity": 0.046,
+            "line_color": "#475569"
+          },
+          "transition_to": "flow_field_turbulent"
         }
       },
       "shape_params": {
@@ -459,27 +448,25 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "pixel_waveform_cascade",
+            "vocab": "particle_birth",
             "params": {
-              "bars": 20,
-              "colors": [
-                "#64748B",
-                "#94A3B8",
-                "#CBD5E1",
-                "#E2E8F0"
-              ],
-              "mode": "cascade",
-              "quantize": 8,
-              "mirror": false,
-              "position": "bottom"
-            }
+              "count": 600,
+              "spawn_duration_sec": 3.056,
+              "spawn_pattern": "random",
+              "initial_color": "#94A3B8",
+              "size_range": [
+                1,
+                5
+              ]
+            },
+            "variant": "triangles_rise"
           },
           {
             "vocab": "text_reveal",
             "params": {
               "text": "자동",
               "mode": "wave",
-              "fontSize": 80,
+              "fontSize": 64,
               "color": "#FFD700",
               "position": "top",
               "glowColor": "#475569",
@@ -495,12 +482,12 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0029,
-            "speed": 0.038,
-            "line_opacity": 0.05,
-            "line_color": "#94A3B8"
+            "noise_scale": 0.0022,
+            "speed": 0.023,
+            "line_opacity": 0.042,
+            "line_color": "#64748B"
           },
-          "transition_to": "flow_field_turbulent"
+          "variant": "opposing"
         }
       },
       "shape_params": {
@@ -518,24 +505,13 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "flow_field_calm",
-            "params": {},
-            "variant": "vortex"
-          },
-          {
-            "vocab": "pixel_waveform_cascade",
+            "vocab": "terra_globe",
             "params": {
-              "bars": 24,
-              "colors": [
-                "#64748B",
-                "#94A3B8",
-                "#CBD5E1",
-                "#E2E8F0"
-              ],
-              "mode": "cascade",
-              "quantize": 10,
-              "mirror": false,
-              "position": "bottom"
+              "dataPoints": 16,
+              "wireColor": "#E2E8F0",
+              "dotColor": "#94A3B8",
+              "rotationSpeed": 0.015,
+              "detail": 3
             }
           },
           {
@@ -544,10 +520,10 @@
               "text": "코드",
               "mode": "wave",
               "fontSize": 72,
-              "color": "#FFFFFF",
-              "position": "upper",
+              "color": "#00FFFF",
+              "position": "center",
               "glowColor": "#475569",
-              "staggerMs": 60
+              "staggerMs": 100
             }
           }
         ],
@@ -559,11 +535,12 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0021,
-            "speed": 0.033,
-            "line_opacity": 0.044,
-            "line_color": "#64748B"
-          }
+            "noise_scale": 0.0014,
+            "speed": 0.025,
+            "line_opacity": 0.063,
+            "line_color": "#475569"
+          },
+          "variant": "vortex"
         }
       },
       "shape_params": {
@@ -577,45 +554,51 @@
       "sentence": "아니다. 발견했다.",
       "start_sec": 55.148,
       "end_sec": 59.168,
-      "emotion": "awakening_spark",
+      "emotion": "tension_reveal",
       "layers": {
         "semantic": [
           {
-            "vocab": "particle_chain_awaken",
+            "vocab": "grid_morph",
             "params": {
-              "count": 400,
+              "cols": 20,
+              "rows": 20,
+              "mode": "wave",
               "color": "#64748B",
-              "chain_speed": 1.845,
-              "glow_color": "#475569"
-            }
+              "accentColor": "#64748B",
+              "morphIntensity": 0.549,
+              "showConnections": true
+            },
+            "variant": "pixel_dissolve"
           },
           {
             "vocab": "text_reveal",
             "params": {
               "text": "발견",
-              "mode": "scatter",
-              "fontSize": 64,
-              "color": "#FFD700",
-              "position": "bottom",
+              "mode": "glitch",
+              "fontSize": 56,
+              "color": "#00FFFF",
+              "position": "top",
               "glowColor": "#475569",
-              "staggerMs": 60
+              "staggerMs": 120
             }
           }
         ],
         "audio_reactive": {
-          "particle_opacity": "rms * 0.8 + 0.2",
-          "particle_size": "bass * 4 + 1",
-          "glow_intensity": "bass * 3",
-          "displacement": "rms * 3"
+          "particle_opacity": "rms * 0.9 + 0.1",
+          "particle_size": "bass * 5 + 1",
+          "glow_intensity": "bass * 5",
+          "displacement": "bass * 4",
+          "speed_mult": "onset ? 4 : 1"
         },
         "background": {
-          "vocab": "flow_field_calm",
+          "vocab": "flow_field_turbulent",
           "params": {
-            "noise_scale": 0.0042,
-            "speed": 0.05,
-            "line_opacity": 0.041,
+            "noise_scale": 0.0077,
+            "speed": 0.212,
+            "line_opacity": 0.065,
             "line_color": "#94A3B8"
-          }
+          },
+          "variant": "opposing"
         }
       },
       "shape_params": {
@@ -633,14 +616,18 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "terra_globe",
+            "vocab": "particle_birth",
             "params": {
-              "dataPoints": 16,
-              "wireColor": "#CBD5E1",
-              "dotColor": "#CBD5E1",
-              "rotationSpeed": 0.022,
-              "detail": 2
-            }
+              "count": 600,
+              "spawn_duration_sec": 2.034,
+              "spawn_pattern": "random",
+              "initial_color": "#E2E8F0",
+              "size_range": [
+                1,
+                3
+              ]
+            },
+            "variant": "dots_grid"
           },
           {
             "vocab": "text_reveal",
@@ -649,7 +636,7 @@
               "mode": "wave",
               "fontSize": 72,
               "color": "#64748B",
-              "position": "center",
+              "position": "bottom",
               "glowColor": "#475569",
               "staggerMs": 60
             }
@@ -663,12 +650,11 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0013,
-            "speed": 0.033,
-            "line_opacity": 0.046,
-            "line_color": "#64748B"
-          },
-          "variant": "vortex"
+            "noise_scale": 0.0012,
+            "speed": 0.026,
+            "line_opacity": 0.045,
+            "line_color": "#475569"
+          }
         }
       },
       "shape_params": {
@@ -690,8 +676,8 @@
             "params": {
               "mode": "waveform",
               "color": "#64748B",
-              "lineWidth": 2,
-              "sensitivity": 1.238
+              "lineWidth": 3,
+              "sensitivity": 1.755
             }
           },
           {
@@ -699,11 +685,11 @@
             "params": {
               "text": "변수",
               "mode": "wave",
-              "fontSize": 56,
-              "color": "#FFD700",
-              "position": "upper",
+              "fontSize": 64,
+              "color": "#FFFFFF",
+              "position": "bottom",
               "glowColor": "#475569",
-              "staggerMs": 80
+              "staggerMs": 120
             }
           }
         ],
@@ -715,11 +701,12 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.0023,
-            "speed": 0.034,
-            "line_opacity": 0.042,
-            "line_color": "#64748B"
+            "noise_scale": 0.0029,
+            "speed": 0.038,
+            "line_opacity": 0.051,
+            "line_color": "#475569"
           },
+          "variant": "vortex",
           "transition_to": "flow_field_turbulent"
         }
       },
@@ -738,29 +725,17 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "waveform_spectrum",
+            "vocab": "grid_morph",
             "params": {
-              "mode": "spectrum",
-              "color": "#64748B",
-              "lineWidth": 3,
-              "sensitivity": 1.869
-            }
-          },
-          {
-            "vocab": "pixel_grid_rain",
-            "params": {
-              "cols": 32,
-              "rows": 32,
-              "mode": "rain",
-              "colors": [
-                "#64748B",
-                "#94A3B8",
-                "#CBD5E1",
-                "#E2E8F0"
-              ],
-              "pixelGap": 2,
-              "reactivity": 1.35
-            }
+              "cols": 15,
+              "rows": 25,
+              "mode": "wave",
+              "color": "#475569",
+              "accentColor": "#64748B",
+              "morphIntensity": 0.657,
+              "showConnections": false
+            },
+            "variant": "wave_propagation"
           },
           {
             "vocab": "text_reveal",
@@ -768,10 +743,10 @@
               "text": "진화",
               "mode": "glitch",
               "fontSize": 64,
-              "color": "#00FFFF",
-              "position": "bottom",
+              "color": "#64748B",
+              "position": "center",
               "glowColor": "#475569",
-              "staggerMs": 80
+              "staggerMs": 100
             }
           }
         ],
@@ -785,10 +760,10 @@
         "background": {
           "vocab": "flow_field_turbulent",
           "params": {
-            "noise_scale": 0.0073,
-            "speed": 0.413,
-            "line_opacity": 0.117,
-            "line_color": "#475569"
+            "noise_scale": 0.0118,
+            "speed": 0.44,
+            "line_opacity": 0.107,
+            "line_color": "#64748B"
           }
         }
       },
@@ -809,21 +784,20 @@
           {
             "vocab": "particle_escape",
             "params": {
-              "count": 800,
+              "count": 500,
               "color": "#64748B",
-              "burst_speed": 3.603,
+              "burst_speed": 3.995,
               "glow": true
-            },
-            "variant": "chain_break"
+            }
           },
           {
             "vocab": "text_reveal",
             "params": {
-              "text": "프로그램",
+              "text": "디버깅",
               "mode": "scatter",
-              "fontSize": 64,
+              "fontSize": 56,
               "color": "#FFFFFF",
-              "position": "center",
+              "position": "top",
               "glowColor": "#475569",
               "staggerMs": 120
             }
@@ -840,11 +814,12 @@
         "background": {
           "vocab": "flow_field_turbulent",
           "params": {
-            "noise_scale": 0.0063,
-            "speed": 0.266,
-            "line_opacity": 0.108,
-            "line_color": "#475569"
-          }
+            "noise_scale": 0.0086,
+            "speed": 0.362,
+            "line_opacity": 0.084,
+            "line_color": "#64748B"
+          },
+          "transition_to": "flow_field_calm"
         }
       },
       "shape_params": {
@@ -862,31 +837,29 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "pixel_grid_life",
+            "vocab": "particle_birth",
             "params": {
-              "cols": 40,
-              "rows": 24,
-              "mode": "life",
-              "colors": [
-                "#64748B",
-                "#94A3B8",
-                "#CBD5E1",
-                "#E2E8F0"
-              ],
-              "pixelGap": 2,
-              "reactivity": 1.1
-            }
+              "count": 800,
+              "spawn_duration_sec": 2.414,
+              "spawn_pattern": "edges",
+              "initial_color": "#94A3B8",
+              "size_range": [
+                1,
+                5
+              ]
+            },
+            "variant": "dots_grid"
           },
           {
             "vocab": "text_reveal",
             "params": {
               "text": "코드",
               "mode": "wave",
-              "fontSize": 64,
-              "color": "#64748B",
-              "position": "top",
+              "fontSize": 80,
+              "color": "#FFD700",
+              "position": "bottom",
               "glowColor": "#475569",
-              "staggerMs": 120
+              "staggerMs": 80
             }
           }
         ],
@@ -899,11 +872,10 @@
           "vocab": "flow_field_calm",
           "params": {
             "noise_scale": 0.0017,
-            "speed": 0.022,
-            "line_opacity": 0.045,
+            "speed": 0.024,
+            "line_opacity": 0.044,
             "line_color": "#94A3B8"
-          },
-          "variant": "vortex"
+          }
         }
       },
       "shape_params": {
@@ -917,23 +889,16 @@
       "sentence": "출력값으로. 코딩한다는 것.",
       "start_sec": 88.068,
       "end_sec": 92.708,
-      "emotion": "neutral_curious",
+      "emotion": "hopeful",
       "layers": {
         "semantic": [
           {
-            "vocab": "pixel_grid_rain",
+            "vocab": "light_source",
             "params": {
-              "cols": 32,
-              "rows": 40,
-              "mode": "rain",
-              "colors": [
-                "#64748B",
-                "#94A3B8",
-                "#CBD5E1",
-                "#E2E8F0"
-              ],
-              "pixelGap": 1,
-              "reactivity": 0.89
+              "rays": 16,
+              "color": "#64748B",
+              "intensity": 0.713,
+              "position": "upper"
             }
           },
           {
@@ -941,26 +906,27 @@
             "params": {
               "text": "출력",
               "mode": "wave",
-              "fontSize": 72,
+              "fontSize": 80,
               "color": "#64748B",
-              "position": "top",
+              "position": "bottom",
               "glowColor": "#475569",
-              "staggerMs": 120
+              "staggerMs": 60
             }
           }
         ],
         "audio_reactive": {
-          "particle_opacity": "rms * 0.7 + 0.3",
-          "particle_size": "bass * 3 + 1",
-          "glow_intensity": "rms * 0.8"
+          "particle_opacity": "rms * 0.8 + 0.2",
+          "particle_size": "bass * 4 + 1",
+          "glow_intensity": "bass * 3",
+          "displacement": "rms * 3"
         },
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.002,
-            "speed": 0.024,
-            "line_opacity": 0.063,
-            "line_color": "#94A3B8"
+            "noise_scale": 0.0031,
+            "speed": 0.05,
+            "line_opacity": 0.048,
+            "line_color": "#475569"
           }
         }
       },
@@ -979,25 +945,15 @@
       "layers": {
         "semantic": [
           {
-            "vocab": "particle_orbit",
+            "vocab": "lissajous",
             "params": {
-              "count": 500,
-              "color": "#64748B",
-              "rings": 5,
-              "speed": 0.75
-            },
-            "variant": "figure_eight"
-          },
-          {
-            "vocab": "text_reveal",
-            "params": {
-              "text": "자연",
-              "mode": "wave",
-              "fontSize": 56,
-              "color": "#64748B",
-              "position": "center",
+              "ratioA": 3,
+              "ratioB": 5,
+              "phaseOffset": 5.08,
+              "color": "#FFFFFF",
               "glowColor": "#475569",
-              "staggerMs": 120
+              "lineWidth": 2.5,
+              "trailLength": 800
             }
           }
         ],
@@ -1010,12 +966,11 @@
         "background": {
           "vocab": "flow_field_calm",
           "params": {
-            "noise_scale": 0.003,
-            "speed": 0.034,
-            "line_opacity": 0.056,
+            "noise_scale": 0.0028,
+            "speed": 0.023,
+            "line_opacity": 0.057,
             "line_color": "#94A3B8"
-          },
-          "transition_to": "flow_field_turbulent"
+          }
         }
       },
       "shape_params": {
@@ -1037,8 +992,8 @@
             "params": {
               "mode": "circular",
               "color": "#64748B",
-              "lineWidth": 1.5,
-              "sensitivity": 1.607
+              "lineWidth": 2,
+              "sensitivity": 1.234
             }
           },
           {
@@ -1047,10 +1002,10 @@
               "text": "언어",
               "mode": "scatter",
               "fontSize": 56,
-              "color": "#64748B",
-              "position": "center",
+              "color": "#FFFFFF",
+              "position": "top",
               "glowColor": "#475569",
-              "staggerMs": 100
+              "staggerMs": 120
             }
           }
         ],
@@ -1065,12 +1020,11 @@
         "background": {
           "vocab": "flow_field_turbulent",
           "params": {
-            "noise_scale": 0.0066,
-            "speed": 0.381,
-            "line_opacity": 0.113,
+            "noise_scale": 0.0074,
+            "speed": 0.327,
+            "line_opacity": 0.115,
             "line_color": "#475569"
-          },
-          "variant": "opposing"
+          }
         }
       },
       "shape_params": {
