@@ -53,8 +53,8 @@ script.txt
  │   ║   ParticleBirth ...              ║    리액티브      │
  │   ║                                   ║                  │
  │   ╠═══════════════════════════════════╣                  │
- │   ║   PostProcess                     ║  ← Remotion     │
- │   ║   스캔라인 / 글리치               ║    항상 적용     │
+ │   ║   PostProcess (8효과)              ║  ← Remotion     │
+ │   ║   CRT/티어링/노이즈/글리치        ║    항상 적용     │
  │   ╚═══════════════════════════════════╝                  │
  │                                                         │
  ├─────────────────────────────────────────────────────────┤
@@ -86,7 +86,7 @@ script.txt
 | FeedbackLayer | 이전 프레임 피드백 루프 | 자기참조 |
 | AsciiBackgroundLayer | SI 기반 ASCII 문자 텍스처 (12×12px 셀 그리드) | script_data + SI |
 
-**장르별 레이어 조합** (`GENRE_LAYER_PRESETS`):
+****장르별** 레이어 조합** (`GENRE_LAYER_PRESETS`):
 
 | visual genre | 음악 레이어 | TTS 레이어 | 특성 |
 |-------------|------------|-----------|------|
@@ -106,7 +106,7 @@ script.txt
 | **데이터** | `counter_up` `neural_network` `loop_ring` `fractal_crack` `data_bar` `data_ring` `grid_morph` `grid_mesh` | CounterUp, NeuralNetwork, LoopRing, FractalCrack, DataBar, GridMorph | 데이터 시각화 |
 | **파형** | `waveform` `_spectrum` `_circular` `lissajous` `_complex` | WaveformVisualizer, Lissajous | 수학적 곡선 |
 | **텍스트** | `text_reveal` `_wave` `_glitch` `_scatter` | TextReveal | 4모드 타이포그래피 |
-| **심볼** | `symbol_morph` | SymbolMotion | 품사→추상도형 (noun→육각형, verb→화살표) |
+| **심볼** | `symbol_morph` | SymbolMotion | 품사→ASCII 그리드 (noun→밀도블록, verb→방향흐름, science→데이터격자) |
 | **ASCII** | `ascii_block` `_shape` `_matrix` | AsciiArt | 비트맵 블록 / 품사 패턴 / 터미널 스트림 |
 | **레트로** | `pixel_grid` `_outline` `_life` `_rain` `pixel_waveform` `_steps` `_cascade` | PixelGrid, PixelWaveform | 8bit 레트로 |
 | **3D** | `terra_globe` `_data` `terra_flythrough` `_tunnel` `_terrain` `_terrain_bars` | TerraGlobe, TerraFlythrough, TerraTerrain | @remotion/three 3D (씬당 최대 1개) |
@@ -391,6 +391,6 @@ Remotion은 `public/epXXX/mixed.wav`를 참조한다.
 
 | 문서 | 내용 |
 |------|------|
-| [docs/visual-architecture.md](docs/visual-architecture.md) | 비주얼 3파트 상세 — Python 배경 레이어, Vocab 30종, PostProcess 5효과, 팔레트, 비주얼 장르/무드, 감정 색상 |
+| [docs/visual-architecture.md](docs/visual-architecture.md) | 비주얼 3파트 상세 — Python 배경 레이어, Vocab 30종, PostProcess 8효과(v22), 팔레트, 비주얼 장르/무드, 백남준 미학 |
 | [docs/CHANGELOG.md](docs/CHANGELOG.md) | 버전별 변경 이력 |
 | [docs/decisions/](docs/decisions/) | 아키텍처 결정 기록 (ADR) |

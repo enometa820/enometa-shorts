@@ -104,10 +104,10 @@ const BlockMode: React.FC<{
   const isLatin = /^[A-Z0-9]+$/.test(upperText);
 
   if (isLatin && upperText.length <= 5) {
-    // 비트맵 렌더링: 각 문자를 5x7 그리드로 표시
+    // 비트맵 렌더링: 각 문자를 5x7 그리드로 표시 (v2: 크기 2배)
     const charSpacing = 1;
     const totalCols = upperText.length * (5 + charSpacing) - charSpacing;
-    const cellSize = Math.min(Math.floor((width * 0.85) / totalCols), 28);
+    const cellSize = Math.min(Math.floor((width * 0.85) / totalCols), 42);
 
     // 프레임별 점진적 등장
     const totalCells = totalCols * 7;
@@ -137,9 +137,9 @@ const BlockMode: React.FC<{
           const isCellRevealed = cellIndex < revealedCells;
           cellIndex++;
 
-          // 글리치: onset 시 일부 셀 깜빡임
+          // 글리치: onset 시 60% 셀 깜빡임 (강화: 0.3→0.6)
           const glitchSeed = frame * 31 + row * 7 + colOffset + col;
-          const isGlitched = onset && seededRand(glitchSeed) < 0.3;
+          const isGlitched = onset && seededRand(glitchSeed) < 0.6;
 
           // 블록 문자 선택: rms에 따라 밀도 변화
           const blockIdx = isGlitched
@@ -162,7 +162,7 @@ const BlockMode: React.FC<{
                 color: isGlitched ? glowColor : color,
                 opacity: isCellRevealed ? (isOn ? 0.9 : 0.05) : 0,
                 textShadow: isOn && isCellRevealed
-                  ? `0 0 ${4 + rms * 12}px ${glowColor}`
+                  ? `0 0 ${8 + rms * 20}px ${glowColor}, 0 0 ${16 + rms * 30}px ${glowColor}40`
                   : "none",
               }}
             >
@@ -206,7 +206,7 @@ const BlockMode: React.FC<{
       {text.split("").map((char, i) => {
         const isRevealed = i < charReveal;
         const glitchSeed = frame * 17 + i * 53;
-        const isGlitched = onset && seededRand(glitchSeed) < 0.4;
+        const isGlitched = onset && seededRand(glitchSeed) < 0.6;
         // 배경: 작은 블록 문자 패턴
         const bgPattern = Array.from({ length: 6 }, (_, row) =>
           Array.from({ length: 4 }, (_, col) => {
@@ -220,8 +220,8 @@ const BlockMode: React.FC<{
             key={i}
             style={{
               position: "relative",
-              width: 80,
-              height: 100,
+              width: 120,
+              height: 140,
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
@@ -248,10 +248,10 @@ const BlockMode: React.FC<{
             <span
               style={{
                 fontFamily: "Pretendard Variable, sans-serif",
-                fontSize: 64,
+                fontSize: 80,
                 fontWeight: 900,
                 color: isGlitched ? glowColor : color,
-                textShadow: `0 0 ${8 + rms * 20}px ${glowColor}`,
+                textShadow: `0 0 ${12 + rms * 25}px ${glowColor}, 0 0 ${20 + rms * 35}px ${glowColor}40`,
                 zIndex: 1,
               }}
             >
@@ -335,10 +335,10 @@ const ShapeMode: React.FC<{
   });
   const revealedChars = Math.floor(revealProgress * totalChars);
 
-  // 호흡 스케일
-  const breathe = 1 + Math.sin(frame * 0.04) * 0.03;
-  // onset 시 전체 플래시
-  const flashOpacity = onset ? 0.3 : 0;
+  // 호흡 스케일 (강화: 0.03→0.08, rms 연동)
+  const breathe = 1 + Math.sin(frame * 0.05) * 0.08 + rms * 0.08;
+  // onset 시 전체 플래시 (강화: 0.3→0.5)
+  const flashOpacity = onset ? 0.5 : 0;
 
   let charCount = 0;
 
@@ -346,7 +346,7 @@ const ShapeMode: React.FC<{
     <div
       style={{
         fontFamily: "'Courier New', monospace",
-        fontSize: 24 + bass * 8,
+        fontSize: 36 + bass * 16,
         lineHeight: 1.3,
         transform: `scale(${breathe})`,
         position: "relative",
@@ -371,7 +371,7 @@ const ShapeMode: React.FC<{
             charCount++;
             const isSpecial = char !== " ";
             const glitchSeed = frame * 23 + lineIdx * 11 + ci;
-            const isGlitched = onset && isSpecial && seededRand(glitchSeed) < 0.25;
+            const isGlitched = onset && isSpecial && seededRand(glitchSeed) < 0.55;
 
             return (
               <span
@@ -382,7 +382,7 @@ const ShapeMode: React.FC<{
                     : color,
                   opacity: isRevealed ? (isSpecial ? 0.9 : 0.1) : 0,
                   textShadow: isSpecial && isRevealed
-                    ? `0 0 ${4 + rms * 10}px ${glowColor}`
+                    ? `0 0 ${8 + rms * 18}px ${glowColor}, 0 0 ${14 + rms * 25}px ${glowColor}40`
                     : "none",
                 }}
               >
@@ -423,12 +423,12 @@ const PatternMode: React.FC<{
   });
   const revealedRows = Math.ceil(revealProgress * patternGrid.length);
 
-  // 호흡 스케일
-  const breathe = 1 + Math.sin(frame * 0.05) * 0.02;
-  // onset 시 글리치
-  const flashOpacity = onset ? 0.25 : 0;
-  // rms 기반 glow 강도
-  const glowIntensity = 6 + rms * 18;
+  // 호흡 스케일 (강화)
+  const breathe = 1 + Math.sin(frame * 0.05) * 0.06 + rms * 0.06;
+  // onset 시 글리치 (강화: 0.25→0.45)
+  const flashOpacity = onset ? 0.45 : 0;
+  // rms 기반 glow 강도 (강화)
+  const glowIntensity = 10 + rms * 25;
 
   // 퇴장
   const exitOpacity = interpolate(sceneProgress, [0.85, 1], [1, 0], {
@@ -440,7 +440,7 @@ const PatternMode: React.FC<{
     <div
       style={{
         fontFamily: "'Courier New', monospace",
-        fontSize: 28,
+        fontSize: 36,
         lineHeight: 1.3,
         transform: `scale(${breathe})`,
         position: "relative",
@@ -480,7 +480,7 @@ const PatternMode: React.FC<{
             {line.split("").map((char, ci) => {
               const isSpecial = char !== " ";
               const glitchSeed = frame * 29 + lineIdx * 13 + ci + (patternId.charCodeAt(0) || 0);
-              const isGlitched = onset && isSpecial && seededRand(glitchSeed) < 0.2;
+              const isGlitched = onset && isSpecial && seededRand(glitchSeed) < 0.5;
               // onset 글리치: 랜덤 문자로 교체
               const displayChar = isGlitched
                 ? DATA_CHARS[Math.floor(seededRand(glitchSeed + 1) * DATA_CHARS.length)]
@@ -526,7 +526,7 @@ const MatrixMode: React.FC<{
   sceneProgress: number;
 }> = ({ text, color, glowColor, frame, fps, rms, bass, onset, density, width, sceneProgress }) => {
   const lineCount = density === "high" ? 10 : density === "low" ? 5 : 8;
-  const charsPerLine = Math.floor(width / 22);
+  const charsPerLine = Math.floor(width / 26);
 
   // 스크롤 오프셋
   const scrollSpeed = 0.15 + rms * 0.1;
@@ -564,9 +564,9 @@ const MatrixMode: React.FC<{
             style={{
               color: isKeyword ? glowColor : color,
               fontWeight: isKeyword ? 900 : "normal",
-              fontSize: isKeyword ? "1.15em" : undefined,
+              fontSize: isKeyword ? "1.25em" : undefined,
               textShadow: isKeyword
-                ? `0 0 ${10 + rms * 20}px ${glowColor}, 0 0 ${20 + rms * 30}px ${glowColor}40`
+                ? `0 0 ${14 + rms * 25}px ${glowColor}, 0 0 ${25 + rms * 40}px ${glowColor}40`
                 : "none",
               opacity: isKeyword ? 1 : 0.7,
             }}
@@ -589,7 +589,7 @@ const MatrixMode: React.FC<{
               color: isActive ? color : color,
               opacity: isActive ? lineOpacity : lineOpacity * 0.5,
               textShadow: isActive
-                ? `0 0 ${3 + rms * 8}px ${glowColor}60`
+                ? `0 0 ${6 + rms * 14}px ${glowColor}80`
                 : "none",
             }}
           >
@@ -628,7 +628,7 @@ const MatrixMode: React.FC<{
     <div
       style={{
         fontFamily: "'Courier New', monospace",
-        fontSize: 26,
+        fontSize: 34,
         opacity: exitOpacity,
         padding: "16px 20px",
         backgroundColor: "rgba(0, 0, 0, 0.4)",

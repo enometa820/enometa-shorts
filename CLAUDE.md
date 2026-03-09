@@ -16,7 +16,7 @@ Claude는:
 
 - **환경**: `py` 명령 사용 (`python`은 Windows Store alias 문제). entry point: `src/index.tsx`
 - **TTS**: `scripts/generate_voice_edge.py` 전용 (Edge-TTS, ko-KR-SunHiNeural). 다른 TTS 엔진 사용 금지
-- **글쓰기**: 대본 컨펌 전 제목/음악/비주얼 등 후속 단계 진행 **금지** (글 컨펌 게이트)
+- **글쓰기**: v13 "차가운 정밀" — 3인칭 관찰, 컴퓨팅 렌즈, 구조적 각성. 대본 컨펌 전 제목/음악/비주얼 등 후속 단계 진행 **금지** (글 컨펌 게이트)
 - **비주얼**: render_mode 항상 `"hybrid"` (legacy 모드 제거됨). genre→strategy 동적 매핑 (cooper→breathing, abstract→cinematic, data→dense, enometa→enometa). SI 기반 전략 승격
 - **음악**: v21 실존 언더그라운드 장르 10종 (acid/ambient/microsound/IDM/minimal/dub/glitch/industrial/techno/**house**). 대본 리액티브 댄스 뮤직. 패턴 엔진 v18 + v19 Vertical Remixing + v21 멜로디 다양성: 장르별 required/optional 레이어 분리 + ep_seed 기반 레이어 조합 자동 변주. 전용 합성 함수 + **ep_seed 기반 seq_config 13개 파라미터**로 에피소드마다 드럼/음색/패턴/멜로디 자동 분화. house 장르: `rhodes_pad()` Rhodes 패드(minor 9 코드) + 4-on-the-floor + 오프비트 하이햇. Gate 2: seq_config 음색 설계 (mood_layers 편집 금지)
 - **오디오**: narration_volume=0.90, bgm_volume=1.0 (기본), 사이드체인 없음, loudnorm -14 LUFS, 엔드카드 BGM 자동 연장
@@ -110,6 +110,13 @@ mix 단계 후 `public/epXXX/mixed.wav`도 반드시 동기화 필요.
 ### 의존성
 - **Python**: numpy, scipy, Pillow, edge-tts, kiwipiepy, soynlp
 - **Node**: remotion, @remotion/cli, @remotion/layout-utils, @remotion/three, three
+
+## 미학 원칙 — 백남준 DNA
+
+- **원초적 + 불완전**: 깔끔함을 거부한다. CRT 왜곡, 신호 글리치, 아날로그 노이즈가 기본 질감. 매끄러움은 적이다.
+- **너드 + 키치**: 데이터아트의 진지함과 8bit 레트로의 장난기가 공존. ASCII/픽셀은 크고 거칠게 — 작고 섬세한 것이 아닌, 화면을 채우는 존재감.
+- **고감도 반응**: 오디오→비주얼 반응은 항상 과감하게. onset/bass/rms 감도를 높게 유지. 미세한 변화보다 강렬한 반응이 기본.
+- **죽은 코드 금지**: 구현한 코드/컴포넌트/함수는 반드시 파이프라인에서 **실제 호출·렌더링**되어야 한다. 스텁·가짜·미연결 코드 생성 절대 금지. 새 코드 작성 시 호출 경로(import→등록→사용)까지 확인 필수.
 
 ## 핵심 원칙
 
@@ -229,3 +236,4 @@ CHANGELOG 항목 형식:
 | "제작 시작" / 파이프라인 | `enometa-produce` |
 | "업로드 준비" / publish | `enometa-publish` |
 | "피드백" / 리뷰 | `enometa-feedback` |
+| "마무리" / 종료 / 커밋 / 푸시 / finalize | `enometa-finalize` |
