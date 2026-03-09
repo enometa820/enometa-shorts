@@ -114,6 +114,14 @@ curr = episodes/epXXX/visual_script.json
 SI 피크 씬 중 하나에 `terra_globe` 또는 `terra_terrain` vocab을 수동으로 semantic 레이어에 추가.
 씬당 terra_* 는 최대 1개 제한.
 
+**E. ASCII 패턴 매핑 리뷰 (권장)**
+`visual_script.json`의 `unmapped_pattern_keywords` 배열 확인.
+테마적으로 중요한 키워드가 있으면 새 ASCII 패턴을 디자인하고 `scripts/ascii_patterns.json`에 추가.
+- `patterns`에 키워드 → `{id, category, grid, ascii_text, tags}` 항목 추가
+- `aliases`에 관련 동의어/파생어 매핑
+- 패턴 grid: 최대 12행 × 16문자, 공백으로 빈 셀 표현
+- 이후 에피소드부터 자동 적용됨
+
 개입 완료 후:
 ```bash
 # 2단계: BGM 생성

@@ -19,6 +19,40 @@ from visual_strategies import (
     promote_strategy_by_si,
 )
 
+
+# ============================================================
+# ASCII 패턴 사전 로딩 (keyword → ASCII art 매핑)
+# ============================================================
+_ASCII_PATTERNS: Dict[str, Any] = {}
+_ASCII_ALIASES: Dict[str, str] = {}
+
+def _load_ascii_patterns():
+    """ascii_patterns.json 로딩 (모듈 초기화 시 1회)"""
+    global _ASCII_PATTERNS, _ASCII_ALIASES
+    patterns_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ascii_patterns.json")
+    if os.path.exists(patterns_path):
+        try:
+            with open(patterns_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            _ASCII_PATTERNS = data.get("patterns", {})
+            _ASCII_ALIASES = data.get("aliases", {})
+            print(f"  ASCII patterns loaded: {len(_ASCII_PATTERNS)} patterns, {len(_ASCII_ALIASES)} aliases")
+        except Exception as e:
+            print(f"  Warning: Could not load ascii_patterns.json: {e}")
+
+def lookup_ascii_pattern(keyword: str) -> Optional[Dict]:
+    """키워드 → ASCII 패턴 검색 (직접 매핑 + alias 지원)"""
+    # 직접 매핑
+    if keyword in _ASCII_PATTERNS:
+        return _ASCII_PATTERNS[keyword]
+    # alias 통해 간접 매핑
+    alias_target = _ASCII_ALIASES.get(keyword)
+    if alias_target and alias_target in _ASCII_PATTERNS:
+        return _ASCII_PATTERNS[alias_target]
+    return None
+
+_load_ascii_patterns()
+
 # ============================================================
 # 팔레트 정의 (src/utils/palettes.ts와 동기화)
 # ============================================================
@@ -871,33 +905,46 @@ def build_scene(
     if not keyword:
         keyword = extract_highlight_word(sentence)
     if keyword and rng.random() < text_chance:
-        # v19: text_reveal(45%) / symbol_morph(25%) / ascii_art(30%) 가중 선택
-        roll = rng.random()
-        if roll < 0.25 and keyword_type != "noun_fallback":
-            # symbol_morph: 품사 기반 추상 도형
-            sym_params = generate_vocab_params("symbol_morph", palette, rng)
-            sym_params["text"] = keyword
-            sym_params["posType"] = _map_pos_type(keyword_type)
-            semantic.append({"vocab": "symbol_morph", "params": sym_params})
-        elif roll < 0.55:
-            # ascii_art: ASCII 아트 (3모드 중 랜덤)
-            ascii_vocab = rng.choice(["ascii_block", "ascii_shape", "ascii_matrix"])
-            ascii_params = generate_vocab_params(ascii_vocab, palette, rng)
+        # v22: ASCII 패턴 사전 매칭 우선 → fallback으로 기존 25/30/45% 랜덤
+        pattern_match = lookup_ascii_pattern(keyword)
+        if pattern_match:
+            # 패턴 매핑됨 → ascii_block + pattern 모드 강제 선택
+            ascii_params = generate_vocab_params("ascii_block", palette, rng)
             ascii_params["text"] = keyword
+            ascii_params["mode"] = "pattern"
+            ascii_params["patternId"] = pattern_match["id"]
+            ascii_params["patternGrid"] = pattern_match["grid"]
+            ascii_params["ascii_text"] = pattern_match.get("ascii_text", "")
             ascii_params["posType"] = _map_pos_type(keyword_type)
-            # ascii_text: block/matrix 모드에서 비트맵 렌더링에 사용할 영어 텍스트
-            # 파이프라인 개입 시 Claude가 맥락에 맞는 영어 번역을 여기에 삽입
-            # 미지정 시 AsciiArt.tsx의 fallback 사전 사용
-            if "ascii_text" not in ascii_params:
-                ascii_params["ascii_text"] = ""
-            semantic.append({"vocab": ascii_vocab, "params": ascii_params})
+            semantic.append({"vocab": "ascii_block", "params": ascii_params})
         else:
-            # text_reveal: 기존 타이포그래피 모션
-            text_mode = force_text_mode or pool.get("text_mode", "wave")
-            text_params = generate_vocab_params("text_reveal", palette, rng)
-            text_params["mode"] = text_mode
-            text_params["text"] = keyword
-            semantic.append({"vocab": "text_reveal", "params": text_params})
+            # 미매핑 → 기존 v19 로직: text_reveal(45%) / symbol_morph(25%) / ascii_art(30%)
+            roll = rng.random()
+            if roll < 0.25 and keyword_type != "noun_fallback":
+                # symbol_morph: 품사 기반 추상 도형
+                sym_params = generate_vocab_params("symbol_morph", palette, rng)
+                sym_params["text"] = keyword
+                sym_params["posType"] = _map_pos_type(keyword_type)
+                semantic.append({"vocab": "symbol_morph", "params": sym_params})
+            elif roll < 0.55:
+                # ascii_art: ASCII 아트 (3모드 중 랜덤)
+                ascii_vocab = rng.choice(["ascii_block", "ascii_shape", "ascii_matrix"])
+                ascii_params = generate_vocab_params(ascii_vocab, palette, rng)
+                ascii_params["text"] = keyword
+                ascii_params["posType"] = _map_pos_type(keyword_type)
+                # ascii_text: block/matrix 모드에서 비트맵 렌더링에 사용할 영어 텍스트
+                # 파이프라인 개입 시 Claude가 맥락에 맞는 영어 번역을 여기에 삽입
+                # 미지정 시 AsciiArt.tsx의 fallback 사전 사용
+                if "ascii_text" not in ascii_params:
+                    ascii_params["ascii_text"] = ""
+                semantic.append({"vocab": ascii_vocab, "params": ascii_params})
+            else:
+                # text_reveal: 기존 타이포그래피 모션
+                text_mode = force_text_mode or pool.get("text_mode", "wave")
+                text_params = generate_vocab_params("text_reveal", palette, rng)
+                text_params["mode"] = text_mode
+                text_params["text"] = keyword
+                semantic.append({"vocab": "text_reveal", "params": text_params})
         if keyword not in highlight_words:
             highlight_words.append(keyword)
 
@@ -1141,6 +1188,22 @@ def generate_visual_script(
         highlight_words = title_words[:2] if title_words else []
     highlight_words = highlight_words[:5]  # B-10: 최대 5개 (3→5)
 
+    # v22: 미매핑 고강도 키워드 수집 (Gate 1 리뷰용)
+    unmapped_keywords = []
+    _seen_unmapped = set()
+    for scene_data in merged_scenes:
+        for seg_idx in scene_data.get("_seg_indices", []):
+            for kw in script_data_keywords.get(seg_idx, []):
+                word = kw["text"]
+                if word not in _seen_unmapped and lookup_ascii_pattern(word) is None:
+                    _seen_unmapped.add(word)
+                    unmapped_keywords.append({
+                        "word": word,
+                        "type": kw["type"],
+                    })
+    if unmapped_keywords:
+        print(f"  Unmapped pattern keywords: {len(unmapped_keywords)} (Gate 1 리뷰 대상)")
+
     # v8: frames_dir + total_frames 자동 계산 (hybrid 전용)
     last_end = merged_scenes[-1]["end"] if merged_scenes else 0
     auto_total_frames = int((last_end + 6.0) * 30)  # 30fps, endcard 6초 포함
@@ -1167,6 +1230,7 @@ def generate_visual_script(
             "palette": palette_name,
         },
         "scenes": scenes,
+        "unmapped_pattern_keywords": unmapped_keywords,
     }
 
 

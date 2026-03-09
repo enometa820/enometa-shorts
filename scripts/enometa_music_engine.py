@@ -1706,6 +1706,15 @@ class EnometaMusicEngine:
             default=0.0, morph_sec=1.0, sr=self.sr
         )
         fm *= vol_env * 1.0  # v16: si_gate 제거, 페이드 제거
+
+        # v22: wavefold — 모듈러 디스토션 (industrial/IDM)
+        music_mood = self.script.get("metadata", {}).get("music_mood", "acid")
+        if music_mood in ("industrial", "IDM"):
+            import random as _rng
+            folds = 2 + (_rng.Random(self._ep_seed + 5555).randint(0, 2))  # 2~4
+            fm = wavefold(fm, folds=folds) * 0.8
+            print(f"  [fm] v22 wavefold: folds={folds}", flush=True)
+
         self._add_mono(fm, 0, 1.0)
 
     def _render_continuous_rhythm(self, sections):
@@ -2217,6 +2226,56 @@ class EnometaMusicEngine:
         # 좌우 약간 다른 위치에 배치 (스테레오 width)
         self._add_stereo(pt, random.uniform(-0.3, 0.3), 0, 1.0)
 
+    def _render_continuous_modular_clicks(self, sections):
+        """v22: 모듈러 클릭 텍스처 — 키워드/이벤트 시점에 임팩트 클릭 배치.
+
+        대본 키워드 타이밍에 맞춰 2~6kHz 전자 클릭을 배치하여
+        데이터 포인트를 청각적으로 표현. ep_seed 기반 결정론적.
+        """
+        print("  [modular_clicks] v22 keyword-event clicks...", flush=True)
+        sd_segments = self._script_data.get("segments", []) if self._script_data else []
+
+        clicks_buf = np.zeros(self.total_samples)
+
+        # 키워드 타이밍에서 클릭 이벤트 수집
+        import random as _rng
+        click_rng = _rng.Random(self._ep_seed + 8888)
+        event_times = []
+
+        for seg in sd_segments:
+            start_sec = seg.get("start_sec", 0)
+            end_sec = seg.get("end_sec", 0)
+            analysis = seg.get("analysis", {})
+            keywords = analysis.get("keywords", [])
+            numbers = analysis.get("numbers", [])
+
+            # 키워드마다 클릭 배치 (세그먼트 시작~끝 사이에 분산)
+            n_events = len(keywords) + len(numbers)
+            if n_events > 0:
+                seg_dur = max(0.1, end_sec - start_sec)
+                for i in range(min(n_events, 6)):  # 세그먼트당 최대 6클릭
+                    t = start_sec + click_rng.uniform(0, seg_dur)
+                    event_times.append(t)
+
+        # 클릭 생성 및 배치
+        for t in event_times:
+            idx = int(t * self.sr)
+            click = modular_click(self.sr)
+            end_idx = min(idx + len(click), self.total_samples)
+            actual_len = end_idx - idx
+            if actual_len > 0 and idx >= 0:
+                clicks_buf[idx:end_idx] += click[:actual_len]
+
+        # 섹션별 볼륨 모핑
+        vol_env = smooth_envelope(
+            self.total_samples, sections, "modular_clicks", "volume",
+            default=0.0, morph_sec=0.5, sr=self.sr
+        )
+        clicks_buf *= vol_env * 0.6
+
+        # 스테레오 배치 (랜덤 패닝)
+        self._add_stereo(clicks_buf, click_rng.uniform(-0.5, 0.5), 0, 1.0)
+
     def _render_continuous_saw_sequence(self, sections):
         """v12: 전체 길이 쏘우파 게이트 시퀀서 — enometa 리듬의 핵심 뼈대
         에피소드 전체에서 하나의 패턴 키를 고정하여 "한 곡"으로 들리게 함.
@@ -2338,6 +2397,15 @@ class EnometaMusicEngine:
         # v14: 코러스로 스테레오 풍부함 추가
         saw_L = chorus(saw_L, sr=self.sr, depth_ms=self.seq_config.chorus_depth_ms)
         saw_R = chorus(saw_R, sr=self.sr, depth_ms=self.seq_config.chorus_depth_ms, lfo_rate=1.7)
+
+        # v22: bit_crush — lo-fi 이펙트 (acid/IDM/glitch)
+        music_mood = self.script.get("metadata", {}).get("music_mood", "acid")
+        if music_mood in ("acid", "IDM", "glitch"):
+            avg_si = float(np.mean(self._si_env)) if self._si_env is not None else 0.5
+            bits = max(6, int(12 - avg_si * 6))  # si=0→12bit(클린), si=1→6bit(거침)
+            saw_L = bit_crush(saw_L, bits=bits, downsample=2)
+            saw_R = bit_crush(saw_R, bits=bits, downsample=2)
+            print(f"  [saw_seq] v22 bit_crush: {bits}bit (si={avg_si:.2f})", flush=True)
 
         # v16: 페이드 제거
         self.master_L += saw_L
@@ -3046,6 +3114,7 @@ class EnometaMusicEngine:
                 "pulse_train":       {"volume": (0.5, 0.8)},
                 "stutter_gate":      {"volume": (0.5, 0.8)},
                 "arpeggio":          {"volume": (0.3, 0.5)},
+                "modular_clicks":    {"volume": (0.5, 0.8)},   # v22: 모듈러 클릭
             },
             "optional_count": (1, 2),
             "inactive": ["kick", "snare", "hi_hat", "saw_sequence", "bass_drone",
@@ -3065,6 +3134,7 @@ class EnometaMusicEngine:
                 "bytebeat":          {"volume": (0.4, 0.6)},
                 "fm_bass":           {"volume": (0.4, 0.6)},
                 "ultrahigh_texture": {"volume": (0.3, 0.5)},
+                "modular_clicks":    {"volume": (0.4, 0.7)},   # v22: 모듈러 클릭
             },
             "optional_count": (3, 4),
             "inactive": ["bass_drone", "gap_burst"],
@@ -3117,6 +3187,7 @@ class EnometaMusicEngine:
                 "data_click":        {"volume": (0.7, 1.0)},
                 "ultrahigh_texture": {"volume": (0.4, 0.6)},
                 "saw_sequence":      {"volume": (0.3, 0.5)},
+                "modular_clicks":    {"volume": (0.6, 0.9)},   # v22: 모듈러 클릭
             },
             "optional_count": (2, 3),
             "inactive": ["hi_hat", "arpeggio", "bass_drone", "fm_bass"],  # 글리치가 대신
@@ -3526,6 +3597,11 @@ class EnometaMusicEngine:
                 self._apply_tape_delay_to_master()
             else:
                 print("  [tape_delay] SKIPPED (mood layer off)", flush=True)
+            # v22: 레이어 8b: 모듈러 클릭 (키워드 이벤트 텍스처)
+            if _layer_on("modular_clicks", default=False):
+                self._render_continuous_modular_clicks(sections)
+            else:
+                print("  [modular_clicks] SKIPPED (mood layer off)", flush=True)
             # 레이어 9: 게이트 + 스터터
             if _layer_on("stutter_gate", default=True):
                 self._render_continuous_gate_stutter(sections)
@@ -3583,6 +3659,14 @@ class EnometaMusicEngine:
         peak2 = np.max(np.abs(stereo))
         if peak2 > 0.95:
             stereo *= 0.95 / peak2
+
+        # v22: tape_stop — 아웃로 피치다운 (마지막 0.5초)
+        tape_stop_dur = 0.5
+        tape_stop_samp = min(int(self.sr * tape_stop_dur), len(stereo) // 4)
+        if tape_stop_samp > 100:
+            for ch in range(2):
+                stereo[:, ch] = tape_stop(stereo[:, ch], stop_duration=tape_stop_dur, sr=self.sr)
+            print(f"  [master] v22 tape_stop: {tape_stop_dur}s ending", flush=True)
 
         # v16: 마스터 페이드 제거 — 음악은 즉시 시작, 즉시 끝남
         # 클릭 방지용 anti-click (5ms — 앨리어싱 방지)
@@ -4690,6 +4774,7 @@ _FLAT_INSTRUMENTS = {
     "ultrahigh_texture": 0.5, "gate_stutter": 0.4,
     "data_click": 0.8, "clicks": 0.6,
     "feedback": 0.15, "bytebeat": 0.15, "synth_lead": 0.15, "acid_bass": 0.4,
+    "modular_clicks": 0.5,
 }
 ARRANGEMENT_TABLE = {
     "intro": dict(_FLAT_INSTRUMENTS),

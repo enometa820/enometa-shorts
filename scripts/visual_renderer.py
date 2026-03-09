@@ -205,6 +205,7 @@ class VisualRenderer:
         self.raw_data = self._load_raw_data()
         self.visual_script = self._load_visual_script()
         self.script_data = self._load_script_data()
+        self.ascii_patterns = self._load_ascii_patterns()
         self.total_frames = int(self.raw_data["total_frames"])
         self.layers = self._init_layers()
 
@@ -228,6 +229,20 @@ class VisualRenderer:
         if sd_path.exists():
             return json.loads(sd_path.read_text(encoding="utf-8"))
         return None
+
+    def _load_ascii_patterns(self) -> dict:
+        """ascii_patterns.json 로딩 (v22: keyword → ASCII art 매핑)"""
+        patterns_path = Path(os.path.dirname(os.path.abspath(__file__))) / "ascii_patterns.json"
+        if patterns_path.exists():
+            try:
+                data = json.loads(patterns_path.read_text(encoding="utf-8"))
+                patterns = data.get("patterns", {})
+                aliases = data.get("aliases", {})
+                print(f"  ASCII patterns: {len(patterns)} patterns, {len(aliases)} aliases")
+                return {"patterns": patterns, "aliases": aliases}
+            except Exception as e:
+                print(f"  Warning: Could not load ascii_patterns.json: {e}")
+        return {"patterns": {}, "aliases": {}}
 
     def _init_layers(self) -> dict:
         preset = GENRE_LAYER_PRESETS.get(self.genre, GENRE_LAYER_PRESETS["enometa"])
@@ -328,6 +343,20 @@ class VisualRenderer:
                     break
             ctx["semantic_intensity"] = si
             ctx["current_keywords"] = current_keywords
+            # v22: 현재 키워드에 매칭된 ASCII 패턴 수집
+            matched_patterns = []
+            patterns_dict = self.ascii_patterns.get("patterns", {})
+            aliases_dict = self.ascii_patterns.get("aliases", {})
+            for kw in current_keywords:
+                word = kw.get("text", kw.get("word", ""))
+                pat = patterns_dict.get(word)
+                if not pat:
+                    alias = aliases_dict.get(word)
+                    if alias:
+                        pat = patterns_dict.get(alias)
+                if pat:
+                    matched_patterns.append(pat)
+            ctx["matched_patterns"] = matched_patterns
             # reactive_level: semantic_intensity 80% + rms 20% (최종 반응 레벨)
             rms = ctx["frame_rms"]
             ctx["reactive_level"] = si * 0.8 + min(rms * 2.0, 0.4) * 0.2

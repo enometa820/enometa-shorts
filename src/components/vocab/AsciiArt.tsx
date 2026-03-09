@@ -396,6 +396,120 @@ const ShapeMode: React.FC<{
   );
 };
 
+// ── Pattern 모드: 키워드별 ASCII 아트 패턴 (v22) ──────
+
+const PatternMode: React.FC<{
+  patternGrid: string[];
+  patternId: string;
+  color: string;
+  glowColor: string;
+  frame: number;
+  fps: number;
+  rms: number;
+  bass: number;
+  onset: boolean;
+  sceneProgress: number;
+}> = ({ patternGrid, patternId, color, glowColor, frame, fps, rms, onset, sceneProgress }) => {
+  if (!patternGrid || patternGrid.length === 0) {
+    return null;
+  }
+
+  const totalChars = patternGrid.reduce((sum, line) => sum + line.length, 0);
+
+  // 행 단위 타이프라이터 reveal
+  const revealProgress = interpolate(frame, [0, fps * 1.2], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const revealedRows = Math.ceil(revealProgress * patternGrid.length);
+
+  // 호흡 스케일
+  const breathe = 1 + Math.sin(frame * 0.05) * 0.02;
+  // onset 시 글리치
+  const flashOpacity = onset ? 0.25 : 0;
+  // rms 기반 glow 강도
+  const glowIntensity = 6 + rms * 18;
+
+  // 퇴장
+  const exitOpacity = interpolate(sceneProgress, [0.85, 1], [1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  return (
+    <div
+      style={{
+        fontFamily: "'Courier New', monospace",
+        fontSize: 28,
+        lineHeight: 1.3,
+        transform: `scale(${breathe})`,
+        position: "relative",
+        opacity: exitOpacity,
+      }}
+    >
+      {/* onset 플래시 배경 */}
+      {flashOpacity > 0 && (
+        <div
+          style={{
+            position: "absolute",
+            inset: -16,
+            backgroundColor: glowColor,
+            opacity: flashOpacity,
+            borderRadius: 8,
+          }}
+        />
+      )}
+      {patternGrid.map((line, lineIdx) => {
+        const isRowRevealed = lineIdx < revealedRows;
+        // 행별 등장 딜레이
+        const rowDelay = lineIdx * 3;
+        const rowOpacity = interpolate(frame - rowDelay, [0, fps * 0.3], [0, 1], {
+          extrapolateLeft: "clamp",
+          extrapolateRight: "clamp",
+        });
+
+        return (
+          <div
+            key={lineIdx}
+            style={{
+              whiteSpace: "pre",
+              textAlign: "center",
+              opacity: isRowRevealed ? rowOpacity : 0,
+            }}
+          >
+            {line.split("").map((char, ci) => {
+              const isSpecial = char !== " ";
+              const glitchSeed = frame * 29 + lineIdx * 13 + ci + (patternId.charCodeAt(0) || 0);
+              const isGlitched = onset && isSpecial && seededRand(glitchSeed) < 0.2;
+              // onset 글리치: 랜덤 문자로 교체
+              const displayChar = isGlitched
+                ? DATA_CHARS[Math.floor(seededRand(glitchSeed + 1) * DATA_CHARS.length)]
+                : char;
+
+              return (
+                <span
+                  key={ci}
+                  style={{
+                    color: isGlitched
+                      ? ["#FF0040", "#00FF80", "#FFD700"][Math.floor(seededRand(glitchSeed + 2) * 3)]
+                      : color,
+                    opacity: isSpecial ? 0.9 : 0.05,
+                    textShadow: isSpecial
+                      ? `0 0 ${glowIntensity}px ${glowColor}`
+                      : "none",
+                  }}
+                >
+                  {displayChar}
+                </span>
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 // ── Matrix 모드: 터미널 스타일 데이터 스트림 ──────
 
 const MatrixMode: React.FC<{
@@ -560,6 +674,8 @@ export const AsciiArt: React.FC<VocabComponentProps> = ({
   const glowColor: string = params.glowColor || "#00FF80";
   const position: string = params.position || "center";
   const density: string = params.density || "medium";
+  const patternGrid: string[] | undefined = params.patternGrid;
+  const patternId: string = params.patternId || "";
 
   const posY =
     position === "top" ? height * 0.15 :
@@ -596,6 +712,10 @@ export const AsciiArt: React.FC<VocabComponentProps> = ({
 
   const renderMode = () => {
     switch (mode) {
+      case "pattern":
+        return patternGrid
+          ? <PatternMode {...sharedProps} patternGrid={patternGrid} patternId={patternId} />
+          : <BlockMode {...sharedProps} text={text} asciiText={asciiText} width={width} />;
       case "block":
         return <BlockMode {...sharedProps} text={text} asciiText={asciiText} width={width} />;
       case "shape":

@@ -83,7 +83,28 @@ class AsciiBackgroundLayer:
         # 기본 색상 (accent × intensity)
         base_color = tuple(int(c * self.intensity) for c in accent)
 
-        # 하이라이트 셀 위치 (키워드 해시 기반)
+        # v22: 매칭된 ASCII 패턴 수집 (ctx에서 전달받거나 직접 룩업)
+        matched_patterns = ctx.get("matched_patterns", [])
+        # 패턴 셀 위치 계산 (ep_seed 기반 오프셋, 패턴당 1개)
+        pattern_cells = {}  # (row, col) → char
+        pattern_color = tuple(min(255, int(c * 0.8)) for c in accent)
+        for pi, pat_info in enumerate(matched_patterns):
+            grid = pat_info.get("grid", [])
+            if not grid:
+                continue
+            pat_h = len(grid)
+            pat_w = max(len(row) for row in grid) if grid else 0
+            # ep_seed + 패턴 인덱스 기반 위치 결정
+            off_r = ((ep_seed * 7 + pi * 37) % max(1, self.rows - pat_h))
+            off_c = ((ep_seed * 13 + pi * 53) % max(1, self.cols - pat_w))
+            for r, line in enumerate(grid):
+                for c, ch in enumerate(line):
+                    if ch != " ":
+                        pr, pc = off_r + r, off_c + c
+                        if 0 <= pr < self.rows and 0 <= pc < self.cols:
+                            pattern_cells[(pr, pc)] = ch
+
+        # 하이라이트 셀 위치 (키워드 해시 기반 — 미매핑 키워드용 fallback)
         highlight_cells = set()
         for word in highlight_words:
             if not word:
@@ -96,14 +117,19 @@ class AsciiBackgroundLayer:
 
         for row in range(self.rows):
             for col in range(self.cols):
-                ch = chars[rng.randint(0, len(chars))]
                 x = col * CELL_SIZE
                 y = row * CELL_SIZE
 
-                if (row, col) in highlight_cells:
+                if (row, col) in pattern_cells:
+                    # v22: 패턴 문자 → accent 원색 + 높은 밝기
+                    ch = pattern_cells[(row, col)]
+                    color = pattern_color
+                elif (row, col) in highlight_cells:
                     # 하이라이트: accent 원색 + 밝기 부스트
+                    ch = chars[rng.randint(0, len(chars))]
                     color = tuple(min(255, int(c * 0.7)) for c in accent)
                 else:
+                    ch = chars[rng.randint(0, len(chars))]
                     color = base_color
 
                 draw.text((x + 1, y), ch, fill=color, font=self._font)

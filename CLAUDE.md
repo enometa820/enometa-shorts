@@ -15,7 +15,7 @@ Claude는:
 ## 절대 규칙
 
 - **환경**: `py` 명령 사용 (`python`은 Windows Store alias 문제). entry point: `src/index.tsx`
-- **TTS**: `scripts/generate_voice_edge.py` 전용. `generate_voice.py`(Chatterbox) **절대 금지**
+- **TTS**: `scripts/generate_voice_edge.py` 전용 (Edge-TTS, ko-KR-SunHiNeural). 다른 TTS 엔진 사용 금지
 - **글쓰기**: 대본 컨펌 전 제목/음악/비주얼 등 후속 단계 진행 **금지** (글 컨펌 게이트)
 - **비주얼**: render_mode 항상 `"hybrid"` (legacy 모드 제거됨). genre→strategy 동적 매핑 (cooper→breathing, abstract→cinematic, data→dense, enometa→enometa). SI 기반 전략 승격
 - **음악**: v21 실존 언더그라운드 장르 10종 (acid/ambient/microsound/IDM/minimal/dub/glitch/industrial/techno/**house**). 대본 리액티브 댄스 뮤직. 패턴 엔진 v18 + v19 Vertical Remixing + v21 멜로디 다양성: 장르별 required/optional 레이어 분리 + ep_seed 기반 레이어 조합 자동 변주. 전용 합성 함수 + **ep_seed 기반 seq_config 13개 파라미터**로 에피소드마다 드럼/음색/패턴/멜로디 자동 분화. house 장르: `rhodes_pad()` Rhodes 패드(minor 9 코드) + 4-on-the-floor + 오프비트 하이햇. Gate 2: seq_config 음색 설계 (mood_layers 편집 금지)

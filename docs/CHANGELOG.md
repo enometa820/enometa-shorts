@@ -647,10 +647,10 @@
 
 ### 코드 변경
 - **`enometa_render.py` v2 전면 재작성**: 단일 명령 통합 파이프라인
-  - 구버전: Chatterbox TTS + ACE-Step BGM + 개별 CLI 명령 조합
+  - 구버전: 개별 CLI 명령 조합 (로컬 AI TTS + 외부 BGM)
   - 신버전: `py scripts/enometa_render.py <episode_dir> --title "제목" --palette phantom`
   - 내부 단계: TTS → script_data → visual_script → BGM → mix → python_frames → Remotion
-  - `py` 명령 통일 (Python311 하드코딩 제거), Chatterbox/ACE-Step 완전 제거
+  - `py` 명령 통일 (Python311 하드코딩 제거), Edge-TTS + 자체 음악 엔진으로 전면 전환
 - **`enometa_music_engine.py`**: 레이어 10 `_render_gap_stutter_burst()` 추가
   - 나레이션 세그먼트 사이 무음 구간(≥30ms) 감지 → 쏘우+스퀘어 brutal burst 삽입
   - drive 5.0~10.0 (burst_energy 비례), 32분음표 게이트, vol 0.5~0.85

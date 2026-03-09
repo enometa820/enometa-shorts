@@ -1,0 +1,333 @@
+{
+  "_version": "1.0",
+  "_description": "ENOMETA 키워드 → ASCII 아트 패턴 매핑. Gate 1에서 Claude가 새 패턴 추가.",
+
+  "patterns": {
+    "심장": {
+      "id": "heart",
+      "category": "body",
+      "grid": [
+        " ## ## ",
+        "#######",
+        "#######",
+        " ##### ",
+        "  ###  ",
+        "   #   "
+      ],
+      "ascii_text": "HEART",
+      "tags": ["body", "emotion"]
+    },
+    "뇌": {
+      "id": "brain",
+      "category": "body",
+      "grid": [
+        "  .===.  ",
+        " /~~~~~\\ ",
+        "|~#~#~#~|",
+        "|~#~~~#~|",
+        "|~#~#~#~|",
+        " \\_____/ ",
+        "   |||   "
+      ],
+      "ascii_text": "BRAIN",
+      "tags": ["body", "science"]
+    },
+    "뉴런": {
+      "id": "neuron",
+      "category": "body",
+      "grid": [
+        "  \\|/    ",
+        "---.---  ",
+        "  /|\\    ",
+        " / | \\   ",
+        "/  |  \\--",
+        "   |     ",
+        "  /|\\    "
+      ],
+      "ascii_text": "NEURON",
+      "tags": ["body", "science"]
+    },
+    "시냅스": {
+      "id": "synapse",
+      "category": "body",
+      "grid": [
+        "o---   ---o",
+        " \\  ::  / ",
+        "  \\ :: /  ",
+        "   >~~<   ",
+        "  / :: \\  ",
+        " /  ::  \\ ",
+        "o---   ---o"
+      ],
+      "ascii_text": "SYNAPSE",
+      "tags": ["body", "science"]
+    },
+    "편도체": {
+      "id": "amygdala",
+      "category": "body",
+      "grid": [
+        "  .---.  ",
+        " / ~~~ \\ ",
+        "| ~~~~~ |",
+        "| ~~!~~ |",
+        "| ~~~~~ |",
+        " \\ ~~~ / ",
+        "  '---'  "
+      ],
+      "ascii_text": "AMYGDALA",
+      "tags": ["body", "emotion"]
+    },
+    "도파민": {
+      "id": "dopamine",
+      "category": "chemical",
+      "grid": [
+        "     OH  ",
+        "    /    ",
+        "HO-<  >--",
+        "    \\-/  ",
+        "     |   ",
+        "    NH2  "
+      ],
+      "ascii_text": "DOPAMINE",
+      "tags": ["chemical", "science"]
+    },
+    "코르티솔": {
+      "id": "cortisol",
+      "category": "chemical",
+      "grid": [
+        "  O      ",
+        " /|\\     ",
+        "/ | \\-OH ",
+        "  |      ",
+        "\\ | /    ",
+        " \\|/     ",
+        "  HO     "
+      ],
+      "ascii_text": "CORTISOL",
+      "tags": ["chemical", "science"]
+    },
+    "세로토닌": {
+      "id": "serotonin",
+      "category": "chemical",
+      "grid": [
+        "HO       ",
+        " \\       ",
+        "  >=NH   ",
+        " //  \\   ",
+        "||    |  ",
+        " \\\\  /  ",
+        "  >--NH2 "
+      ],
+      "ascii_text": "SEROTONIN",
+      "tags": ["chemical", "science"]
+    },
+    "아드레날린": {
+      "id": "adrenaline",
+      "category": "chemical",
+      "grid": [
+        "  !!!!   ",
+        " !!  !!  ",
+        "!!    !! ",
+        "!!!!!!!! ",
+        "!!    !! ",
+        " !!  !!  ",
+        "  !!!!   "
+      ],
+      "ascii_text": "ADRENALINE",
+      "tags": ["chemical", "science"]
+    },
+    "회로": {
+      "id": "circuit",
+      "category": "science",
+      "grid": [
+        "+-+--+-+ ",
+        "| |  | | ",
+        "+-+--+-+ ",
+        "  |  |   ",
+        "+-+--+-+ ",
+        "| |  | | ",
+        "+-+--+-+ "
+      ],
+      "ascii_text": "CIRCUIT",
+      "tags": ["science", "tech"]
+    },
+    "패턴": {
+      "id": "pattern",
+      "category": "science",
+      "grid": [
+        "# . # . #",
+        ". # . # .",
+        "# . # . #",
+        ". # . # .",
+        "# . # . #",
+        ". # . # .",
+        "# . # . #"
+      ],
+      "ascii_text": "PATTERN",
+      "tags": ["science", "data"]
+    },
+    "데이터": {
+      "id": "data",
+      "category": "science",
+      "grid": [
+        "01101001 ",
+        "10010110 ",
+        "01101001 ",
+        "========>",
+        "10010110 ",
+        "01101001 ",
+        "10010110 "
+      ],
+      "ascii_text": "DATA",
+      "tags": ["science", "tech"]
+    },
+    "네트워크": {
+      "id": "network",
+      "category": "science",
+      "grid": [
+        "o---o---o",
+        "|\\  |  /|",
+        "| \\ | / |",
+        "o--\\|/--o",
+        "| / | \\ |",
+        "|/  |  \\|",
+        "o---o---o"
+      ],
+      "ascii_text": "NETWORK",
+      "tags": ["science", "tech"]
+    },
+    "공포": {
+      "id": "fear",
+      "category": "emotion",
+      "grid": [
+        "  /!!!\\  ",
+        " / !!! \\ ",
+        "/  !!!  \\",
+        "|  !!!  |",
+        "\\  !!!  /",
+        " \\ !!! / ",
+        "  \\!!!/  "
+      ],
+      "ascii_text": "FEAR",
+      "tags": ["emotion"]
+    },
+    "각성": {
+      "id": "awaken",
+      "category": "emotion",
+      "grid": [
+        "    *    ",
+        "   ***   ",
+        "  *****  ",
+        " ******* ",
+        "  *****  ",
+        "   ***   ",
+        "    *    "
+      ],
+      "ascii_text": "AWAKEN",
+      "tags": ["emotion"]
+    },
+    "폭발": {
+      "id": "explode",
+      "category": "emotion",
+      "grid": [
+        " \\  |  / ",
+        "  \\ | /  ",
+        "---***---",
+        "  *****  ",
+        "---***---",
+        "  / | \\  ",
+        " /  |  \\ "
+      ],
+      "ascii_text": "EXPLODE",
+      "tags": ["emotion"]
+    },
+    "사랑": {
+      "id": "love",
+      "category": "emotion",
+      "grid": [
+        " ** ** ",
+        "*******",
+        "*******",
+        " ***** ",
+        "  ***  ",
+        "   *   "
+      ],
+      "ascii_text": "LOVE",
+      "tags": ["emotion"]
+    },
+    "존재": {
+      "id": "exist",
+      "category": "philosophy",
+      "grid": [
+        "   ?     ",
+        "  ???    ",
+        "   ?     ",
+        " . ? .   ",
+        "   ?     ",
+        "  ???    ",
+        "   !     "
+      ],
+      "ascii_text": "EXIST",
+      "tags": ["philosophy"]
+    },
+    "자유": {
+      "id": "freedom",
+      "category": "philosophy",
+      "grid": [
+        "     /^  ",
+        "    / |  ",
+        "   /  |  ",
+        "--/   |  ",
+        "      |  ",
+        "  ~~~~|  ",
+        "      +  "
+      ],
+      "ascii_text": "FREE",
+      "tags": ["philosophy"]
+    },
+    "의식": {
+      "id": "conscious",
+      "category": "philosophy",
+      "grid": [
+        "  (   )  ",
+        " ( o o ) ",
+        "(  ---  )",
+        " ( === ) ",
+        "(  ---  )",
+        " ( o o ) ",
+        "  (   )  "
+      ],
+      "ascii_text": "MIND",
+      "tags": ["philosophy", "body"]
+    }
+  },
+
+  "aliases": {
+    "사랑": "심장",
+    "머리": "뇌",
+    "대뇌": "뇌",
+    "소뇌": "뇌",
+    "해마": "편도체",
+    "신경세포": "뉴런",
+    "신경": "뉴런",
+    "연결": "시냅스",
+    "전달": "시냅스",
+    "보상": "도파민",
+    "쾌락": "도파민",
+    "스트레스": "코르티솔",
+    "행복": "세로토닌",
+    "흥분": "아드레날린",
+    "전기": "회로",
+    "반복": "패턴",
+    "정보": "데이터",
+    "연결망": "네트워크",
+    "두려움": "공포",
+    "불안": "공포",
+    "깨어남": "각성",
+    "파괴": "폭발",
+    "에너지": "폭발",
+    "자아": "의식",
+    "인식": "의식",
+    "해방": "자유"
+  }
+}

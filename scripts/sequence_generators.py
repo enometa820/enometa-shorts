@@ -55,26 +55,12 @@ def rotate(seq: list, n: int) -> list:
     return seq[n:] + seq[:n]
 
 
-def mirror(seq: list) -> list:
-    """palindrome: 원본 + 역순."""
-    return seq + seq[::-1]
-
-
 def normalize_to_range(seq: list, lo: float, hi: float) -> list:
     """정수 수열을 [lo, hi] 실수 범위로 매핑."""
     mn, mx = min(seq), max(seq)
     if mn == mx:
         return [0.5 * (lo + hi)] * len(seq)
     return [lo + (x - mn) / (mx - mn) * (hi - lo) for x in seq]
-
-
-def composite(gate_seq: list, value_seq: list) -> list:
-    """게이트 수열(0/1)로 값 수열 필터링. 0인 곳은 0."""
-    out = []
-    for i, g in enumerate(gate_seq):
-        v = value_seq[i % len(value_seq)]
-        out.append(v if g else 0)
-    return out
 
 
 def density_filter(seq: list, target_density: float, seed: int = 0) -> list:
@@ -347,8 +333,6 @@ if __name__ == "__main__":
     tm = thue_morse(16)
     print("\nTM invert:", invert_binary(tm))
     print("TM rotate(4):", rotate(tm, 4))
-    print("Composite(TM, RS):", composite(tm, rudin_shapiro(16)))
-
     # 에피소드 설정
     for seed in [42, 123, 777, 9999]:
         cfg = derive_episode_sequences(seed)

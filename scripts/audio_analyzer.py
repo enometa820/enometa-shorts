@@ -8,8 +8,6 @@ ENOMETA 오디오 분석기
 import sys
 import json
 import wave
-import struct
-import math
 import os
 
 import numpy as np

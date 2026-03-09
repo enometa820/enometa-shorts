@@ -373,7 +373,7 @@ Remotion은 `public/epXXX/mixed.wav`를 참조한다.
 | 번호 | 결정 |
 |------|------|
 | [001](docs/decisions/001-kiwipiepy-vs-konlpy.md) | 형태소 분석: kiwipiepy 선택 |
-| [002](docs/decisions/002-edge-tts-vs-chatterbox.md) | TTS: Edge-TTS 선택 |
+| [002](docs/decisions/002-edge-tts.md) | TTS: Edge-TTS 선택 |
 | [003](docs/decisions/003-hybrid-render.md) | 비주얼: 하이브리드 렌더 |
 | [004](docs/decisions/004-fixed-volume-no-cr.md) | 볼륨 고정 + 콜앤리스폰스 제거 |
 | [005](docs/decisions/005-music-engine-monolith.md) | 음악 엔진 모놀리스 유지 |
