@@ -5,6 +5,22 @@
 
 ---
 
+## 2026-03-10 — 제네레이티브 미디어아트 Phase 0~1 구현
+
+### Added
+- `scripts/script_data_extractor.py`: `extract_story_structure()` — paragraph_breaks/transition_points/energy_arc 추출 (Phase 0)
+- `scripts/enometa_music_engine.py`: `_plan_story_driven_structure()` — 문단 경계→4바 스냅 섹션 구조, 상대 에너지 랭킹 role 배정 (Phase 1A)
+- `scripts/visual_script_generator.py`: `KEYWORD_VOCAB_MAP` 5카테고리(뇌과학/컴퓨팅/생물/철학/물리) + `match_keyword_vocabs()` (Phase 1B)
+- `public/fonts/neodgm.woff2`: Neo둥근모 픽셀 폰트 (SIL OFL, 44KB)
+- `@remotion/fonts` 패키지 추가
+
+### Changed
+- `src/components/vocab/TextReveal.tsx`: 폰트 → neodgm 픽셀폰트 (백남준 미학 8bit 레트로)
+- `scripts/visual_script_generator.py`: 키워드 매칭 vocab 70% 우선 선택 + energy_arc SI 보정
+- `scripts/enometa_music_engine.py`: story_structure 기반 동적 섹션 구조 (하위호환: 없으면 기존 고정 비율)
+
+---
+
 ## 2026-03-10 — 시스템 분석 + 문서 정비 + 글쓰기 STEP 0 개선
 
 ### Added

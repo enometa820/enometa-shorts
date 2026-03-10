@@ -4803,16 +4803,149 @@ ROLE_BAR_RATIOS = [
 ]
 
 
+def _plan_story_driven_structure(total_duration: float, bpm: float,
+                                  story_structure: dict,
+                                  mood_layers: dict = None) -> list:
+    """v22 Phase 1A: 스토리 구조 기반 동적 음악 구조 생성.
+
+    문단 경계를 4바에 스냅하여 섹션 전환점으로 사용하고,
+    에너지 아크(SI 4분위)로 role을 배정한다.
+
+    Returns: (roles_bars, has_transitions_at) — role별 바 수 + 전환점 인덱스
+    """
+    bar_dur = (60.0 / bpm) * 4
+    total_bars = max(24, int(total_duration / bar_dur))
+
+    paragraph_breaks = story_structure.get("paragraph_breaks", [])
+    energy_arc = story_structure.get("energy_arc", {})
+    quarters = energy_arc.get("quarters", [])
+    transition_points = story_structure.get("transition_points", [])
+
+    # 문단 경계 → 4바 스냅 (2초 이상 차이나면 스냅 포기)
+    snap_bars = [0]  # 시작점
+    for pb_sec in paragraph_breaks:
+        bar_idx = pb_sec / bar_dur
+        snapped = round(bar_idx / 4) * 4  # 4바 단위 스냅
+        snap_sec = snapped * bar_dur
+        if abs(snap_sec - pb_sec) <= 2.0 and snapped > snap_bars[-1]:
+            snap_bars.append(int(snapped))
+    snap_bars.append(total_bars)  # 끝점
+
+    # 문단이 너무 적으면 (3개 미만) 최소 4구간으로 분할
+    if len(snap_bars) < 5:
+        quarter = max(4, (total_bars // 4 // 4) * 4)
+        snap_bars = [0, quarter, quarter * 2, quarter * 3, total_bars]
+
+    # 각 구간에 role 배정 (상대적 에너지 + 위치 기반)
+    # quarters의 label이 모두 같을 수 있으므로 (SI 전체가 낮은 경우)
+    # 상대적 순위로 role을 결정한다
+    roles_bars = []
+    transition_bar_set = set()
+
+    # transition_points의 시간을 바 인덱스로 변환
+    for tp in transition_points:
+        tp_bar = int(tp["time_sec"] / bar_dur)
+        transition_bar_set.add(tp_bar)
+
+    # 구간별 avg_si 계산 (상대 순위용)
+    seg_infos = []
+    for seg_i in range(len(snap_bars) - 1):
+        seg_start_bar = snap_bars[seg_i]
+        seg_end_bar = snap_bars[seg_i + 1]
+        seg_bars = seg_end_bar - seg_start_bar
+        if seg_bars < 4:
+            continue
+
+        seg_mid_sec = ((seg_start_bar + seg_end_bar) / 2) * bar_dur
+        # 해당 구간의 quarter avg_si 찾기
+        q_si = 0.3  # 기본
+        for q in quarters:
+            if q["start_sec"] <= seg_mid_sec < q["end_sec"]:
+                q_si = q["avg_si"]
+                break
+
+        has_transition = any(seg_start_bar <= tb < seg_end_bar for tb in transition_bar_set)
+        seg_infos.append((seg_start_bar, seg_end_bar, seg_bars, q_si, has_transition))
+
+    if not seg_infos:
+        return [("intro", 8, False), ("buildup", 16, False),
+                ("drop", 16, False), ("outro", 8, False)]
+
+    # 상대 순위: 구간별 q_si를 정렬하여 상위 25%=high, 하위 25%=low, 나머지=mid
+    si_sorted = sorted(set(si for _, _, _, si, _ in seg_infos))
+    if len(si_sorted) >= 3:
+        low_thresh = si_sorted[len(si_sorted) // 4]
+        high_thresh = si_sorted[-(len(si_sorted) // 4 + 1)]
+    else:
+        low_thresh = si_sorted[0]
+        high_thresh = si_sorted[-1]
+
+    for seg_start_bar, seg_end_bar, seg_bars, q_si, has_transition in seg_infos:
+        position_pct = seg_start_bar / total_bars
+
+        # 상대적 label
+        if q_si >= high_thresh and high_thresh > low_thresh:
+            label = "high"
+        elif q_si <= low_thresh and high_thresh > low_thresh:
+            label = "low"
+        else:
+            label = "mid"
+
+        # role 배정 (위치 + 상대 에너지)
+        if position_pct < 0.12:
+            role = "intro"
+        elif position_pct > 0.88:
+            role = "outro"
+        elif label == "high":
+            role = "drop" if position_pct < 0.6 else "drop2"
+        elif label == "low":
+            role = "breakdown" if position_pct > 0.25 else "intro"
+        else:
+            role = "buildup" if position_pct < 0.45 else "drop2"
+
+        roles_bars.append((role, seg_bars, has_transition))
+
+    # 안전장치 1: drop이 하나도 없으면 가장 긴 mid/high 구간을 drop으로 승격
+    has_drop = any(r == "drop" or r == "drop2" for r, _, _ in roles_bars)
+    if not has_drop and len(roles_bars) > 2:
+        best_idx = -1
+        best_bars = 0
+        for i, (r, b, _) in enumerate(roles_bars):
+            if r not in ("intro", "outro") and b > best_bars:
+                best_bars = b
+                best_idx = i
+        if best_idx >= 0:
+            _, b, t = roles_bars[best_idx]
+            roles_bars[best_idx] = ("drop", b, t)
+
+    # 안전장치 2: 첫 drop 직전에 buildup 없으면 직전 intro를 buildup으로 변환
+    first_drop_idx = next((i for i, (r, _, _) in enumerate(roles_bars) if r in ("drop", "drop2")), -1)
+    if first_drop_idx > 0:
+        prev_role = roles_bars[first_drop_idx - 1][0]
+        if prev_role in ("intro", "breakdown"):
+            _, b, t = roles_bars[first_drop_idx - 1]
+            roles_bars[first_drop_idx - 1] = ("buildup", b, t)
+
+    # 빈 결과 방어
+    if not roles_bars:
+        roles_bars = [("intro", 8, False), ("buildup", 16, False),
+                      ("drop", 16, False), ("outro", 8, False)]
+
+    return roles_bars
+
+
 def _plan_song_structure(total_duration: float, bpm: float,
                          climax_time: float = None, outro_time: float = None,
-                         mood_layers: dict = None) -> list:
-    """v12: 대본 길이와 클라이맥스 시점으로 댄스 음악 구조 자동 생성.
+                         mood_layers: dict = None,
+                         story_structure: dict = None) -> list:
+    """v22: 스토리 구조 기반 동적 or 고정 비율 댄스 음악 구조 생성.
 
     Args:
         total_duration: 전체 BGM 길이 (초), 엔드카드 포함
         bpm: 고정 BPM
         climax_time: SI 피크 시점 (초). None이면 60% 지점
         outro_time: 아웃트로 시작 시점 (초). None이면 80% 지점
+        story_structure: script_data.json의 story_structure (Phase 0 출력)
 
     Returns: sections 리스트 (smooth_envelope 호환 형태)
     """
@@ -4822,46 +4955,55 @@ def _plan_song_structure(total_duration: float, bpm: float,
     # 최소 24바 (약 43초 @135bpm) 보장
     total_bars = max(total_bars, 24)
 
-    # 기준 72바 대비 비례 배분
-    base_total = sum(r[1] for r in ROLE_BAR_RATIOS)  # 72
-    scale = total_bars / base_total
+    story_driven = False
 
-    # 각 role의 바 수 계산 (최소 4바)
-    roles_bars = []
-    for role_name, base_bars in ROLE_BAR_RATIOS:
-        bars = max(4, round(base_bars * scale / 4) * 4)  # 4바 단위 올림
-        roles_bars.append((role_name, bars))
+    # Phase 1A: story_structure가 있으면 동적 구조 생성
+    if story_structure and story_structure.get("paragraph_breaks"):
+        story_roles = _plan_story_driven_structure(
+            total_duration, bpm, story_structure, mood_layers
+        )
+        # (role, bars, has_transition) → (role, bars)로 변환 + has_transition 보존
+        roles_bars = [(r, b) for r, b, _ in story_roles]
+        has_transition_flags = [t for _, _, t in story_roles]
+        story_driven = True
+        print(f"  [v22] Story-driven structure: {' → '.join(f'{r}({b}bar)' for r, b in roles_bars)}")
+    else:
+        # 폴백: 기존 고정 비율
+        base_total = sum(r[1] for r in ROLE_BAR_RATIOS)  # 72
+        scale = total_bars / base_total
 
-    # 총 바 수 조정 (초과/부족 시 drop/drop2에서 보정)
-    actual_total = sum(b for _, b in roles_bars)
-    diff = total_bars - actual_total
-    if diff != 0:
-        # drop2에서 조정 (4바 단위)
-        for i, (name, bars) in enumerate(roles_bars):
-            if name == "drop2":
-                adjusted = max(4, bars + (diff // 4) * 4)
-                roles_bars[i] = (name, adjusted)
-                break
+        roles_bars = []
+        for role_name, base_bars in ROLE_BAR_RATIOS:
+            bars = max(4, round(base_bars * scale / 4) * 4)
+            roles_bars.append((role_name, bars))
+        has_transition_flags = [False] * len(roles_bars)
 
-    # climax_time에 drop을 맞추기 위한 오프셋 계산
-    # 단, climax가 영상의 20~70% 구간에 있을 때만 조정 (범위 밖이면 기본 비율 유지)
-    if climax_time is not None:
-        climax_pct = climax_time / total_duration if total_duration > 0 else 0.5
-        if 0.20 <= climax_pct <= 0.70:
-            buildup_bars = roles_bars[1][1]
-            needed_intro_bars = max(4, round((climax_time - buildup_bars * bar_dur) / bar_dur / 4) * 4)
-            # intro가 전체의 40%를 넘지 않도록 제한
-            max_intro = max(4, int(total_bars * 0.4 / 4) * 4)
-            needed_intro_bars = min(needed_intro_bars, max_intro)
-            roles_bars[0] = ("intro", needed_intro_bars)
-        else:
-            print(f"  [v12] climax at {climax_pct:.0%} — outside 20~70% range, using default ratio")
+        # 총 바 수 조정 (초과/부족 시 drop2에서 보정)
+        actual_total = sum(b for _, b in roles_bars)
+        diff = total_bars - actual_total
+        if diff != 0:
+            for i, (name, bars) in enumerate(roles_bars):
+                if name == "drop2":
+                    adjusted = max(4, bars + (diff // 4) * 4)
+                    roles_bars[i] = (name, adjusted)
+                    break
 
-    # v16: 총 바 수가 target을 초과하지 않도록 강제 축소
+        # climax_time에 drop을 맞추기 위한 오프셋 계산
+        if climax_time is not None:
+            climax_pct = climax_time / total_duration if total_duration > 0 else 0.5
+            if 0.20 <= climax_pct <= 0.70:
+                buildup_bars = roles_bars[1][1]
+                needed_intro_bars = max(4, round((climax_time - buildup_bars * bar_dur) / bar_dur / 4) * 4)
+                max_intro = max(4, int(total_bars * 0.4 / 4) * 4)
+                needed_intro_bars = min(needed_intro_bars, max_intro)
+                roles_bars[0] = ("intro", needed_intro_bars)
+            else:
+                print(f"  [v12] climax at {climax_pct:.0%} — outside 20~70% range, using default ratio")
+
+    # 총 바 수가 target을 초과하지 않도록 강제 축소
     final_total = sum(b for _, b in roles_bars)
     if final_total > total_bars:
         excess = final_total - total_bars
-        # 큰 섹션부터 축소 (drop2 → intro → drop → buildup 순)
         for shrink_target in ("drop2", "intro", "drop", "buildup", "breakdown", "outro"):
             for i, (name, bars) in enumerate(roles_bars):
                 if name == shrink_target and bars > 4:
@@ -4879,7 +5021,7 @@ def _plan_song_structure(total_duration: float, bpm: float,
     genre_preset = GENRE_PRESETS["enometa"]
     vol_scale = genre_preset.get("volume_scale", {})
 
-    for role_name, bars in roles_bars:
+    for sec_idx, (role_name, bars) in enumerate(roles_bars):
         start_sec = t
         end_sec = t + bars * bar_dur
 
@@ -4920,6 +5062,8 @@ def _plan_song_structure(total_duration: float, bpm: float,
             },
             "transition_in": {"type": "crossfade", "duration_sec": 1.0},
             "_role": role_name,  # 원본 role 보존
+            "_story_driven": story_driven,
+            "_has_transition": has_transition_flags[sec_idx] if sec_idx < len(has_transition_flags) else False,
         }
         sections.append(section)
         t = end_sec
@@ -5042,9 +5186,13 @@ def generate_music_script(script_data_path: str, visual_script_path: str = None)
     # v19: 장르별 레이어 조합 생성
     mood_layers = EnometaMusicEngine._generate_mood_layers(music_mood, seed_val)
 
+    # v22 Phase 1A: story_structure 읽기
+    story_structure = script_data.get("story_structure", None)
+
     sections, actual_dur = _plan_song_structure(
         total_dur, bpm, climax_time=si_peak_time,
-        mood_layers=mood_layers
+        mood_layers=mood_layers,
+        story_structure=story_structure,
     )
     # v16: BGM 길이는 요청 길이(TTS+엔드카드)로 고정 — 초과 확장 금지
     total_dur = min(total_dur, actual_dur)
@@ -5076,6 +5224,7 @@ def generate_music_script(script_data_path: str, visual_script_path: str = None)
             "synthesis_overrides": {"enometa_mode": True},
             "music_mood": music_mood_out,
             "drum_mode": drum_mode_out,
+            "story_driven": story_structure is not None,
             "seq_config": dataclasses.asdict(seq_config),
             # v19: seed 기반 Vertical Remixing 레이어 조합 기록 (재현성)
             "mood_layers": mood_layers,

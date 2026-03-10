@@ -15,6 +15,7 @@
   "dependencies": {
     "@remotion/bundler": "4.0.431",
     "@remotion/cli": "4.0.431",
+    "@remotion/fonts": "4.0.431",
     "@remotion/layout-utils": "^4.0.432",
     "@remotion/renderer": "4.0.431",
     "@remotion/three": "4.0.431",

@@ -678,9 +678,92 @@ def extract_units(text):
 BPM_DEFAULT = 135
 SEC_PER_BAR = 60.0 / BPM_DEFAULT * 4  # 135 BPM 기준 4/4박자 1마디 = 1.777...초
 
+def extract_story_structure(segments, timing_data=None):
+    """스토리 구조 추출 — 제네레이티브 레이어의 공통 기반 (Phase 0)
+
+    Args:
+        segments: 분석 완료된 세그먼트 리스트 (analysis.semantic_intensity 포함)
+        timing_data: narration_timing.json 원본 (paragraph_breaks 포함)
+
+    Returns:
+        story_structure dict (paragraph_breaks, transition_points, energy_arc 등)
+    """
+    if not segments:
+        return None
+
+    # 1. paragraph_breaks: narration_timing.json에서 복사
+    paragraph_breaks = []
+    if timing_data and "paragraph_breaks" in timing_data:
+        paragraph_breaks = [pb["start_sec"] for pb in timing_data["paragraph_breaks"]]
+
+    # 2. transition_points: 인접 세그먼트 SI 차이 ≥ 0.25
+    transition_points = []
+    for i in range(1, len(segments)):
+        si_prev = segments[i - 1]["analysis"]["semantic_intensity"]
+        si_curr = segments[i]["analysis"]["semantic_intensity"]
+        delta = si_curr - si_prev
+        if abs(delta) >= 0.25:
+            transition_points.append({
+                "index": i,
+                "time_sec": round(segments[i]["start_sec"], 2),
+                "si_delta": round(delta, 3),
+                "direction": "rise" if delta > 0 else "fall",
+            })
+
+    # 3. energy_arc: SI 시계열의 구조적 요약
+    si_values = [seg["analysis"]["semantic_intensity"] for seg in segments]
+    si_times = [seg["start_sec"] for seg in segments]
+
+    total_duration = segments[-1]["end_sec"]
+    avg_si = round(sum(si_values) / len(si_values), 3)
+    si_variance = round(sum((s - avg_si) ** 2 for s in si_values) / len(si_values), 4)
+
+    # 피크 시점
+    peak_idx = si_values.index(max(si_values))
+    peak_time = round(si_times[peak_idx], 2)
+
+    # 4분위 분할 (최소 구간 길이 10초 제약)
+    quarter_dur = total_duration / 4
+    min_quarter = max(quarter_dur, 10.0)  # 최소 10초
+    num_quarters = max(1, int(total_duration / min_quarter))
+    actual_dur = total_duration / num_quarters
+
+    quarters = []
+    for q in range(num_quarters):
+        q_start = actual_dur * q
+        q_end = actual_dur * (q + 1)
+        q_si = [si_values[j] for j in range(len(segments))
+                if segments[j]["start_sec"] >= q_start and segments[j]["start_sec"] < q_end]
+        if not q_si:
+            q_si = [avg_si]
+        q_avg = round(sum(q_si) / len(q_si), 3)
+
+        # label: low(≤0.3), mid(0.3~0.6), high(>0.6)
+        label = "low" if q_avg <= 0.3 else ("high" if q_avg > 0.6 else "mid")
+        quarters.append({
+            "start_sec": round(q_start, 2),
+            "end_sec": round(q_end, 2),
+            "avg_si": q_avg,
+            "label": label,
+        })
+
+    return {
+        "paragraph_breaks": paragraph_breaks,
+        "transition_points": transition_points,
+        "energy_arc": {
+            "peak_time_sec": peak_time,
+            "avg_si": avg_si,
+            "si_variance": si_variance,
+            "quarters": quarters,
+        },
+        "total_paragraphs": len(paragraph_breaks) + 1,
+        "segment_count": len(segments),
+    }
+
+
 def extract_script_data(input_path):
     """script.txt(.txt) 또는 기존 narration_timing.json 모두 지원"""
-    
+
     is_json = input_path.endswith('.json')
     segments_raw = []
     
@@ -780,16 +863,24 @@ def extract_script_data(input_path):
         elif "drum" in timing:  # 하위호환: bool → drum_mode 변환
             timing_meta["drum_mode"] = "on" if timing["drum"] else "off"
 
-    return {
+    # story_structure 추출 (Phase 0 — 제네레이티브 기반)
+    timing_raw = timing if is_json else None
+    story_structure = extract_story_structure(segments_out, timing_raw)
+
+    result = {
         "metadata": {
             "episode": os.path.basename(os.path.dirname(input_path)),
             "source": os.path.basename(input_path),
-            "version": 2, # v12 Music-First
+            "version": 3,  # v3: story_structure 추가
             **timing_meta,
         },
         "segments": segments_out,
         "global": global_data,
     }
+    if story_structure:
+        result["story_structure"] = story_structure
+
+    return result
 
 
 def print_unregistered_report(unregistered):

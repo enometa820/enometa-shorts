@@ -300,6 +300,73 @@ EMOTION_KEYWORDS = {
 }
 
 # ============================================================
+# v22 Phase 1B: 키워드 → vocab 매핑 (제네레이티브 레이어)
+# 대본 키워드로 의미 맞는 vocab을 우선 선택
+# ============================================================
+KEYWORD_VOCAB_MAP = {
+    # 뇌과학 (신경, 시냅스, 뇌, 뉴런, 인지, 감각 등)
+    "neuroscience": {
+        "keywords": {"뇌", "뉴런", "시냅스", "신경", "피질", "편도체", "전두엽", "해마",
+                      "도파민", "세로토닌", "인지", "감각", "의식", "기억", "가소성",
+                      "수용체", "전달물질", "활성화", "억제", "전위"},
+        "vocabs": ["neural_network", "particle_chain_awaken", "fractal_crack",
+                   "particle_orbit", "lissajous_complex", "brightness_pulse"],
+    },
+    # 데이터/컴퓨팅 (알고리즘, 코드, 데이터, 네트워크 등)
+    "computing": {
+        "keywords": {"알고리즘", "코드", "데이터", "네트워크", "연산", "프로세스",
+                      "루프", "재귀", "캐시", "스택", "함수", "변수", "컴파일",
+                      "최적화", "병렬", "시뮬레이션", "머신러닝", "딥러닝"},
+        "vocabs": ["data_bar", "grid_morph", "counter_up",
+                   "ascii_matrix", "data_ring", "grid_mesh"],
+    },
+    # 자연/생물 (DNA, 진화, 세포, 생태계 등)
+    "biology": {
+        "keywords": {"DNA", "유전자", "진화", "세포", "생태계", "자연", "식물", "동물",
+                      "광합성", "단백질", "효소", "분열", "돌연변이", "종", "적응",
+                      "코돈", "아미노산", "리보솜", "미토콘드리아"},
+        "vocabs": ["particle_birth", "flow_field_calm", "terra_terrain",
+                   "flow_field_turbulent", "particle_converge", "color_bloom"],
+    },
+    # 철학 (존재, 본질, 자아, 인식 등)
+    "philosophy": {
+        "keywords": {"존재", "본질", "자아", "인식", "자유의지", "결정론", "의식",
+                      "현상", "실체", "범주", "명제", "귀납", "연역", "인과",
+                      "구조", "메커니즘", "역학", "메타인지"},
+        "vocabs": ["lissajous", "loop_ring", "brightness_pulse",
+                   "symbol_morph", "waveform_circular", "color_shift"],
+    },
+    # 물리 (파동, 주파수, 에너지, 양자 등)
+    "physics": {
+        "keywords": {"파동", "주파수", "에너지", "양자", "중력", "광자", "전자",
+                      "진동", "진폭", "파장", "스펙트럼", "엔트로피",
+                      "열역학", "상대성", "관성", "가속도"},
+        "vocabs": ["waveform_spectrum", "particle_scatter", "lissajous_complex",
+                   "waveform", "particle_escape", "color_shift_cold"],
+    },
+}
+
+
+def match_keyword_vocabs(sd_keywords: list, rng) -> list:
+    """sd_keywords에서 KEYWORD_VOCAB_MAP 매칭 → 우선 vocab 리스트 반환"""
+    if not sd_keywords:
+        return []
+
+    matched = []
+    keyword_texts = {kw["text"] for kw in sd_keywords}
+
+    for category, mapping in KEYWORD_VOCAB_MAP.items():
+        overlap = keyword_texts & mapping["keywords"]
+        if overlap:
+            # 매칭 비율에 따라 vocab 추가 (많이 겹칠수록 더 많이)
+            n = min(len(mapping["vocabs"]), max(1, len(overlap) // 2))
+            chosen = rng.sample(mapping["vocabs"], n) if n < len(mapping["vocabs"]) else mapping["vocabs"][:n]
+            matched.extend(chosen)
+
+    return matched
+
+
+# ============================================================
 # 감정 → 비주얼 어휘 풀 매핑
 # ============================================================
 EMOTION_VOCAB_POOL = {
@@ -811,18 +878,25 @@ def build_scene(
     avoid = set(strategy.get("avoid_vocabs", []))
     prefer = strategy.get("prefer_vocabs", [])
 
-    # 주요 비주얼 1개 선택 (이전 씬과 다른 것 선호 + 전략 반영)
-    primary_candidates = [v for v in pool["primary"] if v not in used_vocabs and v not in avoid]
-    if not primary_candidates:
-        primary_candidates = [v for v in pool["primary"] if v not in avoid]
-    if not primary_candidates:
-        primary_candidates = pool["primary"]
-    # prefer 가중치: prefer에 있는 후보를 앞에 배치
-    preferred = [v for v in primary_candidates if v in prefer]
-    if preferred and rng.random() > 0.3:
-        primary_vocab = rng.choice(preferred)
+    # v22 Phase 1B: 키워드 매칭 vocab을 최우선 후보로 배치
+    keyword_vocabs = match_keyword_vocabs(sd_keywords, rng) if sd_keywords else []
+    keyword_vocabs = [v for v in keyword_vocabs if v not in avoid and v not in used_vocabs]
+
+    # 주요 비주얼 1개 선택 (키워드 매칭 → prefer → 풀)
+    if keyword_vocabs and rng.random() < 0.7:  # 70% 확률로 키워드 매칭 우선
+        primary_vocab = rng.choice(keyword_vocabs)
     else:
-        primary_vocab = rng.choice(primary_candidates)
+        primary_candidates = [v for v in pool["primary"] if v not in used_vocabs and v not in avoid]
+        if not primary_candidates:
+            primary_candidates = [v for v in pool["primary"] if v not in avoid]
+        if not primary_candidates:
+            primary_candidates = pool["primary"]
+        # prefer 가중치: prefer에 있는 후보를 앞에 배치
+        preferred = [v for v in primary_candidates if v in prefer]
+        if preferred and rng.random() > 0.3:
+            primary_vocab = rng.choice(preferred)
+        else:
+            primary_vocab = rng.choice(primary_candidates)
 
     # 보조 비주얼 선택 (minimal 전략이면 생략, SI 기반 레이어 수 조절)
     max_layers = strategy.get("max_semantic_layers", 3)
@@ -1035,6 +1109,19 @@ def generate_visual_script(
         except Exception as e:
             print(f"  Warning: Could not load script_data.json keywords: {e}")
 
+    # v22 Phase 1B: story_structure 로드 (energy_arc → max_layers 차등)
+    story_structure = None
+    if os.path.exists(script_data_path):
+        try:
+            with open(script_data_path, 'r', encoding='utf-8') as f:
+                sd_full = json.load(f)
+            story_structure = sd_full.get("story_structure")
+            if story_structure:
+                print(f"  Story structure loaded: {story_structure.get('total_paragraphs', 0)} paragraphs, "
+                      f"peak at {story_structure.get('energy_arc', {}).get('peak_time_sec', '?')}s")
+        except Exception:
+            pass
+
     # B-9: script_path에서 tagline 추출 (없으면 기본값)
     tagline = "존재와 사유,\n그 경계를 초월하다"
     if script_path:
@@ -1164,6 +1251,18 @@ def generate_visual_script(
 
         # SI 기반 전략 승격: 고에너지 씬에서 더 밀도 높은 비주얼
         scene_si = scene_data.get("si", 0.5)
+
+        # v22 Phase 1B: energy_arc로 SI 부스트 (상대적 에너지 반영)
+        if story_structure and story_structure.get("energy_arc", {}).get("quarters"):
+            scene_mid = (scene_data["start"] + scene_data["end"]) / 2
+            for q in story_structure["energy_arc"]["quarters"]:
+                if q["start_sec"] <= scene_mid < q["end_sec"]:
+                    if q["label"] == "high":
+                        scene_si = min(1.0, scene_si + 0.15)  # 고에너지 구간 부스트
+                    elif q["label"] == "low":
+                        scene_si = max(0.05, scene_si - 0.05)  # 저에너지 구간 약간 감소
+                    break
+
         scene_strategy_name = promote_strategy_by_si(strategy_name, scene_si)
         scene_strategy = get_strategy(scene_strategy_name) if scene_strategy_name != strategy_name else strategy
 

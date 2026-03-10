@@ -1,6 +1,15 @@
 import React from "react";
 import { interpolate, spring } from "remotion";
+import { loadFont } from "@remotion/fonts";
+import { staticFile } from "remotion";
 import { VocabComponentProps } from "../../types";
+
+// Neo둥근모 (neodgm) — 8bit 픽셀 한글 폰트, SIL OFL
+const fontLoaded = loadFont({
+  family: "neodgm",
+  url: staticFile("fonts/neodgm.woff2"),
+});
+const FONT_FAMILY = '"neodgm", monospace';
 
 /**
  * TextReveal — 타이포그래피 모션그래픽
@@ -105,7 +114,7 @@ export const TextReveal: React.FC<VocabComponentProps> = ({
               <span key={i} style={{ position: "relative", display: "inline-block" }}>
                 <span
                   style={{
-                    fontFamily: "Pretendard Variable, sans-serif",
+                    fontFamily: FONT_FAMILY,
                     fontSize,
                     fontWeight: 800,
                     color: colorPulse,
@@ -154,7 +163,7 @@ export const TextReveal: React.FC<VocabComponentProps> = ({
               <span
                 key={i}
                 style={{
-                  fontFamily: "Pretendard Variable, sans-serif",
+                  fontFamily: FONT_FAMILY,
                   fontSize,
                   fontWeight: 800,
                   color,
@@ -191,7 +200,7 @@ export const TextReveal: React.FC<VocabComponentProps> = ({
               <span
                 key={i}
                 style={{
-                  fontFamily: "'Courier New', monospace",
+                  fontFamily: FONT_FAMILY,
                   fontSize,
                   fontWeight: 700,
                   color: glitchColor2,
@@ -235,7 +244,7 @@ export const TextReveal: React.FC<VocabComponentProps> = ({
               <span
                 key={i}
                 style={{
-                  fontFamily: "Pretendard Variable, sans-serif",
+                  fontFamily: FONT_FAMILY,
                   fontSize,
                   fontWeight: 900,
                   color,
