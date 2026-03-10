@@ -2,7 +2,7 @@
   "metadata": {
     "episode": "ep011",
     "source": "narration_timing.json",
-    "version": 2,
+    "version": 3,
     "music_mood": "acid",
     "drum_mode": "simple"
   },
@@ -7250,6 +7250,68 @@
     "total_duration_sec": 102.148,
     "bpm": 135,
     "sec_per_bar": 1.7777777777777777
+  },
+  "story_structure": {
+    "paragraph_breaks": [
+      5.34,
+      12.152,
+      18.22,
+      23.832,
+      30.14,
+      36.136,
+      40.008,
+      46.436,
+      50.284,
+      54.348,
+      59.168,
+      65.524,
+      72.168,
+      77.708,
+      81.772,
+      90.012,
+      96.008
+    ],
+    "transition_points": [
+      {
+        "index": 14,
+        "time_sec": 43.51,
+        "si_delta": -0.255,
+        "direction": "fall"
+      }
+    ],
+    "energy_arc": {
+      "peak_time_sec": 40.81,
+      "avg_si": 0.104,
+      "si_variance": 0.0036,
+      "quarters": [
+        {
+          "start_sec": 0.0,
+          "end_sec": 25.54,
+          "avg_si": 0.082,
+          "label": "low"
+        },
+        {
+          "start_sec": 25.54,
+          "end_sec": 51.07,
+          "avg_si": 0.156,
+          "label": "low"
+        },
+        {
+          "start_sec": 51.07,
+          "end_sec": 76.61,
+          "avg_si": 0.107,
+          "label": "low"
+        },
+        {
+          "start_sec": 76.61,
+          "end_sec": 102.15,
+          "avg_si": 0.082,
+          "label": "low"
+        }
+      ]
+    },
+    "total_paragraphs": 18,
+    "segment_count": 33
   },
   "unregistered_words": {
     "unregistered_verbs": [
