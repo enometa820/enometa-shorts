@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 컴퓨터적 사고 프로토콜
+
+논의/토론/문제 해결 시 `.claude/rules/computational-thinking.md`의 5단계를 자동 적용한다.
+**STEP 0(문제 정의) → STEP 1(분해) → STEP 2(패턴) → STEP 3(추상화) → STEP 4(알고리즘)**
+바로 답하지 말고 먼저 문제를 정의한다. 단순 질문/명령 실행에는 적용하지 않음.
+
 ## 학습 목표 — 개발 개념 체득
 
 이 프로젝트를 진행하면서 개발 용어/개념/작업 방식을 학습하고 싶어한다.

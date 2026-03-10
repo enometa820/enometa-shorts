@@ -5,6 +5,19 @@
 
 ---
 
+## 2026-03-10 — 시스템 분석 + 문서 정비 + 글쓰기 STEP 0 개선
+
+### Added
+- `docs/reactive-architecture.md`: 3경로 리액티브 아키텍처 문서 (대본→음악/대본→비주얼/음악→비주얼 현황, SI 계산 방식, 체감도 비교)
+- `docs/document-map.md`: 프로젝트 전체 문서 지도 — 역할별 분류, 동기화 규칙
+- `docs/vision-roadmap.md`: 비전 로드맵 — 제네레이티브+리액티브 목표, 레퍼런스 갭 분석, 대본→비주얼 강 목표
+
+### Changed
+- `enometa-writing.md` STEP 0: 주제 발굴 전략 3종 추가 (충돌 생성기/엣지 팩트 시드/일상 해킹 믹스), 도메인 밸런스 규칙, 뻔함 테스트, 과잉 소비 주제 확장
+- `enometa-finalize.md`: STEP 1 영향 범위 테이블 확장 (audio_analyzer/script_data_extractor/docs 추가), STEP 2에 아키텍처 문서 동기화 섹션(E) 추가
+
+---
+
 ## 2026-03-10 — v22 백남준 미학 + 비주얼 강화 + 글쓰기 v13
 
 ### Added

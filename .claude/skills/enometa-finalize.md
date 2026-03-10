@@ -26,10 +26,13 @@ git diff --name-only HEAD
 |-----------|-------------|
 | `src/components/vocab/*.tsx` | CLAUDE.md (vocab 목록), README.md (vocab 테이블), visual-architecture.md |
 | `src/components/*.tsx` | README.md (구조도), visual-architecture.md |
-| `scripts/enometa_music_engine.py` | CLAUDE.md (음악 규칙), README.md (장르 테이블) |
-| `scripts/visual_*.py` | visual-architecture.md, README.md (레이어 테이블) |
-| `.claude/skills/*.md` | CLAUDE.md (스킬 라우팅 테이블) |
+| `scripts/enometa_music_engine.py` | CLAUDE.md (음악 규칙), README.md (장르 테이블), reactive-architecture.md (대본→음악 경로) |
+| `scripts/visual_*.py` | visual-architecture.md, README.md (레이어 테이블), reactive-architecture.md (대본→비주얼 경로) |
+| `scripts/audio_analyzer.py` | reactive-architecture.md (음악→비주얼 경로) |
+| `scripts/script_data_extractor.py` | reactive-architecture.md (SI 계산 방식) |
+| `.claude/skills/*.md` | CLAUDE.md (스킬 라우팅 테이블), document-map.md (스킬 목록) |
 | `CLAUDE.md` | MEMORY.md (규칙 동기화) |
+| `docs/*.md` 신규/삭제 | document-map.md (문서 지도 동기화) |
 
 ## STEP 2: 교차 검증 체크리스트
 
@@ -54,6 +57,11 @@ git diff --name-only HEAD
 - [ ] MEMORY.md가 200줄 이내
 - [ ] CLAUDE.md 절대 규칙 변경 시 → MEMORY.md에도 반영됨
 - [ ] 새 교훈/패턴 발견 시 → MEMORY.md 또는 하위 파일에 기록됨
+
+### E. 아키텍처 문서 동기화
+- [ ] 리액티브 경로 변경 시 → reactive-architecture.md 반영됨 (SI 계산, 데이터 흐름, 파라미터 테이블)
+- [ ] 비주얼 레이어/컴포넌트 변경 시 → visual-architecture.md 반영됨
+- [ ] 문서 추가/삭제 시 → document-map.md 반영됨
 
 ## STEP 3: 검증 결과 보고
 
