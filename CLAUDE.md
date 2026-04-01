@@ -28,6 +28,7 @@ Claude는:
 - **오디오**: narration_volume=0.90, bgm_volume=1.0 (기본), 사이드체인 없음, loudnorm -14 LUFS, 엔드카드 BGM 자동 연장
 - **태그**: 주제 기반 3개 + 고정 5개(`#데이터아트` `#전자음악` `#오디오비주얼` `#철학` `#동기부여`) = 해시태그 항상 8개. **완전 금지** (어디에도 사용 불가): `#쇼츠` `#shorts` `#ENOMETA` `#이노메타`
 - **AsciiArt position**: 자막 영역(y≥1230 전체 캔버스) 침범 금지. bottom 위치 = height*0.62. TextReveal과 동일 규칙.
+- **크리처 시스템**: v26 ASCII Fuggler 크리처. `visual_script_generator.py`가 ep_seed 기반으로 `creature_config` 자동 생성. `CreatureOverlay.tsx`가 VisualSection 정중앙(500×520)에 항상 렌더링. 종별 6종(cat/rabbit/bear/owl/dog/blob), 귀/눈/이빨 비대칭 자동 변형. 종족간 합체 금지 — species는 단일 종으로 고정.
 
 ## 빌드 & 실행 명령
 
@@ -92,8 +93,8 @@ script.txt → gen_timing.py → narration_timing.json
 ### 새 에피소드 추가 절차
 
 1. `episodes/epXXX/` 디렉토리 생성 후 파이프라인 실행
-2. `src/epXXXScript.ts` 생성 — ep011Script.ts 패턴 복사 (json import + export 5개)
-3. `src/Root.tsx` 상단 import 추가, `<Composition id="EPXXX" ... calcMeta>` 블록 추가
+2. `src/Root.tsx` — EPISODES 배열에 `"epXXX"` 추가 (epXXXScript.ts 별도 생성 불필요)
+3. `public/epXXX/` 폴더 생성 후 JSON 파일 복사 (audio_analysis, narration_timing, visual_script)
 4. `public/epXXX/mixed.wav` 동기화 (`episodes/epXXX/mixed.wav` 복사)
 
 ### 사용 가능한 Vocab 문자열 (VisualSection.tsx VOCAB_MAP)
@@ -107,7 +108,7 @@ script.txt → gen_timing.py → narration_timing.json
 **레트로**: `pixel_grid` `pixel_grid_outline` `pixel_grid_life` `pixel_grid_rain` `pixel_waveform` `pixel_waveform_steps` `pixel_waveform_cascade`
 **3D/Terra**: `terra_globe` `terra_globe_data` `terra_flythrough` `terra_tunnel` `terra_terrain` `terra_terrain_bars` (씬당 최대 1개, @remotion/three 기반, `.claude/rules/3d.md` 규칙 준수)
 **GLSL 셰이더**: `shader_field` (노이즈 간섭 필드, neutral/analytical) `shader_field_plasma` (플라즈마 고에너지, tension/climax) — Three.js ShaderMaterial + AdditiveBlending, audio-reactive fBm noise
-**자동 적용**: `post_process` (VisualSection이 항상 렌더링, vocab에 추가 불필요)
+**자동 적용**: `post_process` (VisualSection이 항상 렌더링, vocab에 추가 불필요), `creature` (CreatureOverlay가 항상 렌더링, vocab에 추가 불필요)
 
 ### ⚠️ 오디오 경로 주의
 Remotion은 `public/epXXX/mixed.wav`를 참조. `episodes/epXXX/mixed.wav`와 **별개**.
