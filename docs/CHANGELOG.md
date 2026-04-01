@@ -5,6 +5,23 @@
 
 ---
 
+## 2026-04-01 — v25: 멜로디 레이어 다양성 + 리드 선택 + 배경 장르 차별화
+
+### Added
+- `pluck_sequence()` — Karplus-Strong 플럭 시퀀서 (lfilter 기반)
+- `pad_sequence()` — 가산합성 4레이어 + LFO 모핑 패드
+- `fm_lead()` — 2-op FM 합성 리드 (DX7 스타일)
+- 렌더러 3개: `_render_continuous_pluck_sequence`, `_render_continuous_pad_sequence`, `_render_continuous_fm_lead`
+- 리드 선택 시스템: `_generate_mood_layers()`에 ep_seed+77777 기반 lead/support 볼륨 분리
+- seq_config 3필드: `pluck_brightness`, `pad_morph_speed`, `fm_lead_mod_ratio` (ep_seed+25000 별도 rng)
+
+### Changed
+- `_FLAT_INSTRUMENTS`: saw_sequence 1.0→0.7, synth_lead 제거, 신규 3레이어 0.7 추가
+- `_GENRE_SPECS` 10종: 신규 레이어 optional_pool 추가 + 배경 장르 차별화 (arpeggio 8/10→5/10, fm_bass 7/10→4/10)
+- CLAUDE.md: seq_config 파라미터 수 23→26
+
+---
+
 ## 2026-03-10 — 제네레이티브 미디어아트 Phase 0~1 구현
 
 ### Added

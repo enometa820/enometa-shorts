@@ -40,6 +40,41 @@ def rudin_shapiro(n: int) -> list:
     return [bin(i & (i << 1)).count('1') % 2 for i in range(n)]
 
 
+def fibonacci_word(n: int) -> list:
+    """Fibonacci Word 수열: F(0)=0, F(1)=01, F(k)=F(k-1)+F(k-2).
+    황금비 기반 준주기 패턴 — Thue-Morse보다 불규칙하고 유기적.
+    """
+    if n <= 0:
+        return []
+    a, b = [0], [0, 1]
+    while len(b) < n + 32:  # 여유분 생성
+        a, b = b, b + a
+    return [x % 2 for x in b[:n]]  # 0/1 이진화
+
+
+def cantor_set(n: int, density: float = 0.5) -> list:
+    """Cantor Set 기반 수열: 3등분 자기유사 패턴.
+    density로 밀도 제어 (0.33=칸토르 3등분, 0.5=균형).
+    """
+    if n <= 0:
+        return []
+    result = [1] * n
+    # 중간 1/3 제거를 재귀적으로 적용 (depth=3)
+    def remove_middle(start, end, depth):
+        if depth == 0 or end - start < 3:
+            return
+        third = (end - start) // 3
+        mid_s = start + third
+        mid_e = end - third
+        for i in range(mid_s, mid_e):
+            if i < n:
+                result[i] = 0
+        remove_middle(start, mid_s, depth - 1)
+        remove_middle(mid_e, end, depth - 1)
+    remove_middle(0, n, 3)
+    return result
+
+
 # ── 변환 함수 ──────────────────────────────────────────────
 
 def invert_binary(seq: list) -> list:
@@ -118,6 +153,22 @@ class EpisodeSequenceConfig:
     melody_scale_offset: int   # 0~6, 스케일 시작 음계 회전
     melody_beat_base: float    # 2.0~8.0 Hz, 맥놀이 기본 주파수
     melody_norgard_offset: int # 0~15, Norgard 수열 시작점 오프셋
+    # v23: 음색/조성 다양성
+    base_freq: float           # 근음 주파수 55~73 Hz (에피소드마다 다른 키)
+    chord_voicing: str         # 코드 보이싱 (minor/minor7/sus4/power/dim)
+    hat_brightness: int        # 하이햇 HP 필터 컷오프 Hz (3000~12000)
+    hat_decay: float           # 하이햇 감쇠 속도 (40~80)
+    snare_tone_mix: float      # 스네어 톤/노이즈 비율 (0.0~0.45)
+    snare_freq: int            # 스네어 톤 주파수 Hz (150~260)
+    rhodes_brightness: float   # 로즈 패드 밝기 (0.0~1.0)
+    # v23: 드럼 패턴 다양성
+    snare_independent: bool    # True=독립 시퀀스, False=킥 파생(기존)
+    # v24: 멜로디 수열 유형 + 장르별 음정 풀
+    melody_seq_type: int       # 0=norgard 1=fibonacci 2=thue_morse 3=random_contour
+    # v25: 신규 멜로디 레이어 파라미터 (별도 rng offset으로 파생 — 기존 스트림 보존)
+    pluck_brightness: float    # 0.2~0.9 (나일론→금속)
+    pad_morph_speed: float     # 0.1~0.8 (느린→빠른 LFO 모핑)
+    fm_lead_mod_ratio: float   # 1.5~5.0 (FM 모듈레이터 비율)
 
 
 # ── 아르페지오 패턴 풀 ─────────────────────────────────────
@@ -140,12 +191,17 @@ BPM_POOL = [108, 115, 120, 125, 128, 130, 135, 138, 140, 145, 150, 155, 160, 162
 _HARMONIC_POOL = [1, 2, 3, 4, 5, 6, 7, 8]
 _CUTOFF_POOL = [2000, 2500, 3000, 3500, 4000, 5000, 6000, 7000]
 
+# v23: 다양성 강화 풀
+KEY_FREQS = [55.0, 58.27, 61.74, 65.41, 69.30, 73.42]  # A1~D2 반음 6개
+CHORD_VOICING_POOL = ["minor", "minor7", "sus4", "power", "dim"]
+HAT_BRIGHTNESS_POOL = [3000, 4500, 6000, 8000, 10000, 12000]
+SNARE_FREQ_POOL = [150, 175, 200, 230, 260]
+
 
 def derive_episode_sequences(ep_seed: int) -> EpisodeSequenceConfig:
     """에피소드 시드에서 결정론적으로 시퀀스+음색 설정 파생."""
     rng = random.Random(ep_seed)
-    # v13 패턴 파라미터
-    drum_seq_type = rng.randint(0, 1)
+    # v13 패턴 파라미터 (drum_seq_type은 v23에서 4종으로 확장됨, 아래에서 재정의)
     drum_rotation = rng.randint(0, 15)
     pitch_rotation = rng.randint(0, 7)
     pitch_length = rng.choice([4, 5, 6, 7, 8])
@@ -165,6 +221,24 @@ def derive_episode_sequences(ep_seed: int) -> EpisodeSequenceConfig:
     melody_scale_offset = rng.randint(0, 6)
     melody_beat_base = round(rng.uniform(2.0, 8.0), 1)
     melody_norgard_offset = rng.randint(0, 15)
+    # v23: 음색/조성 다양성
+    base_freq = rng.choice(KEY_FREQS)
+    chord_voicing = rng.choice(CHORD_VOICING_POOL)
+    hat_brightness = rng.choice(HAT_BRIGHTNESS_POOL)
+    hat_decay = round(rng.uniform(40.0, 80.0), 1)
+    snare_tone_mix = round(rng.uniform(0.0, 0.45), 2)
+    snare_freq = rng.choice(SNARE_FREQ_POOL)
+    rhodes_brightness = round(rng.uniform(0.0, 1.0), 2)
+    # v23: 드럼 다양성 — 시퀀스 4종 + 스네어 독립 여부
+    drum_seq_type = rng.randint(0, 3)   # 0=TM 1=RS 2=Fibonacci 3=Cantor
+    snare_independent = rng.random() > 0.5  # 50% 확률로 독립 패턴
+    # v24: 멜로디 수열 유형
+    melody_seq_type = rng.randint(0, 3)  # 0=norgard 1=fibonacci 2=thue_morse 3=random_contour
+    # v25: 신규 레이어 파라미터 — 별도 rng (기존 스트림 보존)
+    rng25 = random.Random(ep_seed + 25000)
+    pluck_brightness  = round(rng25.uniform(0.2, 0.9), 2)
+    pad_morph_speed   = round(rng25.uniform(0.1, 0.8), 2)
+    fm_lead_mod_ratio = round(rng25.uniform(1.5, 5.0), 2)
     return EpisodeSequenceConfig(
         drum_seq_type=drum_seq_type,
         drum_rotation=drum_rotation,
@@ -182,6 +256,18 @@ def derive_episode_sequences(ep_seed: int) -> EpisodeSequenceConfig:
         melody_scale_offset=melody_scale_offset,
         melody_beat_base=melody_beat_base,
         melody_norgard_offset=melody_norgard_offset,
+        base_freq=base_freq,
+        chord_voicing=chord_voicing,
+        hat_brightness=hat_brightness,
+        hat_decay=hat_decay,
+        snare_tone_mix=snare_tone_mix,
+        snare_freq=snare_freq,
+        rhodes_brightness=rhodes_brightness,
+        snare_independent=snare_independent,
+        melody_seq_type=melody_seq_type,
+        pluck_brightness=pluck_brightness,
+        pad_morph_speed=pad_morph_speed,
+        fm_lead_mod_ratio=fm_lead_mod_ratio,
     )
 
 
@@ -203,20 +289,25 @@ def generate_drum_pattern(config: EpisodeSequenceConfig, role: str, si: float = 
 
     Returns: {"kick": [0/1]*16, "snare": [0/1]*16, "hihat": [0/1]*16}
     """
-    # 기본 16스텝 이진 수열
-    if config.drum_seq_type == 0:
-        kick_base = thue_morse(16)
-        hihat_base = rudin_shapiro(16)
-    else:
-        kick_base = rudin_shapiro(16)
-        hihat_base = thue_morse(16)
+    # v23: 4종 기본 시퀀스 (0=TM 1=RS 2=Fibonacci 3=Cantor)
+    _SEQ_POOL = [thue_morse, rudin_shapiro,
+                 lambda n: fibonacci_word(n),
+                 lambda n: cantor_set(n)]
+    seq_fn_kick  = _SEQ_POOL[config.drum_seq_type % 4]
+    seq_fn_hihat = _SEQ_POOL[(config.drum_seq_type + 1) % 4]  # 킥과 다른 시퀀스
+    kick_base  = seq_fn_kick(16)
+    hihat_base = seq_fn_hihat(16)
 
     # 에피소드별 회전
     kick_base = rotate(kick_base, config.drum_rotation)
     hihat_base = rotate(hihat_base, config.drum_rotation + 2)
 
-    # 스네어: 킥 반전 + 4스텝 회전 (킥과 엇갈림)
-    snare_base = invert_binary(rotate(kick_base, 4))
+    # 스네어: 독립 패턴 or 킥 파생 (snare_independent 플래그)
+    if getattr(config, 'snare_independent', False):
+        seq_fn_snare = _SEQ_POOL[(config.drum_seq_type + 2) % 4]
+        snare_base = rotate(seq_fn_snare(16), config.drum_rotation + 8)
+    else:
+        snare_base = invert_binary(rotate(kick_base, 4))
 
     # 밀도 테이블
     densities = ROLE_DENSITY.get(role, ROLE_DENSITY["drop"])
@@ -286,8 +377,32 @@ def generate_fill_pattern(config: EpisodeSequenceConfig, fill_type: str) -> dict
 
 # ── 피치 패턴 생성 ────────────────────────────────────────
 
-# 양자화 대상 음정비율
+# 기본 음정비율 풀 (fallback)
 PITCH_RATIOS = [0.5, 0.75, 1.0, 1.125, 1.25, 1.333, 1.5, 1.75, 2.0]
+
+# v24: 장르별 음정 풀 — 장르 정체성에 맞는 음정 집합
+GENRE_PITCH_RATIOS = {
+    # 크로매틱 반음계 — acid 특유의 액체 필터 스윕과 어울림
+    "acid":       [1.0, 1.059, 1.122, 1.189, 1.260, 1.335, 1.414, 1.498, 1.587, 1.782, 2.0],
+    # 옥타브+5도 도약 — techno의 강렬한 리듬감
+    "techno":     [0.5, 1.0, 1.5, 2.0, 0.75, 1.25],
+    # 파워코드 간격 — industrial의 거칠고 강한 질감
+    "industrial": [0.5, 1.0, 1.189, 1.498, 2.0],
+    # 펜타토닉 — ambient의 떠다니는 명상적 질감
+    "ambient":    [1.0, 1.125, 1.25, 1.5, 1.75, 2.0],
+    # 펜타토닉 — dub의 느슨한 그루브
+    "dub":        [1.0, 1.125, 1.333, 1.5, 1.75, 2.0],
+    # 미분음 느낌 — microsound의 입자적 텍스처
+    "microsound": [1.0, 1.059, 1.122, 1.414, 1.587, 2.0],
+    # 단순 3화음 — minimal의 절제
+    "minimal":    [1.0, 1.25, 1.5, 2.0],
+    # 불규칙 크로매틱 — IDM의 복잡한 리듬/멜로디
+    "IDM":        [0.5, 1.0, 1.189, 1.414, 1.498, 1.782, 2.0],
+    # 극단 도약 — glitch의 파괴적 음정
+    "glitch":     [0.5, 0.75, 1.0, 1.414, 2.0, 2.828],
+    # 메이저 7th 풍 — house의 따뜻한 코드감
+    "house":      [1.0, 1.125, 1.25, 1.333, 1.5, 1.75, 2.0],
+}
 
 # 에너지 레벨별 음역 범위
 ENERGY_PITCH_RANGE = {
@@ -298,25 +413,53 @@ ENERGY_PITCH_RANGE = {
 }
 
 
-def generate_pitch_pattern(config: EpisodeSequenceConfig, energy_key: str = "mid") -> list:
-    """Nørgård 수열 기반 음정비율 패턴 생성.
+def generate_pitch_pattern(config: EpisodeSequenceConfig, energy_key: str = "mid",
+                            genre: str = "") -> list:
+    """v24: 멜로디 수열 4종 × 장르별 음정 풀 — 에피소드마다 다른 멜로디 윤곽.
+
+    melody_seq_type:
+      0 = Nørgård  (프랙탈 자기유사)
+      1 = Fibonacci word (황금비 비주기)
+      2 = Thue-Morse (이진 교대 → 멜로디 변환)
+      3 = Random contour (ep_seed 기반 완전 랜덤)
+
+    genre: GENRE_PITCH_RATIOS 키 (없으면 PITCH_RATIOS fallback)
 
     Returns: [float, ...] 길이 = config.pitch_length
     """
     length = config.pitch_length
+    seq_type = getattr(config, "melody_seq_type", 0)
 
-    # Nørgård 수열 생성 (여유분 포함)
-    raw = norgard(length * 4)
-    raw = rotate(raw, config.pitch_rotation)[:length]
+    # ── 수열 선택 ──────────────────────────────────────────
+    if seq_type == 0:
+        # Nørgård: 프랙탈 자기유사 윤곽
+        raw = norgard(length * 4)
+        raw = rotate(raw, config.pitch_rotation)[:length]
+    elif seq_type == 1:
+        # Fibonacci word: 황금비 기반 비주기 패턴 → 정수로 스케일
+        raw_bin = fibonacci_word(length * 4)[:length]
+        # 0/1 이진 → 0~7 범위로 확장 (pitch_rotation으로 오프셋)
+        offset = config.pitch_rotation % 4
+        raw = [v * (3 + offset) + (i % 3) for i, v in enumerate(raw_bin)]
+    elif seq_type == 2:
+        # Thue-Morse: 이진 교대 → 멜로디 윤곽으로 변환
+        raw_bin = thue_morse(length * 4)[:length]
+        scale = config.pitch_rotation % 5 + 2  # 2~6
+        raw = [v * scale + (i % scale) for i, v in enumerate(raw_bin)]
+    else:
+        # Random contour: ep_seed 기반 완전 랜덤 (같은 ep에서는 항상 동일)
+        crng = random.Random(config.pitch_rotation * 997 + length * 31)
+        raw = [crng.randint(0, 8) for _ in range(length)]
 
-    # 에너지별 음역 범위
+    # ── 장르별 음정 풀 선택 ────────────────────────────────
+    pitch_pool = GENRE_PITCH_RATIOS.get(genre, PITCH_RATIOS)
+
+    # ── 음역 범위 적용 ─────────────────────────────────────
     lo, hi = ENERGY_PITCH_RANGE.get(energy_key, (0.75, 1.5))
-
-    # 정수 → 실수 매핑
     ratios = normalize_to_range(raw, lo, hi)
 
-    # 가장 가까운 음악적 비율로 양자화
-    return [min(PITCH_RATIOS, key=lambda r: abs(r - v)) for v in ratios]
+    # ── 가장 가까운 음정으로 양자화 ────────────────────────
+    return [min(pitch_pool, key=lambda r: abs(r - v)) for v in ratios]
 
 
 # ── 테스트 ─────────────────────────────────────────────────

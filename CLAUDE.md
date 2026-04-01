@@ -106,6 +106,7 @@ script.txt → gen_timing.py → narration_timing.json
 **ASCII**: `ascii_block` `ascii_shape` `ascii_matrix` (block: 비트맵 블록 문자, shape: 품사별 ASCII 패턴, matrix: 터미널 데이터 스트림)
 **레트로**: `pixel_grid` `pixel_grid_outline` `pixel_grid_life` `pixel_grid_rain` `pixel_waveform` `pixel_waveform_steps` `pixel_waveform_cascade`
 **3D/Terra**: `terra_globe` `terra_globe_data` `terra_flythrough` `terra_tunnel` `terra_terrain` `terra_terrain_bars` (씬당 최대 1개, @remotion/three 기반, `.claude/rules/3d.md` 규칙 준수)
+**GLSL 셰이더**: `shader_field` (노이즈 간섭 필드, neutral/analytical) `shader_field_plasma` (플라즈마 고에너지, tension/climax) — Three.js ShaderMaterial + AdditiveBlending, audio-reactive fBm noise
 **자동 적용**: `post_process` (VisualSection이 항상 렌더링, vocab에 추가 불필요)
 
 ### ⚠️ 오디오 경로 주의
@@ -129,7 +130,7 @@ mix 단계 후 `public/epXXX/mixed.wav`도 반드시 동기화 필요.
 - **레이어 ON/OFF + 볼륨 고정**: 에너지는 볼륨 커브가 아닌 레이어 추가/제거로 표현. 콜앤리스폰스/song_arc 비활성. 마스터 페이드 없음 (5ms anti-click만).
 - **고정 BPM**: 가변 BPM은 섹션 경계에서 리듬 파괴. 장르 범위 내 단일 BPM 유지.
 - **타이밍**: 영상 길이 = `lastScene.end_sec + endcard`. BGM 초과분 자동 잘림. 문장 갭 `--gap 0.3`, 문단 갭 `--paragraph-gap 0.8`.
-- **다양성 보장**: ep_seed → seq_config(드럼/음색/패턴/멜로디 13개 파라미터) 에피소드마다 자동 분화. 비주얼 전략은 genre에 따라 동적 선택, SI≥0.80에서 전략 승격. vocab avoid 목록은 최소한만 유지.
+- **다양성 보장**: ep_seed → seq_config(드럼/음색/패턴/멜로디/조성 **26개 파라미터**) 에피소드마다 자동 분화. v23: base_freq(키 6종), chord_voicing(5종), hat_brightness/snare_tone_mix(드럼 음색), 드럼 시퀀스 4종(TM/RS/Fibonacci/Cantor), 마스터링 drive 장르별 차별화. v25: pluck_brightness/pad_morph_speed/fm_lead_mod_ratio(신규 3개, ep_seed+25000 별도 rng). 비주얼 전략은 genre에 따라 동적 선택, SI≥0.80에서 전략 승격. vocab avoid 목록은 최소한만 유지.
 
 ### 메모리 과부하 방지
 

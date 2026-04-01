@@ -143,6 +143,36 @@ def resonant_bandpass(audio, low_hz, high_hz, sr=SAMPLE_RATE, order=2):
     return sosfilt(sos, audio)
 
 
+def svf_lowpass(audio: np.ndarray, cutoff_hz: float, resonance: float = 1.0,
+                sr: int = SAMPLE_RATE) -> np.ndarray:
+    """SVF (State Variable Filter) — 레조넌트 LP 필터. v23 신규.
+
+    scipy butter와 달리 Q(resonance) 파라미터를 직접 제어.
+    resonance=0.5: 플랫(Butterworth), 1.0=약한 피크, 4.0=acid 특유의 유체 사운드,
+    8.0=산 자락 날카로운 공명, 10+: 자기진동 경계.
+
+    Biquad IIR LPF 공식 (Audio EQ Cookbook, R. Bristow-Johnson):
+      w0 = 2π·fc/fs,  alpha = sin(w0)/(2Q)
+      b = [(1-cos(w0))/2, 1-cos(w0), (1-cos(w0))/2]
+      a = [1+alpha, -2cos(w0), 1-alpha]
+    scipy.lfilter로 적용 (벡터화, 빠름).
+    """
+    cutoff_hz = min(max(cutoff_hz, 20.0), sr / 2 - 100)
+    Q = max(resonance, 0.5)
+    w0 = 2.0 * np.pi * cutoff_hz / sr
+    alpha = np.sin(w0) / (2.0 * Q)
+    cos_w0 = np.cos(w0)
+    b0 = (1.0 - cos_w0) / 2.0
+    b1 = 1.0 - cos_w0
+    b2 = (1.0 - cos_w0) / 2.0
+    a0 = 1.0 + alpha
+    a1 = -2.0 * cos_w0
+    a2 = 1.0 - alpha
+    b = np.array([b0 / a0, b1 / a0, b2 / a0])
+    a = np.array([1.0, a1 / a0, a2 / a0])
+    return lfilter(b, a, audio)
+
+
 def make_wavetable(harmonics: dict, size: int = 2048) -> np.ndarray:
     """배음 딕셔너리 → 1주기 웨이브테이블.
     harmonics: {배음번호: 진폭}  예: {1: 1.0, 3: 0.5, 5: 0.2}
@@ -735,27 +765,39 @@ def kick_drum(freq=55, sr=SAMPLE_RATE, character=0):
     return wave
 
 
-def hi_hat(open_hat=False, sr=SAMPLE_RATE):
-    """하이햇 v4 — highpass 제거, 볼륨 업"""
+def hi_hat(open_hat=False, sr=SAMPLE_RATE, brightness=8000, decay_rate=60):
+    """하이햇 v23 — brightness(HP 필터 컷오프)/decay_rate(감쇠) 파라미터화.
+    brightness: 3000~12000 Hz — 어두운 히햇(낮음) vs 밝은 심벌 느낌(높음)
+    decay_rate: 40~80 — 빠른 클로즈드(높음) vs 느린 오픈(낮음)
+    """
     duration = 0.15 if open_hat else 0.04
     n = noise(duration, sr)
     t = np.linspace(0, duration, len(n), endpoint=False)
     if open_hat:
-        env = np.exp(-t * 15) * 0.25
+        env = np.exp(-t * (decay_rate * 0.25)) * 0.25
     else:
-        env = np.exp(-t * 60) * 0.2
+        env = np.exp(-t * decay_rate) * 0.2
     n *= env
+    # brightness로 HP 필터 (고역 밝기 제어)
+    cutoff = min(int(brightness), sr // 2 - 100)
+    sos = butter(2, cutoff, btype='high', fs=sr, output='sos')
+    n = sosfilt(sos, n)
     return n
 
 
-def snare_drum(freq=200, sr=SAMPLE_RATE):
-    """스네어 드럼 v12 — 짧고 건조한 노이즈 버스트. raw 전자음악 스타일.
-    촌스러운 톤 바디 제거, 순수 노이즈 히트 + 어택 클릭만.
+def snare_drum(freq=200, sr=SAMPLE_RATE, tone_mix=0.2, decay_rate=45):
+    """스네어 드럼 v23 — tone_mix(톤/노이즈 비율)/decay_rate(감쇠)/freq(피치) 파라미터화.
+    tone_mix=0 → 순수 노이즈(dry), tone_mix=0.45 → 살짝 피치감 있는 스네어
+    decay_rate: 30~60 — 짧은 스냅(높음) vs 긴 꼬리(낮음)
     """
-    duration = 0.08  # 0.18 → 0.08 (훨씬 짧게)
+    duration = 0.08
     t = np.linspace(0, duration, int(sr * duration), endpoint=False)
-    # 노이즈 히트: 빠르게 감쇠하는 짧은 버스트
-    n = noise(duration, sr) * np.exp(-t * 45) * 0.35
+    # 노이즈 히트: decay_rate로 감쇠 속도 제어
+    n = noise(duration, sr) * np.exp(-t * decay_rate) * 0.35
+    # 톤 레이어: tone_mix > 0이면 freq 기반 사인파 추가
+    if tone_mix > 0:
+        tone = np.sin(2 * np.pi * freq * t) * np.exp(-t * decay_rate * 1.5) * tone_mix
+        n = n * (1.0 - tone_mix * 0.5) + tone
     # 어택 클릭 (디지털 느낌)
     click_dur = 0.002
     click_samples = int(sr * click_dur)
@@ -1031,15 +1073,24 @@ def distorted_kick(freq=50, sr=SAMPLE_RATE, drive=3.0):
     return driven
 
 
-def chord_stab(root_freq=130.8, duration=2.0, sr=SAMPLE_RATE):
-    """코드 스탭 — dub techno 딥 코드.
-    Basic Channel 스타일: 마이너 코드(root + m3 + 5th) + LP 필터 + 느린 감쇠.
+# v23: 코드 보이싱 풀 — ep_seed 기반 선택
+CHORD_VOICINGS = {
+    "minor":  [1.0, 1.189, 1.498],                   # 마이너 (어둡고 서정적)
+    "minor7": [1.0, 1.189, 1.498, 1.782],             # 마이너 7th (재즈/딥하우스)
+    "sus4":   [1.0, 1.335, 1.498],                    # sus4 (긴장감, 해결 대기)
+    "power":  [1.0, 1.498, 2.0],                      # 파워 코드 (raw, industrial)
+    "dim":    [1.0, 1.189, 1.414],                    # 디미니시드 (불안, tension)
+}
+
+
+def chord_stab(root_freq=130.8, duration=2.0, sr=SAMPLE_RATE, voicing="minor"):
+    """코드 스탭 v23 — voicing 파라미터로 5종 코드 보이싱 선택.
+    Basic Channel 스타일: 선택된 코드 + LP 필터 + 느린 감쇠.
     tape_delay()와 조합하면 dub techno 특유의 공간감 형성.
     """
     total_samples = int(sr * duration)
     t = np.linspace(0, duration, total_samples, endpoint=False)
-    # 마이너 코드: root, minor 3rd (1.189), perfect 5th (1.498)
-    ratios = [1.0, 1.189, 1.498]
+    ratios = CHORD_VOICINGS.get(voicing, CHORD_VOICINGS["minor"])
     chord = np.zeros(total_samples)
     for ratio in ratios:
         freq = root_freq * ratio
@@ -1128,9 +1179,140 @@ def sawtooth_distorted(freq, duration, drive=3.0, sr=SAMPLE_RATE):
     return np.tanh(wave * drive) * 0.4
 
 
+def pluck_sequence(base_freq, duration, pattern_ratios, gate_div=8,
+                   note_len_ratio=0.7, bpm=120, brightness=0.5, sr=SAMPLE_RATE):
+    """Karplus-Strong 플럭 시퀀서 — 기타/하프 같은 뜯는 음색.
+    brightness: 0.0=따뜻한 나일론, 1.0=밝은 금속성
+    lfilter 기반 고속 구현 (순수 Python 루프 없음)
+    """
+    from scipy.signal import lfilter as _lfilter
+    _rng = np.random.default_rng(12345)
+    total_samples = int(sr * duration)
+    result = np.zeros(total_samples)
+    beat_sec = 60.0 / bpm
+    note_sec = beat_sec * 4 / gate_div
+    note_samples = max(int(sr * note_sec), 1)
+    sound_samples = max(int(note_samples * note_len_ratio), 1)
+
+    pos = 0
+    pat_idx = 0
+    while pos < total_samples:
+        ratio = pattern_ratios[pat_idx % len(pattern_ratios)]
+        freq = max(float(base_freq) * ratio, 20.0)
+        pat_idx += 1
+
+        delay_len = max(int(round(sr / freq)), 2)
+        play_len = min(sound_samples, total_samples - pos)
+        if play_len <= 0:
+            break
+
+        # 노이즈 버스트: delay_len 샘플, brightness로 1-pole LP 프리필터
+        noise = _rng.standard_normal(delay_len) * 0.8
+        lp_alpha = max(0.0, 0.5 - brightness * 0.4)   # warm=0.5, bright=0.1
+        if lp_alpha > 0.01:
+            _b = np.array([1 - lp_alpha])
+            _a = np.array([1.0, -lp_alpha])
+            noise = _lfilter(_b, _a, noise)
+
+        # KS IIR: y[n] = x[n] + decay/2*(y[n-D] + y[n-D-1])
+        decay = 0.998 - (1.0 - brightness) * 0.006
+        x = np.zeros(play_len)
+        copy_len = min(delay_len, play_len)
+        x[:copy_len] = noise[:copy_len]
+
+        a_ks = np.zeros(delay_len + 2)
+        a_ks[0] = 1.0
+        a_ks[delay_len] = -decay * 0.5
+        if delay_len + 1 < len(a_ks):
+            a_ks[delay_len + 1] = -decay * 0.5
+
+        note_wave = _lfilter(np.array([1.0]), a_ks, x)
+        fade = np.linspace(1.0, 0.0, play_len) ** 0.3
+        note_wave *= fade
+
+        end = min(pos + play_len, total_samples)
+        result[pos:end] += note_wave[:end - pos]
+        pos += note_samples
+
+    result *= 0.55
+    return result
+
+
+def pad_sequence(base_freq, duration, pattern_ratios, morph_speed=0.5,
+                 bpm=120, sr=SAMPLE_RATE):
+    """가산합성 패드 시퀀서 — 4개 사인파 레이어 + LFO 모핑.
+    saw_sequence의 대척점: 부드럽고 넓은 음색.
+    morph_speed: 0.1(느린 모핑) ~ 0.8(빠른 모핑)
+    """
+    _rng2 = np.random.default_rng(54321)
+    total_samples = int(sr * duration)
+    result = np.zeros(total_samples)
+    beat_sec = 60.0 / bpm
+    note_sec = beat_sec * 4 / 4   # 4분음표 단위 (패드는 긴 노트)
+    note_samples = max(int(sr * note_sec), 1)
+
+    pos = 0
+    pat_idx = 0
+    while pos < total_samples:
+        ratio = pattern_ratios[pat_idx % len(pattern_ratios)]
+        freq = float(base_freq) * ratio
+        pat_idx += 1
+
+        play_len = min(note_samples, total_samples - pos)
+        if play_len <= 0:
+            break
+        t = np.linspace(0, play_len / sr, play_len, endpoint=False)
+
+        # 4개 배음: 기본음 + 옥타브 + 5도 + 2배음
+        harmonic_ratios = [1.0, 2.0, 1.5, 3.0]
+        harmonic_amps   = [0.5, 0.3, 0.25, 0.15]
+
+        wave = np.zeros(play_len)
+        lfo_freq = morph_speed * 0.3
+        for h_ratio, h_amp in zip(harmonic_ratios, harmonic_amps):
+            lfo_phase = _rng2.uniform(0, 2 * np.pi)
+            lfo = 1.0 + 0.4 * np.sin(2 * np.pi * lfo_freq * t + lfo_phase)
+            wave += h_amp * lfo * np.sin(2 * np.pi * freq * h_ratio * t)
+
+        # 느린 attack + 릴리즈
+        att = min(int(sr * 0.15), play_len)
+        rel = min(int(sr * 0.10), play_len)
+        wave[:att] *= np.linspace(0.0, 1.0, att)
+        wave[-rel:] *= np.linspace(1.0, 0.0, rel)
+        wave *= 0.35
+
+        end = min(pos + play_len, total_samples)
+        result[pos:end] += wave[:end - pos]
+        pos += note_samples
+
+    return result
+
+
+def fm_lead(freq, duration, mod_ratio=3.0, mod_depth=200.0, mod_env_decay=0.3,
+            sr=SAMPLE_RATE, vibrato_depth=0.005):
+    """FM 합성 리드 — 2-op FM (DX7 스타일).
+    carrier = sin(2π*fc*t + mod_env(t)*sin(2π*fm*t))
+    mod_env_decay: 모듈레이터 감쇠 속도(초). 작을수록 빠르게 클린해짐.
+    ADSR: A=0.01, D=0.15, S=0.4, R=0.2
+    """
+    n = int(sr * duration)
+    t = np.linspace(0, duration, n, endpoint=False)
+
+    mod_env = np.exp(-t / max(mod_env_decay, 0.001)) * mod_depth
+    vibrato = 1.0 + vibrato_depth * np.sin(2 * np.pi * 5.5 * t)
+
+    mod_phase = 2 * np.pi * freq * mod_ratio * t
+    carrier_phase = 2 * np.pi * freq * vibrato * t + mod_env * np.sin(mod_phase)
+    wave = np.sin(carrier_phase)
+
+    wave = envelope(wave, attack=0.01, decay=0.15, sustain=0.4, release=0.2)
+    wave *= 0.40
+    return wave
+
+
 def saw_sequence(base_freq, duration, pattern_ratios, gate_div=8,
                  note_len_ratio=0.7, bpm=120, distort=True, sr=SAMPLE_RATE,
-                 wt=None, drive=2.5, cutoff_hz=0):
+                 wt=None, drive=2.5, cutoff_hz=0, resonance=0.7):
     """v14 게이트된 시퀀서 — 웨이브테이블 + LP 필터 + 동적 drive.
     pattern_ratios: 음정 비율 리스트
     gate_div: 16(16분), 8(8분), 4(4분) 단위
@@ -1177,9 +1359,9 @@ def saw_sequence(base_freq, duration, pattern_ratios, gate_div=8,
             result[pos:pos + trim] += note
         pos += note_samples
         pat_idx += 1
-    # v14: LP 필터 적용
+    # v14: LP 필터 적용 (v23: svf_lowpass + resonance)
     if cutoff_hz > 0:
-        result = resonant_lowpass(result, cutoff_hz, sr=sr)
+        result = svf_lowpass(result, cutoff_hz, resonance=resonance, sr=sr)
     return result
 
 
@@ -1411,9 +1593,11 @@ def ultrahigh_texture(duration, center_freq=12000, bandwidth=4000, sr=SAMPLE_RAT
     return filtered
 
 
-def acid_bass(freq, duration, sweep_dir="down", sr=SAMPLE_RATE, cutoff_hz=2000):
-    """애시드 베이스 v14 — 실제 레조넌트 LP 필터 스윕
+def acid_bass(freq, duration, sweep_dir="down", sr=SAMPLE_RATE, cutoff_hz=2000,
+              resonance=5.0):
+    """애시드 베이스 v23 — SVF 레조넌트 LP 필터 스윕.
     cutoff_hz: 기본 컷오프 (역할/에피소드별 다르게 전달)
+    resonance: Q 계수 — acid=5.0(유체 공명), techno=3.0, 기타=1.5
     """
     t = np.linspace(0, duration, int(sr * duration), endpoint=False)
     wave = np.zeros_like(t)
@@ -1421,7 +1605,7 @@ def acid_bass(freq, duration, sweep_dir="down", sr=SAMPLE_RATE, cutoff_hz=2000):
         wave += np.sin(2 * np.pi * freq * h * t) / h
     wave *= 0.4
     wave = soft_clip(wave, drive=3.0)
-    # v14: 실제 LP 필터 스윕 (시간 분할)
+    # v23: SVF 레조넌트 LP 스윕 (resonance 파라미터 지원)
     n_chunks = 8
     chunk_size = len(wave) // n_chunks
     if sweep_dir == "down":
@@ -1434,7 +1618,7 @@ def acid_bass(freq, duration, sweep_dir="down", sr=SAMPLE_RATE, cutoff_hz=2000):
         e = s + chunk_size if i < n_chunks - 1 else len(wave)
         chunk = wave[s:e]
         if len(chunk) > 20:
-            filtered[s:e] = resonant_lowpass(chunk, cutoffs[i], sr=sr, order=4)
+            filtered[s:e] = svf_lowpass(chunk, cutoffs[i], resonance=resonance, sr=sr)
         else:
             filtered[s:e] = chunk
     filtered = envelope(filtered, attack=0.005, decay=0.06, sustain=0.55, release=0.12)
@@ -1499,6 +1683,21 @@ class EnometaMusicEngine:
                 melody_scale_offset=sc.get("melody_scale_offset", 0),
                 melody_beat_base=sc.get("melody_beat_base", 3.0),
                 melody_norgard_offset=sc.get("melody_norgard_offset", 0),
+                # v23 음색/조성 다양성
+                base_freq=sc.get("base_freq", 60.0),
+                chord_voicing=sc.get("chord_voicing", "minor"),
+                hat_brightness=sc.get("hat_brightness", 8000),
+                hat_decay=sc.get("hat_decay", 60.0),
+                snare_tone_mix=sc.get("snare_tone_mix", 0.2),
+                snare_freq=sc.get("snare_freq", 200),
+                rhodes_brightness=sc.get("rhodes_brightness", 0.5),
+                snare_independent=sc.get("snare_independent", False),
+                # v24: 멜로디 수열 유형
+                melody_seq_type=sc.get("melody_seq_type", 0),
+                # v25: 신규 멜로디 레이어 파라미터
+                pluck_brightness=sc.get("pluck_brightness", 0.5),
+                pad_morph_speed=sc.get("pad_morph_speed", 0.4),
+                fm_lead_mod_ratio=sc.get("fm_lead_mod_ratio", 3.0),
             )
         else:
             # fallback: episode_id 해시 기반 시드 (고정 시드 42 방지)
@@ -1617,7 +1816,8 @@ class EnometaMusicEngine:
         stab_dur = min(stab_interval * 0.8, 2.0)  # 최대 2초
         pos = 0.0
         while pos < self.duration:
-            stab = chord_stab(self.pad_root * 0.5, stab_dur, self.sr)
+            stab = chord_stab(self.pad_root * 0.5, stab_dur, self.sr,
+                              voicing=self.seq_config.chord_voicing)
             start_sample = int(pos * self.sr)
             end_sample = min(start_sample + len(stab), self.total_samples)
             length = end_sample - start_sample
@@ -1641,7 +1841,8 @@ class EnometaMusicEngine:
         pad_dur = min(pad_interval * 1.05, 4.0)  # 약간 겹치게 — 음이 끊기지 않음
         pos = 0.0
         while pos < self.duration:
-            pad = rhodes_pad(self.pad_root * 0.5, pad_dur, self.sr, brightness=0.5)
+            pad = rhodes_pad(self.pad_root * 0.5, pad_dur, self.sr,
+                             brightness=self.seq_config.rhodes_brightness)
             start_sample = int(pos * self.sr)
             end_sample = min(start_sample + len(pad), self.total_samples)
             length = end_sample - start_sample
@@ -1743,7 +1944,9 @@ class EnometaMusicEngine:
 
         # 원샷 사운드 사전 렌더 (v14: kick character)
         k = kick_drum(self.bass_freq * 0.5, self.sr, character=self.seq_config.kick_character)
-        sn = snare_drum(self.bass_freq * 1.5, self.sr)
+        sn = snare_drum(self.seq_config.snare_freq, self.sr,
+                        tone_mix=self.seq_config.snare_tone_mix,
+                        decay_rate=45)
         t_impact = transition_impact(self.sr)  # v12: 섹션 전환 임팩트
 
         # 이벤트 버퍼
@@ -1897,7 +2100,9 @@ class EnometaMusicEngine:
                 # 하이햇
                 if pat["hihat"][step]:
                     is_open = rng.random() > 0.65
-                    h = hi_hat(open_hat=is_open, sr=self.sr)
+                    h = hi_hat(open_hat=is_open, sr=self.sr,
+                               brightness=self.seq_config.hat_brightness,
+                               decay_rate=self.seq_config.hat_decay)
                     pan = rng.uniform(-0.2, 0.2)
                     s = stereo_pan(h, pan)
                     end = min(pos + len(h), self.total_samples)
@@ -2320,15 +2525,19 @@ class EnometaMusicEngine:
         fixed_gate_div = _gate_rng.choice(_gate_options.get(fixed_pat_key, [8]))
         fixed_note_len = 0.85 if fixed_pat_key in ["low", "mid"] else 0.6
 
-        # v14+: seed 기반 동적 pat_list 생성 (3~5개 변형, 에피소드마다 다른 rotation 오프셋)
-        base_pitch_pat = generate_pitch_pattern(self.seq_config, fixed_pat_key)
+        # v24: 멜로디 수열 유형 + 장르별 음정 풀 적용
+        _genre = self.script.get("metadata", {}).get("music_mood", "acid")
+        base_pitch_pat = generate_pitch_pattern(self.seq_config, fixed_pat_key, genre=_genre)
         _pat_rng = _rng.Random(self._ep_seed + 7777)
         num_variations = 3 + self.seq_config.pitch_rotation % 3  # 3~5개
         pat_len = len(base_pitch_pat)
         _max_offset = pat_len * 2
         rotation_offsets = sorted(_pat_rng.sample(range(1, _max_offset), min(num_variations - 1, _max_offset - 1)))
         pat_list = [base_pitch_pat] + [seq_rotate(base_pitch_pat, off) for off in rotation_offsets]
-        print(f"  [saw_seq] v14+ seed={self._ep_seed}: {fixed_pat_key}, gate_div={fixed_gate_div}, pat_variants={len(pat_list)}, offsets={rotation_offsets}", flush=True)
+        _seq_names = ["norgard", "fibonacci", "thue_morse", "random"]
+        _seq_name = _seq_names[getattr(self.seq_config, "melody_seq_type", 0)]
+        print(f"  [saw_seq] v24 seed={self._ep_seed}: seq={_seq_name}, genre={_genre}, "
+              f"{fixed_pat_key}, gate_div={fixed_gate_div}, pat_variants={len(pat_list)}", flush=True)
 
         # 전체 길이를 4~8바 청크로 연속 렌더링 (seed 기반 변동)
         bar_dur = (60.0 / bpm) * 4  # 4/4 1바 길이
@@ -2337,9 +2546,11 @@ class EnometaMusicEngine:
         bar_counter = 0
         t = 0.0
 
-        # v14: 웨이브테이블 + 필터 + 동적 drive
+        # v14: 웨이브테이블 + 필터 + 동적 drive (v23: SVF resonance)
         _wt = make_wavetable(self.seq_config.saw_harmonics)
         _cutoff = self.seq_config.filter_cutoff_base
+        _saw_mood = self.script.get("metadata", {}).get("music_mood", "acid")
+        _saw_resonance = {"acid": 4.0, "techno": 2.5, "industrial": 2.0}.get(_saw_mood, 0.7)
         # SI 기반 drive: si 낮으면 1.5(클린), si 높으면 4.5(거침)
         _drive_base = 1.5
 
@@ -2360,11 +2571,13 @@ class EnometaMusicEngine:
             chunk_L = saw_sequence(self.bass_freq, this_chunk_dur, pattern,
                                    gate_div=fixed_gate_div, note_len_ratio=fixed_note_len,
                                    bpm=bpm, distort=True, sr=self.sr,
-                                   wt=_wt, drive=_drive, cutoff_hz=_cutoff)
+                                   wt=_wt, drive=_drive, cutoff_hz=_cutoff,
+                                   resonance=_saw_resonance)
             chunk_R = saw_sequence(self.bass_freq * 1.003, this_chunk_dur, pattern,
                                    gate_div=fixed_gate_div, note_len_ratio=fixed_note_len,
                                    bpm=bpm, distort=True, sr=self.sr,
-                                   wt=_wt, drive=_drive, cutoff_hz=_cutoff)
+                                   wt=_wt, drive=_drive, cutoff_hz=_cutoff,
+                                   resonance=_saw_resonance)
 
             # 청크 페이드 (크로스페이드)
             fade_s = min(int(0.03 * self.sr), len(chunk_L) // 4)
@@ -2410,6 +2623,230 @@ class EnometaMusicEngine:
         # v16: 페이드 제거
         self.master_L += saw_L
         self.master_R += saw_R
+
+    # ── v25: 신규 멜로디 렌더러 ─────────────────────────────────
+
+    def _render_continuous_pluck_sequence(self, sections):
+        """v25: Karplus-Strong 플럭 시퀀서 — 뜯는 음색, saw와 완전 다른 질감."""
+        print("  [pluck_seq] Karplus-Strong pluck sequencer...", flush=True)
+        from sequence_generators import generate_pitch_pattern, rotate as seq_rotate
+        import random as _rng
+
+        bpm = self.script.get("metadata", {}).get("base_bpm", 120)
+        _genre = self.script.get("metadata", {}).get("music_mood", "acid")
+
+        avg_energy = np.mean([s.get("energy", 0.3) for s in sections]) if sections else 0.3
+        pat_key = "high" if avg_energy >= 0.6 else "mid"
+        base_pat = generate_pitch_pattern(self.seq_config, pat_key, genre=_genre)
+        _pr = _rng.Random(self._ep_seed + 4444)
+        num_vars = 3 + self.seq_config.pitch_rotation % 2
+        pat_len = len(base_pat)
+        offsets = sorted(_pr.sample(range(1, pat_len * 2), min(num_vars - 1, pat_len * 2 - 1)))
+        pat_list = [base_pat] + [seq_rotate(base_pat, off) for off in offsets]
+
+        _brightness = getattr(self.seq_config, "pluck_brightness", 0.5)
+        _gate_div = 8
+        bar_dur = (60.0 / bpm) * 4
+        chunk_bars = 4 + (self._ep_seed % 3) * 2
+        chunk_dur = bar_dur * chunk_bars
+
+        pluck_L = np.zeros(self.total_samples)
+        pluck_R = np.zeros(self.total_samples)
+        t = 0.0
+        bar_ctr = 0
+        while t < self.duration:
+            pat = pat_list[(bar_ctr // chunk_bars) % len(pat_list)]
+            this_dur = min(chunk_dur, self.duration - t)
+            if this_dur < 0.05:
+                break
+
+            cL = pluck_sequence(self.bass_freq, this_dur, pat,
+                                gate_div=_gate_div, note_len_ratio=0.8,
+                                bpm=bpm, brightness=_brightness, sr=self.sr)
+            cR = pluck_sequence(self.bass_freq * 1.003, this_dur, pat,
+                                gate_div=_gate_div, note_len_ratio=0.8,
+                                bpm=bpm, brightness=_brightness, sr=self.sr)
+
+            fade_s = min(int(0.03 * self.sr), len(cL) // 4)
+            if fade_s > 0:
+                cL[:fade_s] *= np.linspace(0, 1, fade_s)
+                cR[:fade_s] *= np.linspace(0, 1, fade_s)
+                cL[-fade_s:] *= np.linspace(1, 0, fade_s)
+                cR[-fade_s:] *= np.linspace(1, 0, fade_s)
+
+            abs_s = int(t * self.sr)
+            abs_e = min(abs_s + len(cL), self.total_samples)
+            cl = abs_e - abs_s
+            if cl > 0:
+                pluck_L[abs_s:abs_e] += cL[:cl]
+                pluck_R[abs_s:abs_e] += cR[:cl]
+            t += this_dur
+            bar_ctr += chunk_bars
+
+        vol_env = smooth_envelope(
+            self.total_samples, sections, "pluck_sequence", "volume",
+            default=0.65, morph_sec=1.5, sr=self.sr
+        )
+        cr_m = self._cr_melody_env[:self.total_samples] if hasattr(self, '_cr_melody_env') else 1.0
+        pluck_L *= vol_env * cr_m
+        pluck_R *= vol_env * cr_m
+        self.master_L += pluck_L
+        self.master_R += pluck_R
+
+    def _render_continuous_pad_sequence(self, sections):
+        """v25: 가산합성 패드 시퀀서 — 부드럽고 넓은 멜로디 레이어."""
+        print("  [pad_seq] additive pad sequencer...", flush=True)
+        from sequence_generators import generate_pitch_pattern, rotate as seq_rotate
+        import random as _rng
+
+        bpm = self.script.get("metadata", {}).get("base_bpm", 120)
+        _genre = self.script.get("metadata", {}).get("music_mood", "acid")
+
+        avg_energy = np.mean([s.get("energy", 0.3) for s in sections]) if sections else 0.3
+        pat_key = "high" if avg_energy >= 0.6 else "mid"
+        base_pat = generate_pitch_pattern(self.seq_config, pat_key, genre=_genre)
+        _pr = _rng.Random(self._ep_seed + 5555)
+        num_vars = 2 + self.seq_config.pitch_rotation % 2
+        offsets = sorted(_pr.sample(range(1, len(base_pat) * 2),
+                                    min(num_vars - 1, len(base_pat) * 2 - 1)))
+        pat_list = [base_pat] + [seq_rotate(base_pat, off) for off in offsets]
+
+        _morph = getattr(self.seq_config, "pad_morph_speed", 0.4)
+        bar_dur = (60.0 / bpm) * 4
+        chunk_bars = 8  # 패드는 긴 청크 (8바)
+        chunk_dur = bar_dur * chunk_bars
+
+        pad_L = np.zeros(self.total_samples)
+        pad_R = np.zeros(self.total_samples)
+        t = 0.0
+        bar_ctr = 0
+        while t < self.duration:
+            pat = pat_list[(bar_ctr // chunk_bars) % len(pat_list)]
+            this_dur = min(chunk_dur, self.duration - t)
+            if this_dur < 0.05:
+                break
+
+            cL = pad_sequence(self.bass_freq, this_dur, pat,
+                              morph_speed=_morph, bpm=bpm, sr=self.sr)
+            # R채널: 미세 디튠 + LFO 위상 달라짐 (seed 내부)
+            cR = pad_sequence(self.bass_freq * 1.002, this_dur, pat,
+                              morph_speed=_morph * 1.05, bpm=bpm, sr=self.sr)
+
+            fade_s = min(int(0.05 * self.sr), len(cL) // 4)
+            if fade_s > 0:
+                cL[:fade_s] *= np.linspace(0, 1, fade_s)
+                cR[:fade_s] *= np.linspace(0, 1, fade_s)
+                cL[-fade_s:] *= np.linspace(1, 0, fade_s)
+                cR[-fade_s:] *= np.linspace(1, 0, fade_s)
+
+            abs_s = int(t * self.sr)
+            abs_e = min(abs_s + len(cL), self.total_samples)
+            cl = abs_e - abs_s
+            if cl > 0:
+                pad_L[abs_s:abs_e] += cL[:cl]
+                pad_R[abs_s:abs_e] += cR[:cl]
+            t += this_dur
+            bar_ctr += chunk_bars
+
+        vol_env = smooth_envelope(
+            self.total_samples, sections, "pad_sequence", "volume",
+            default=0.60, morph_sec=2.0, sr=self.sr
+        )
+        cr_m = self._cr_melody_env[:self.total_samples] if hasattr(self, '_cr_melody_env') else 1.0
+        pad_L *= vol_env * cr_m
+        pad_R *= vol_env * cr_m
+        self.master_L += pad_L
+        self.master_R += pad_R
+
+    def _render_continuous_fm_lead(self, sections):
+        """v25: FM 합성 리드 시퀀서 — DX7 스타일 금속성 음색."""
+        print("  [fm_lead] FM synthesis lead...", flush=True)
+        from sequence_generators import generate_pitch_pattern, rotate as seq_rotate
+        import random as _rng
+
+        bpm = self.script.get("metadata", {}).get("base_bpm", 120)
+        _genre = self.script.get("metadata", {}).get("music_mood", "acid")
+
+        avg_energy = np.mean([s.get("energy", 0.3) for s in sections]) if sections else 0.3
+        pat_key = "tension" if avg_energy >= 0.7 else ("high" if avg_energy >= 0.5 else "mid")
+        base_pat = generate_pitch_pattern(self.seq_config, pat_key, genre=_genre)
+        _pr = _rng.Random(self._ep_seed + 6666)
+        num_vars = 3 + self.seq_config.pitch_rotation % 2
+        offsets = sorted(_pr.sample(range(1, len(base_pat) * 2),
+                                    min(num_vars - 1, len(base_pat) * 2 - 1)))
+        pat_list = [base_pat] + [seq_rotate(base_pat, off) for off in offsets]
+
+        _mod_ratio = getattr(self.seq_config, "fm_lead_mod_ratio", 3.0)
+        _vib = getattr(self.seq_config, "bass_detune", 0.003) * 1.5
+
+        beat_sec = 60.0 / bpm
+        # 8분음표 단위 노트
+        note_sec = beat_sec * 0.5
+        note_sound_sec = note_sec * 0.7  # 70% 레가토
+
+        fm_L = np.zeros(self.total_samples)
+        fm_R = np.zeros(self.total_samples)
+
+        bar_dur = beat_sec * 4
+        chunk_bars = 4 + (self._ep_seed % 3) * 2
+        chunk_notes = int(chunk_bars * 8)  # 8분음표 수
+
+        pat_global_idx = 0
+        chunk_idx = 0
+        t = 0.0
+        while t < self.duration:
+            pat = pat_list[chunk_idx % len(pat_list)]
+            for _ in range(chunk_notes):
+                if t >= self.duration:
+                    break
+                freq = self.bass_freq * pat[pat_global_idx % len(pat)]
+                pat_global_idx += 1
+
+                actual_dur = min(note_sound_sec, self.duration - t)
+                if actual_dur < 0.01:
+                    break
+
+                # FM lead mod_depth: energy 기반 조절
+                t_mid = t + actual_dur / 2
+                si_idx = max(0, min(int(t_mid * self.sr), self.total_samples - 1))
+                si_val = float(self._si_env[si_idx]) if self._si_env is not None else 0.5
+                _mod_depth = 80 + si_val * 200  # 80~280
+
+                note_wave = fm_lead(freq, actual_dur,
+                                    mod_ratio=_mod_ratio, mod_depth=_mod_depth,
+                                    mod_env_decay=0.2 + si_val * 0.3,
+                                    sr=self.sr, vibrato_depth=_vib)
+
+                abs_s = int(t * self.sr)
+                abs_e = min(abs_s + len(note_wave), self.total_samples)
+                cl = abs_e - abs_s
+                if cl > 0:
+                    fm_L[abs_s:abs_e] += note_wave[:cl]
+                    # R채널: 미세 피치 오프셋 (스테레오 넓힘)
+                    note_R = fm_lead(freq * 1.002, actual_dur,
+                                     mod_ratio=_mod_ratio, mod_depth=_mod_depth,
+                                     mod_env_decay=0.2 + si_val * 0.3,
+                                     sr=self.sr, vibrato_depth=_vib)
+                    fm_R[abs_s:abs_e] += note_R[:cl]
+                t += note_sec
+
+            t = round(t / (beat_sec * chunk_bars * 4)) * (beat_sec * chunk_bars * 4) + beat_sec * chunk_bars * 4
+            chunk_idx += 1
+            # t 갱신: 청크 경계에 정렬
+            t_chunk_start = chunk_idx * bar_dur * chunk_bars
+            if t_chunk_start > self.duration:
+                break
+            t = t_chunk_start
+
+        vol_env = smooth_envelope(
+            self.total_samples, sections, "fm_lead", "volume",
+            default=0.65, morph_sec=1.5, sr=self.sr
+        )
+        cr_m = self._cr_melody_env[:self.total_samples] if hasattr(self, '_cr_melody_env') else 1.0
+        fm_L *= vol_env * cr_m
+        fm_R *= vol_env * cr_m
+        self.master_L += fm_L
+        self.master_R += fm_R
 
     def _render_continuous_gate_stutter(self, sections):
         """v9: 게이트 + 유클리드 리듬 + 스터터 — 대본 데이터 직접 연동
@@ -2756,8 +3193,11 @@ class EnometaMusicEngine:
                 freq = self.bass_freq * bass_pattern[note_idx % len(bass_pattern)]
                 actual_dur = min(note_dur, dur - t_note)
                 if actual_dur > 0.05:
+                    _mood = self.script.get("metadata", {}).get("music_mood", "acid")
+                    _resonance = {"acid": 5.0, "techno": 3.0}.get(_mood, 1.5)
                     ab = acid_bass(freq, actual_dur, sweep_dir, self.sr,
-                                   cutoff_hz=self.seq_config.filter_cutoff_base)
+                                   cutoff_hz=self.seq_config.filter_cutoff_base,
+                                   resonance=_resonance)
                     self._add_mono(ab, start + t_note, vol)
                 t_note += beat_interval
                 note_idx += 1
@@ -3096,13 +3536,15 @@ class EnometaMusicEngine:
             "optional_pool": {
                 "sine_interference": {"volume": (0.4, 0.7)},
                 "pulse_train":       {"volume": (0.4, 0.7)},
-                "arpeggio":          {"volume": (0.4, 0.6)},
-                "fm_bass":           {"volume": (0.4, 0.6)},
-                "saw_sequence":      {"volume": (0.3, 0.5)},
+                # v25: 신규 멜로디 레이어
+                "pad_sequence":      {"volume": (0.5, 0.7)},
+                "pluck_sequence":    {"volume": (0.4, 0.6)},
             },
             "optional_count": (2, 3),
+            # v25 Phase5: arpeggio/fm_bass/saw_sequence → inactive (ambient 배경 시그니처: 드론+사인+패드)
             "inactive": ["kick", "snare", "hi_hat", "data_click", "ultrahigh_texture",
-                         "stutter_gate", "gap_burst", "glitch", "bytebeat"],
+                         "stutter_gate", "gap_burst", "glitch", "bytebeat",
+                         "arpeggio", "fm_bass", "saw_sequence"],
         },
         "microsound": {
             "required": {
@@ -3113,12 +3555,15 @@ class EnometaMusicEngine:
                 "sine_interference": {"volume": (0.3, 0.5)},
                 "pulse_train":       {"volume": (0.5, 0.8)},
                 "stutter_gate":      {"volume": (0.5, 0.8)},
-                "arpeggio":          {"volume": (0.3, 0.5)},
                 "modular_clicks":    {"volume": (0.5, 0.8)},   # v22: 모듈러 클릭
+                # v25: 신규 멜로디 레이어 (플럭이 마이크로 질감에 어울림)
+                "pluck_sequence":    {"volume": (0.3, 0.5)},
+                "fm_lead":           {"volume": (0.3, 0.5)},
             },
             "optional_count": (1, 2),
+            # v25 Phase5: arpeggio/fm_bass → inactive (마이크로 질감 집중)
             "inactive": ["kick", "snare", "hi_hat", "saw_sequence", "bass_drone",
-                         "glitch", "bytebeat", "gap_burst"],
+                         "glitch", "bytebeat", "gap_burst", "arpeggio", "fm_bass"],
         },
         "IDM": {
             "required": {
@@ -3132,12 +3577,15 @@ class EnometaMusicEngine:
                 "arpeggio":          {"volume": (0.5, 0.8)},
                 "glitch":            {"volume": (0.5, 0.7), "extra": {"density": 0.7}},
                 "bytebeat":          {"volume": (0.4, 0.6)},
-                "fm_bass":           {"volume": (0.4, 0.6)},
                 "ultrahigh_texture": {"volume": (0.3, 0.5)},
                 "modular_clicks":    {"volume": (0.4, 0.7)},   # v22: 모듈러 클릭
+                # v25: 신규 멜로디 레이어
+                "pluck_sequence":    {"volume": (0.4, 0.6)},
+                "fm_lead":           {"volume": (0.4, 0.6)},
             },
             "optional_count": (3, 4),
-            "inactive": ["bass_drone", "gap_burst"],
+            # v25 Phase5: fm_bass → inactive (글리치 리듬/bytebeat이 배경 역할)
+            "inactive": ["bass_drone", "gap_burst", "fm_bass"],
         },
         "minimal": {
             "required": {
@@ -3149,12 +3597,14 @@ class EnometaMusicEngine:
                 "bass_drone":        {"volume": (0.5, 0.7)},
                 "arpeggio":          {"volume": (0.5, 0.7)},
                 "sine_interference": {"volume": (0.3, 0.5)},
-                "pulse_train":       {"volume": (0.3, 0.5)},
-                "saw_sequence":      {"volume": (0.3, 0.5)},
+                # v25: 신규 멜로디 레이어 (minimal에 어울리는 fm_lead/pluck)
+                "pluck_sequence":    {"volume": (0.4, 0.6)},
+                "fm_lead":           {"volume": (0.4, 0.6)},
             },
             "optional_count": (2, 3),
+            # v25 Phase5: pulse_train → inactive (sparse 유지)
             "inactive": ["snare", "glitch", "bytebeat", "gap_burst",
-                         "data_click", "ultrahigh_texture"],
+                         "data_click", "ultrahigh_texture", "pulse_train"],
         },
         "dub": {
             "required": {
@@ -3167,12 +3617,15 @@ class EnometaMusicEngine:
                 "hi_hat":            {"volume": (0.3, 0.5)},   # dub 하이햇 (희소)
                 "snare":             {"volume": (0.3, 0.5)},
                 "sine_interference": {"volume": (0.3, 0.6)},
-                "arpeggio":          {"volume": (0.3, 0.5)},
-                "pulse_train":       {"volume": (0.3, 0.5)},
+                # v25: 신규 멜로디 레이어 (pad가 dub 공간감에 어울림)
+                "pad_sequence":      {"volume": (0.4, 0.6)},
+                "pluck_sequence":    {"volume": (0.3, 0.5)},
             },
             "optional_count": (1, 2),
+            # v25 Phase5: arpeggio/pulse_train → inactive (코드스탭+딜레이가 역할)
             "inactive": ["saw_sequence", "glitch", "bytebeat",
-                         "data_click", "ultrahigh_texture", "gap_burst"],
+                         "data_click", "ultrahigh_texture", "gap_burst",
+                         "arpeggio", "pulse_train", "fm_bass"],
         },
         "glitch": {
             "required": {
@@ -3188,9 +3641,13 @@ class EnometaMusicEngine:
                 "ultrahigh_texture": {"volume": (0.4, 0.6)},
                 "saw_sequence":      {"volume": (0.3, 0.5)},
                 "modular_clicks":    {"volume": (0.6, 0.9)},   # v22: 모듈러 클릭
+                # v25: fm_lead가 글리치에 어울림 (금속성 FM)
+                "fm_lead":           {"volume": (0.3, 0.5)},
             },
             "optional_count": (2, 3),
-            "inactive": ["hi_hat", "arpeggio", "bass_drone", "fm_bass"],  # 글리치가 대신
+            # v25 Phase5: 이미 arpeggio/fm_bass/bass_drone inactive ✓
+            "inactive": ["hi_hat", "arpeggio", "bass_drone", "fm_bass",
+                         "pluck_sequence", "pad_sequence"],
         },
         "acid": {
             "required": {
@@ -3201,14 +3658,16 @@ class EnometaMusicEngine:
                 "saw_sequence": {"volume": (0.8, 1.0)},
             },
             "optional_pool": {
-                "arpeggio":          {"volume": (0.5, 0.8)},
-                "fm_bass":           {"volume": (0.4, 0.6)},
                 "stutter_gate":      {"volume": (0.4, 0.6)},
                 "ultrahigh_texture": {"volume": (0.3, 0.5)},
+                # v25: fm_lead가 acid 전면 리드로 어울림
+                "fm_lead":           {"volume": (0.4, 0.6)},
             },
             "optional_count": (1, 2),
+            # v25 Phase5: arpeggio/fm_bass → inactive (303+saw가 충분)
             "inactive": ["bass_drone", "glitch", "bytebeat", "gap_burst",
-                         "data_click"],
+                         "data_click", "arpeggio", "fm_bass",
+                         "pluck_sequence", "pad_sequence"],
         },
         "industrial": {
             "required": {
@@ -3223,11 +3682,13 @@ class EnometaMusicEngine:
                 "feedback_loop":     {"volume": (0.5, 0.8)},
                 "gap_burst":         {"volume": (0.7, 1.0)},
                 "stutter_gate":      {"volume": (0.6, 0.8)},
-                "fm_bass":           {"volume": (0.5, 0.7)},
+                # v25: fm_lead가 industrial 전면 리드로
+                "fm_lead":           {"volume": (0.5, 0.7)},
             },
             "optional_count": (2, 3),
+            # v25 Phase5: arpeggio/fm_bass → inactive (디스토션+feedback이 배경)
             "inactive": ["arpeggio", "bass_drone", "glitch", "bytebeat",
-                         "data_click"],
+                         "data_click", "fm_bass", "pluck_sequence", "pad_sequence"],
         },
         "techno": {
             "required": {
@@ -3237,14 +3698,18 @@ class EnometaMusicEngine:
                 "saw_sequence": {"volume": (0.8, 1.0)},
             },
             "optional_pool": {
-                "arpeggio":          {"volume": (0.6, 0.9)},
                 "fm_bass":           {"volume": (0.5, 0.8)},
                 "ultrahigh_texture": {"volume": (0.4, 0.7)},
                 "stutter_gate":      {"volume": (0.4, 0.6)},
                 "bass_drone":        {"volume": (0.3, 0.5)},
+                # v25: pluck/fm_lead 중 하나가 techno 리드로
+                "pluck_sequence":    {"volume": (0.4, 0.6)},
+                "fm_lead":           {"volume": (0.4, 0.6)},
             },
             "optional_count": (2, 3),
-            "inactive": ["glitch", "bytebeat", "gap_burst", "data_click"],
+            # v25 Phase5: arpeggio → inactive (직선적 그루브, 303 대신 saw+fm)
+            "inactive": ["glitch", "bytebeat", "gap_burst", "data_click",
+                         "arpeggio", "pad_sequence"],
         },
         "house": {
             "required": {
@@ -3259,6 +3724,9 @@ class EnometaMusicEngine:
                 "arpeggio":          {"volume": (0.4, 0.6)},   # 하이 아르페지오
                 "fm_bass":           {"volume": (0.4, 0.6)},   # FM 베이스 레이어
                 "sine_interference": {"volume": (0.2, 0.4)},   # 배경 사인파 질감
+                # v25: pad가 house 공간감에 어울림
+                "pad_sequence":      {"volume": (0.4, 0.6)},
+                "pluck_sequence":    {"volume": (0.3, 0.5)},
             },
             "optional_count": (2, 3),
             "inactive": ["saw_sequence", "acid_bass", "distorted_kick", "glitch",
@@ -3320,6 +3788,44 @@ class EnometaMusicEngine:
         for name in pool_names:
             if name not in layers:
                 layers[name] = {"active": False}
+
+        # ── v25: 리드 선택 시스템 ──────────────────────────────────────────────
+        # ep_seed 기반으로 활성 레이어 중 하나를 "lead"로 선택.
+        # lead 볼륨 = 0.85, 나머지 멜로디 레이어 = 기존 × 0.35
+        _LEAD_CANDIDATES = [
+            "saw_sequence", "pluck_sequence", "pad_sequence",
+            "fm_lead", "arpeggio", "acid_bass"
+        ]
+        # 장르별 리드 가능 후보 (inactive에 있거나 부적합 음색 제외)
+        _GENRE_LEAD_ALLOWED = {
+            "acid":       ["saw_sequence", "acid_bass", "fm_lead"],
+            "techno":     ["saw_sequence", "pluck_sequence", "fm_lead"],
+            "industrial": ["saw_sequence", "fm_lead"],
+            "ambient":    ["pad_sequence", "arpeggio", "pluck_sequence"],
+            "dub":        ["pad_sequence", "pluck_sequence", "arpeggio"],
+            "minimal":    ["fm_lead", "pluck_sequence", "arpeggio"],
+            "IDM":        ["fm_lead", "pluck_sequence", "saw_sequence", "arpeggio"],
+            "glitch":     ["saw_sequence", "fm_lead"],
+            "microsound": ["pluck_sequence", "fm_lead"],
+            "house":      ["pad_sequence", "arpeggio", "pluck_sequence"],
+        }
+        allowed = _GENRE_LEAD_ALLOWED.get(genre, _LEAD_CANDIDATES)
+        # 실제 활성 레이어 중 허용 후보만 필터
+        active_candidates = [
+            n for n in allowed
+            if layers.get(n, {}).get("active", False)
+        ]
+        if active_candidates:
+            lead_rng = _rng_mod.Random(ep_seed + 77777)
+            lead_layer = lead_rng.choice(active_candidates)
+            # lead 볼륨 승격
+            layers[lead_layer]["volume"] = 0.85
+            # 나머지 멜로디 레이어는 서포트 역할로 감소
+            for n in _LEAD_CANDIDATES:
+                if n != lead_layer and layers.get(n, {}).get("active", False):
+                    layers[n]["volume"] = round(layers[n].get("volume", 0.7) * 0.35, 2)
+            print(f"  [lead_select] genre={genre} seed={ep_seed} → lead={lead_layer} "
+                  f"(candidates={active_candidates})", flush=True)
 
         return layers
 
@@ -3555,6 +4061,19 @@ class EnometaMusicEngine:
                 self._render_continuous_saw_sequence(sections)
             else:
                 print("  [saw_seq] SKIPPED (mood layer off)", flush=True)
+            # 레이어 2-v25: 신규 멜로디 레이어 (리드 선택 시스템으로 볼륨 조정)
+            if _layer_on("pluck_sequence"):
+                self._render_continuous_pluck_sequence(sections)
+            else:
+                print("  [pluck_seq] SKIPPED (mood layer off)", flush=True)
+            if _layer_on("pad_sequence"):
+                self._render_continuous_pad_sequence(sections)
+            else:
+                print("  [pad_seq] SKIPPED (mood layer off)", flush=True)
+            if _layer_on("fm_lead"):
+                self._render_continuous_fm_lead(sections)
+            else:
+                print("  [fm_lead] SKIPPED (mood layer off)", flush=True)
             # 레이어 3: 아르페지오
             if _layer_on("arpeggio"):
                 self._render_continuous_arpeggio(sections)
@@ -3631,22 +4150,49 @@ class EnometaMusicEngine:
             print(f"  [{i+1}/{total}] textures: {sid} ({emotion})", flush=True)
             self._render_section_textures(section)
 
-        # v16: 볼륨 고정 — song_arc, SI modulation, breath envelope 모두 비활성
-        # 음악은 ARRANGEMENT_TABLE 구조 + smooth_envelope만으로 에너지 표현
-        print(f"  [v16] Volume: FIXED (no song_arc, no SI modulation, no breath)", flush=True)
+        # v22: 마이크로 다이내믹스 — SI 엔벨로프를 마스터 레벨에서 ±5% 범위로 적용
+        # 레이어 ON/OFF 원칙 유지 + song_arc/breath 비활성 유지
+        print(f"  [v22] Volume: FIXED layers + SI micro-dynamics at master (±5%)", flush=True)
 
         return self._master()
 
     def _master(self) -> np.ndarray:
-        """마스터링 v11: enometa 마스터링 체인 — tanh(1.5) + RMS -6dB + 페이드"""
-        print("  Mastering v11 (enometa: saturation + RMS normalize)...", flush=True)
+        """마스터링 v22: enometa 마스터링 체인 — SI 마이크로 다이내믹스 + tanh(1.5) + RMS -6dB + 페이드"""
+        print("  Mastering v22 (SI micro-dynamics + saturation + RMS normalize)...", flush=True)
+
+        # v22: 마이크로 다이내믹스 — SI 엔벨로프를 마스터 볼륨에 살짝 반영
+        # _si_modulation = 0.95 + si * 0.05 (범위 0.95~1.0, ±5%)
+        # 레이어 ON/OFF 규칙 유지 + 대본 강도에 맞는 미세한 생동감 추가
+        if self._si_modulation is not None and len(self._si_modulation) == len(self.master_L):
+            self.master_L *= self._si_modulation
+            self.master_R *= self._si_modulation
+            _mod_min = float(self._si_modulation.min())
+            _mod_max = float(self._si_modulation.max())
+            if abs(_mod_max - _mod_min) > 0.001:
+                print(f"  [micro-dyn] SI modulation applied: {_mod_min:.3f}~{_mod_max:.3f}", flush=True)
+
         stereo = np.column_stack([self.master_L, self.master_R])
 
-        # v11: enometa 마스터링 — 부드러운 새츄레이션
+        # v23: 장르별 새츄레이션 drive (ambient=부드러움, acid/industrial=거칠음)
+        _GENRE_DRIVE = {
+            "ambient":    1.0,   # 클린, 다이나믹 유지
+            "microsound": 1.1,   # 거의 클린
+            "dub":        1.2,   # 살짝 워밍
+            "house":      1.3,   # 약한 새츄레이션
+            "minimal":    1.3,
+            "IDM":        1.5,   # 기본
+            "glitch":     1.6,   # 약간 디스토션
+            "techno":     1.7,   # 단단한 펀치
+            "acid":       2.0,   # 공격적 new츄레이션
+            "industrial": 2.5,   # 최대 하드클리핑
+        }
+        music_mood = self.script.get("metadata", {}).get("music_mood", "acid")
+        sat_drive = _GENRE_DRIVE.get(music_mood, 1.5)
         peak = np.max(np.abs(stereo))
         if peak > 0:
             stereo = stereo / peak
-        stereo = np.tanh(stereo * 1.5)  # v10.1: 새츄레이션 완화 (3.0→1.5, 너무 정신없음 피드백)
+        stereo = np.tanh(stereo * sat_drive)
+        print(f"  [master v23] saturation drive={sat_drive} ({music_mood})", flush=True)
 
         # RMS 타겟 -6dB (0.5 linear) — v10: 더 큰 음악 볼륨 (이전: -10dB 0.316)
         rms = np.sqrt(np.mean(stereo ** 2))
@@ -3680,101 +4226,6 @@ class EnometaMusicEngine:
         audio_16bit = (stereo * 32767).astype(np.int16)
         return audio_16bit
 
-    # ============================================================
-    # F-5: 호흡 엔벨로프 — 미시적 에너지 딥
-    # ============================================================
-
-    def _compute_breath_envelope(self) -> np.ndarray:
-        """8~16바 주기의 미시적 호흡: 바 단위 에너지 딥(dip)
-
-        Song arc(매크로)와 보완하는 미시적 에너지 변조.
-        매 8바의 7번째 바: 85%, 매 16바의 15번째 바: 70% (큰 호흡).
-        0.3초 스무딩으로 계단 제거.
-        """
-        breath = np.ones(self.total_samples, dtype=np.float64)
-        bar_dur = (60.0 / self.bpm) * 4  # 4/4 1바 (기본 BPM 기준)
-        bar_samples = max(1, int(bar_dur * self.sr))
-        total_bars = self.total_samples // bar_samples
-
-        for bar in range(total_bars):
-            start = bar * bar_samples
-            end = min(start + bar_samples, self.total_samples)
-
-            # v16: 호흡 깊이 완화 (음악 연속성 보호)
-            # 매 16바의 15번째: 가벼운 호흡 (0.90)
-            if bar % 16 == 14:
-                breath[start:end] = 0.90
-            # 매 8바의 7번째: 미세 호흡 (0.95)
-            elif bar % 8 == 6:
-                breath[start:end] = 0.95
-
-        # 0.3초 cumsum 스무딩 (계단 → 부드러운 곡선)
-        window = int(0.3 * self.sr)
-        if window > 1 and self.total_samples > window:
-            cumsum = np.cumsum(breath)
-            cumsum = np.insert(cumsum, 0, 0)
-            smoothed = (cumsum[window:] - cumsum[:-window]) / window
-            pad_left = window // 2
-            pad_right = self.total_samples - len(smoothed) - pad_left
-            breath = np.concatenate([
-                np.full(pad_left, smoothed[0]),
-                smoothed,
-                np.full(max(0, pad_right), smoothed[-1])
-            ])[:self.total_samples]
-
-        return breath
-
-    def _compute_call_response_envelopes(self) -> tuple:
-        """F-7: 콜앤리스폰스 — 드럼/멜로디 교대 gain 엔벨로프
-
-        2바 주기로 드럼↔멜로디 gain이 교대:
-        - 홀수 2바 그룹: 드럼 100%, 멜로디 75%
-        - 짝수 2바 그룹: 드럼 75%, 멜로디 100%
-        SI 0.3~0.7 구간에서만 활성 (극단값은 교대 불필요).
-        """
-        drum_env = np.ones(self.total_samples, dtype=np.float64)
-        melody_env = np.ones(self.total_samples, dtype=np.float64)
-        bar_dur = (60.0 / self.bpm) * 4
-        bar_samples = max(1, int(bar_dur * self.sr))
-        total_bars = self.total_samples // bar_samples
-
-        for bar in range(total_bars):
-            start = bar * bar_samples
-            end = min(start + bar_samples, self.total_samples)
-
-            # SI 체크: 해당 바 중앙의 SI
-            mid_idx = min((start + end) // 2, self.total_samples - 1)
-            si_val = float(self._si_env[mid_idx]) if self._si_env is not None else 0.5
-
-            # SI 0.3~0.7 에서만 활성
-            if 0.3 <= si_val <= 0.7:
-                group = (bar // 2) % 2  # 0 또는 1
-                if group == 0:
-                    # 드럼 강조, 멜로디 절제
-                    drum_env[start:end] = 1.0
-                    melody_env[start:end] = 0.75
-                else:
-                    # 멜로디 강조, 드럼 절제
-                    drum_env[start:end] = 0.75
-                    melody_env[start:end] = 1.0
-
-        # 0.2초 스무딩
-        window = int(0.2 * self.sr)
-        if window > 1 and self.total_samples > window:
-            for env in [drum_env, melody_env]:
-                cumsum = np.cumsum(env)
-                cumsum = np.insert(cumsum, 0, 0)
-                smoothed = (cumsum[window:] - cumsum[:-window]) / window
-                pad_left = window // 2
-                pad_right = self.total_samples - len(smoothed) - pad_left
-                result = np.concatenate([
-                    np.full(pad_left, smoothed[0]),
-                    smoothed,
-                    np.full(max(0, pad_right), smoothed[-1])
-                ])[:self.total_samples]
-                env[:] = result
-
-        return drum_env, melody_env
 
     # Song Arc — 기승전결 매크로 에너지 엔벨로프
     # ============================================================
@@ -4106,390 +4557,6 @@ class EnometaMusicEngine:
         print(f"  Raw visual data: {output_path} ({total_frames} frames)")
 
 
-# ============================================================
-# 감정 → 악기 매핑 테이블 v5: bytebeat/feedback/chiptune_lead/chiptune_drum 추가
-# 장르 프리셋이 force_active/force_inactive로 최종 결정하므로 기본값만 배치
-# ============================================================
-
-# v12: generate_music_script()에서 더 이상 사용하지 않음.
-# ARRANGEMENT_TABLE + _plan_song_structure()가 대체.
-# v13: 하드코딩 패턴 제거, sequence_generators.py 사용.
-EMOTION_MAP = {
-    # === 뉴트럴 계열: 미니멀, 관찰적 ===
-    "neutral": {
-        "energy": 0.35,
-        "bass_drone": {"active": True, "volume": 0.6},
-        "clicks": {"active": True, "density": 0.3, "pan_spread": 0.4},
-        "fm_bass": {"active": True, "volume": 0.25},
-        "arpeggio": {"active": False},
-        "glitch": {"active": False},
-        "kick": {"active": False},
-        "hi_hat": {"active": False},
-        "sub_pulse": {"active": True, "volume": 0.35},
-        "bytebeat": {"active": False},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": False},
-        "chiptune_drum": {"active": False},
-    },
-    "neutral_curious": {
-        "energy": 0.4,
-        "bass_drone": {"active": True, "volume": 0.65},
-        "clicks": {"active": True, "density": 0.5, "pan_spread": 0.5},
-        "fm_bass": {"active": True, "volume": 0.35},
-        "arpeggio": {"active": True, "speed": 0.35, "volume": 0.25},
-        "glitch": {"active": True, "density": 0.15},
-        "kick": {"active": True, "volume": 0.25},
-        "hi_hat": {"active": True, "volume": 0.15},
-        "sub_pulse": {"active": True, "volume": 0.4},
-        "noise_burst": {"active": True, "density": 0.15},
-        "bytebeat": {"active": False},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": True, "volume": 0.2, "duty": 0.25},
-        "chiptune_drum": {"active": False},
-    },
-    "neutral_analytical": {
-        "energy": 0.45,
-        "bass_drone": {"active": True, "volume": 0.7},
-        "clicks": {"active": True, "density": 0.6, "pan_spread": 0.5},
-        "fm_bass": {"active": True, "volume": 0.4},
-        "arpeggio": {"active": True, "speed": 0.25, "volume": 0.35},
-        "glitch": {"active": True, "density": 0.25},
-        "kick": {"active": True, "volume": 0.35},
-        "hi_hat": {"active": True, "volume": 0.2},
-        "sub_pulse": {"active": True, "volume": 0.45},
-        "metallic_hit": {"active": True, "volume": 0.2, "density": 0.2},
-        "bytebeat": {"active": False},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": False},
-        "chiptune_drum": {"active": True, "volume": 0.2},
-    },
-    "curious": {
-        "energy": 0.45,
-        "bass_drone": {"active": True, "volume": 0.7},
-        "clicks": {"active": True, "density": 0.5, "pan_spread": 0.5},
-        "fm_bass": {"active": True, "volume": 0.35},
-        "arpeggio": {"active": True, "speed": 0.3, "volume": 0.35},
-        "glitch": {"active": True, "density": 0.15},
-        "kick": {"active": True, "volume": 0.3},
-        "hi_hat": {"active": True, "volume": 0.18},
-        "sub_pulse": {"active": True, "volume": 0.45},
-        "bytebeat": {"active": False},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": True, "volume": 0.15, "duty": 0.5},
-        "chiptune_drum": {"active": False},
-    },
-    # === 솜버 계열: 어둡고 무거운 ===
-    "somber": {
-        "energy": 0.45,
-        "bass_drone": {"active": True, "volume": 0.85},
-        "clicks": {"active": True, "density": 0.2, "pan_spread": 0.3},
-        "fm_bass": {"active": True, "volume": 0.45},
-        "arpeggio": {"active": False},
-        "glitch": {"active": False},
-        "kick": {"active": False},
-        "hi_hat": {"active": False},
-        "sub_pulse": {"active": True, "volume": 0.45},
-        "bytebeat": {"active": False},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": False},
-        "chiptune_drum": {"active": False},
-    },
-    "somber_reflective": {
-        "energy": 0.5,
-        "bass_drone": {"active": True, "volume": 0.8},
-        "clicks": {"active": True, "density": 0.15, "pan_spread": 0.3},
-        "fm_bass": {"active": True, "volume": 0.5},
-        "arpeggio": {"active": True, "speed": 0.3, "volume": 0.45},
-        "glitch": {"active": False},
-        "kick": {"active": False},
-        "hi_hat": {"active": False},
-        "sub_pulse": {"active": True, "volume": 0.45},
-        "bytebeat": {"active": False},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": False},
-        "chiptune_drum": {"active": False},
-    },
-    "somber_repetitive": {
-        "energy": 0.55,
-        "bass_drone": {"active": True, "volume": 0.85},
-        "clicks": {"active": True, "density": 0.4, "pan_spread": 0.4},
-        "fm_bass": {"active": True, "volume": 0.45},
-        "arpeggio": {"active": True, "speed": 0.22, "volume": 0.6},
-        "glitch": {"active": True, "density": 0.15},
-        "kick": {"active": True, "volume": 0.25},
-        "hi_hat": {"active": True, "volume": 0.15},
-        "sub_pulse": {"active": True, "volume": 0.5},
-        "bytebeat": {"active": False},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": False},
-        "chiptune_drum": {"active": True, "volume": 0.15},
-    },
-    "somber_analytical": {
-        "energy": 0.6,
-        "bass_drone": {"active": True, "volume": 0.9},
-        "clicks": {"active": True, "density": 0.45, "pan_spread": 0.5},
-        "fm_bass": {"active": True, "volume": 0.5},
-        "arpeggio": {"active": True, "speed": 0.2, "volume": 0.65},
-        "glitch": {"active": True, "density": 0.3},
-        "kick": {"active": True, "volume": 0.35},
-        "hi_hat": {"active": True, "volume": 0.18},
-        "sub_pulse": {"active": True, "volume": 0.55},
-        "noise_burst": {"active": True, "density": 0.2},
-        "bytebeat": {"active": False},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": False},
-        "chiptune_drum": {"active": False},
-    },
-    "somber_warning": {
-        "energy": 0.6,
-        "bass_drone": {"active": True, "volume": 0.9},
-        "clicks": {"active": True, "density": 0.4, "pan_spread": 0.5},
-        "fm_bass": {"active": True, "volume": 0.45},
-        "arpeggio": {"active": True, "speed": 0.2, "volume": 0.55},
-        "glitch": {"active": True, "density": 0.25},
-        "noise_sweep": {"active": True, "direction": "down", "speed": 0.3},
-        "kick": {"active": True, "volume": 0.4},
-        "hi_hat": {"active": True, "volume": 0.2},
-        "sub_pulse": {"active": True, "volume": 0.6},
-        "bytebeat": {"active": True, "volume": 0.15, "formula": "drone"},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": False},
-        "chiptune_drum": {"active": False},
-    },
-    # === 텐션 계열: 강렬, 공격적 ===
-    "tension": {
-        "energy": 0.75,
-        "bass_drone": {"active": True, "volume": 1.0},
-        "clicks": {"active": True, "density": 1.2, "pan_spread": 0.8},
-        "fm_bass": {"active": True, "volume": 0.6},
-        "arpeggio": {"active": True, "speed": 0.15, "volume": 0.8},
-        "glitch": {"active": True, "density": 0.7},
-        "noise_sweep": {"active": True, "direction": "up", "speed": 0.3},
-        "kick": {"active": True, "volume": 0.65},
-        "hi_hat": {"active": True, "volume": 0.35},
-        "acid_bass": {"active": True, "volume": 0.5, "sweep_dir": "down"},
-        "saw_sequence": {"active": True, "volume": 0.7},  # v9
-        "gate_stutter": {"active": True, "volume": 0.4},  # v9
-        "sub_pulse": {"active": True, "volume": 0.8},
-        "noise_burst": {"active": True, "density": 0.5},
-        "bytebeat": {"active": True, "volume": 0.2, "formula": "industrial"},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": False},
-        "chiptune_drum": {"active": True, "volume": 0.25},
-        "pulse_train": {"active": True, "volume": 0.3},
-    },
-    "tension_reveal": {
-        "energy": 0.7,
-        "bass_drone": {"active": True, "volume": 0.95},
-        "clicks": {"active": True, "density": 1.0, "pan_spread": 0.7},
-        "fm_bass": {"active": True, "volume": 0.5},
-        "arpeggio": {"active": True, "speed": 0.18, "volume": 0.7},
-        "glitch": {"active": True, "density": 0.55},
-        "kick": {"active": True, "volume": 0.5},
-        "hi_hat": {"active": True, "volume": 0.3},
-        "sub_pulse": {"active": True, "volume": 0.7},
-        "noise_burst": {"active": True, "density": 0.4},
-        "metallic_hit": {"active": True, "volume": 0.25, "density": 0.25},
-        "bytebeat": {"active": True, "volume": 0.15, "formula": "glitch"},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": False},
-        "chiptune_drum": {"active": False},
-    },
-    "tension_transformative": {
-        "energy": 0.8,
-        "bass_drone": {"active": True, "volume": 1.0},
-        "clicks": {"active": True, "density": 1.1, "pan_spread": 0.8},
-        "fm_bass": {"active": True, "volume": 0.6},
-        "arpeggio": {"active": True, "speed": 0.12, "volume": 0.85},
-        "glitch": {"active": True, "density": 0.7},
-        "kick": {"active": True, "volume": 0.65},
-        "hi_hat": {"active": True, "volume": 0.35},
-        "acid_bass": {"active": True, "volume": 0.6, "sweep_dir": "up"},
-        "sub_pulse": {"active": True, "volume": 0.8},
-        "stutter_gate": {"active": True, "divisions": 8, "blend": 0.3},
-        "bytebeat": {"active": True, "volume": 0.2, "formula": "chaos"},
-        "feedback": {"active": True, "volume": 0.2, "iterations": 4},
-        "chiptune_lead": {"active": False},
-        "chiptune_drum": {"active": False},
-    },
-    "tension_redefine": {
-        "energy": 0.78,
-        "bass_drone": {"active": True, "volume": 1.0},
-        "clicks": {"active": True, "density": 1.0, "pan_spread": 0.75},
-        "fm_bass": {"active": True, "volume": 0.5},
-        "arpeggio": {"active": True, "speed": 0.14, "volume": 0.75},
-        "glitch": {"active": True, "density": 0.6},
-        "kick": {"active": True, "volume": 0.6},
-        "hi_hat": {"active": True, "volume": 0.32},
-        "synth_lead": {"active": True, "volume": 0.35, "note_duration": 1.0},
-        "sub_pulse": {"active": True, "volume": 0.75},
-        "noise_burst": {"active": True, "density": 0.35},
-        "bytebeat": {"active": False},
-        "feedback": {"active": True, "volume": 0.15, "iterations": 3},
-        "chiptune_lead": {"active": False},
-        "chiptune_drum": {"active": True, "volume": 0.2},
-    },
-    "tension_frustrated": {
-        "energy": 0.85,
-        "bass_drone": {"active": True, "volume": 1.1},
-        "clicks": {"active": True, "density": 1.4, "pan_spread": 0.9},
-        "fm_bass": {"active": True, "volume": 0.65},
-        "arpeggio": {"active": True, "speed": 0.1, "volume": 0.9},
-        "glitch": {"active": True, "density": 0.85},
-        "kick": {"active": True, "volume": 0.7},
-        "hi_hat": {"active": True, "volume": 0.4},
-        "acid_bass": {"active": True, "volume": 0.65, "sweep_dir": "down"},
-        "sub_pulse": {"active": True, "volume": 0.9},
-        "stutter_gate": {"active": True, "divisions": 16, "blend": 0.4},
-        "bytebeat": {"active": True, "volume": 0.25, "formula": "industrial"},
-        "feedback": {"active": True, "volume": 0.1},  # v8 C-2: enometa 피드백 텍스처
-        "chiptune_lead": {"active": False},
-        "chiptune_drum": {"active": False},
-    },
-    "tension_peak": {
-        "energy": 0.95,
-        "bass_drone": {"active": True, "volume": 1.2},
-        "clicks": {"active": True, "density": 1.8, "pan_spread": 1.0},
-        "fm_bass": {"active": True, "volume": 0.7},
-        "arpeggio": {"active": True, "speed": 0.1, "volume": 1.0},
-        "glitch": {"active": True, "density": 1.0},
-        "noise_sweep": {"active": True, "direction": "up", "speed": 0.3},
-        "kick": {"active": True, "volume": 0.8},
-        "hi_hat": {"active": True, "volume": 0.45},
-        "acid_bass": {"active": True, "volume": 0.7, "sweep_dir": "down"},
-        "saw_sequence": {"active": True, "volume": 1.0},  # v9
-        "gate_stutter": {"active": True, "volume": 0.6},  # v9
-        "sub_pulse": {"active": True, "volume": 1.0},
-        "stutter_gate": {"active": True, "divisions": 16, "blend": 0.5},
-        "noise_burst": {"active": True, "density": 0.6},
-        "bytebeat": {"active": True, "volume": 0.3, "formula": "chaos"},
-        "feedback": {"active": True, "volume": 0.15},
-        "chiptune_lead": {"active": False},
-        "chiptune_drum": {"active": False},
-        "pulse_train": {"active": True, "volume": 0.5},
-    },
-    # === 각성 계열: 에너지 상승, 해방 ===
-    "awakening_spark": {
-        "energy": 0.8,
-        "bass_drone": {"active": True, "volume": 0.95},
-        "clicks": {"active": True, "density": 0.4, "pan_spread": 0.5},
-        "fm_bass": {"active": True, "volume": 0.7},
-        "arpeggio": {"active": True, "speed": 0.25, "volume": 0.45},
-        "glitch": {"active": True, "density": 0.15},
-        "kick": {"active": True, "volume": 0.45},
-        "hi_hat": {"active": True, "volume": 0.25},
-        "synth_lead": {"active": True, "volume": 0.4, "note_duration": 0.6},
-        "sub_pulse": {"active": True, "volume": 0.6},
-        "metallic_hit": {"active": True, "volume": 0.25, "density": 0.2},
-        "bytebeat": {"active": False},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": True, "volume": 0.25, "duty": 0.125},
-        "chiptune_drum": {"active": True, "volume": 0.2},
-    },
-    "awakening_climax": {
-        "energy": 1.0,
-        "bass_drone": {"active": True, "volume": 1.2},
-        "clicks": {"active": True, "density": 0.5, "pan_spread": 0.6},
-        "fm_bass": {"active": True, "volume": 0.8},
-        "arpeggio": {"active": True, "speed": 0.18, "volume": 0.6},
-        "glitch": {"active": True, "density": 0.25},
-        "kick": {"active": True, "volume": 0.75},
-        "hi_hat": {"active": True, "volume": 0.4},
-        "synth_lead": {"active": True, "volume": 0.5, "note_duration": 0.5},
-        "acid_bass": {"active": True, "volume": 0.5, "sweep_dir": "up"},
-        "saw_sequence": {"active": True, "volume": 0.8},  # v9
-        "gate_stutter": {"active": True, "volume": 0.5},  # v9
-        "sub_pulse": {"active": True, "volume": 0.7},
-        "stutter_gate": {"active": True, "divisions": 8, "blend": 0.25},
-        "bytebeat": {"active": True, "volume": 0.15, "formula": "cascade"},
-        "feedback": {"active": True, "volume": 0.12},
-        "chiptune_lead": {"active": True, "volume": 0.3, "duty": 0.25},
-        "chiptune_drum": {"active": True, "volume": 0.25},
-        "pulse_train": {"active": True, "volume": 0.45},
-    },
-    "awakening": {
-        "energy": 0.85,
-        "bass_drone": {"active": True, "volume": 1.0},
-        "clicks": {"active": True, "density": 0.3, "pan_spread": 0.4},
-        "fm_bass": {"active": True, "volume": 0.7},
-        "arpeggio": {"active": True, "speed": 0.3, "volume": 0.35},
-        "glitch": {"active": True, "density": 0.12},
-        "kick": {"active": True, "volume": 0.5},
-        "hi_hat": {"active": True, "volume": 0.25},
-        "synth_lead": {"active": True, "volume": 0.45, "note_duration": 0.7},
-        "sub_pulse": {"active": True, "volume": 0.6},
-        "metallic_hit": {"active": True, "volume": 0.2, "density": 0.15},
-        "bytebeat": {"active": False},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": True, "volume": 0.2, "duty": 0.5},
-        "chiptune_drum": {"active": True, "volume": 0.2},
-        "pulse_train": {"active": True, "volume": 0.35},
-    },
-    # === 희망/초월 계열 ===
-    "hopeful": {
-        "energy": 0.7,
-        "bass_drone": {"active": True, "volume": 0.85},
-        "clicks": {"active": True, "density": 0.2, "pan_spread": 0.3},
-        "fm_bass": {"active": True, "volume": 0.6},
-        "arpeggio": {"active": True, "speed": 0.3, "volume": 0.4},
-        "glitch": {"active": False},
-        "kick": {"active": True, "volume": 0.4},
-        "hi_hat": {"active": True, "volume": 0.2},
-        "synth_lead": {"active": True, "volume": 0.4, "note_duration": 0.9},
-        "sub_pulse": {"active": True, "volume": 0.45},
-        "bytebeat": {"active": False},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": True, "volume": 0.2, "duty": 0.5},
-        "chiptune_drum": {"active": False},
-    },
-    "transcendent": {
-        "energy": 0.65,
-        "bass_drone": {"active": True, "volume": 0.75},
-        "clicks": {"active": True, "density": 0.1, "pan_spread": 0.3},
-        "fm_bass": {"active": True, "volume": 0.55},
-        "arpeggio": {"active": True, "speed": 0.35, "volume": 0.25},
-        "glitch": {"active": False},
-        "kick": {"active": False},
-        "hi_hat": {"active": False},
-        "synth_lead": {"active": True, "volume": 0.35, "note_duration": 1.2},
-        "sub_pulse": {"active": True, "volume": 0.4},
-        "bytebeat": {"active": False},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": False},
-        "chiptune_drum": {"active": False},
-        "pulse_train": {"active": True, "volume": 0.2},
-    },
-    "transcendent_open": {
-        "energy": 0.6,
-        "bass_drone": {"active": True, "volume": 0.7},
-        "clicks": {"active": True, "density": 0.08, "pan_spread": 0.3},
-        "fm_bass": {"active": True, "volume": 0.5},
-        "arpeggio": {"active": True, "speed": 0.4, "volume": 0.2},
-        "glitch": {"active": False},
-        "kick": {"active": False},
-        "hi_hat": {"active": False},
-        "synth_lead": {"active": True, "volume": 0.3, "note_duration": 1.5},
-        "bytebeat": {"active": False},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": False},
-        "chiptune_drum": {"active": False},
-    },
-    # === 페이드 아웃 ===
-    "fade": {
-        "energy": 0.1,
-        "bass_drone": {"active": True, "volume": 0.25},
-        "clicks": {"active": False},
-        "fm_bass": {"active": True, "volume": 0.15},
-        "arpeggio": {"active": False},
-        "glitch": {"active": False},
-        "kick": {"active": False},
-        "hi_hat": {"active": False},
-        "bytebeat": {"active": False},
-        "feedback": {"active": False},
-        "chiptune_lead": {"active": False},
-        "chiptune_drum": {"active": False},
-    },
-}
 
 
 # ============================================================
@@ -4760,29 +4827,28 @@ GENRE_PRESETS = {
 }
 
 
-# ============================================================
-# v12: 댄스 음악 편곡 테이블 — 곡 구조 role별 악기 편성
-# smooth_envelope과 호환: instruments[key]["active"]=bool, instruments[key]["volume"]=float
-# ============================================================
 
-# v16: 볼륨 완전 고정 — 모든 role이 동일한 악기 편성/볼륨
-# smooth_envelope이 모핑할 차이가 없으므로 볼륨 변화 0
 _FLAT_INSTRUMENTS = {
     "kick": 1.0, "hi_hat": 0.6, "snare": 0.2,
-    "saw_sequence": 1.0, "arpeggio": 0.7, "bass_drone": 0.8, "fm_bass": 0.2,
+    "saw_sequence": 0.7,   # v25: 리드 아닐 때 기본값 (리드일 때 Phase 3에서 0.85로 승격)
+    "arpeggio": 0.7, "bass_drone": 0.8, "fm_bass": 0.2,
     "sub_pulse": 0.4, "sine_interference": 0.8, "pulse_train": 0.7,
     "ultrahigh_texture": 0.5, "gate_stutter": 0.4,
     "data_click": 0.8, "clicks": 0.6,
-    "feedback": 0.15, "bytebeat": 0.15, "synth_lead": 0.15, "acid_bass": 0.4,
+    "feedback": 0.15, "bytebeat": 0.15, "acid_bass": 0.4,
     "modular_clicks": 0.5,
+    # v25: 신규 멜로디 레이어
+    "pluck_sequence": 0.7,
+    "pad_sequence":   0.7,
+    "fm_lead":        0.7,
 }
 ARRANGEMENT_TABLE = {
-    "intro": dict(_FLAT_INSTRUMENTS),
-    "buildup": dict(_FLAT_INSTRUMENTS),
-    "drop": dict(_FLAT_INSTRUMENTS),
+    "intro":     dict(_FLAT_INSTRUMENTS),
+    "buildup":   dict(_FLAT_INSTRUMENTS),
+    "drop":      dict(_FLAT_INSTRUMENTS),
     "breakdown": dict(_FLAT_INSTRUMENTS),
-    "drop2": dict(_FLAT_INSTRUMENTS),
-    "outro": dict(_FLAT_INSTRUMENTS),
+    "drop2":     dict(_FLAT_INSTRUMENTS),
+    "outro":     dict(_FLAT_INSTRUMENTS),
 }
 
 # role별 에너지 (song_arc에 사용)
@@ -5025,9 +5091,9 @@ def _plan_song_structure(total_duration: float, bpm: float,
         start_sec = t
         end_sec = t + bars * bar_dur
 
-        # ARRANGEMENT_TABLE에서 악기 편성 가져와서 smooth_envelope 형태로 변환
-        # v19: mood_layers로 장르별 레이어 ON/OFF + 볼륨 적용
-        arr = ARRANGEMENT_TABLE[role_name]
+        # 악기 편성: 모든 role이 동일한 _FLAT_INSTRUMENTS 볼륨 사용
+        # v16: 볼륨 고정 — 장르/mood_layers가 ON/OFF와 볼륨 스케일 결정
+        arr = dict(_FLAT_INSTRUMENTS)
         instruments = {}
         for inst_key, vol in arr.items():
             # genre_preset volume_scale 적용
@@ -5085,38 +5151,6 @@ def _plan_song_structure(total_duration: float, bpm: float,
     return sections, t  # sections + 실제 total_duration 반환
 
 
-# ============================================================
-# v7-P7: 음악 키(Key) 프리셋 + 에피소드 이력
-# ============================================================
-
-KEY_PRESETS = {
-    "C_minor":  {"bass_freq": 65.4, "pad_root": 261.6, "pad_fifth": 392.0, "arp_root": 196.0},
-    "D_minor":  {"bass_freq": 73.4, "pad_root": 293.7, "pad_fifth": 440.0, "arp_root": 220.0},
-    "E_minor":  {"bass_freq": 82.4, "pad_root": 329.6, "pad_fifth": 493.9, "arp_root": 220.0},
-    "F_minor":  {"bass_freq": 87.3, "pad_root": 349.2, "pad_fifth": 523.3, "arp_root": 233.1},
-    "G_minor":  {"bass_freq": 98.0, "pad_root": 392.0, "pad_fifth": 587.3, "arp_root": 261.6},
-    "A_minor":  {"bass_freq": 110.0, "pad_root": 440.0, "pad_fifth": 659.3, "arp_root": 293.7},
-    "Bb_minor": {"bass_freq": 116.5, "pad_root": 466.2, "pad_fifth": 698.5, "arp_root": 311.1},
-}
-
-def _get_transition(prev_emotion, curr_emotion):
-    """두 감정 사이의 전환 방식 결정"""
-    dramatic_pairs = {
-        ("tension", "awakening"), ("tension_frustrated", "awakening_climax"),
-        ("tension_peak", "awakening"), ("somber_analytical", "awakening_climax"),
-        ("tension", "awakening_climax"), ("tension_reveal", "awakening_spark"),
-        ("tension_transformative", "awakening"), ("tension_redefine", "awakening_climax"),
-    }
-    pair = (prev_emotion, curr_emotion)
-    if pair in dramatic_pairs:
-        return {"type": "silence_break", "silence_sec": 0.3,
-                "then": "fade_in", "duration_sec": 1.5}
-
-    if prev_emotion.split("_")[0] == curr_emotion.split("_")[0]:
-        return {"type": "crossfade", "duration_sec": 1.0}
-
-    return {"type": "crossfade", "duration_sec": 2.0}
-
 
 def _quantize_to_bar(time_sec: float, bar_duration: float) -> float:
     """시간을 가장 가까운 마디 경계로 퀀타이즈 (반올림)"""
@@ -5170,7 +5204,9 @@ def generate_music_script(script_data_path: str, visual_script_path: str = None)
     bpm = bpm_min + (seed_val % max(1, bpm_max - bpm_min + 1))
     print(f"  [v17] mood={music_mood} → BPM {bpm} (range {bpm_min}~{bpm_max})")
 
-    base_freq = 60.0
+    # v23: ep_seed 기반 키 선택 (55~73 Hz 범위, 반음 6개)
+    base_freq = seq_config.base_freq
+    print(f"  [v23] base_freq={base_freq:.2f} Hz, chord={seq_config.chord_voicing}")
     sections = []
 
     # v16: BGM = TTS 길이 + 엔드카드(6초) + 버퍼(2초)
