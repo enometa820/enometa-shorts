@@ -5,13 +5,7 @@ import { Scene, VocabComponentProps, VisualScriptMeta } from "../types";
 import { PythonFrameBackground } from "./PythonFrameBackground";
 
 // 비주얼 어휘 컴포넌트 임포트
-import { ParticleBirth } from "./vocab/ParticleBirth";
-import { ParticleScatter } from "./vocab/ParticleScatter";
-import { ParticleConverge } from "./vocab/ParticleConverge";
-import { ParticleOrbit } from "./vocab/ParticleOrbit";
-import { ParticleEscape } from "./vocab/ParticleEscape";
-import { ParticleChainAwaken } from "./vocab/ParticleChainAwaken";
-import { ParticleSplitRatio } from "./vocab/ParticleSplitRatio";
+import { ParticleSystem } from "./vocab/ParticleSystem";
 import { FlowField } from "./vocab/FlowField";
 import { CounterUp } from "./vocab/CounterUp";
 import { ColorShift } from "./vocab/ColorShift";
@@ -21,6 +15,7 @@ import { LoopRing } from "./vocab/LoopRing";
 import { FractalCrack } from "./vocab/FractalCrack";
 import { LightSource } from "./vocab/LightSource";
 import { PostProcess } from "./vocab/PostProcess";
+import { CreatureOverlay } from "./CreatureOverlay";
 import { TextReveal } from "./vocab/TextReveal";
 import { DataBar } from "./vocab/DataBar";
 import { GridMorph } from "./vocab/GridMorph";
@@ -33,16 +28,17 @@ import { AsciiArt } from "./vocab/AsciiArt";
 import { TerraGlobe } from "./vocab/three/TerraGlobe";
 import { TerraFlythrough } from "./vocab/three/TerraFlythrough";
 import { TerraTerrain } from "./vocab/three/TerraTerrain";
+import { ShaderField } from "./vocab/three/ShaderField";
 
 // 비주얼 어휘 → 컴포넌트 매핑
 const VOCAB_MAP: Record<string, React.FC<VocabComponentProps>> = {
-  particle_birth: ParticleBirth,
-  particle_scatter: ParticleScatter,
-  particle_converge: ParticleConverge,
-  particle_orbit: ParticleOrbit,
-  particle_escape: ParticleEscape,
-  particle_chain_awaken: ParticleChainAwaken,
-  particle_split_ratio: ParticleSplitRatio,
+  particle_birth: ParticleSystem,
+  particle_scatter: ParticleSystem,
+  particle_converge: ParticleSystem,
+  particle_orbit: ParticleSystem,
+  particle_escape: ParticleSystem,
+  particle_chain_awaken: ParticleSystem,
+  particle_split_ratio: ParticleSystem,
   flow_field_calm: FlowField,
   flow_field_turbulent: FlowField,
   counter_up: CounterUp,
@@ -92,6 +88,9 @@ const VOCAB_MAP: Record<string, React.FC<VocabComponentProps>> = {
   terra_tunnel: TerraFlythrough,
   terra_terrain: TerraTerrain,
   terra_terrain_bars: TerraTerrain,
+  // GLSL 셰이더 필드
+  shader_field: ShaderField,
+  shader_field_plasma: ShaderField,
 };
 
 interface VisualSectionProps {
@@ -99,6 +98,7 @@ interface VisualSectionProps {
   audio: AudioFrame;
   bgColor: string;
   meta?: VisualScriptMeta;
+  creature?: import("../types").CreatureConfig;
 }
 
 export const VisualSection: React.FC<VisualSectionProps> = ({
@@ -106,6 +106,7 @@ export const VisualSection: React.FC<VisualSectionProps> = ({
   audio,
   bgColor,
   meta,
+  creature,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -183,6 +184,18 @@ export const VisualSection: React.FC<VisualSectionProps> = ({
           />
         );
       })}
+
+      {/* ASCII 크리처 마스코트 (vocab과 PostProcess 사이) */}
+      {creature && (
+        <CreatureOverlay
+          creature={creature}
+          audio={audio}
+          sceneProgress={sceneProgress}
+          emotion={activeScene?.emotion ?? "neutral"}
+          parentWidth={SIZE}
+          parentHeight={SIZE}
+        />
+      )}
 
       {/* 포스트프로세싱 오버레이 */}
       <PostProcess audio={audio} width={SIZE} height={SIZE} />

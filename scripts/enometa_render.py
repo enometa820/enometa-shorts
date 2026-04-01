@@ -253,6 +253,14 @@ def step_copy_public(episode_dir: str, episode_id: str):
         shutil.copy2(mixed_src, mixed_dst)
         print(f"  copied mixed.wav → public/{episode_id}/")
 
+    # JSON 데이터 파일 복사 (v2 동적 로딩용 — Remotion이 staticFile로 접근)
+    for json_name in ("visual_script.json", "audio_analysis.json", "narration_timing.json"):
+        src = os.path.join(episode_dir, json_name)
+        dst = os.path.join(public_dir, json_name)
+        if os.path.exists(src) and not os.path.exists(dst):
+            shutil.copy2(src, dst)
+            print(f"  copied {json_name} → public/{episode_id}/")
+
     # frames 복사
     frames_src = os.path.join(episode_dir, "frames")
     frames_dst = os.path.join(public_dir, "frames")

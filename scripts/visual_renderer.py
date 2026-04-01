@@ -21,7 +21,7 @@ from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from visual_layers import (
     BytebeatLayer, WaveformLayer, ParticleLayer,
-    DataMatrixLayer, FeedbackLayer,
+    DataMatrixLayer,
     BarcodeLayer, SineWaveLayer, DataStreamLayer, TextDataLayer,
     AsciiBackgroundLayer,
     composite_layers, composite_dual_source,
@@ -165,7 +165,6 @@ LAYER_CLASSES = {
     "WaveformLayer": WaveformLayer,
     "ParticleLayer": ParticleLayer,
     "DataMatrixLayer": DataMatrixLayer,
-    "FeedbackLayer": FeedbackLayer,
     "BarcodeLayer": BarcodeLayer,
     "SineWaveLayer": SineWaveLayer,
     "DataStreamLayer": DataStreamLayer,

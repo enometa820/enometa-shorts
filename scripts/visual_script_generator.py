@@ -10,6 +10,8 @@ import os
 import json
 import random
 import re
+import hashlib
+import math
 from typing import List, Dict, Any, Tuple, Optional
 
 # 같은 scripts/ 디렉토리에서 임포트
@@ -178,36 +180,6 @@ def select_variant(vocab: str, rng: random.Random) -> Optional[str]:
 # 장르 → 비주얼 오버라이드 (8bit 장르에서 픽셀 비주얼 주입)
 # ============================================================
 GENRE_VISUAL_OVERRIDES = {
-    "bytebeat": {
-        "palette": "gameboy",
-        "inject_vocabs": [
-            "pixel_grid", "pixel_grid_life", "pixel_grid_rain",
-            "pixel_waveform_steps", "pixel_waveform_cascade",
-        ],
-        "inject_chance": 0.7,  # 70% 확률로 8bit 비주얼 삽입
-        "force_bg_pixel": True,  # 배경에도 pixel_grid 사용
-    },
-    "chiptune": {
-        "palette": "gameboy",
-        "inject_vocabs": [
-            "pixel_grid", "pixel_grid_outline", "pixel_grid_life",
-            "pixel_waveform", "pixel_waveform_steps",
-        ],
-        "inject_chance": 0.6,
-        "force_bg_pixel": False,
-    },
-    "algorave": {
-        "palette": "neon_noir",
-        "inject_vocabs": ["pixel_grid_rain", "pixel_waveform_cascade"],
-        "inject_chance": 0.3,
-        "force_bg_pixel": False,
-    },
-    "harsh_noise": {
-        "palette": "cold_steel",
-        "inject_vocabs": ["pixel_grid_life", "pixel_waveform_cascade"],
-        "inject_chance": 0.2,
-        "force_bg_pixel": False,
-    },
     # techno: 기본 비주얼 유지, 오버라이드 없음
     "enometa": {
         "palette": "enometa",
@@ -371,21 +343,21 @@ def match_keyword_vocabs(sd_keywords: list, rng) -> list:
 # ============================================================
 EMOTION_VOCAB_POOL = {
     "neutral_curious": {
-        "primary": ["particle_birth", "particle_orbit", "flow_field_calm", "lissajous", "waveform", "terra_globe"],
+        "primary": ["particle_birth", "particle_orbit", "flow_field_calm", "lissajous", "waveform", "terra_globe", "shader_field"],
         "secondary": ["waveform", "counter_up", "brightness_pulse", "data_bar", "grid_mesh", "terra_terrain"],
         "text_mode": "wave",
         "bg_mode": "subtle",  # B-8: calm→subtle (더 조용한 배경)
         "reactivity": "low",
     },
     "tension_reveal": {
-        "primary": ["particle_scatter", "neural_network", "fractal_crack", "grid_morph", "waveform_spectrum", "terra_flythrough"],
-        "secondary": ["grid_morph", "waveform_spectrum", "color_shift", "data_bar", "loop_ring"],
+        "primary": ["particle_scatter", "neural_network", "fractal_crack", "grid_morph", "waveform_spectrum", "terra_flythrough", "shader_field_plasma"],
+        "secondary": ["grid_morph", "waveform_spectrum", "color_shift", "data_bar", "loop_ring", "shader_field"],
         "text_mode": "glitch",
         "bg_mode": "turbulent",
         "reactivity": "high",
     },
     "neutral_analytical": {
-        "primary": ["grid_morph", "data_bar", "neural_network", "lissajous", "counter_up", "terra_terrain", "terra_terrain_bars"],
+        "primary": ["grid_morph", "data_bar", "neural_network", "lissajous", "counter_up", "terra_terrain", "terra_terrain_bars", "shader_field"],
         "secondary": ["waveform_spectrum", "counter_up", "grid_mesh", "lissajous", "brightness_pulse", "terra_globe_data"],
         "text_mode": "typewriter",
         "bg_mode": "calm",
@@ -434,7 +406,7 @@ EMOTION_VOCAB_POOL = {
         "reactivity": "medium",
     },
     "awakening_climax": {
-        "primary": ["particle_chain_awaken", "particle_escape", "fractal_crack", "color_bloom", "waveform_circular", "terra_flythrough"],
+        "primary": ["particle_chain_awaken", "particle_escape", "fractal_crack", "color_bloom", "waveform_circular", "terra_flythrough", "shader_field_plasma"],
         "secondary": ["waveform_circular", "brightness_pulse", "light_source", "particle_scatter", "lissajous", "terra_globe_data"],
         "text_mode": "scatter",
         "bg_mode": "intense",  # B-8: turbulent→intense
@@ -1070,6 +1042,120 @@ def build_scene(
     }
 
 
+def generate_creature_config(seed: int, palette: Dict[str, Any]) -> Dict[str, Any]:
+    """ep_seed → 에피소드별 고유 ASCII 크리처 설정 생성
+    Fuggler(어글리토이) 감성 × ASCII 동물 × 글리치 데이터 생명체
+    seed 오프셋 +99999 — 다른 시드 사용처와 충돌 없음
+    """
+    rng = random.Random(seed + 99999)
+
+    # 동물 종류 (ep_seed로 결정)
+    species_pool = ["cat", "rabbit", "bear", "owl", "dog", "blob"]
+    species = rng.choice(species_pool)
+
+    # 팔레트에서 색상 추출
+    colors = palette.get("colors", ["#a855f7", "#06b6d4", "#f59e0b"])
+    accent = palette.get("accent", "#a855f7")
+    body_color = rng.choice(colors)
+
+    # 눈 설정 — Fuggler 핵심: 비대칭
+    eye_chars = ["●", "◉", "⊙", "◎", "○", "@", "0", "*", "♦", "•"]
+    left_eye = rng.choice(eye_chars)
+    right_eye = rng.choice([c for c in eye_chars if c != left_eye])
+    # 크기 비대칭 (1.0 = 기본, 0.7~1.5 범위에서 서로 다름)
+    left_eye_scale = round(rng.uniform(0.8, 1.5), 2)
+    right_eye_scale = round(rng.uniform(0.7, 1.3), 2)
+    # 같지 않도록 보장
+    if abs(left_eye_scale - right_eye_scale) < 0.2:
+        right_eye_scale = round(right_eye_scale + rng.choice([-0.25, 0.25]), 2)
+
+    # 귀 설정 — 한쪽과 다른 쪽이 다름
+    ear_types = ["pointy", "round", "long", "broken", "tiny"]
+    left_ear = rng.choice(ear_types)
+    right_ear = rng.choice([e for e in ear_types if e != left_ear])
+
+    # 입 + 이빨 — Fuggler 시그니처
+    mouth_chars = ["w", "ω", "∀", "▽", "─", "~", "ᆺ", "v", "u"]
+    mouth_char = rng.choice(mouth_chars)
+    teeth_count = rng.randint(0, 6)
+    teeth_chars = ["|", "╥", "╨", "▼", "█", "I", "i", "1"]
+    # 이빨 배치: 불규칙 간격 (Fuggler 핵심)
+    teeth = []
+    for _ in range(teeth_count):
+        teeth.append({
+            "char": rng.choice(teeth_chars),
+            "offset": round(rng.gauss(0, 2), 1),  # 들쭉날쭉 위치
+            "scale": round(rng.gauss(1.0, 0.4), 2),  # 불규칙 크기
+        })
+
+    # 몸통 설정
+    body_width = rng.randint(10, 16)   # 문자 칸 수
+    body_height = rng.randint(5, 9)    # 줄 수
+    fill_chars = [".", "·", ":", "░", "▒", " ", "·", "."]
+    fill_char = rng.choice(fill_chars)
+    # 비율 이상함 (Fuggler): 머리 크게 or 몸통 작게
+    head_scale = round(rng.uniform(0.9, 1.6), 2)  # 머리:몸통 비율
+
+    # 팔다리
+    limb_count = rng.randint(0, 4)
+    limb_types = ["stick", "zigzag", "pixel", "tentacle"]
+    limbs = []
+    for _ in range(limb_count):
+        limbs.append({
+            "type": rng.choice(limb_types),
+            "length": rng.randint(1, 4),
+            "side": rng.choice(["left", "right"]),
+        })
+
+    # 꼬리
+    tail_chars = ["~", "∿", ")", "≈", "~∿~"]
+    has_tail = rng.random() > 0.4
+    tail_char = rng.choice(tail_chars) if has_tail else None
+
+    # 글리치 설정
+    glitch_rate = round(rng.uniform(0.02, 0.12), 3)  # 프레임당 글리치 확률
+    glitch_chars = ["▓", "█", "░", "#", "▒", "X", "?"]
+
+    # 애니메이션 성격
+    idle_animations = ["breathe", "wobble", "twitch", "vibrate"]
+    idle_animation = rng.choice(idle_animations)
+    blink_rate = round(rng.uniform(0.5, 2.5), 2)  # 초당 깜빡임
+    expressiveness = round(rng.uniform(0.4, 1.0), 2)
+
+    return {
+        "species": species,
+        "body_color": body_color,
+        "accent_color": accent,
+        "body_width": body_width,
+        "body_height": body_height,
+        "fill_char": fill_char,
+        "head_scale": head_scale,
+        "eyes": {
+            "left_char": left_eye,
+            "right_char": right_eye,
+            "left_scale": left_eye_scale,
+            "right_scale": right_eye_scale,
+        },
+        "ears": {
+            "left_type": left_ear,
+            "right_type": right_ear,
+        },
+        "mouth": {
+            "char": mouth_char,
+            "teeth": teeth,
+        },
+        "limbs": limbs,
+        "tail": tail_char,
+        "glitch": {
+            "rate": glitch_rate,
+            "chars": glitch_chars,
+        },
+        "idle_animation": idle_animation,
+        "blink_rate": blink_rate,
+        "expressiveness": expressiveness,
+    }
+
+
 def generate_visual_script(
     narration_timing_path: str,
     script_path: Optional[str] = None,
@@ -1219,9 +1305,12 @@ def generate_visual_script(
     # 팔레트
     palette = PALETTES.get(palette_name, PALETTES["phantom"])
 
-    # 시드 기반 랜덤
+    # 시드 기반 랜덤 — episode_id 있으면 음악 엔진과 동일한 MD5 방식으로 통일
     if seed is None:
-        seed = hash(title) & 0xFFFFFFFF
+        if episode_id:
+            seed = int(hashlib.md5(episode_id.encode()).hexdigest(), 16) % (2 ** 32)
+        else:
+            seed = int(hashlib.md5(title.encode()).hexdigest(), 16) % (2 ** 32)
     rng = random.Random(seed)
 
     # 씬별 비주얼 생성
@@ -1307,6 +1396,8 @@ def generate_visual_script(
     last_end = merged_scenes[-1]["end"] if merged_scenes else 0
     auto_total_frames = int((last_end + 6.0) * 30)  # 30fps, endcard 6초 포함
 
+    creature_config = generate_creature_config(seed, palette)
+
     return {
         "title": title,
         "tagline": tagline,  # B-9: 엔드카드 태그라인
@@ -1328,6 +1419,7 @@ def generate_visual_script(
             "font": "Pretendard Variable",
             "palette": palette_name,
         },
+        "creature": creature_config,
         "scenes": scenes,
         "unmapped_pattern_keywords": unmapped_keywords,
     }

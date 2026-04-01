@@ -73,13 +73,13 @@ STRATEGIES: Dict[str, Dict[str, Any]] = {
         "force_text_mode": "glitch",
     },
     "enometa": {
-        "description": "ENOMETA data art - minimal+terminal+sine",
+        "description": "ENOMETA data art - minimal+terminal+sine+terra (3D 허용, awakening/tension에서 등장)",
         "max_semantic_layers": 3,
         "particle_density": 0.0,
         "text_chance": 0.9,
         "bg_opacity_mult": 1.0,
         "prefer_vocabs": ["text_reveal", "data_bar", "waveform", "lissajous"],
-        "avoid_vocabs": ["terra_flythrough", "terra_tunnel", "color_bloom"],
+        "avoid_vocabs": ["color_bloom"],
         "reactivity_boost": 0,
     },
 }
@@ -88,16 +88,22 @@ STRATEGIES: Dict[str, Dict[str, Any]] = {
 # 장르 → 기본 전략 매핑
 # ============================================================
 GENRE_DEFAULT_STRATEGY: Dict[str, str] = {
-    "techno": "dense",
-    "algorave": "collision",
-    "harsh_noise": "glitch",
-    "bytebeat": "minimal",
-    "chiptune": "layered",
-    "enometa": "enometa",
-    "ikeda": "enometa",       # 하위호환
-    "cooper": "breathing",    # 비주얼 무드 매핑
-    "abstract": "collision",  # 비주얼 무드 매핑
-    "data": "dense",          # 비주얼 무드 매핑
+    # 음악 장르 10종 (enometa_music_engine.py 기준)
+    "acid":       "enometa",
+    "ambient":    "breathing",
+    "microsound": "breathing",
+    "IDM":        "collision",
+    "minimal":    "minimal",
+    "dub":        "breathing",
+    "glitch":     "glitch",
+    "industrial": "dense",
+    "techno":     "dense",
+    "house":      "breathing",
+    # 비주얼 무드 매핑
+    "enometa":    "enometa",
+    "cooper":     "breathing",
+    "abstract":   "collision",
+    "data":       "dense",
 }
 
 # ============================================================

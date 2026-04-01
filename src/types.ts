@@ -73,6 +73,50 @@ export interface VisualScriptMeta {
   seed?: number;
 }
 
+// ASCII 크리처 설정 — Fuggler(어글리토이) × ASCII 동물 × 글리치 데이터 생명체
+export interface CreatureTeeth {
+  char: string;
+  offset: number;
+  scale: number;
+}
+
+export interface CreatureConfig {
+  species: "cat" | "rabbit" | "bear" | "owl" | "dog" | "blob";
+  body_color: string;
+  accent_color: string;
+  body_width: number;
+  body_height: number;
+  fill_char: string;
+  head_scale: number;
+  eyes: {
+    left_char: string;
+    right_char: string;
+    left_scale: number;
+    right_scale: number;
+  };
+  ears: {
+    left_type: string;
+    right_type: string;
+  };
+  mouth: {
+    char: string;
+    teeth: CreatureTeeth[];
+  };
+  limbs: Array<{
+    type: string;
+    length: number;
+    side: "left" | "right";
+  }>;
+  tail: string | null;
+  glitch: {
+    rate: number;
+    chars: string[];
+  };
+  idle_animation: "breathe" | "wobble" | "twitch" | "vibrate";
+  blink_rate: number;
+  expressiveness: number;
+}
+
 // 비주얼 스크립트 전체 구조
 export interface VisualScript {
   global: {
@@ -83,6 +127,7 @@ export interface VisualScript {
     palette?: string;
   };
   meta?: VisualScriptMeta;
+  creature?: CreatureConfig;
   scenes: Scene[];
   transitions?: Record<string, TransitionConfig>;
 }

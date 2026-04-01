@@ -5,7 +5,6 @@ from .bytebeat_layer import BytebeatLayer
 from .waveform_layer import WaveformLayer
 from .particle_layer import ParticleLayer
 from .data_matrix_layer import DataMatrixLayer
-from .feedback_layer import FeedbackLayer
 from .barcode_layer import BarcodeLayer
 from .sine_wave_layer import SineWaveLayer
 from .data_stream_layer import DataStreamLayer
@@ -20,7 +19,6 @@ __all__ = [
     "WaveformLayer",
     "ParticleLayer",
     "DataMatrixLayer",
-    "FeedbackLayer",
     "BarcodeLayer",
     "SineWaveLayer",
     "DataStreamLayer",

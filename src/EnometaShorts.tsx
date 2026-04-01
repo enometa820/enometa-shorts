@@ -35,6 +35,9 @@ export const EnometaShorts: React.FC<EnometaShortsProps> = ({
   tagline,
 }) => {
   const script = visualScript;
+  if (!script?.global) {
+    return <AbsoluteFill style={{ background: "#06060a", display: "flex", alignItems: "center", justifyContent: "center", color: "#555", fontFamily: "monospace", fontSize: 18 }}>select an episode</AbsoluteFill>;
+  }
   const palette = getPalette(script.global.palette || "phantom");
   const simulatedAudio = useSimulatedAudio();
   const realAudio = useAudioData(audioAnalysis);
@@ -101,6 +104,7 @@ export const EnometaShorts: React.FC<EnometaShortsProps> = ({
             audio={audio}
             bgColor={palette.bg}
             meta={script.meta}
+            creature={script.creature}
           />
         </div>
 
