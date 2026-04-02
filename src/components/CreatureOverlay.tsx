@@ -1,13 +1,13 @@
 /**
- * ENOMETA ASCII 크리처 오버레이
- * PostProcess와 같은 "always-on" 패턴 — 에피소드 전체 정체성으로 상주
+ * ENOMETA 픽셀아트 크리처 오버레이
+ * 16×16 PNG 스프라이트를 nearest-neighbor 업스케일로 렌더
  *
- * 위치: VisualSection 우하단 코너 마스코트
+ * 위치: VisualSection 중앙 (500×520 캔버스)
  * 렌더 순서: Vocab 오버레이 위, PostProcess 아래
  */
 
-import React, { useRef, useEffect, useMemo } from "react";
-import { useCurrentFrame, useVideoConfig } from "remotion";
+import React, { useRef, useEffect, useMemo, useState } from "react";
+import { useCurrentFrame, delayRender, continueRender, cancelRender, staticFile } from "remotion";
 import { CreatureConfig } from "../types";
 import { AudioFrame } from "../hooks/useAudioData";
 import { renderCreature, CreatureEmotion } from "./creature/CreatureRenderer";
@@ -16,12 +16,12 @@ interface CreatureOverlayProps {
   creature: CreatureConfig;
   audio: AudioFrame;
   sceneProgress: number;
-  emotion: string;  // Scene.emotion 값
+  emotion: string;
   parentWidth: number;
   parentHeight: number;
 }
 
-// Scene emotion 문자열 → CreatureEmotion 변환
+// Scene emotion → CreatureEmotion
 function mapEmotion(sceneEmotion: string): CreatureEmotion {
   if (sceneEmotion.startsWith("tension")) return "tension";
   if (sceneEmotion.startsWith("awakening")) return "awakening";
@@ -30,7 +30,16 @@ function mapEmotion(sceneEmotion: string): CreatureEmotion {
   return "neutral";
 }
 
-// 크리처 캔버스 크기 — 중앙 강조 마스코트
+// species → 이미지 경로 매핑
+function getSpritePath(species: string): string {
+  const known = new Set([
+    "cat", "dog", "fox", "frog", "jellyfish",
+    "mouse", "duck", "bird", "bee", "squirrel", "dolphin",
+  ]);
+  const id = known.has(species) ? species : "cat";
+  return staticFile(`creatures/${id}.png`);
+}
+
 const CREATURE_W = 500;
 const CREATURE_H = 520;
 
@@ -44,19 +53,38 @@ export const CreatureOverlay: React.FC<CreatureOverlayProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
+  const [handle] = useState(() => delayRender("Loading creature sprite"));
+  const [loaded, setLoaded] = useState(false);
 
   const creatureEmotion = useMemo(() => mapEmotion(emotion), [emotion]);
+  const spritePath = useMemo(() => getSpritePath(creature.species), [creature.species]);
 
-  // bass에 따른 미세 위치 드리프트 (±8px)
+  // 스프라이트 로드
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => {
+      imgRef.current = img;
+      setLoaded(true);
+      continueRender(handle);
+    };
+    img.onerror = (e) => {
+      cancelRender(new Error(`크리처 스프라이트 로드 실패: ${spritePath}`));
+    };
+    img.src = spritePath;
+  }, [spritePath, handle]);
+
+  // bass에 따른 미세 위치 드리프트
   const driftX = audio.bass * creature.expressiveness * 6;
   const driftY = Math.sin(frame * 0.03) * 5;
 
   // 중앙 배치
-  const posX = (parentWidth - CREATURE_W) / 2 + driftX;
+  const posX = (parentWidth  - CREATURE_W) / 2 + driftX;
   const posY = (parentHeight - CREATURE_H) / 2 + driftY;
 
   useEffect(() => {
+    if (!loaded) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -71,8 +99,11 @@ export const CreatureOverlay: React.FC<CreatureOverlayProps> = ({
       emotion: creatureEmotion,
       canvasWidth: CREATURE_W,
       canvasHeight: CREATURE_H,
+      spriteImage: imgRef.current,
     });
-  }, [frame, audio, sceneProgress, creatureEmotion, creature]);
+  }, [frame, audio, sceneProgress, creatureEmotion, creature, loaded]);
+
+  if (!loaded) return null;
 
   return (
     <canvas
@@ -85,7 +116,6 @@ export const CreatureOverlay: React.FC<CreatureOverlayProps> = ({
         top: posY,
         imageRendering: "pixelated",
         zIndex: 8,
-        // 중앙 강조 — 약간의 반투명 배경으로 비주얼 레이어와 분리
         background: "rgba(0, 0, 0, 0.45)",
         borderRadius: 4,
       }}

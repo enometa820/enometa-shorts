@@ -185,10 +185,14 @@ export const VisualSection: React.FC<VisualSectionProps> = ({
         );
       })}
 
-      {/* ASCII 크리처 마스코트 (vocab과 PostProcess 사이) */}
+      {/* 픽셀아트 크리처 마스코트 (vocab과 PostProcess 사이) */}
       {creature && (
         <CreatureOverlay
-          creature={creature}
+          creature={
+            activeScene?.creature_species
+              ? { ...creature, species: activeScene.creature_species }
+              : creature
+          }
           audio={audio}
           sceneProgress={sceneProgress}
           emotion={activeScene?.emotion ?? "neutral"}

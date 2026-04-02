@@ -88,7 +88,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "cat"
     },
     {
       "id": "scene_02",
@@ -143,7 +144,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "bird"
     },
     {
       "id": "scene_03",
@@ -197,7 +199,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "dolphin"
     },
     {
       "id": "scene_04",
@@ -249,7 +252,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "dog"
     },
     {
       "id": "scene_05",
@@ -301,7 +305,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "bee"
     },
     {
       "id": "scene_06",
@@ -356,7 +361,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "duck"
     },
     {
       "id": "scene_07",
@@ -407,7 +413,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "frog"
     },
     {
       "id": "scene_08",
@@ -458,7 +465,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "jellyfish"
     },
     {
       "id": "scene_09",
@@ -510,7 +518,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "fox"
     },
     {
       "id": "scene_10",
@@ -565,7 +574,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "squirrel"
     },
     {
       "id": "scene_11",
@@ -622,7 +632,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "mouse"
     },
     {
       "id": "scene_12",
@@ -685,7 +696,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "bee"
     },
     {
       "id": "scene_13",
@@ -740,7 +752,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "frog"
     },
     {
       "id": "scene_14",
@@ -794,7 +807,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "mouse"
     },
     {
       "id": "scene_15",
@@ -848,7 +862,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "squirrel"
     },
     {
       "id": "scene_16",
@@ -906,7 +921,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "fox"
     },
     {
       "id": "scene_17",
@@ -970,7 +986,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "jellyfish"
     },
     {
       "id": "scene_18",
@@ -1025,7 +1042,8 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "dog"
     },
     {
       "id": "scene_19",
@@ -1078,61 +1096,47 @@
         "speed": 1.1,
         "scale": 1.05,
         "count": 1
-      }
+      },
+      "creature_species": "bird"
     }
   ],
   "creature": {
-    "species": "owl",
-    "body_color": "#a855f7",
-    "accent_color": "#a855f7",
-    "body_width": 12,
-    "body_height": 5,
+    "species": "frog",
+    "body_color": "#c084fc",
+    "accent_color": "#f59e0b",
+    "body_width": 14,
+    "body_height": 7,
     "fill_char": " ",
-    "head_scale": 0.97,
+    "head_scale": 0.98,
     "eyes": {
       "left_char": "◉",
-      "right_char": "•",
-      "left_scale": 1.22,
-      "right_scale": 0.79
+      "right_char": "◉",
+      "left_scale": 0.92,
+      "right_scale": 0.92
     },
     "ears": {
-      "left_type": "round",
-      "right_type": "long"
+      "left_type": "floppy",
+      "right_type": "round"
     },
     "mouth": {
-      "char": "─",
-      "teeth": [
-        {
-          "char": "╥",
-          "offset": 0.8,
-          "scale": 1.05
-        },
-        {
-          "char": "|",
-          "offset": 2.0,
-          "scale": 1.12
-        },
-        {
-          "char": "|",
-          "offset": -1.7,
-          "scale": 0.54
-        },
-        {
-          "char": "1",
-          "offset": -1.3,
-          "scale": 0.82
-        },
-        {
-          "char": "|",
-          "offset": -4.3,
-          "scale": 1.57
-        }
-      ]
+      "char": "ᆺ",
+      "teeth": []
     },
-    "limbs": [],
+    "limbs": [
+      {
+        "type": "pixel",
+        "length": 4,
+        "side": "right"
+      },
+      {
+        "type": "zigzag",
+        "length": 2,
+        "side": "left"
+      }
+    ],
     "tail": null,
     "glitch": {
-      "rate": 0.04,
+      "rate": 0.035,
       "chars": [
         "▓",
         "█",
@@ -1144,7 +1148,7 @@
       ]
     },
     "idle_animation": "wobble",
-    "blink_rate": 0.98,
-    "expressiveness": 0.61
+    "blink_rate": 0.87,
+    "expressiveness": 0.54
   }
 }

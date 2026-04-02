@@ -43,7 +43,8 @@ export interface Scene {
   end_sec: number;
   emotion: string;
   layers: SceneLayers;
-  shape_params?: ShapeParams;  // B-6: ShapeMotion 파라미터 오버라이드
+  shape_params?: ShapeParams;       // B-6: ShapeMotion 파라미터 오버라이드
+  creature_species?: string;        // 씬별 크리처 종 오버라이드 (없으면 글로벌 species 사용)
 }
 
 // 전환 설정
@@ -81,7 +82,10 @@ export interface CreatureTeeth {
 }
 
 export interface CreatureConfig {
-  species: "cat" | "rabbit" | "bear" | "owl" | "dog" | "blob";
+  // 11종 픽셀아트 스프라이트 (public/creatures/{id}.png)
+  species: "cat" | "dog" | "fox" | "frog" | "jellyfish"
+         | "mouse" | "duck" | "bird" | "bee" | "squirrel" | "dolphin"
+         | string; // 하위호환 (구 종족명은 cat으로 폴백)
   body_color: string;
   accent_color: string;
   body_width: number;
@@ -100,7 +104,7 @@ export interface CreatureConfig {
   };
   mouth: {
     char: string;
-    teeth: CreatureTeeth[];
+    teeth?: CreatureTeeth[];
   };
   limbs: Array<{
     type: string;
@@ -115,6 +119,10 @@ export interface CreatureConfig {
   idle_animation: "breathe" | "wobble" | "twitch" | "vibrate";
   blink_rate: number;
   expressiveness: number;
+  // 레거시 필드 (하위호환)
+  ascii_lines?: string[];
+  eye_positions?: { left: [number, number]; right: [number, number] };
+  mouth_position?: [number, number];
 }
 
 // 비주얼 스크립트 전체 구조

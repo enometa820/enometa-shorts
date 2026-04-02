@@ -1044,13 +1044,16 @@ def build_scene(
 
 def generate_creature_config(seed: int, palette: Dict[str, Any]) -> Dict[str, Any]:
     """ep_seed → 에피소드별 고유 ASCII 크리처 설정 생성
-    Fuggler(어글리토이) 감성 × ASCII 동물 × 글리치 데이터 생명체
+    귀여운 + 살짝 괴짜 감성 — enometa-landing-showcase 이식
     seed 오프셋 +99999 — 다른 시드 사용처와 충돌 없음
+
+    10종: cat / dog / rabbit / fox / bear / wolf / owl / dragon / turtle / octopus
+    species-data.ts의 ASCII + 표정 시스템 사용 (렌더러가 TypeScript에서 직접 참조)
     """
     rng = random.Random(seed + 99999)
 
-    # 동물 종류 (ep_seed로 결정)
-    species_pool = ["cat", "rabbit", "bear", "owl", "dog", "blob"]
+    # 11종 픽셀아트 스프라이트 (public/creatures/{id}.png)
+    species_pool = ["cat", "dog", "fox", "frog", "jellyfish", "mouse", "duck", "bird", "bee", "squirrel", "dolphin"]
     species = rng.choice(species_pool)
 
     # 팔레트에서 색상 추출
@@ -1058,45 +1061,47 @@ def generate_creature_config(seed: int, palette: Dict[str, Any]) -> Dict[str, An
     accent = palette.get("accent", "#a855f7")
     body_color = rng.choice(colors)
 
-    # 눈 설정 — Fuggler 핵심: 비대칭
-    eye_chars = ["●", "◉", "⊙", "◎", "○", "@", "0", "*", "♦", "•"]
-    left_eye = rng.choice(eye_chars)
-    right_eye = rng.choice([c for c in eye_chars if c != left_eye])
-    # 크기 비대칭 (1.0 = 기본, 0.7~1.5 범위에서 서로 다름)
-    left_eye_scale = round(rng.uniform(0.8, 1.5), 2)
-    right_eye_scale = round(rng.uniform(0.7, 1.3), 2)
-    # 같지 않도록 보장
-    if abs(left_eye_scale - right_eye_scale) < 0.2:
-        right_eye_scale = round(right_eye_scale + rng.choice([-0.25, 0.25]), 2)
+    # 눈 설정 — 귀여운 문자, 80% 대칭 / 20% 살짝 비대칭
+    eye_chars = ["◕", "●", "•", "○", "◉"]
+    base_eye = rng.choice(eye_chars)
+    if rng.random() < 0.20:
+        left_eye = base_eye
+        right_eye = rng.choice([c for c in eye_chars if c != base_eye])
+    else:
+        left_eye = base_eye
+        right_eye = base_eye
 
-    # 귀 설정 — 한쪽과 다른 쪽이 다름
-    ear_types = ["pointy", "round", "long", "broken", "tiny"]
-    left_ear = rng.choice(ear_types)
-    right_ear = rng.choice([e for e in ear_types if e != left_ear])
+    eye_scale = round(rng.uniform(0.9, 1.1), 2)
+    left_eye_scale = eye_scale
+    right_eye_scale = eye_scale
+    if rng.random() < 0.20:
+        right_eye_scale = round(eye_scale + rng.uniform(-0.1, 0.1), 2)
 
-    # 입 + 이빨 — Fuggler 시그니처
-    mouth_chars = ["w", "ω", "∀", "▽", "─", "~", "ᆺ", "v", "u"]
+    # 귀 설정 — cat/dog만 사용, 70% 대칭
+    ear_types = ["pointy", "round", "long", "floppy", "tiny"]
+    base_ear = rng.choice(ear_types)
+    if rng.random() < 0.30:
+        left_ear = base_ear
+        right_ear = rng.choice([e for e in ear_types if e != base_ear])
+    else:
+        left_ear = base_ear
+        right_ear = base_ear
+
+    # 입 — 귀여운 문자만
+    mouth_chars = ["ω", "w", "ᆺ", "u", "v", "~"]
     mouth_char = rng.choice(mouth_chars)
-    teeth_count = rng.randint(0, 6)
-    teeth_chars = ["|", "╥", "╨", "▼", "█", "I", "i", "1"]
-    # 이빨 배치: 불규칙 간격 (Fuggler 핵심)
+
+    # 이빨 완전 제거
     teeth = []
-    for _ in range(teeth_count):
-        teeth.append({
-            "char": rng.choice(teeth_chars),
-            "offset": round(rng.gauss(0, 2), 1),  # 들쭉날쭉 위치
-            "scale": round(rng.gauss(1.0, 0.4), 2),  # 불규칙 크기
-        })
 
     # 몸통 설정
-    body_width = rng.randint(10, 16)   # 문자 칸 수
-    body_height = rng.randint(5, 9)    # 줄 수
+    body_width = rng.randint(10, 16)
+    body_height = rng.randint(5, 9)
     fill_chars = [".", "·", ":", "░", "▒", " ", "·", "."]
     fill_char = rng.choice(fill_chars)
-    # 비율 이상함 (Fuggler): 머리 크게 or 몸통 작게
-    head_scale = round(rng.uniform(0.9, 1.6), 2)  # 머리:몸통 비율
+    head_scale = round(rng.uniform(0.95, 1.2), 2)  # 자연스러운 큰 머리
 
-    # 팔다리
+    # 팔다리 (선택적)
     limb_count = rng.randint(0, 4)
     limb_types = ["stick", "zigzag", "pixel", "tentacle"]
     limbs = []
@@ -1112,17 +1117,20 @@ def generate_creature_config(seed: int, palette: Dict[str, Any]) -> Dict[str, An
     has_tail = rng.random() > 0.4
     tail_char = rng.choice(tail_chars) if has_tail else None
 
-    # 글리치 설정
-    glitch_rate = round(rng.uniform(0.02, 0.12), 3)  # 프레임당 글리치 확률
+    # 글리치 — 절반으로 줄임
+    glitch_rate = round(rng.uniform(0.01, 0.06), 3)
     glitch_chars = ["▓", "█", "░", "#", "▒", "X", "?"]
 
-    # 애니메이션 성격
-    idle_animations = ["breathe", "wobble", "twitch", "vibrate"]
-    idle_animation = rng.choice(idle_animations)
-    blink_rate = round(rng.uniform(0.5, 2.5), 2)  # 초당 깜빡임
+    # 애니메이션 — breathe/wobble 가중치 높임
+    idle_animation = rng.choices(
+        ["breathe", "wobble", "twitch", "vibrate"],
+        weights=[4, 3, 2, 1],
+        k=1
+    )[0]
+    blink_rate = round(rng.uniform(0.3, 1.5), 2)  # 느긋하게
     expressiveness = round(rng.uniform(0.4, 1.0), 2)
 
-    return {
+    config = {
         "species": species,
         "body_color": body_color,
         "accent_color": accent,
@@ -1154,6 +1162,8 @@ def generate_creature_config(seed: int, palette: Dict[str, Any]) -> Dict[str, An
         "blink_rate": blink_rate,
         "expressiveness": expressiveness,
     }
+
+    return config
 
 
 def generate_visual_script(
@@ -1313,6 +1323,19 @@ def generate_visual_script(
             seed = int(hashlib.md5(title.encode()).hexdigest(), 16) % (2 ** 32)
     rng = random.Random(seed)
 
+    # 씬별 크리처 species 시퀀스 — ep_seed 기반으로 에피소드마다 다른 순서
+    SPECIES_POOL = ["cat", "dog", "fox", "frog", "jellyfish", "mouse", "duck", "bird", "bee", "squirrel", "dolphin"]
+    scene_count = len(merged_scenes)
+    species_rng = random.Random(seed + 55555)
+    # 씬 수에 맞게 species 리스트 생성 (중복 최소화: 셔플 후 반복)
+    shuffled = SPECIES_POOL[:]
+    species_rng.shuffle(shuffled)
+    scene_species_list = []
+    while len(scene_species_list) < scene_count:
+        scene_species_list.extend(shuffled)
+        species_rng.shuffle(shuffled)
+    scene_species_list = scene_species_list[:scene_count]
+
     # 씬별 비주얼 생성
     scenes = []
     used_vocabs: set = set()
@@ -1366,6 +1389,9 @@ def generate_visual_script(
             sd_keywords=scene_sd_keywords if scene_sd_keywords else None,
             mood_override=mood_override,
         )
+        # 씬별 크리처 species 오버라이드
+        scene["creature_species"] = scene_species_list[i]
+
         scenes.append(scene)
         prev_emotion = emotion
 
