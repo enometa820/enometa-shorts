@@ -28,7 +28,7 @@ Claude는:
 - **오디오**: narration_volume=0.90, bgm_volume=1.0 (기본), 사이드체인 없음, loudnorm -14 LUFS, 엔드카드 BGM 자동 연장
 - **태그**: 주제 기반 3개 + 고정 5개(`#데이터아트` `#전자음악` `#오디오비주얼` `#철학` `#동기부여`) = 해시태그 항상 8개. **완전 금지** (어디에도 사용 불가): `#쇼츠` `#shorts` `#ENOMETA` `#이노메타`
 - **AsciiArt position**: 자막 영역(y≥1230 전체 캔버스) 침범 금지. bottom 위치 = height*0.62. TextReveal과 동일 규칙.
-- **크리처 시스템**: v26 ASCII Fuggler 크리처. `visual_script_generator.py`가 ep_seed 기반으로 `creature_config` 자동 생성. `CreatureOverlay.tsx`가 VisualSection 정중앙(500×520)에 항상 렌더링. 종별 6종(cat/rabbit/bear/owl/dog/blob), 귀/눈/이빨 비대칭 자동 변형. 종족간 합체 금지 — species는 단일 종으로 고정.
+- **크리처 시스템**: v27 픽셀아트 크리처. `public/creatures/` 16×16 PNG 스프라이트 11종(cat/dog/fox/frog/jellyfish/mouse/duck/bird/bee/squirrel/dolphin). `CreatureOverlay.tsx`가 nearest-neighbor 업스케일(SCALE=18)로 렌더링. `visual_script_generator.py`가 ep_seed 기반으로 씬별 `creature_species` 자동 배정 — 씬 전환마다 다른 종 등장. 감정별 색상 오버레이(tension=빨강/awakening=연두/somber=파랑/hopeful=노랑). onset 글리치 픽셀 스캐터.
 
 ## 빌드 & 실행 명령
 
